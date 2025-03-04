@@ -1,13 +1,15 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { postRequest } from "../../services/httpMethods";
+import { postRequest, postRequestFormData, postRequestMultipartFormData } from "../../services/httpMethods";
 import { Alert } from "react-native";
-import { handleDangNhap } from "../../axios/axiosInterceptor";
+import { handleLogin } from "../../axios/axiosInterceptor";
 
 export const login = createAsyncThunk(
   "authSlice/login",
   async (credentials, { rejectWithValue }) => {
     try {
-      const response = await postRequest("authentication/login", credentials);
+      const response = await postRequest(
+        `Account/login?username=${credentials.username}&password=${credentials.password}`
+      );
       return response.data;
     } catch (error) {
       Alert.alert("Error", "Login failed. Please try again.");
@@ -16,11 +18,27 @@ export const login = createAsyncThunk(
   }
 );
 
+export const getImage = createAsyncThunk(
+  "authSlice/getImage",
+  async (formData, { rejectWithValue }) => {
+    try {
+      const response = await postRequestFormData(`Account/test`, formData);
+      return response.data;
+    } catch (error) {
+      console.error("Upload failed:", error);
+      return rejectWithValue("Upload failed");
+    }
+  }
+);
+
 export const register = createAsyncThunk(
   "authSlice/register",
   async (credentials, { rejectWithValue }) => {
     try {
-      const response = await postRequest("authentication/register", credentials);
+      const response = await postRequest(
+        "authentication/register",
+        credentials
+      );
       return response.data;
     } catch (error) {
       Alert.alert("Error", "Registration failed. Please try again.");
@@ -42,6 +60,7 @@ const authSlice = createSlice({
   reducers: {
     logout(state) {
       state.token = null;
+      state.user = null;
       Alert.alert("Success", "Logged out successfully");
     },
   },
@@ -53,8 +72,9 @@ const authSlice = createSlice({
       })
       .addCase(login.fulfilled, (state, action) => {
         state.loading = false;
-        state.token = action.payload;
-        handleDangNhap(action.payload);
+        state.token = action.payload.token;
+        state.user = action.payload.user;
+        handleLogin(action.payload);
         Alert.alert("Success", "Login successful");
       })
       .addCase(login.rejected, (state, action) => {

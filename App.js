@@ -4,15 +4,26 @@ import store from './redux/store';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
 import { NavigationContainer } from '@react-navigation/native';
-import HomeScreen from './screens/HomeScreen';
-import LoginScreen from './screens/LoginScreen';
-import RegisterScreen from './screens/RegisterScreen';
 import { View, Text } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import FishStatistic from './screens/FishStatistic';
-import FishDetail from './screens/FishDetail';
-import PondStatistic from './screens/PondStatistic';
+import HomeScreen from './screens/HomeScreen/HomeScreen';
+import RegisterScreen from './screens/RegisterScreen/RegisterScreen';
+import FishStatistic from './screens/FishStatistic/FishStatistic';
+import FishDetail from './screens/FishDetails/FishDetail';
+import PondStatistic from './screens/PondStatistic/PondStatistic';
+import PondDetail from './screens/PondDetail/PondDetail';
+import LoginScreen from './screens/LoginScreen/LoginScreen';
+import Profile from './screens/Profile/Profile';
+import EditProfile from './screens/EditProfile/EditProfile';
+import Shopping from './screens/Shopping/Shopping';
+import ProductDetail from './screens/ProductDetail/ProductDetail';
+import CartScreen from './screens/CartScreen/CartScreen';
+import AddressForm from './screens/CartScreen/components/AddressForm/AddressForm';
+import SaltCalculator from './screens/SaltCalculator/SaltCalculator';
+import FoodCalculator from './screens/FoodCalculator/FoodCalculator';
+import WaterParameter from './screens/WaterParameter/WaterParameter';
+
 
 // Create Bottom Tab Navigator
 const Tab = createBottomTabNavigator();
@@ -114,6 +125,56 @@ export default function App() {
         <Stack.Screen
           name="PondStatistic"
           component={PondStatistic}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="PondDetail"
+          component={PondDetail}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="Profile"
+          component={Profile}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="EditProfile"
+          component={EditProfile}
+          options={{ headerShown: false }}
+        />
+         <Stack.Screen
+          name="Shopping"
+          component={Shopping}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="CartScreen"
+          component={CartScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="ProductDetail"
+          component={ProductDetail}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="AddressForm"
+          component={AddressForm}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="SaltCalculator"
+          component={SaltCalculator}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="FoodCalculator"
+          component={FoodCalculator}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="WaterParameter"
+          component={WaterParameter}
           options={{ headerShown: false }}
         />
           <Stack.Screen

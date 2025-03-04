@@ -3,11 +3,11 @@ import { deleteRequest, getRequest, postRequest, putRequest } from "../../servic
 import { Alert } from "react-native";
 
 const initialState = {
-  test: null,
+  product: null,
 };
 
-export const testSlice = createSlice({
-  name: "testSlice",
+export const productSlice = createSlice({
+  name: "productSlice",
   initialState,
   reducers: {
     setData: (state, action) => {
@@ -15,31 +15,29 @@ export const testSlice = createSlice({
     },
   },
   extraReducers: (builder) => {
-    builder.addCase(getTest.fulfilled, (state, action) => {
-      state.test = action.payload;
+    builder.addCase(getProduct.fulfilled, (state, action) => {
+      state.product = action.payload;
     });
   },
 });
 
-export const getTest = createAsyncThunk(
-  "testSlice/getTest",
-  async (id, { rejectWithValue }) => {
+export const getProduct = createAsyncThunk(
+  "productSlice/getProduct",
+  async () => {
     try {
       const res = await getRequest(`Product`);
       return res.data;
     } catch (error) {
-      Alert.alert("Error", "Failed to fetch test data.");
-      return rejectWithValue("Fetch failed");
+      Alert.alert("Error", "Failed to load product data.");
     }
   }
 );
 
-export const postTest = createAsyncThunk(
-  "testSlice/postTest",
+export const createProduct = createAsyncThunk(
+  "productSlice/createProduct",
   async (payload, { rejectWithValue }) => {
     try {
-      const res = await postRequest(`test`, payload);
-      Alert.alert("Success", "Test added successfully");
+      const res = await postRequest(`Product/create-product`, payload);
       return res.data;
     } catch (error) {
       Alert.alert("Error", "Failed to add test.");
@@ -78,5 +76,5 @@ export const deleteTest = createAsyncThunk(
   }
 );
 
-export const { setData } = testSlice.actions;
-export default testSlice;
+export const { setData } = productSlice.actions;
+export default productSlice;

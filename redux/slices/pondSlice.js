@@ -3,11 +3,12 @@ import { deleteRequest, getRequest, postRequest, putRequest } from "../../servic
 import { Alert } from "react-native";
 
 const initialState = {
-  test: null,
+  pondByOwner: null,
+  pondById:null,
 };
 
-export const testSlice = createSlice({
-  name: "testSlice",
+export const pondSlice = createSlice({
+  name: "pondSlice",
   initialState,
   reducers: {
     setData: (state, action) => {
@@ -15,31 +16,44 @@ export const testSlice = createSlice({
     },
   },
   extraReducers: (builder) => {
-    builder.addCase(getTest.fulfilled, (state, action) => {
-      state.test = action.payload;
-    });
+    builder.addCase(getPondByOwner.fulfilled, (state, action) => {
+      state.pondByOwner = action.payload;
+    })
+    .addCase(getPondByID.fulfilled, (state, action) => {
+      state.pondById = action.payload;
+    })
   },
 });
 
-export const getTest = createAsyncThunk(
-  "testSlice/getTest",
-  async (id, { rejectWithValue }) => {
+export const getPondByOwner = createAsyncThunk(
+  "pondSlice/getPondByOwner",
+  async (ownerId) => {
     try {
-      const res = await getRequest(`Product`);
+      const res = await getRequest(`Pond/get-by-owner?owner=${ownerId}`);
       return res.data;
     } catch (error) {
-      Alert.alert("Error", "Failed to fetch test data.");
-      return rejectWithValue("Fetch failed");
+      Alert.alert("Error", "Failed to load pond data.");
     }
   }
 );
 
-export const postTest = createAsyncThunk(
-  "testSlice/postTest",
+export const getPondByID = createAsyncThunk(
+  "pondSlice/getPondByID",
+  async (pondId) => {
+    try {
+      const res = await getRequest(`Pond/get-by-owner?owner=${pondId}`);
+      return res.data;
+    } catch (error) {
+      Alert.alert("Error", "Failed to load pond data.");
+    }
+  }
+);
+
+export const createPond = createAsyncThunk(
+  "pondSlice/createPond",
   async (payload, { rejectWithValue }) => {
     try {
-      const res = await postRequest(`test`, payload);
-      Alert.alert("Success", "Test added successfully");
+      const res = await postRequest(`Pond/create-pond`, payload);
       return res.data;
     } catch (error) {
       Alert.alert("Error", "Failed to add test.");
@@ -48,15 +62,13 @@ export const postTest = createAsyncThunk(
   }
 );
 
-export const putTest = createAsyncThunk(
-  "testSlice/putTest",
+export const updatePond = createAsyncThunk(
+  "testSlice/updatePond",
   async (payload, { rejectWithValue }) => {
     try {
-      const res = await putRequest(`test`, payload);
-      Alert.alert("Success", "Test updated successfully");
+      const res = await putRequest(`Pond/update-pond`, payload);
       return res.data;
     } catch (error) {
-      Alert.alert("Error", "Failed to update test.");
       return rejectWithValue("Update failed");
     }
   }
@@ -78,5 +90,5 @@ export const deleteTest = createAsyncThunk(
   }
 );
 
-export const { setData } = testSlice.actions;
-export default testSlice;
+export const { setData } = pondSlice.actions;
+export default pondSlice;

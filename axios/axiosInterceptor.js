@@ -8,7 +8,7 @@ let refreshPromise = null;
 
 // Axios Client
 export const axiosClientVer2 = axios.create({
-  baseURL: "https://localhost:7017/api/",
+  baseURL: "http://14.225.206.203:5444/api/",
   headers: {
     "Content-Type": "application/json",
     Accept: "application/json",
@@ -123,11 +123,13 @@ axiosClientVer2.interceptors.response.use(
 
 // Handle Login (Save Access Token)
 export const handleLogin = async (newToken) => {
+  console.log(newToken)
   accessToken = newToken;
   axiosClientVer2.defaults.headers.common[
     "Authorization"
   ] = `Bearer ${newToken}`;
-  await AsyncStorage.setItem("accessToken", newToken);
+  await AsyncStorage.setItem("accessToken", newToken.token);
+  await AsyncStorage.setItem("user", JSON.stringify(newToken.user));
 };
 
 // Handle Logout (Clear Token)

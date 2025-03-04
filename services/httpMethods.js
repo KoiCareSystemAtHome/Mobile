@@ -5,7 +5,7 @@ import handleError from "../axios/error";
 // [GET]
 const getRequest = async (url) => {
   try {
-    const res = await axiosClientVer2.get(`${url}`);
+    const res = await axiosClientVer2.get(`${url}`); 
     return res;
   } catch (error) {
     return handleError(error);
@@ -15,7 +15,7 @@ const getRequest = async (url) => {
 // [GET] -> params
 const getRequestParams = async (url, params) => {
   try {
-    const res = await axiosClientVer2.get(`${url}`, { params: params });
+    const res = await axiosClientVer2.get(`${url}`,{params });
     return res;
   } catch (error) {
     return handleError(error);
@@ -44,9 +44,8 @@ const postRequestMultipartFormData = async (url, payload) => {
   try {
     const res = await axios.post(`${url}`, payload, {
       headers: {
-        Accept: "application/json, text/plain, */*",
-        ContentType: "multipart/form-data",
-        Authorization: sessionStorage.getItem("token"),
+        Accept: "application/json",
+        "Content-Type": "multipart/form-data",
       },
     });
     return res;

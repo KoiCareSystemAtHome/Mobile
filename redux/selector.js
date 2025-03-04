@@ -1,0 +1,12 @@
+export const testDataSelector = (state) => state.testSlice.test;
+export const pondByOwnerSelector = (state) => state.pondSlice.pondByOwner;
+export const pondByIdSelector = (state) => state.pondSlice.pondById;
+export const fishByOwnerSelector = (state) => state.fishSlice.fishByOwner;
+export const productSelector = (state) => state.productSlice.product;
+export const categorySelector = (state) => state.categorySlice.category;
+export const provinceSelector = (state) => state.ghnSlice.province;
+export const districtSelector = (state) => state.ghnSlice.district;
+export const wardSelector = (state) => state.ghnSlice.ward;
+export const foodSelector = (state) => state.calculatorSlice.food;
+export const tokenSelector = (state) => state.authSlice.token;
+export const userSelector = (state) => state.pondSlice.user;

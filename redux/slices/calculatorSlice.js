@@ -1,13 +1,13 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { deleteRequest, getRequest, postRequest, putRequest } from "../../services/httpMethods";
+import { deleteRequest, getRequest, getRequestParams, postRequest, putRequest } from "../../services/httpMethods";
 import { Alert } from "react-native";
 
 const initialState = {
-  test: null,
+  food: null,
 };
 
-export const testSlice = createSlice({
-  name: "testSlice",
+export const calculatorSlice = createSlice({
+  name: "calculatorSlice",
   initialState,
   reducers: {
     setData: (state, action) => {
@@ -15,31 +15,31 @@ export const testSlice = createSlice({
     },
   },
   extraReducers: (builder) => {
-    builder.addCase(getTest.fulfilled, (state, action) => {
-      state.test = action.payload;
+    builder.addCase(calculateFood.fulfilled, (state, action) => {
+      state.food = action.payload;
     });
   },
 });
 
-export const getTest = createAsyncThunk(
-  "testSlice/getTest",
-  async (id, { rejectWithValue }) => {
+export const calculateFood = createAsyncThunk(
+  "calculatorSlice/calculateFood",
+  async (values) => {
     try {
-      const res = await getRequest(`Product`);
+        console.log(values)
+      const res = await getRequestParams(`FoodCalculate`, values);
+      console.log("res", res)
       return res.data;
     } catch (error) {
-      Alert.alert("Error", "Failed to fetch test data.");
-      return rejectWithValue("Fetch failed");
+      Alert.alert("Error", "Failed to load category data.");
     }
   }
 );
 
-export const postTest = createAsyncThunk(
-  "testSlice/postTest",
+export const createCategory = createAsyncThunk(
+  "calculatorSlice/createCategory",
   async (payload, { rejectWithValue }) => {
     try {
-      const res = await postRequest(`test`, payload);
-      Alert.alert("Success", "Test added successfully");
+      const res = await postRequest(`Category/create-category`, payload);
       return res.data;
     } catch (error) {
       Alert.alert("Error", "Failed to add test.");
@@ -78,5 +78,5 @@ export const deleteTest = createAsyncThunk(
   }
 );
 
-export const { setData } = testSlice.actions;
-export default testSlice;
+export const { setData } = calculatorSlice.actions;
+export default calculatorSlice;
