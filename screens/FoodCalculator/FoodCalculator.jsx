@@ -15,7 +15,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { getPondByOwner } from "../../redux/slices/pondSlice";
 import { calculateFood } from "../../redux/slices/calculatorSlice";
 
-const FoodCalculator = () => {
+const FoodCalculator = ({navigation}) => {
   const dispatch = useDispatch();
 
   const pondData = useSelector(pondByOwnerSelector);
@@ -110,7 +110,7 @@ const FoodCalculator = () => {
         <View style={{ justifyContent: "center", flexDirection: "row" }}>
           {homePondOpen && (
             <View style={styles.dropdown}>
-              {pondData.map((item) => (
+              {pondData?.map((item) => (
                 <TouchableOpacity
                   key={item?.pondID}
                   onPress={() => {
@@ -181,9 +181,25 @@ const FoodCalculator = () => {
         {/* Recommended Amount */}
         <View style={styles.recommendationButton}>
           <Text style={styles.recommendationText}>
-            {homePond ? `Recommended Amount: ${food}` : "Please Select A Pond"}
+            {homePond ? `Recommended Amount: ${food}g` : "Please Select A Pond"}
           </Text>
         </View>
+        <Text
+          style={[
+            styles.recommendationText,
+            { marginTop: 20, color: "#FFCC00" },
+          ]}
+        >
+          Have your fish finished eating the recommended amount of food in the
+          last 15 minutes?
+        </Text>
+        <TouchableOpacity onPress={() => navigation.navigate("SymptomScreen")}>
+          <View style={[styles.recommendationButton, { marginTop: 0 }]}>
+            <Text style={styles.recommendationText}>
+              Click here to provide possible symptoms
+            </Text>
+          </View>
+        </TouchableOpacity>
       </ScrollView>
     </ImageBackground>
   );

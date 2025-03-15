@@ -11,32 +11,36 @@ import Slider from "@react-native-community/slider";
 import { useDispatch, useSelector } from "react-redux";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { getPondByID, getPondByOwner } from "../../redux/slices/pondSlice";
-import { pondByOwnerSelector } from "../../redux/selector";
+import {
+  instructionSelector,
+  pondByOwnerSelector,
+  saltSelector,
+} from "../../redux/selector";
 import Icon from "react-native-vector-icons/AntDesign";
+import {
+  additionProccess,
+  calculateSalt,
+} from "../../redux/slices/calculatorSlice";
 
 const SaltCalculator = () => {
   const dispatch = useDispatch();
 
   const pondData = useSelector(pondByOwnerSelector);
+  const saltData = useSelector(saltSelector);
+  const instructionData = useSelector(instructionSelector);
   const [homePond, setHomePond] = useState(null);
   const [homePondOpen, setHomePondOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [currentConcentration, setCurrentConcentration] = useState(0.09);
   const [desiredConcentration, setDesiredConcentration] = useState(0.31);
   const [waterChange, setWaterChange] = useState(8);
-  const pondVolume = 80; // Example volume in liters
+  const [previewValue, setPreviewValue] = useState(0.2);
+
+  const [growth, setGrowth] = useState("Medium");
+  const growthOptions = ["Low", "Medium", "High"];
+  const pondVolume = 80;
 
   // Calculate required salt amounts
-  const calculateSalt = () => {
-    const saltNeeded =
-      ((desiredConcentration - currentConcentration) / 100) * pondVolume;
-    const waterChangeSalt =
-      (waterChange / 100) * pondVolume * (desiredConcentration / 100);
-    return {
-      totalSalt: saltNeeded.toFixed(2),
-      waterChangeSalt: waterChangeSalt.toFixed(2),
-    };
-  };
 
   const { totalSalt, waterChangeSalt } = calculateSalt();
 
@@ -64,7 +68,21 @@ const SaltCalculator = () => {
     }
   }, [homePond, dispatch]);
 
-
+  useEffect(() => {
+    if (homePond) {
+      const pondId = homePond?.pondID;
+      const standardSaltLevel = growth;
+      const waterChangePercent = Number(
+        ((waterChange / pondVolume) * 100).toFixed(0)
+      );
+      const value = { pondId, standardSaltLevel, waterChangePercent };
+      dispatch(calculateSalt(value))
+        .unwrap()
+        .then(() => {
+          dispatch(additionProccess(pondId));
+        });
+    }
+  }, [homePond, growth, waterChange, dispatch]);
   return (
     <ImageBackground
       source={require("../../assets/koimain3.jpg")}
@@ -107,47 +125,40 @@ const SaltCalculator = () => {
           <Text style={styles.label}>
             Pond volume: <Text style={styles.value}>80L</Text>
           </Text>
-          <Text style={styles.label}>
-            Current concentration:{" "}
-            <Text style={styles.value}>{currentConcentration}%</Text>
-          </Text>
-          <Slider
-            style={styles.slider}
-            minimumValue={0}
-            maximumValue={100}
-            step={1}
-            value={currentConcentration}
-            onValueChange={setCurrentConcentration}
-            minimumTrackTintColor="#007AFF"
-            maximumTrackTintColor="#ccc"
-            thumbTintColor="#007AFF"
-          />
         </View>
 
         {/* Desired Concentration */}
         <View style={styles.card}>
-          <Text style={styles.label}>
-            Desired Concentration:{" "}
-            <Text style={styles.value}>{desiredConcentration}%</Text>
-          </Text>
-          <Slider
-            style={styles.slider}
-            minimumValue={0}
-            maximumValue={100}
-            step={1}
-            value={desiredConcentration}
-            onValueChange={setDesiredConcentration}
-            minimumTrackTintColor="#007AFF"
-            maximumTrackTintColor="#ccc"
-            thumbTintColor="#007AFF"
-          />
+          <Text style={styles.label}>Desired Concentration: </Text>
+          <View style={styles.toggleContainer}>
+            {growthOptions.map((option) => (
+              <TouchableOpacity
+                key={option}
+                style={[
+                  styles.toggleButton,
+                  growth === option && styles.activeToggle,
+                ]}
+                onPress={() => setGrowth(option)}
+              >
+                <Text
+                  style={[
+                    styles.toggleText,
+                    growth === option && styles.activeText,
+                  ]}
+                >
+                  {option}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </View>
         </View>
 
         <View style={styles.card}>
           <Text style={styles.label}>
             Water change:{" "}
             <Text style={styles.value}>
-              {waterChange}L ({((waterChange / pondVolume) * 100).toFixed(0)}%)
+              {previewValue}L ({((previewValue / pondVolume) * 100).toFixed(0)}
+              %)
             </Text>
           </Text>
           <Slider
@@ -156,7 +167,8 @@ const SaltCalculator = () => {
             maximumValue={pondVolume}
             step={1}
             value={waterChange}
-            onValueChange={setWaterChange}
+            onValueChange={(value) => setPreviewValue(value)}
+            onSlidingComplete={(value) => setWaterChange(value)}
             minimumTrackTintColor="#007AFF"
             maximumTrackTintColor="#ccc"
             thumbTintColor="#007AFF"
@@ -165,11 +177,29 @@ const SaltCalculator = () => {
 
         {/* Salt Amount Display */}
         <View style={styles.saltBox}>
-          <Text style={styles.saltText}>Amount of salt: {totalSalt}kg</Text>
           <Text style={styles.saltText}>
-            Amount of salt (water change): {waterChangeSalt}kg
+            Amount of current salt: {saltData?.saltCurrent}kg
+          </Text>
+          <Text style={styles.saltText}>
+            Amount of salt needed: {saltData?.saltNeeded}kg
+          </Text>
+          <Text style={styles.saltText}>
+            Total salt: {saltData?.totalSalt}kg
+          </Text>
+          <Text style={styles.saltText}>
+            Water needed: {saltData?.waterNeeded}L
           </Text>
         </View>
+        {instructionData?.instructions && (
+          <View style={styles.saltBox}>
+            <Text style={styles.instructionLabel}>Instructions:</Text>
+            {instructionData.instructions.map((instruction, index) => (
+              <Text key={index} style={styles.instructionItem}>
+              {instructionData.instructions.length > 1 ? `${index + 1}. ` : ""}{instruction}
+              </Text>
+            ))}
+          </View>
+        )}
       </ScrollView>
     </ImageBackground>
   );

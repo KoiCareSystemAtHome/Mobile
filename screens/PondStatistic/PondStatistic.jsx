@@ -17,8 +17,10 @@ import {
   Form,
   Input,
   Provider,
+  Toast,
 } from "@ant-design/react-native";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
+import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 import { useDispatch, useSelector } from "react-redux";
 import { getTest } from "../../redux/slices/testSlice";
 import { pondByOwnerSelector, testDataSelector } from "../../redux/selector";
@@ -29,6 +31,7 @@ import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import * as ImagePicker from "expo-image-picker";
 import { getImage } from "../../redux/slices/authSlice";
+import { loadAsync } from "expo-font";
 dayjs.extend(utc);
 
 const PondStatistic = ({ navigation }) => {
@@ -39,6 +42,7 @@ const PondStatistic = ({ navigation }) => {
   const [isModalVisible, setModalVisible] = useState(false);
   const [imageBlob, setImageBlob] = useState(null);
   const [uploadResponse, setUploadResponse] = useState(null);
+  const [fontLoaded, setFontLoaded] = useState(false);
 
   const dispatch = useDispatch();
 
@@ -48,22 +52,17 @@ const PondStatistic = ({ navigation }) => {
     >
       <Card style={styles.card}>
         <View style={styles.cardContent}>
-          <Image source={{uri:item.image}} style={styles.pondImage} />
+          <Image source={{ uri: item.image }} style={styles.pondImage} />
           <View style={styles.pondInfo}>
             <View style={styles.infoRow}>
               <Text style={styles.pondText}>
                 <Text style={styles.label}>Name: </Text>
-                {item.name}
+                {item.name}  {" "}
+              </Text>
+              <Text style={styles.pondText}>
+                <Text style={styles.label}>{item?.fish?.length} <FontAwesome5 name="fish" size={25}  /></Text>
               </Text>
             </View>
-            <Text style={styles.pondText}>
-              <Text style={styles.label}>Number Of Pond: </Text>
-              {item.numberOfPond}
-            </Text>
-            <Text style={styles.pondText}>
-              <Text style={styles.label}>Volume: </Text>
-              {item.volume} l
-            </Text>
           </View>
         </View>
       </Card>
@@ -72,9 +71,9 @@ const PondStatistic = ({ navigation }) => {
 
   const onFinish = (values) => {
     const createDate = dayjs().utc().format("YYYY-MM-DDTHH:mm:ss.SSS[Z]");
-    let image = "string"
+    let image = "string";
     const ownerId = isLoggedIn?.id;
-    if(uploadResponse){
+    if (uploadResponse) {
       image = uploadResponse;
     }
     const requirementPondParam = [
@@ -87,7 +86,18 @@ const PondStatistic = ({ navigation }) => {
     dispatch(createPond(values))
       .unwrap()
       .then((response) => {
-        dispatch(getPondByOwner(isLoggedIn.id));
+        if (response?.status === "201") {
+          console.log(response);
+          Toast.success("Pond Added Successfully");
+          dispatch(getFishByOwner(isLoggedIn.id));
+          form.resetFields();
+          setTimeout(() => {
+            setModalVisible(false);
+          });
+        } else {
+          Toast.fail("Failed to add pond");
+          setModalVisible(false);
+        }
       });
     setModalVisible(false); // Close modal after submission
   };
@@ -152,7 +162,17 @@ const PondStatistic = ({ navigation }) => {
     }
   }, [isLoggedIn?.id, dispatch]);
 
+  useEffect(() => {
+    const loadFontAsync = async () => {
+      await loadAsync({
+        antoutline: require("@ant-design/icons-react-native/fonts/antoutline.ttf"),
+      });
+      setFontLoaded(true);
+      Toast.config({ duration: 2 });
+    };
 
+    loadFontAsync();
+  }, []);
   return (
     <Provider>
       <ImageBackground
@@ -167,7 +187,7 @@ const PondStatistic = ({ navigation }) => {
           <FlatList
             data={pondData}
             renderItem={renderPondCard}
-            keyExtractor={(item) => item.id}
+            keyExtractor={(item) => item.pondID}
             contentContainerStyle={styles.listContent}
           />
           <View style={styles.footer}>

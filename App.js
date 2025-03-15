@@ -23,6 +23,9 @@ import AddressForm from './screens/CartScreen/components/AddressForm/AddressForm
 import SaltCalculator from './screens/SaltCalculator/SaltCalculator';
 import FoodCalculator from './screens/FoodCalculator/FoodCalculator';
 import WaterParameter from './screens/WaterParameter/WaterParameter';
+import SymptomScreen from './screens/SymptomScreen/SymptomScreen';
+import OrderHistory from './screens/OrderHistory/OrderHistory';
+import ReportScreen from './screens/ReportScreen/ReportScreen';
 
 
 // Create Bottom Tab Navigator
@@ -175,6 +178,21 @@ export default function App() {
         <Stack.Screen
           name="WaterParameter"
           component={WaterParameter}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="SymptomScreen"
+          component={SymptomScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="OrderHistory"
+          component={OrderHistory}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="Report"
+          component={ReportScreen}
           options={{ headerShown: false }}
         />
           <Stack.Screen

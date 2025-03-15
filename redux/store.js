@@ -7,6 +7,8 @@ import categorySlice from "./slices/categorySlice";
 import fishSlice from "./slices/fishSlice";
 import ghnSlice from "./slices/ghnSlice";
 import calculatorSlice from "./slices/calculatorSlice";
+import symptomSlice from "./slices/symptomSlice";
+import reportSlice from "./slices/reportSlice";
 
 
 const store = configureStore({
@@ -18,7 +20,10 @@ const store = configureStore({
     productSlice: productSlice.reducer,
     categorySlice: categorySlice.reducer,
     ghnSlice: ghnSlice.reducer,
-    calculatorSlice: calculatorSlice.reducer,
+    calculatorSlice: calculatorSlice.reducer,    
+    symptomSlice: symptomSlice.reducer,
+    reportSlice: reportSlice.reducer,
+
 
   },
   middleware: (getDefaultMiddleware) =>

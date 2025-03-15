@@ -9,19 +9,21 @@ import {
   ImageBackground,
   Alert,
 } from "react-native";
-import { Button } from "@ant-design/react-native";
+import { Button, Provider, Toast } from "@ant-design/react-native";
 import AntDesign from "react-native-vector-icons/AntDesign";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { styles } from "./styles"; // Assume styles are correctly imported
 import { useDispatch } from "react-redux";
 import { createOrder } from "../../redux/slices/ghnSlice";
+import { loadAsync } from "expo-font";
 
 const CartScreen = ({ navigation }) => {
   const dispatch = useDispatch();
   const [cart, setCart] = useState([]);
   const [subtotal, setSubtotal] = useState(0);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [fontLoaded, setFontLoaded] = useState(false);
 
   const [address, setAddress] = useState(null);
   const shippingCost = 8.0;
@@ -93,20 +95,33 @@ const CartScreen = ({ navigation }) => {
       })),
       shipFee: 10,
       shipType: "string",
-      status: "string",
+      status: "Pending",
     };
     console.log(order);
     dispatch(createOrder(order))
-    .unwrap()
-    .then(async (res)=>{
-      Alert.alert(res[0].message);
-      navigation.navigate("Shopping")
-      await AsyncStorage.removeItem("cart");
-      await AsyncStorage.removeItem("address");
-    })
+      .unwrap()
+      .then(async (res) => {
+        Toast.success("Order Created Successfully");
+        setTimeout(() => {
+          navigation.navigate("Shopping");
+          },2000)
+        await AsyncStorage.removeItem("cart");
+      });
   };
-  console.log(cart);
+    useEffect(() => {
+      const loadFontAsync = async () => {
+        await loadAsync({
+          antoutline: require("@ant-design/icons-react-native/fonts/antoutline.ttf"),
+        });
+        setFontLoaded(true);
+        Toast.config({ duration: 2 });
+      };
+  
+      loadFontAsync();
+    }, []);
+    console.log("id",isLoggedIn?.id)
   return (
+    <Provider>
     <ImageBackground
       source={require("../../assets/koimain3.jpg")}
       style={styles.background}
@@ -124,16 +139,9 @@ const CartScreen = ({ navigation }) => {
       </View>
       {address ? (
         <View style={styles.addressInfo}>
-          <Text>
-            {address.provinceName}, {address.districtName}, {address.wardName}
-          </Text>
-          <TouchableOpacity>
-            <Text
-              style={{ color: "blue" }}
-              onPress={() => navigation.navigate("AddressForm")}
-            >
-              Change address
-            </Text>
+          <Text>{`${address.provinceName}, ${address.districtName}, ${address.wardName}`}</Text>
+          <TouchableOpacity onPress={() => navigation.navigate("AddressForm")}>
+            <Text style={{ color: "blue" }}>Change address</Text>
           </TouchableOpacity>
         </View>
       ) : (
@@ -154,9 +162,7 @@ const CartScreen = ({ navigation }) => {
             <View>
               <View style={styles.productDetails}>
                 <Text style={styles.productName}>{item.productName}</Text>
-                <Text style={styles.productPrice}>
-                  {item.price.toFixed(0)}đ
-                </Text>
+                <Text style={styles.productPrice}>{`${item.price.toFixed(0)}đ`}</Text>
               </View>
               <View style={styles.quantityContainer}>
                 <TouchableOpacity
@@ -184,21 +190,19 @@ const CartScreen = ({ navigation }) => {
       {/* Order Summary */}
       <View style={styles.summaryContainer}>
         <Text style={styles.summaryText}>Subtotal</Text>
-        <Text style={styles.summaryPrice}>${subtotal.toFixed(2)}</Text>
+        <Text style={styles.summaryPrice}>{`$${subtotal.toFixed(2)}`}</Text>
       </View>
       <View style={styles.summaryContainer}>
         <Text style={styles.summaryText}>Shipping Cost</Text>
-        <Text style={styles.summaryPrice}>${shippingCost.toFixed(2)}</Text>
+        <Text style={styles.summaryPrice}>{`$${shippingCost.toFixed(2)}`}</Text>
       </View>
       <View style={styles.summaryContainer}>
         <Text style={styles.summaryText}>Tax</Text>
-        <Text style={styles.summaryPrice}>${tax.toFixed(2)}</Text>
+        <Text style={styles.summaryPrice}>{`$${tax.toFixed(2)}`}</Text>
       </View>
       <View style={styles.summaryContainer}>
         <Text style={styles.totalText}>Total</Text>
-        <Text style={styles.totalPrice}>
-          ${(subtotal + shippingCost + tax).toFixed(2)}
-        </Text>
+        <Text style={styles.totalPrice}>{`$${(subtotal + shippingCost + tax).toFixed(2)}`}</Text>
       </View>
       {/* Coupon Input */}
       <View style={styles.couponContainer}>
@@ -219,8 +223,8 @@ const CartScreen = ({ navigation }) => {
       >
         <Text style={styles.checkoutText}>Checkout</Text>
       </Button>
-      ;
     </ImageBackground>
+  </Provider>
   );
 };
 

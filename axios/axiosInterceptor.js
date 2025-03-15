@@ -64,59 +64,59 @@ axiosClientVer2.interceptors.response.use(
     const originalRequest = error.config;
 
     // Handle different error statuses
-    if (error.response) {
-      const status = error.response.status;
+    // if (error.response) {
+    //   const status = error.response.status;
 
-      if (status === 400) {
-        Alert.alert("Error", error.response.data.message);
-      }
-      if (status === 409) {
-        Alert.alert("Conflict", error.response.data.errorMessage);
-      }
-      if (status === 403) {
-        Alert.alert(
-          "Permission Denied",
-          error.response.data.errorMessage ||
-            "You do not have permission for this action."
-        );
-      }
-      if (status === 404) {
-        Alert.alert("Not Found", error.response.data);
-      }
-      if (status === 405) {
-        Alert.alert("Method Not Allowed", error.response.data.errorMessage || "Error");
-      }
+    //   if (status === 400) {
+    //     Alert.alert("Error", error.response.data.message);
+    //   }
+    //   if (status === 409) {
+    //     Alert.alert("Conflict", error.response.data.errorMessage);
+    //   }
+    //   if (status === 403) {
+    //     Alert.alert(
+    //       "Permission Denied",
+    //       error.response.data.errorMessage ||
+    //         "You do not have permission for this action."
+    //     );
+    //   }
+    //   if (status === 404) {
+    //     Alert.alert("Not Found", error.response.data);
+    //   }
+    //   if (status === 405) {
+    //     Alert.alert("Method Not Allowed", error.response.data.errorMessage || "Error");
+    //   }
 
-      const refreshToken_current = await AsyncStorage.getItem("refreshToken");
+    //   const refreshToken_current = await AsyncStorage.getItem("refreshToken");
 
-      if (status === 401 && !originalRequest._retry && refreshToken_current) {
-        console.log("Start Refresh Token");
-        originalRequest._retry = true;
+    //   if (status === 401 && !originalRequest._retry && refreshToken_current) {
+    //     console.log("Start Refresh Token");
+    //     originalRequest._retry = true;
 
-        if (!isRefreshing) {
-          isRefreshing = true;
-          try {
-            const newToken = await refreshToken();
-            originalRequest.headers.Authorization = `Bearer ${newToken}`;
-            return axiosClientVer2(originalRequest);
-          } catch (refreshError) {
-            // Handle refresh token failure
-            console.error("Refresh Token Failed", refreshError);
-            Alert.alert("Session Expired", "Please log in again.");
-            return Promise.reject(refreshError);
-          }
-        } else {
-          // Wait for the ongoing refresh
-          if (!refreshPromise) {
-            refreshPromise = refreshToken();
-          }
-          return refreshPromise.then((newToken) => {
-            originalRequest.headers.Authorization = `Bearer ${newToken}`;
-            return axiosClientVer2(originalRequest);
-          });
-        }
-      }
-    }
+    //     if (!isRefreshing) {
+    //       isRefreshing = true;
+    //       try {
+    //         const newToken = await refreshToken();
+    //         originalRequest.headers.Authorization = `Bearer ${newToken}`;
+    //         return axiosClientVer2(originalRequest);
+    //       } catch (refreshError) {
+    //         // Handle refresh token failure
+    //         console.error("Refresh Token Failed", refreshError);
+    //         Alert.alert("Session Expired", "Please log in again.");
+    //         return Promise.reject(refreshError);
+    //       }
+    //     } else {
+    //       // Wait for the ongoing refresh
+    //       if (!refreshPromise) {
+    //         refreshPromise = refreshToken();
+    //       }
+    //       return refreshPromise.then((newToken) => {
+    //         originalRequest.headers.Authorization = `Bearer ${newToken}`;
+    //         return axiosClientVer2(originalRequest);
+    //       });
+    //     }
+    //   }
+    // }
     return Promise.reject(error);
   }
 );

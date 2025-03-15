@@ -83,8 +83,9 @@ export const styles = StyleSheet.create({
     alignItems: "center",
     textAlign: "center",
     marginHorizontal: 5,
-    height: 40,
+    height: 50,
     width: "30%",
+    overflow: "hidden",
   },
   parameterLabel: {
     fontSize: 14,

@@ -1,10 +1,11 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { deleteRequest, getRequest, postRequest, putRequest } from "../../services/httpMethods";
+import { deleteRequest, getRequest, getRequestParams, postRequest, putRequest } from "../../services/httpMethods";
 import { Alert } from "react-native";
 
 const initialState = {
   pondByOwner: null,
   pondById:null,
+  params:null,
 };
 
 export const pondSlice = createSlice({
@@ -22,6 +23,9 @@ export const pondSlice = createSlice({
     .addCase(getPondByID.fulfilled, (state, action) => {
       state.pondById = action.payload;
     })
+    .addCase(getRequiredParams.fulfilled, (state, action) => {
+      state.params = action.payload;
+    })
   },
 });
 
@@ -36,12 +40,23 @@ export const getPondByOwner = createAsyncThunk(
     }
   }
 );
+export const getRequiredParams = createAsyncThunk(
+  "pondSlice/getRequiredParams",
+  async (ownerId) => {
+    try {
+      const res = await getRequest(`Pond/pond-required-param`)
+      return res.data;
+    } catch (error) {
+      Alert.alert("Error", "Failed to load pond data.");
+    }
+  }
+);
 
 export const getPondByID = createAsyncThunk(
   "pondSlice/getPondByID",
   async (pondId) => {
     try {
-      const res = await getRequest(`Pond/get-by-owner?owner=${pondId}`);
+      const res = await getRequest(`Pond/get-pond/${pondId}`);
       return res.data;
     } catch (error) {
       Alert.alert("Error", "Failed to load pond data.");

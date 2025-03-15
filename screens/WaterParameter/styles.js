@@ -108,4 +108,7 @@ export const styles = StyleSheet.create({
     fontWeight: "bold", // Bold text
     textAlign: "center", // Centers the text
   },
+  modal:{
+    width:"350"
+  }
 });

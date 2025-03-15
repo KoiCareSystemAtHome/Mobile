@@ -130,12 +130,12 @@ const HomeScreen = ({ navigation }) => {
             <></>
           )}
 
-          <TouchableOpacity style={styles.drawerItem}>
+          <TouchableOpacity style={styles.drawerItem} onPress={() => navigation.navigate("OrderHistory")}>
             <Image
               source={require("../../assets/history_svgrepo.com.png")}
               style={styles.drawerItemImage}
             />
-            <Text style={styles.drawerItemText}>Purchase History</Text>
+            <Text style={styles.drawerItemText}>Order History</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.drawerItem}>
             <Image
@@ -209,7 +209,7 @@ const HomeScreen = ({ navigation }) => {
           <Text style={styles.userText}>
             Hi{" "}
             {isLoggedIn || userState
-              ? isLoggedIn.name || userState.name
+              ? isLoggedIn?.name || userState?.name
               : "User"}
           </Text>
         </View>

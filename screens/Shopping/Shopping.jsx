@@ -19,11 +19,10 @@ import { categorySelector, productSelector } from "../../redux/selector";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const Shopping = ({ navigation }) => {
-
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [searchText, setSearchText] = useState("");
-    const [cart, setCart] = useState(false);
-  
+  const [cart, setCart] = useState(false);
+
   const products = useSelector(productSelector);
   const categories = useSelector(categorySelector);
   const dispatch = useDispatch();
@@ -47,7 +46,6 @@ const Shopping = ({ navigation }) => {
       product.productName.toLowerCase().includes(searchText.toLowerCase())
   );
 
-
   useEffect(() => {
     const getData = async (key) => {
       try {
@@ -61,19 +59,18 @@ const Shopping = ({ navigation }) => {
     getData();
   }, []);
 
-
   return (
     <View style={styles.background} resizeMode="cover">
       <View style={styles.overlay} />
 
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.navigate("CartScreen")}>
-          <AntDesign name="shoppingcart" size={28} color="black" />
+        <TouchableOpacity onPress={() => navigation.goBack()}>
+          <AntDesign name="left" size={24} color="black" />
         </TouchableOpacity>
         <Text style={styles.title}>Shop</Text>
-        <TouchableOpacity>
-          <FontAwesome name="user-circle" size={28} color="black" />
+        <TouchableOpacity onPress={() => navigation.navigate("CartScreen")}>
+          <AntDesign name="shoppingcart" size={28} color="black" />
         </TouchableOpacity>
       </View>
 
@@ -128,6 +125,7 @@ const Shopping = ({ navigation }) => {
           <TouchableOpacity style={styles.productCard}>
             <Image source={{ uri: item.image }} style={styles.productImage} />
             <Text style={styles.productName}>{item.productName}</Text>
+            <Text style={styles.productName}>{item?.shop}</Text>
             <Text style={styles.productPrice}>{item.price} VND</Text>
             <TouchableOpacity
               style={styles.addToCartButton}

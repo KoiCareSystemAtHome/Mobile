@@ -13,6 +13,7 @@ const ProductDetail = ({ navigation }) => {
   const feedbacks = product.feedbacks || [];
   const handleIncrement = () => setQuantity(quantity + 1);
   const handleDecrement = () => quantity > 1 && setQuantity(quantity - 1);
+  console.log(product)
 
   const addToCart = async () => {
     try {
@@ -64,6 +65,7 @@ const ProductDetail = ({ navigation }) => {
       {/* Product Info */}
       <Text style={styles.productTitle}>{product.productName}</Text>
       <Text style={styles.productDescription}>{product.description}</Text>
+      <Text style={styles.productDescription}>{product.shop}</Text>
 
       {/* Quantity Selector and Price */}
       <View style={styles.row}>

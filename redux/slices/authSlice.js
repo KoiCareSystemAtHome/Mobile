@@ -75,7 +75,6 @@ const authSlice = createSlice({
         state.token = action.payload.token;
         state.user = action.payload.user;
         handleLogin(action.payload);
-        Alert.alert("Success", "Login successful");
       })
       .addCase(login.rejected, (state, action) => {
         state.loading = false;

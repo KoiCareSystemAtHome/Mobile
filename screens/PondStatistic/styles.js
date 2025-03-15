@@ -34,7 +34,7 @@ export const styles = StyleSheet.create({
   },
   pondImage: {
     width: "100%",
-    height: "180",
+    height: 200,
     borderRadius: 10,
   },
   pondInfo: {
@@ -43,6 +43,8 @@ export const styles = StyleSheet.create({
   pondText: {
     marginTop: 16,
     fontSize: 16,
+    alignContent: "center",
+    textAlign:"center",
     // marginBottom: 15,
   },
   label: {

@@ -7,6 +7,7 @@ const initialState = {
   province: null,
   district: null,
   ward: null,
+  orderByAccount:null,
 };
 
 export const ghnSlice = createSlice({
@@ -27,7 +28,10 @@ export const ghnSlice = createSlice({
     .addCase(getWard.fulfilled, (state, action) => {
       state.ward = action.payload;
     })
-    ;
+    .addCase(getOrderByAccount.fulfilled, (state, action) => {
+      state.orderByAccount = action.payload;
+    })
+    
   },
 });
 
@@ -61,6 +65,18 @@ export const getDistrict = createAsyncThunk(
       try {
         const res = await postRequest(`Ghn/get-ward`, {district_id});
         return res.data.data;
+      } catch (error) {
+        Alert.alert("Error", "Failed to load category data.");
+      }
+    }
+  );
+
+  export const getOrderByAccount = createAsyncThunk(
+    "ghnSlice/getOrderByAccount",
+    async (values) => {
+      try {
+        const res = await getRequest(`Order?AccountId=${values}`);
+        return res.data;
       } catch (error) {
         Alert.alert("Error", "Failed to load category data.");
       }

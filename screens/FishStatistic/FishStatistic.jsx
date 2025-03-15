@@ -9,14 +9,17 @@ import {
   TouchableOpacity,
   TextInput,
   Modal,
+  ScrollView,
 } from "react-native";
 import {
   Button,
   Card,
   Form,
   Input,
+  List,
   Picker,
   Provider,
+  Toast,
 } from "@ant-design/react-native";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import { styles } from "./styles";
@@ -28,6 +31,7 @@ import DropDownPicker from "react-native-dropdown-picker";
 import { createFish, getFishByOwner } from "../../redux/slices/fishSlice";
 import * as ImagePicker from "expo-image-picker";
 import { getImage } from "../../redux/slices/authSlice";
+import { loadAsync } from "expo-font";
 
 const FishStatistic = ({ navigation }) => {
   const [form] = Form.useForm();
@@ -42,6 +46,7 @@ const FishStatistic = ({ navigation }) => {
   const [pondItems, setPondItems] = useState([]);
   const [imageBlob, setImageBlob] = useState(null);
   const [uploadResponse, setUploadResponse] = useState(null);
+  const [fontLoaded, setFontLoaded] = useState(false);
 
   useEffect(() => {
     const getData = async (key) => {
@@ -103,6 +108,18 @@ const FishStatistic = ({ navigation }) => {
       }
     }
   };
+  useEffect(() => {
+    const loadFontAsync = async () => {
+      await loadAsync({
+        antoutline: require("@ant-design/icons-react-native/fonts/antoutline.ttf"),
+      });
+      setFontLoaded(true);
+      Toast.config({ duration: 2 });
+    };
+
+    loadFontAsync();
+  }, []);
+
   const onFinish = (values) => {
     const pondID = selectedPond;
     let image = "string";
@@ -112,7 +129,7 @@ const FishStatistic = ({ navigation }) => {
     values.price = Number(values?.price);
     values.physique = "string";
     values.inPondSince = "2025-02-06T14:31:50.654Z";
-    if(uploadResponse){
+    if (uploadResponse) {
       image = uploadResponse;
     }
     const requirementFishParam = [
@@ -125,9 +142,19 @@ const FishStatistic = ({ navigation }) => {
     dispatch(createFish(values))
       .unwrap()
       .then((response) => {
-        dispatch(getFishByOwner(isLoggedIn.id));
+        if (response?.status === "201") {
+          console.log(response);
+          Toast.success("Fish Added Successfully");
+          dispatch(getFishByOwner(isLoggedIn.id));
+          form.resetFields();
+          setTimeout(() => {
+            setModalVisible(false);
+          });
+        } else {
+          Toast.fail("Failed to add fish");
+          setModalVisible(false);
+        }
       });
-    setModalVisible(false); // Close modal after submission
   };
 
   useEffect(() => {
@@ -140,45 +167,40 @@ const FishStatistic = ({ navigation }) => {
       );
     }
   }, [pondData]);
+
   const renderFishCard = ({ item }) => (
     <TouchableOpacity
       onPress={() => navigation.navigate("FishDetail", { fish: item })}
     >
       <Card style={styles.card}>
         <View style={styles.cardContent}>
-          <Image source={{uri:item.image}} style={styles.fishImage} />
+          <Image source={{ uri: item.image }} style={styles.fishImage} />
           <View style={styles.fishInfo}>
             <View style={styles.infoRow}>
               <Text style={styles.fishText}>
                 <Text style={styles.label}>Name: </Text>
                 {item.name}
               </Text>
-              <FontAwesome
-                name={item.gender === "male" ? "mars" : "venus"}
-                size={20}
-                color="#6497B1"
-                style={{ paddingRight: 10 }}
-              />
+              <Text style={styles.fishText}>
+                <Text style={styles.label}>Variety: </Text>
+                {item.variety.varietyName}{" "}
+                <FontAwesome
+                  name={item.gender === "male" ? "mars" : "venus"}
+                  size={20}
+                  color="#6497B1"
+                  style={{ paddingRight: 10 }}
+                />
+              </Text>
             </View>
-            <Text style={styles.fishText}>
-              <Text style={styles.label}>Age: </Text>
-              {item.age}
-            </Text>
-            <Text style={styles.fishText}>
-              <Text style={styles.label}>Variety: </Text>
-              {item.variety.varietyName}
-            </Text>
             <View style={styles.infoRow}>
+              <Text style={styles.fishText}>
+                <Text style={styles.label}>Age: </Text>
+                {item.age}
+              </Text>
               <Text style={styles.fishText}>
                 <Text style={styles.label}>Length: </Text>
                 {item.length}
               </Text>
-              <FontAwesome
-                name="star"
-                size={20}
-                color="#f5c542"
-                style={{ paddingRight: 10 }}
-              />
             </View>
           </View>
         </View>
@@ -199,7 +221,7 @@ const FishStatistic = ({ navigation }) => {
           <FlatList
             data={fishData}
             renderItem={renderFishCard}
-            keyExtractor={(item) => item.id}
+            keyExtractor={(item) => item?.koiID}
             contentContainerStyle={styles.listContent}
           />
           <View style={styles.footer}>
@@ -222,143 +244,149 @@ const FishStatistic = ({ navigation }) => {
           animationType="fade"
           onRequestClose={() => setModalVisible(false)}
         >
-          <View style={styles.modalOverlay}>
-            <Form form={form} onFinish={onFinish} style={styles.modalContainer}>
-              <View style={styles.modalHeader}>
-                <Text style={styles.modalTitle}>Add New Koi</Text>
-              </View>
-              {imageBlob ? (
-                <View style={styles.imageContainer}>
-                  <Image
-                    source={{ uri: uploadResponse }}
-                    style={styles.selectedImage}
-                  />
+          <ScrollView>
+            <View style={styles.modalOverlay}>
+              <Form
+                form={form}
+                onFinish={onFinish}
+                style={styles.modalContainer}
+              >
+                <View style={styles.modalHeader}>
+                  <Text style={styles.modalTitle}>Add New Koi</Text>
+                </View>
+                {imageBlob ? (
+                  <View style={styles.imageContainer}>
+                    <Image
+                      source={{ uri: uploadResponse }}
+                      style={styles.selectedImage}
+                    />
+                    <TouchableOpacity
+                      style={styles.changeImageButton}
+                      onPress={handleImagePick}
+                    >
+                      <Text style={styles.changeImageText}>Change Picture</Text>
+                    </TouchableOpacity>
+                  </View>
+                ) : (
                   <TouchableOpacity
-                    style={styles.changeImageButton}
+                    style={styles.imageButton}
                     onPress={handleImagePick}
                   >
-                    <Text style={styles.changeImageText}>Change Picture</Text>
+                    <Text style={styles.imageButtonText}>
+                      Tap To Select Image
+                    </Text>
                   </TouchableOpacity>
-                </View>
-              ) : (
-                <TouchableOpacity
-                  style={styles.imageButton}
-                  onPress={handleImagePick}
-                >
-                  <Text style={styles.imageButtonText}>
-                    Tap To Select Image
-                  </Text>
-                </TouchableOpacity>
-              )}
-              <View style={styles.modalFields}>
-                <View style={styles.row}>
-                  <View style={styles.inputRow}>
-                    <Text style={styles.inputLabel}>Name:</Text>
-                    <Form.Item name="name" style={styles.input}>
-                      <Input placeholder="Name" />
-                    </Form.Item>
-                  </View>
-                  <View style={styles.inputRow}>
-                    <Text style={styles.inputLabel}>Age:</Text>
-                    <Form.Item name="age" style={styles.input}>
-                      <Input placeholder="Age" />
-                    </Form.Item>
-                  </View>
-                </View>
-                <View style={styles.row}>
-                  <View style={styles.inputRow}>
-                    <Text style={styles.inputLabel}>Length:</Text>
-                    <Form.Item name="length" style={styles.input}>
-                      <Input placeholder="Length" />
-                    </Form.Item>
-                  </View>
-                  <View style={styles.inputRow}>
-                    <Text style={styles.inputLabel}>Weight:</Text>
-                    <Form.Item name="weight" style={styles.input}>
-                      <Input placeholder="Weight" />
-                    </Form.Item>
-                  </View>
-                </View>
-                <View style={styles.row}>
-                  <View style={styles.inputRow}>
-                    <Text style={styles.inputLabel}>Sex:</Text>
-                    <Form.Item name="sex" style={styles.input}>
-                      <Input placeholder="Sex" />
-                    </Form.Item>
-                  </View>
-                  <View style={styles.inputRow}>
-                    <Text style={styles.inputLabel}>Variety:</Text>
-                    <Form.Item name="varietyName" style={styles.input}>
-                      <Input placeholder="Variety" />
-                    </Form.Item>
-                  </View>
-                </View>
-                <View style={styles.row}>
-                  <View style={styles.inputRow}>
-                    <Text style={styles.inputLabel}>Condition:</Text>
-                    <Form.Item name="condition" style={styles.input}>
-                      <Input placeholder="Condition" />
-                    </Form.Item>
-                  </View>
-                  <View style={styles.inputRow}>
-                    <Text style={styles.inputLabel}>In Pond Since:</Text>
-                    <Form.Item name="inPondSince" style={styles.input}>
-                      <Input placeholder="In Pond Since" />
-                    </Form.Item>
-                  </View>
-                </View>
-                <View style={styles.row}>
-                  <View style={styles.inputRow}>
-                    <Text style={styles.inputLabel}>Breeder:</Text>
-                    <Form.Item name="breeder" style={styles.input}>
-                      <Input placeholder="Breeder" />
-                    </Form.Item>
-                  </View>
-                  <View style={styles.inputRow}>
-                    <Text style={styles.inputLabel}>Purchase Price:</Text>
-                    <Form.Item name="price" style={styles.input}>
-                      <Input placeholder="Purchase Price" />
-                    </Form.Item>
-                  </View>
-                </View>
-                <View style={styles.row}>
-                  <View style={styles.inputRow}>
-                    <Text style={styles.inputLabel}>Pond:</Text>
+                )}
 
-                    <DropDownPicker
-                      open={open}
-                      value={selectedPond}
-                      items={pondItems}
-                      setOpen={setOpen}
-                      setValue={setSelectedPond}
-                      setItems={setPondItems}
-                      containerStyle={styles.dropdownContainer}
-                      style={styles.dropdown}
-                      dropDownStyle={styles.dropdownBox}
-                      placeholder="Select a Pond"
-                      listMode="SCROLLVIEW"
-                    />
+                <View style={styles.modalFields}>
+                  <View style={styles.row}>
+                    <View style={styles.inputRow}>
+                      <Text style={styles.inputLabel}>Name:</Text>
+                      <Form.Item name="name" style={styles.input}>
+                        <Input placeholder="Name" />
+                      </Form.Item>
+                    </View>
+                    <View style={styles.inputRow}>
+                      <Text style={styles.inputLabel}>Age:</Text>
+                      <Form.Item name="age" style={styles.input}>
+                        <Input placeholder="Age" />
+                      </Form.Item>
+                    </View>
+                  </View>
+                  <View style={styles.row}>
+                    <View style={styles.inputRow}>
+                      <Text style={styles.inputLabel}>Length:</Text>
+                      <Form.Item name="length" style={styles.input} extra="cm">
+                        <Input placeholder="Length" />
+                      </Form.Item>
+                    </View>
+                    <View style={styles.inputRow}>
+                      <Text style={styles.inputLabel}>Weight:</Text>
+                      <Form.Item name="weight" style={styles.input} extra="kg">
+                        <Input placeholder="Weight" />
+                      </Form.Item>
+                    </View>
+                  </View>
+                  <View style={styles.row}>
+                    <View style={styles.inputRow}>
+                      <Text style={styles.inputLabel}>Sex:</Text>
+                      <Form.Item name="sex" style={styles.input}>
+                        <Input placeholder="Sex" />
+                      </Form.Item>
+                    </View>
+                    <View style={styles.inputRow}>
+                      <Text style={styles.inputLabel}>Variety:</Text>
+                      <Form.Item name="varietyName" style={styles.input}>
+                        <Input placeholder="Variety" />
+                      </Form.Item>
+                    </View>
+                  </View>
+                  <View style={styles.row}>
+                    <View style={styles.inputRow}>
+                      <Text style={styles.inputLabel}>Condition:</Text>
+                      <Form.Item name="condition" style={styles.input}>
+                        <Input placeholder="Condition" />
+                      </Form.Item>
+                    </View>
+                    <View style={styles.inputRow}>
+                      <Text style={styles.inputLabel}>In Pond Since:</Text>
+                      <Form.Item name="inPondSince" style={styles.input}>
+                        <Input placeholder="In Pond Since" />
+                      </Form.Item>
+                    </View>
+                  </View>
+                  <View style={styles.row}>
+                    <View style={styles.inputRow}>
+                      <Text style={styles.inputLabel}>Breeder:</Text>
+                      <Form.Item name="breeder" style={styles.input}>
+                        <Input placeholder="Breeder" />
+                      </Form.Item>
+                    </View>
+                    <View style={styles.inputRow}>
+                      <Text style={styles.inputLabel}>Purchase Price:</Text>
+                      <Form.Item name="price" style={styles.input} extra="VND">
+                        <Input placeholder="Purchase Price" />
+                      </Form.Item>
+                    </View>
+                  </View>
+                  <View style={styles.row}>
+                    <View style={styles.inputRow}>
+                      <Text style={styles.inputLabel}>Pond:</Text>
+
+                      <DropDownPicker
+                        open={open}
+                        value={selectedPond}
+                        items={pondItems}
+                        setOpen={setOpen}
+                        setValue={setSelectedPond}
+                        setItems={setPondItems}
+                        containerStyle={styles.dropdownContainer}
+                        style={styles.dropdown}
+                        dropDownStyle={styles.dropdownBox}
+                        placeholder="Select a Pond"
+                        listMode="SCROLLVIEW"
+                      />
+                    </View>
+                  </View>
+                  <View style={styles.modalFooter}>
+                    <TouchableOpacity
+                      style={styles.modalCancelButton}
+                      onPress={() => setModalVisible(false)}
+                    >
+                      <Text style={styles.modalCancelText}>Cancel</Text>
+                    </TouchableOpacity>
+                    <Button
+                      type="ghost"
+                      style={styles.modalSaveButton}
+                      onPress={() => form.submit()}
+                    >
+                      <Text style={styles.modalSaveText}>Save</Text>
+                    </Button>
                   </View>
                 </View>
-                <View style={styles.modalFooter}>
-                  <TouchableOpacity
-                    style={styles.modalCancelButton}
-                    onPress={() => setModalVisible(false)}
-                  >
-                    <Text style={styles.modalCancelText}>Cancel</Text>
-                  </TouchableOpacity>
-                  <Button
-                    type="ghost"
-                    style={styles.modalSaveButton}
-                    onPress={() => form.submit()}
-                  >
-                    <Text style={styles.modalSaveText}>Save</Text>
-                  </Button>
-                </View>
-              </View>
-            </Form>
-            ;
-          </View>
+              </Form>
+            </View>
+          </ScrollView>
         </Modal>
       </ImageBackground>
     </Provider>

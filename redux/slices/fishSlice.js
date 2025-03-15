@@ -40,8 +40,7 @@ export const createFish = createAsyncThunk(
       const res = await postRequest(`Fish/create-fish`, payload);
       return res.data;
     } catch (error) {
-      Alert.alert("Error", "Failed to add test.");
-      return rejectWithValue("Add failed");
+      console.log(error)
     }
   }
 );

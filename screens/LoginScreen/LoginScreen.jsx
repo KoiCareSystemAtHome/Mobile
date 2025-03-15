@@ -1,5 +1,5 @@
 import CheckBox from "@react-native-community/checkbox";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -11,10 +11,11 @@ import {
   Alert,
 } from "react-native";
 import { styles } from "./styles";
-import { Button, Form, Input } from "@ant-design/react-native";
+import { Provider, Button, Form, Input, Toast } from "@ant-design/react-native";
 import { useDispatch } from "react-redux";
 import { login } from "../../redux/slices/authSlice";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { loadAsync } from "expo-font";
 
 const LoginScreen = ({ navigation }) => {
   const dispatch = useDispatch();
@@ -24,14 +25,18 @@ const LoginScreen = ({ navigation }) => {
   };
 
   const onFinish = async (values) => {
-  
     dispatch(login(values))
       .unwrap()
-      .then((response) => {
+      .then(async (response) => {
         if (response?.user?.status === "Active") {
-          navigation.navigate("MainTabs");
+          Toast.success("Login Successful");
+          await AsyncStorage.setItem("accessToken", response?.token);
+          await AsyncStorage.setItem("user", JSON.stringify(response?.user));
+          setTimeout(() => {
+            navigation.navigate("MainTabs");
+          }, 2000);
         } else {
-          Alert.alert("Invalid Credentials", "Check your email and password again.");
+          Toast.fail("Invalid Credentials");
         }
       })
       .catch((error) => {
@@ -39,99 +44,129 @@ const LoginScreen = ({ navigation }) => {
         Alert.alert("Login Error", "An error occurred. Please try again.");
       }); // Ensure this line is properly closed
   };
-  
+
+  useEffect(() => {
+    Toast.config({ duration: 2 });
+  }, []);
+
+  const [fontLoaded, setFontLoaded] = useState(false);
+
+  useEffect(() => {
+    const loadFontAsync = async () => {
+      await loadAsync({
+        antoutline: require("@ant-design/icons-react-native/fonts/antoutline.ttf"),
+      });
+      setFontLoaded(true);
+    };
+
+    loadFontAsync();
+  }, []);
+
+  if (!fontLoaded) {
+    return <Text>'字体加载中...'</Text>;
+  }
+
   return (
-    <ImageBackground
-      source={require("../../assets/koiimg.jpg")}
-      style={styles.background}
-      resizeMode="cover"
-    >
-      <View style={styles.overlay} />
-      <View style={styles.container}>
-        <Text style={styles.title}>Login</Text>
-        <Text style={styles.terms}>
-          By signing in you are agreeing to our{" "}
-          <Text style={styles.link}>Term and privacy policy</Text>
-        </Text>
+    <Provider>
+      <ImageBackground
+        source={require("../../assets/koiimg.jpg")}
+        style={styles.background}
+        resizeMode="cover"
+      >
+        <View style={styles.overlay} />
+        <View style={styles.container}>
+          <Text style={styles.title}>Login</Text>
+          <Text style={styles.terms}>
+            By signing in you are agreeing to our{" "}
+            <Text style={styles.link}>Term and privacy policy</Text>
+          </Text>
 
-        <View style={styles.tabs}>
-          <TouchableOpacity onPress={() => navigation.navigate("Login")}>
-            <Text style={[styles.tab, styles.activeTab]}>Login</Text>
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => navigation.navigate("Register")}>
-            <Text style={styles.tab}>Register</Text>
-          </TouchableOpacity>
-        </View>
-        <Form
-          name="basic"
-          onFinish={onFinish}
-          style={{ backgroundColor: "transparent" }}
-          form={form}
-        >
-          <View style={styles.inputContainer}>
-            <Form.Item name="username" noStyle>
-              <Input
-                placeholder="Email Address"
-                style={styles.input}
-                placeholderTextColor="#C4C4C4"
-              />
-            </Form.Item>
-            <Image
-              source={require("../../assets/adaptive-icon.png")}
-              style={styles.icon}
-            />
-          </View>
-
-          <View style={styles.inputContainer}>
-            <Form.Item name="password" noStyle>
-              <Input
-                placeholder="Password"
-                secureTextEntry
-                style={styles.input}
-                placeholderTextColor="#C4C4C4"
-              />
-            </Form.Item>
-            <Image
-              source={require("../../assets/adaptive-icon.png")}
-              style={styles.icon}
-            />
-          </View>
-
-          <View style={styles.row}>
-            {/* <CheckBox value={true} /> */}
-            <Text style={styles.remember}>Remember password</Text>
-            <TouchableOpacity>
-              <Text style={styles.forgot}>Forget password</Text>
+          <View style={styles.tabs}>
+            <TouchableOpacity onPress={() => navigation.navigate("Login")}>
+              <Text style={[styles.tab, styles.activeTab]}>Login</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => navigation.navigate("Register")}>
+              <Text style={styles.tab}>Register</Text>
             </TouchableOpacity>
           </View>
-          <View style={styles.row}>
+          <Form
+            name="basic"
+            onFinish={onFinish}
+            style={{ backgroundColor: "transparent" }}
+            form={form}
+          >
+            <View style={styles.inputContainer}>
+              <Form.Item name="username" noStyle>
+                <Input
+                  placeholder="Email Address"
+                  style={styles.input}
+                  placeholderTextColor="#C4C4C4"
+                />
+              </Form.Item>
+              <Image
+                source={require("../../assets/adaptive-icon.png")}
+                style={styles.icon}
+              />
+            </View>
+
+            <View style={styles.inputContainer}>
+              <Form.Item name="password" noStyle>
+                <Input
+                  placeholder="Password"
+                  secureTextEntry
+                  style={styles.input}
+                  placeholderTextColor="#C4C4C4"
+                />
+              </Form.Item>
+              <Image
+                source={require("../../assets/adaptive-icon.png")}
+                style={styles.icon}
+              />
+            </View>
+
+            <View style={styles.row}>
+              {/* <CheckBox value={true} /> */}
+              <Text style={styles.remember}>Remember password</Text>
+              <TouchableOpacity>
+                <Text style={styles.forgot}>Forget password</Text>
+              </TouchableOpacity>
+            </View>
+            <View style={styles.row}>
+              <TouchableOpacity>
+                <Text
+                  style={styles.forgot}
+                  onPress={() => {
+                    navigation.navigate("MainTabs");
+                  }}
+                >
+                  Log in as guest?
+                </Text>
+              </TouchableOpacity>
+            </View>
+
+            <Button style={styles.loginButton} onPress={onSubmit}>
+              <Text style={styles.loginText}>Login</Text>
+            </Button>
+          </Form>
+          <Text style={styles.connectText}>or connect with</Text>
+
+          <View style={styles.socialContainer}>
             <TouchableOpacity>
-              <Text style={styles.forgot} onPress={()=>{navigation.navigate("MainTabs")}}>Log in as guest?</Text>
+              <Image
+                source={require("../../assets/facebook 1.png")}
+                style={styles.socialIcon}
+              />
+            </TouchableOpacity>
+            <TouchableOpacity>
+              <Image
+                source={require("../../assets/google-icon-2048x2048-czn3g8x8 1.png")}
+                style={styles.socialIcon}
+              />
             </TouchableOpacity>
           </View>
-
-          <Button style={styles.loginButton} onPress={onSubmit}>
-            <Text style={styles.loginText}>Login</Text>
-          </Button>
-        </Form>
-        <Text style={styles.connectText}>or connect with</Text>
-
-        <View style={styles.socialContainer}>
-          <TouchableOpacity>
-            <Image
-              source={require("../../assets/facebook 1.png")}
-              style={styles.socialIcon}
-            />
-          </TouchableOpacity>
-          <TouchableOpacity>
-            <Image
-              source={require("../../assets/google-icon-2048x2048-czn3g8x8 1.png")}
-              style={styles.socialIcon}
-            />
-          </TouchableOpacity>
         </View>
-      </View>
-    </ImageBackground>
+      </ImageBackground>
+    </Provider>
   );
 };
 

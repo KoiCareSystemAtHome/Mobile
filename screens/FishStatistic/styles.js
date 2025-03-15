@@ -34,11 +34,11 @@ export const styles = StyleSheet.create({
     },
     fishImage: {
       width: "100%",
-      height: 130,
+      height: 200,
       borderRadius: 10,
     },
     fishInfo: {
-      marginLeft: 10,
+      // marginLeft: 10,
     },
     fishText: {
       marginTop: 16,
@@ -52,6 +52,7 @@ export const styles = StyleSheet.create({
       flexDirection: "row",
       justifyContent: "space-between",
       alignItems: "center",
+      paddingInline:20
     },
     footer: {
       flexDirection: "row",
@@ -145,6 +146,7 @@ export const styles = StyleSheet.create({
       fontSize: 16,
     },
     modalFields: {
+      backgroundColor:"#fff",
       width: "100%",
       marginVertical: 10,
     },
