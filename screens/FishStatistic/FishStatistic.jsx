@@ -47,6 +47,19 @@ const FishStatistic = ({ navigation }) => {
   const [imageBlob, setImageBlob] = useState(null);
   const [uploadResponse, setUploadResponse] = useState(null);
   const [fontLoaded, setFontLoaded] = useState(false);
+  
+  // Pagination states
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 5; // Number of fish per page
+
+  // Calculate the total number of pages
+  const totalPages = Math.ceil(fishData?.length / itemsPerPage);
+
+  // Slice the fishData array to show only the current page's items
+  const paginatedFishData = fishData?.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
 
   useEffect(() => {
     const getData = async (key) => {
@@ -62,6 +75,7 @@ const FishStatistic = ({ navigation }) => {
 
     getData();
   }, []);
+
   useEffect(() => {
     if (isLoggedIn?.id) {
       dispatch(getPondByOwner(isLoggedIn.id));
@@ -76,9 +90,8 @@ const FishStatistic = ({ navigation }) => {
       return;
     }
 
-    // Launch image picker
     let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaType, // Correct format for Expo 49+
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
       quality: 1,
     });
@@ -86,10 +99,8 @@ const FishStatistic = ({ navigation }) => {
     if (!result.canceled) {
       const uri = result.assets[0].uri;
       const fileType = uri.split(".").pop();
-
       const fileMimeType = `image/${fileType === "jpg" ? "jpeg" : fileType}`;
 
-      // Create FormData
       let formData = new FormData();
       formData.append("filene", {
         uri: uri,
@@ -108,6 +119,7 @@ const FishStatistic = ({ navigation }) => {
       }
     }
   };
+
   useEffect(() => {
     const loadFontAsync = async () => {
       await loadAsync({
@@ -208,6 +220,19 @@ const FishStatistic = ({ navigation }) => {
     </TouchableOpacity>
   );
 
+  // Pagination controls
+  const handlePreviousPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+    }
+  };
+
+  const handleNextPage = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage(currentPage + 1);
+    }
+  };
+
   return (
     <Provider>
       <ImageBackground
@@ -219,11 +244,39 @@ const FishStatistic = ({ navigation }) => {
         <View style={styles.container}>
           <Text style={styles.title}>Fish Statistic</Text>
           <FlatList
-            data={fishData}
+            data={paginatedFishData} // Use paginated data instead of fishData
             renderItem={renderFishCard}
             keyExtractor={(item) => item?.koiID}
             contentContainerStyle={styles.listContent}
           />
+          {/* Pagination Controls */}
+          {fishData?.length > 0 && (
+            <View style={styles.paginationContainer}>
+              <TouchableOpacity
+                style={[
+                  styles.paginationButton,
+                  currentPage === 1 && styles.disabledButton,
+                ]}
+                onPress={handlePreviousPage}
+                disabled={currentPage === 1}
+              >
+                <Text style={styles.paginationText}>Previous</Text>
+              </TouchableOpacity>
+              <Text style={styles.pageText}>
+                {currentPage}/{totalPages}
+              </Text>
+              <TouchableOpacity
+                style={[
+                  styles.paginationButton,
+                  currentPage === totalPages && styles.disabledButton,
+                ]}
+                onPress={handleNextPage}
+                disabled={currentPage === totalPages}
+              >
+                <Text style={styles.paginationText}>Next</Text>
+              </TouchableOpacity>
+            </View>
+          )}
           <View style={styles.footer}>
             <View style={styles.badge}>
               <Text style={styles.badgeText}>{fishData?.length} Fish(s)</Text>
@@ -352,7 +405,6 @@ const FishStatistic = ({ navigation }) => {
                   <View style={styles.row}>
                     <View style={styles.inputRow}>
                       <Text style={styles.inputLabel}>Pond:</Text>
-
                       <DropDownPicker
                         open={open}
                         value={selectedPond}

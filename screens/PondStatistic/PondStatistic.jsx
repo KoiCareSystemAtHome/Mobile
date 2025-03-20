@@ -44,6 +44,19 @@ const PondStatistic = ({ navigation }) => {
   const [uploadResponse, setUploadResponse] = useState(null);
   const [fontLoaded, setFontLoaded] = useState(false);
 
+  // Pagination states
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 5; // Number of ponds per page
+
+  // Calculate the total number of pages
+  const totalPages = Math.ceil(pondData?.length / itemsPerPage);
+
+  // Slice the pondData array to show only the current page's items
+  const paginatedPondData = pondData?.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
   const dispatch = useDispatch();
 
   const renderPondCard = ({ item }) => (
@@ -57,10 +70,13 @@ const PondStatistic = ({ navigation }) => {
             <View style={styles.infoRow}>
               <Text style={styles.pondText}>
                 <Text style={styles.label}>Name: </Text>
-                {item.name}  {" "}
+                {item.name} {" "}
               </Text>
               <Text style={styles.pondText}>
-                <Text style={styles.label}>{item?.fish?.length} <FontAwesome5 name="fish" size={25}  /></Text>
+                <Text style={styles.label}>
+                  {item?.fish?.length}{" "}
+                  <FontAwesome5 name="fish" size={25} />
+                </Text>
               </Text>
             </View>
           </View>
@@ -89,7 +105,7 @@ const PondStatistic = ({ navigation }) => {
         if (response?.status === "201") {
           console.log(response);
           Toast.success("Pond Added Successfully");
-          dispatch(getFishByOwner(isLoggedIn.id));
+          dispatch(getPondByOwner(isLoggedIn.id)); // Refresh pond data
           form.resetFields();
           setTimeout(() => {
             setModalVisible(false);
@@ -109,9 +125,8 @@ const PondStatistic = ({ navigation }) => {
       return;
     }
 
-    // Launch image picker
     let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaType, // Correct format for Expo 49+
+      mediaTypes: ImagePicker.MediaTypeOptions.Images, // Correct format for Expo 49+
       allowsEditing: true,
       quality: 1,
     });
@@ -119,10 +134,8 @@ const PondStatistic = ({ navigation }) => {
     if (!result.canceled) {
       const uri = result.assets[0].uri;
       const fileType = uri.split(".").pop();
-
       const fileMimeType = `image/${fileType === "jpg" ? "jpeg" : fileType}`;
 
-      // Create FormData
       let formData = new FormData();
       formData.append("filene", {
         uri: uri,
@@ -141,8 +154,9 @@ const PondStatistic = ({ navigation }) => {
       }
     }
   };
+
   useEffect(() => {
-    const getData = async (key) => {
+    const getData = async () => {
       try {
         const value = await AsyncStorage.getItem("user");
         setIsLoggedIn(value ? JSON.parse(value) : null);
@@ -173,6 +187,20 @@ const PondStatistic = ({ navigation }) => {
 
     loadFontAsync();
   }, []);
+
+  // Pagination controls
+  const handlePreviousPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+    }
+  };
+
+  const handleNextPage = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage(currentPage + 1);
+    }
+  };
+
   return (
     <Provider>
       <ImageBackground
@@ -185,11 +213,41 @@ const PondStatistic = ({ navigation }) => {
           <Text style={styles.title}>Pond Statistic</Text>
 
           <FlatList
-            data={pondData}
+            data={paginatedPondData} // Use paginated data instead of pondData
             renderItem={renderPondCard}
             keyExtractor={(item) => item.pondID}
             contentContainerStyle={styles.listContent}
           />
+
+          {/* Pagination Controls */}
+          {pondData?.length > 0 && (
+            <View style={styles.paginationContainer}>
+              <TouchableOpacity
+                style={[
+                  styles.paginationButton,
+                  currentPage === 1 && styles.disabledButton,
+                ]}
+                onPress={handlePreviousPage}
+                disabled={currentPage === 1}
+              >
+                <Text style={styles.paginationText}>Previous</Text>
+              </TouchableOpacity>
+              <Text style={styles.pageText}>
+                {currentPage}/{totalPages}
+              </Text>
+              <TouchableOpacity
+                style={[
+                  styles.paginationButton,
+                  currentPage === totalPages && styles.disabledButton,
+                ]}
+                onPress={handleNextPage}
+                disabled={currentPage === totalPages}
+              >
+                <Text style={styles.paginationText}>Next</Text>
+              </TouchableOpacity>
+            </View>
+          )}
+
           <View style={styles.footer}>
             <View style={styles.badge}>
               <Text style={styles.badgeText}>

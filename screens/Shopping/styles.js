@@ -104,13 +104,11 @@ productCard: {
   productName: {
     fontSize: 14,
     textAlign:"center",
-    // fontWeight: "bold",
-    marginTop: 5,
   },
   productPrice: {
     fontSize: 16,
     fontWeight: "bold",
-    marginTop: 5,
+    marginBottom:100-0
   },
   addToCartButton: {
   position:"absolute",

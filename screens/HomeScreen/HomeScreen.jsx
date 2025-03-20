@@ -59,7 +59,6 @@ const HomeScreen = ({ navigation }) => {
     getData();
   }, []);
 
-
   return (
     <ImageBackground
       source={require("../../assets/koimain3.jpg")}
@@ -99,14 +98,19 @@ const HomeScreen = ({ navigation }) => {
             />
             <Text style={styles.drawerItemText}>Messages</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.drawerItem}>
+          <TouchableOpacity
+            style={styles.drawerItem}
+            onPress={() => {
+              navigation.navigate("BlogScreen");
+            }}
+          >
             <Image
               source={require("../../assets/bookmark.png")}
               style={styles.drawerItemImage}
             />
-            <Text style={styles.drawerItemText}>Bookmarks</Text>
+            <Text style={styles.drawerItemText}>Blogs</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.drawerItem}>
+          <TouchableOpacity style={styles.drawerItem} onPress={() => {navigation.navigate("ReminderScreen")}}>
             <Image
               source={require("../../assets/download-removebg-preview (1) 1.png")}
               style={styles.drawerItemImage}
@@ -130,14 +134,18 @@ const HomeScreen = ({ navigation }) => {
             <></>
           )}
 
-          <TouchableOpacity style={styles.drawerItem} onPress={() => navigation.navigate("OrderHistory")}>
+          <TouchableOpacity
+            style={styles.drawerItem}
+            onPress={() => navigation.navigate("OrderHistory")}
+          >
             <Image
               source={require("../../assets/history_svgrepo.com.png")}
               style={styles.drawerItemImage}
             />
             <Text style={styles.drawerItemText}>Order History</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.drawerItem}>
+
+          <TouchableOpacity style={styles.drawerItem} onPress={() => navigation.navigate("ScheduleScreen")}>
             <Image
               source={require("../../assets/Calendar.png")}
               style={styles.drawerItemImage}
@@ -270,13 +278,31 @@ const HomeScreen = ({ navigation }) => {
           >
             Pond Statistic
           </Button>
-          <Button type="primary" style={styles.pondButton} onPress={()=>{navigation.navigate("WaterParameter")}}>
+          <Button
+            type="primary"
+            style={styles.pondButton}
+            onPress={() => {
+              navigation.navigate("WaterParameter");
+            }}
+          >
             Water Parameters
           </Button>
-          <Button type="primary" style={styles.pondButton} onPress={()=>{navigation.navigate("FoodCalculator")}}>
+          <Button
+            type="primary"
+            style={styles.pondButton}
+            onPress={() => {
+              navigation.navigate("FoodCalculator");
+            }}
+          >
             Food Calculator
           </Button>
-          <Button type="primary" style={styles.pondButton} onPress={()=>{navigation.navigate("SaltCalculator")}}>
+          <Button
+            type="primary"
+            style={styles.pondButton}
+            onPress={() => {
+              navigation.navigate("SaltCalculator");
+            }}
+          >
             Salt Calculator
           </Button>
         </View>

@@ -1,10 +1,16 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { deleteRequest, getRequest, getRequestParams, postRequest, putRequest } from "../../services/httpMethods";
+import {
+  deleteRequest,
+  getRequest,
+  getRequestParams,
+  postRequest,
+  putRequest,
+} from "../../services/httpMethods";
 import { Alert } from "react-native";
 
 const initialState = {
   food: null,
-  salt:null,
+  salt: null,
   instructions: null,
 };
 
@@ -17,15 +23,16 @@ export const calculatorSlice = createSlice({
     },
   },
   extraReducers: (builder) => {
-    builder.addCase(calculateFood.fulfilled, (state, action) => {
-      state.food = action.payload;
-    })
-    .addCase(calculateSalt.fulfilled, (state, action) => {
-      state.salt = action.payload;
-    })
-    .addCase(additionProccess.fulfilled, (state, action) => {
-      state.instructions = action.payload;
-    })
+    builder
+      .addCase(calculateFood.fulfilled, (state, action) => {
+        state.food = action.payload;
+      })
+      .addCase(calculateSalt.fulfilled, (state, action) => {
+        state.salt = action.payload;
+      })
+      .addCase(additionProccess.fulfilled, (state, action) => {
+        state.instructions = action.payload;
+      });
   },
 });
 
@@ -33,9 +40,9 @@ export const calculateFood = createAsyncThunk(
   "calculatorSlice/calculateFood",
   async (values) => {
     try {
-        console.log(values)
+      console.log(values);
       const res = await getRequestParams(`FoodCalculate`, values);
-      console.log("res", res)
+      console.log("res", res);
       return res.data;
     } catch (error) {
       Alert.alert("Error", "Failed to load category data.");
@@ -47,8 +54,20 @@ export const calculateSalt = createAsyncThunk(
   "calculatorSlice/calculateSalt",
   async (values) => {
     try {
-        console.log("a",values)
+      console.log("a", values);
       const res = await postRequest(`SaltCalculate/calculate`, values);
+      return res.data;
+    } catch (error) {
+      Alert.alert("Error", "Failed to load category data.");
+    }
+  }
+);
+
+export const updateSalt = createAsyncThunk(
+  "calculatorSlice/updateSalt",
+  async (values) => {
+    try {
+      const res = await postRequest(`SaltCalculate/update-salt-amount`, values);
       return res.data;
     } catch (error) {
       Alert.alert("Error", "Failed to load category data.");
@@ -60,7 +79,9 @@ export const additionProccess = createAsyncThunk(
   "calculatorSlice/additionProccess",
   async (values) => {
     try {
-      const res = await postRequest(`SaltCalculate/addition-process?pondId=${values}`);
+      const res = await postRequest(
+        `SaltCalculate/addition-process?pondId=${values}`
+      );
       return res.data;
     } catch (error) {
       Alert.alert("Error", "Failed to load category data.");

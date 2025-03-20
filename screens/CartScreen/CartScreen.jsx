@@ -96,6 +96,7 @@ const CartScreen = ({ navigation }) => {
       shipFee: 10,
       shipType: "string",
       status: "Pending",
+      note:"string"
     };
     console.log(order);
     dispatch(createOrder(order))
@@ -129,7 +130,7 @@ const CartScreen = ({ navigation }) => {
       <View style={styles.overlay} />
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
+        <TouchableOpacity onPress={() => navigation.navigate("Shopping")}>
           <AntDesign name="left" size={24} color="black" />
         </TouchableOpacity>
         <Text style={styles.title}>Cart</Text>

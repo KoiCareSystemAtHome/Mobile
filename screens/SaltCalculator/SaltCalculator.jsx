@@ -21,8 +21,9 @@ import {
   additionProccess,
   calculateSalt,
 } from "../../redux/slices/calculatorSlice";
+import { Button } from "react-native-paper";
 
-const SaltCalculator = () => {
+const SaltCalculator = ({ navigation }) => { // Added navigation prop
   const dispatch = useDispatch();
 
   const pondData = useSelector(pondByOwnerSelector);
@@ -35,12 +36,10 @@ const SaltCalculator = () => {
   const [desiredConcentration, setDesiredConcentration] = useState(0.31);
   const [waterChange, setWaterChange] = useState(8);
   const [previewValue, setPreviewValue] = useState(0.2);
+  const [pondVolume, setPondVolume] = useState(80);
 
   const [growth, setGrowth] = useState("Medium");
   const growthOptions = ["Low", "Medium", "High"];
-  const pondVolume = 80;
-
-  // Calculate required salt amounts
 
   const { totalSalt, waterChangeSalt } = calculateSalt();
 
@@ -56,6 +55,7 @@ const SaltCalculator = () => {
 
     getData();
   }, []);
+
   useEffect(() => {
     if (isLoggedIn?.id) {
       dispatch(getPondByOwner(isLoggedIn.id));
@@ -64,6 +64,7 @@ const SaltCalculator = () => {
 
   useEffect(() => {
     if (homePond) {
+      setPondVolume(homePond?.maxVolume);
       dispatch(getPondByID(homePond?.pondID));
     }
   }, [homePond, dispatch]);
@@ -83,6 +84,7 @@ const SaltCalculator = () => {
         });
     }
   }, [homePond, growth, waterChange, dispatch]);
+
   return (
     <ImageBackground
       source={require("../../assets/koimain3.jpg")}
@@ -90,10 +92,10 @@ const SaltCalculator = () => {
       resizeMode="cover"
     >
       <View style={styles.overlay} />
-      <ScrollView contentContainerStyle={styles.container}>
-        <Text style={styles.title}>Food Calculator</Text>
+      <ScrollView contentContainerStyle={styles.scrollContainer}>
+        <Text style={styles.title}>Salt Calculator</Text>
 
-        <View style={{ justifyContent: "center", flexDirection: "row" }}>
+        <View style={styles.selectorContainer}>
           <TouchableOpacity
             onPress={() => setHomePondOpen(!homePondOpen)}
             style={styles.selector}
@@ -104,26 +106,26 @@ const SaltCalculator = () => {
             <Icon name="down" size={16} color="#000" />
           </TouchableOpacity>
         </View>
-        <View style={{ justifyContent: "center", flexDirection: "row" }}>
-          {homePondOpen && (
-            <View style={styles.dropdown}>
-              {pondData.map((item) => (
-                <TouchableOpacity
-                  key={item?.pondID}
-                  onPress={() => {
-                    setHomePond(item);
-                    setHomePondOpen(false);
-                  }}
-                >
-                  <Text style={styles.dropdownItem}>{item?.name}</Text>
-                </TouchableOpacity>
-              ))}
-            </View>
-          )}
-        </View>
+        {homePondOpen && (
+          <View style={styles.dropdown}>
+            {pondData.map((item) => (
+              <TouchableOpacity
+                key={item?.pondID}
+                onPress={() => {
+                  setHomePond(item);
+                  setHomePondOpen(false);
+                }}
+                style={styles.dropdownItemContainer}
+              >
+                <Text style={styles.dropdownItem}>{item?.name}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        )}
+
         <View style={styles.card}>
           <Text style={styles.label}>
-            Pond volume: <Text style={styles.value}>80L</Text>
+            Pond volume: <Text style={styles.value}>{pondVolume}L</Text>
           </Text>
         </View>
 
@@ -195,12 +197,34 @@ const SaltCalculator = () => {
             <Text style={styles.instructionLabel}>Instructions:</Text>
             {instructionData.instructions.map((instruction, index) => (
               <Text key={index} style={styles.instructionItem}>
-              {instructionData.instructions.length > 1 ? `${index + 1}. ` : ""}{instruction}
+                {instructionData.instructions.length > 1
+                  ? `${index + 1}. `
+                  : ""}
+                {instruction}
               </Text>
             ))}
           </View>
         )}
+
+        {/* Add padding or placeholder to ensure scrollable content */}
+        <View style={{ height: 100 }} />
       </ScrollView>
+
+      {/* Next Button */}
+      <TouchableOpacity
+        style={[
+          styles.nextButton,
+          !homePond && styles.nextButtonDisabled, // Apply disabled style if no pond is selected
+        ]}
+        onPress={() => {
+          if (homePond) {
+            navigation.navigate("AddSaltForm", { pondID: homePond?.pondID });
+          }
+        }}
+        disabled={!homePond} // Disable the button if homePond is null
+      >
+        <Text style={styles.nextButtonText}>Next</Text>
+      </TouchableOpacity>
     </ImageBackground>
   );
 };

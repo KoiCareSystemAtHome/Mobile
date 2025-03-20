@@ -25,11 +25,12 @@ export const styles = StyleSheet.create({
     textAlign: "center",
     marginVertical: 20,
   },
-  selectorContainer:{
+  selectorContainer: {
+    justifyContent: "center",
     flexDirection: "row",
-    justifyContent: "space-center",
+    marginBottom: 10,
   },
- selector: {
+  selector: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
@@ -48,6 +49,12 @@ export const styles = StyleSheet.create({
     marginTop: 5,
     padding: 10,
     width: "50%",
+    maxHeight: 200,
+  },
+  dropdownItemContainer: {
+    paddingVertical: 5,
+    borderBottomWidth: 1,
+    borderBottomColor: "#ddd",
   },
   dropdownItem: {
     fontSize: 16,
@@ -68,6 +75,7 @@ export const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "bold",
     color: "#333",
+    marginBottom: 10,
   },
   value: {
     fontSize: 16,
@@ -123,12 +131,11 @@ export const styles = StyleSheet.create({
     fontSize: 14,
     color: "white",
   },
-  // Styles for the Next button
   nextButton: {
     position: "absolute",
     bottom: 20,
     right: 20,
-    backgroundColor: "#FFA500", // Matches the active toggle color
+    backgroundColor: "#FFA500",
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: 8,
@@ -138,13 +145,52 @@ export const styles = StyleSheet.create({
     shadowOpacity: 0.3,
     shadowRadius: 4,
   },
+  nextButtonDisabled: {
+    backgroundColor: "#ccc",
+    opacity: 0.6,
+  },
   nextButtonText: {
     color: "#fff",
     fontSize: 16,
     fontWeight: "bold",
   },
-  nextButtonDisabled: {
-    backgroundColor: "#ccc", // Grayed out when disabled
-    opacity: 0.6, // Slightly transparent to indicate disabled state
+  // New styles for the form
+  formContainer: {
+    backgroundColor: "#fff",
+    padding: 15,
+    borderRadius: 10,
+    marginVertical: 10,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 4,
+  },
+  input: {
+    height: 40,
+    borderColor: "#ccc",
+    borderWidth: 1,
+    borderRadius: 8,
+    paddingHorizontal: 10,
+    marginBottom: 15,
+    fontSize: 16,
+    color: "#333",
+  },
+  saveButton: {
+    backgroundColor: "#FFA500",
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+    alignItems: "center",
+    elevation: 5,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+  },
+  saveButtonText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "bold",
   },
 });

@@ -78,6 +78,8 @@ export const styles = StyleSheet.create({
     marginBottom: 3,
   },
   parameterCard: {
+    flexDirection:"row",
+    justifyContent:"center",
     backgroundColor: "#f9f9f9",
     borderRadius: 20,
     alignItems: "center",

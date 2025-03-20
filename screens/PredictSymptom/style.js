@@ -20,71 +20,38 @@ export const styles = StyleSheet.create({
     textAlign: "center",
     marginVertical: 20,
   },
-  subTitle: {
-    fontSize: 18,
+  symptomCard: {
+    marginTop: 20,
+    backgroundColor: "rgba(255, 255, 255, 0.9)",
+    borderRadius: 10,
+    padding: 15,
+    marginHorizontal: 10,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+    zIndex: 1,
+  },
+  cardTitle: {
+    fontSize: 16,
     fontWeight: "bold",
+    marginBottom: 10,
     color: "#333",
   },
   dropdown: {
     marginBottom: 150,
     borderColor: "#4A90E2",
   },
-  dropdownContainer: {
-    zIndex:100,
-    borderColor: "#4A90E2",
-  },
-  selectedContainer: {
-    marginTop: 20,
-  },
-  symptomText: {
-    color: "white",
-    fontSize: 16,
-    marginVertical: 5,
-  },
-  symptomCard: {
-    marginTop: 20,
-    backgroundColor: 'rgba(255, 255, 255, 0.9)',
-    borderRadius: 10,
-    padding: 15,
-    marginHorizontal: 10,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-    zIndex:1
-  },
-  cardTitle: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    marginBottom: 10,
-    color: '#333',
-  },
-
   symptomList: {
     maxHeight: 100, // Adjust as needed
-    zIndex:1
+    zIndex: 1,
   },
   symptomItem: {
     paddingVertical: 5,
   },
   symptomText: {
     fontSize: 16,
-    color: '#666',
-  },
-  nextButton: {
-    position: "absolute",
-    bottom: 20,
-    right: 20,
-    backgroundColor: "#4A90E2",
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 25,
-    elevation: 5,
-  },
-  nextButtonText: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "bold",
+    color: "#666",
   },
 });

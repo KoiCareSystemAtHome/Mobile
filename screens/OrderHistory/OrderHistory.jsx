@@ -63,11 +63,8 @@ const OrderHistory = ({ navigation }) => {
 
   useEffect(() => {
     dispatch(getProduct());
-    if (productData) {
-      dispatch(getOrderByAccount(isLoggedIn?.id));
-    }
+    dispatch(getOrderByAccount(isLoggedIn?.id));
   }, [dispatch, isLoggedIn]);
-
   return (
     <Provider>
       <ImageBackground
@@ -132,17 +129,30 @@ const OrderHistory = ({ navigation }) => {
                     {order.coins} Xu
                   </Text>
                 </View>
-
                 <View style={styles.buttonRow}>
+                  {order?.status === "Complete" ? (
+                    <TouchableOpacity
+                      style={styles.returnButton}
+                      onPress={() => {
+                        navigation.navigate("Report", {
+                          orderId: order.orderId,
+                        });
+                      }}
+                    >
+                      <Text style={styles.returnText}>Báo cáo</Text>
+                    </TouchableOpacity>
+                  ) : (
+                    (<></>)
+                  )}
+
                   <TouchableOpacity
-                    style={styles.returnButton}
+                    style={styles.reviewButton}
                     onPress={() => {
-                      navigation.navigate("Report", { orderId: order.orderId });
+                      navigation.navigate("OrderTracking", {
+                        orderId: order.orderId,
+                      });
                     }}
                   >
-                    <Text style={styles.returnText}>Báo cáo</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity style={styles.reviewButton}>
                     <Text style={styles.reviewText}>Theo dõi đơn hàng</Text>
                   </TouchableOpacity>
                 </View>

@@ -1,5 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { ImageBackground, Text, View } from "react-native";
+import {
+  ImageBackground,
+  Text,
+  View,
+  FlatList,
+  TouchableOpacity,
+} from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import {
   getExamination,
@@ -14,19 +20,14 @@ import {
 import DropDownPicker from "react-native-dropdown-picker";
 import { styles } from "./styles";
 
-const SymptomScreen = () => {
+const SymptomScreen = ({ navigation }) => {
   const dispatch = useDispatch();
   const symptomData = useSelector(symptomByTypeSelector);
-  const symptomPredictionData = useSelector(symptomPredictionSelector);
-  const symptomExaminationData = useSelector(symptomExaminationSelector);
+
   // Dropdown states
   const [open, setOpen] = useState(false);
   const [items, setItems] = useState([]);
   const [selectedValues, setSelectedValues] = useState([]);
-
-  const [openPrediction, setOpenPrediction] = useState(false);
-  const [itemsPrediction, setItemsPrediction] = useState([]);
-  const [selectedValuesPrediction, setSelectedValuesPrediction] = useState();
 
   // Fetch data on mount
   useEffect(() => {
@@ -42,39 +43,54 @@ const SymptomScreen = () => {
       }));
       setItems(dropdownItems);
     }
-    if (symptomPredictionData) {
-      const dropdownItemsPrediction =
-        symptomPredictionData?.symptomPredicts?.map((symptom) => ({
-          label: symptom.name,
-          value: symptom.symtompId,
-        }));
-      console.log(dropdownItemsPrediction);
-      setItemsPrediction(dropdownItemsPrediction);
-    }
-  }, [symptomData, selectedValues]);
+  }, [symptomData]);
 
-  useEffect(() => {
-    if (selectedValues) {
-      const mappedSymptoms = selectedValues?.map((id) => ({
+  // Get selected symptom names
+  const selectedSymptoms = symptomData
+    ?.filter((symptom) => selectedValues.includes(symptom.symtompId))
+    .map((symptom) => symptom.name);
+
+  // Get unique selected symptom types
+  const selectedTypes = [
+    ...new Set(
+      symptomData
+        ?.filter((symptom) => selectedValues.includes(symptom.symtompId))
+        .map((symptom) => symptom.type)
+    ),
+  ];
+
+  // Render individual symptom item
+  const renderSymptomItem = ({ item }) => (
+    <View style={styles.symptomItem}>
+      <Text style={styles.symptomText}>{item}</Text>
+    </View>
+  );
+
+  // Render individual type item
+  const renderTypeItem = ({ item }) => (
+    <View style={styles.symptomItem}>
+      <Text style={styles.symptomText}>
+        {item === "Common_Food"
+          ? "Thức Ăn"
+          : item === "Common_Environment"
+          ? "Môi trường"
+          : item === "Common_Disease"
+          ? "Loại bệnh phổ biển"
+          : item}
+      </Text>
+    </View>
+  );
+
+  // Handle navigation to PredictSymptom
+  const handleNext = () => {
+    navigation.navigate("PredictSymptom", {
+      selectedSymptomIds: selectedValues.map((id) => ({
         symtompId: id,
-        value: "True",
-      }));
-      if (mappedSymptoms.length > 0) {
-        dispatch(getPrediction(mappedSymptoms));
-      }
-      if (selectedValuesPrediction) {
-        const mappedSymptomsPrediction = selectedValuesPrediction?.map(
-          (id) => ({
-            symtompId: id,
-            value: "True",
-          })
-        );
-        dispatch(getExamination(mappedSymptomsPrediction));
-      }
-    }
-  }, [selectedValues, selectedValuesPrediction]);
+        value: "string",
+      })),
+    });
+  };
 
-  console.log(symptomExaminationData);
   return (
     <ImageBackground
       source={require("../../assets/koimain3.jpg")}
@@ -83,7 +99,7 @@ const SymptomScreen = () => {
     >
       <View style={styles.overlay} />
       <View style={styles.container}>
-        <Text style={styles.title}>Predict Symptoms</Text>
+        <Text style={styles.title}>DIsease Examination</Text>
         <Text style={styles.subTitle}>Hãy chọn triệu chứng của cá</Text>
         <DropDownPicker
           open={open}
@@ -95,37 +111,45 @@ const SymptomScreen = () => {
           mode="BADGE"
           placeholder="Select Symptoms"
           style={styles.dropdown}
-          dropDownContainerStyle={{ zIndex: 11 }}
+          dropDownContainerStyle={{ zIndex: 100 }}
         />
 
-        <Text style={styles.subTitle}>
-          Hãy chọn triệu chứng của cá dựa vào chẩn đoán dưới đây
-        </Text>
-        <DropDownPicker
-          open={openPrediction}
-          value={selectedValuesPrediction}
-          items={itemsPrediction}
-          setOpen={setOpenPrediction}
-          setValue={setSelectedValuesPrediction}
-          multiple={true}
-          mode="BADGE"
-          placeholder="Select Symptoms"
-          style={{ zIndex: 0 }}
-          dropDownContainerStyle={{ zIndex: 11, borderColor: "black" }}
-          disabled={selectedValues.length === 0}
-        />
-        {selectedValuesPrediction ? (
-          <View>
-            <Text style={[styles.subTitle, { marginTop: 150 }]}>
-              Chẩn đoán bệnh: {symptomExaminationData?.diseaseName}
-            </Text>
-            <Text>
-            {symptomExaminationData?.description}
-            </Text>
+        {selectedSymptoms?.length > 0 && (
+          <View style={styles.symptomCard}>
+            <FlatList
+              data={selectedSymptoms}
+              renderItem={renderSymptomItem}
+              keyExtractor={(item, index) => index.toString()}
+              style={styles.symptomList}
+            />
           </View>
-        ) : (
-          ""
         )}
+
+        {selectedTypes?.length > 0 && (
+          <View style={styles.symptomCard}>
+            <Text style={styles.cardTitle}>
+              Có vẻ hồ cá của bạn đang gặp vấn đề về:
+            </Text>
+            <FlatList
+              data={selectedTypes}
+              renderItem={renderTypeItem}
+              keyExtractor={(item, index) => index.toString()}
+              style={styles.symptomList}
+            />
+          </View>
+        )}
+
+        {/* Next Button */}
+        <TouchableOpacity
+          style={[
+            styles.nextButton,
+            { opacity: selectedValues.length > 0 ? 1 : 0.5 },
+          ]}
+          onPress={handleNext}
+          disabled={selectedValues.length === 0}
+        >
+          <Text style={styles.nextButtonText}>Tiếp theo</Text>
+        </TouchableOpacity>
       </View>
     </ImageBackground>
   );

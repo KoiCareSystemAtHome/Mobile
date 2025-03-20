@@ -3,13 +3,13 @@ import { deleteRequest, getRequest, getRequestParams, postRequest, putRequest } 
 import { Alert } from "react-native";
 
 const initialState = {
-  pondByOwner: null,
-  pondById:null,
+  approvedBlogs: null,
+  blogById:null,
   params:null,
 };
 
-export const pondSlice = createSlice({
-  name: "pondSlice",
+export const blogSlice = createSlice({
+  name: "blogSlice",
   initialState,
   reducers: {
     setData: (state, action) => {
@@ -17,59 +17,53 @@ export const pondSlice = createSlice({
     },
   },
   extraReducers: (builder) => {
-    builder.addCase(getPondByOwner.fulfilled, (state, action) => {
-      state.pondByOwner = action.payload;
+    builder.addCase(getApprovedBlogs.fulfilled, (state, action) => {
+      state.approvedBlogs = action.payload;
     })
-    .addCase(getPondByID.fulfilled, (state, action) => {
-      state.pondById = action.payload;
-    })
-    .addCase(getRequiredParams.fulfilled, (state, action) => {
-      state.params = action.payload;
-    })
+
   },
 });
 
-export const getPondByOwner = createAsyncThunk(
-  "pondSlice/getPondByOwner",
-  async (ownerId) => {
+export const getApprovedBlogs = createAsyncThunk(
+  "blogSlice/getApprovedBlogs",
+  async () => {
     try {
-      const res = await getRequest(`Pond/get-by-owner?owner=${ownerId}`);
+      const res = await getRequest(`Blog/approved-blogs`);
       return res.data;
     } catch (error) {
-      Alert.alert("Error", "Failed to load pond data.");
+      Alert.alert("Error", "Failed to load blog data.");
     }
   }
 );
 export const getRequiredParams = createAsyncThunk(
-  "pondSlice/getRequiredParams",
+  "blogSlice/getRequiredParams",
   async (ownerId) => {
     try {
-      const res = await getRequest(`Pond/pond-required-param`)
+      const res = await getRequest(`Blog/blog-required-param`)
       return res.data;
     } catch (error) {
-      Alert.alert("Error", "Failed to load pond data.");
+      Alert.alert("Error", "Failed to load blog data.");
     }
   }
 );
 
-export const getPondByID = createAsyncThunk(
-  "pondSlice/getPondByID",
-  async (pondId) => {
+export const getBlogByID = createAsyncThunk(
+  "blogSlice/getBlogByID",
+  async (blogId) => {
     try {
-      console.log("a",pondId)
-      const res = await getRequest(`Pond/get-pond/${pondId}`);
+      const res = await getRequest(`Blog/get-blog/${blogId}`);
       return res.data;
     } catch (error) {
-      Alert.alert("Error", "Failed to load pond data.");
+      Alert.alert("Error", "Failed to load blog data.");
     }
   }
 );
 
-export const createPond = createAsyncThunk(
-  "pondSlice/createPond",
+export const createBlog = createAsyncThunk(
+  "blogSlice/createBlog",
   async (payload, { rejectWithValue }) => {
     try {
-      const res = await postRequest(`Pond/create-pond`, payload);
+      const res = await postRequest(`Blog/create-blog`, payload);
       return res.data;
     } catch (error) {
       Alert.alert("Error", "Failed to add test.");
@@ -78,11 +72,11 @@ export const createPond = createAsyncThunk(
   }
 );
 
-export const updatePond = createAsyncThunk(
-  "testSlice/updatePond",
+export const updateBlog = createAsyncThunk(
+  "testSlice/updateBlog",
   async (payload, { rejectWithValue }) => {
     try {
-      const res = await putRequest(`Pond/update-pond`, payload);
+      const res = await putRequest(`Blog/update-blog`, payload);
       return res.data;
     } catch (error) {
       return rejectWithValue("Update failed");
@@ -106,5 +100,5 @@ export const deleteTest = createAsyncThunk(
   }
 );
 
-export const { setData } = pondSlice.actions;
-export default pondSlice;
+export const { setData } = blogSlice.actions;
+export default blogSlice;

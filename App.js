@@ -5,6 +5,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
 import { NavigationContainer } from '@react-navigation/native';
 import { View, Text } from 'react-native';
+import "react-native-reanimated"; // ✅ ADD THIS AT THE TOP
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import HomeScreen from './screens/HomeScreen/HomeScreen';
@@ -26,6 +27,15 @@ import WaterParameter from './screens/WaterParameter/WaterParameter';
 import SymptomScreen from './screens/SymptomScreen/SymptomScreen';
 import OrderHistory from './screens/OrderHistory/OrderHistory';
 import ReportScreen from './screens/ReportScreen/ReportScreen';
+import OrderTracking from './screens/OrderTracking/OrderTracking';
+import BlogScreen from './screens/BlogScreen/BlogScreen';
+import AddSaltForm from './screens/SaltCalculator/components/AddSaltForm';
+import PredictSymptom from './screens/PredictSymptom/PredictSymptom';
+import ReminderScreen from './screens/ReminderScreen/ReminderScreen';
+import ScheduleScreen from './screens/ScheduleScreen/ScheduleScreen';
+import CalculateMaintainance from './screens/CalculateMaintainance/CalculateMaintainance';
+import RecurringMaintainance from './screens/ReccuringMaintainance/RecurringMaintainance';
+
 
 
 // Create Bottom Tab Navigator
@@ -193,6 +203,46 @@ export default function App() {
         <Stack.Screen
           name="Report"
           component={ReportScreen}
+          options={{ headerShown: false }}
+        />
+         <Stack.Screen
+          name="OrderTracking"
+          component={OrderTracking}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="BlogScreen"
+          component={BlogScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="AddSaltForm"
+          component={AddSaltForm}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="PredictSymptom"
+          component={PredictSymptom}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="ReminderScreen"
+          component={ReminderScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="ScheduleScreen"
+          component={ScheduleScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="CalculateMaintainance"
+          component={CalculateMaintainance}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="RecurringMaintainance"
+          component={RecurringMaintainance}
           options={{ headerShown: false }}
         />
           <Stack.Screen

@@ -9,6 +9,8 @@ import ghnSlice from "./slices/ghnSlice";
 import calculatorSlice from "./slices/calculatorSlice";
 import symptomSlice from "./slices/symptomSlice";
 import reportSlice from "./slices/reportSlice";
+import blogSlice from "./slices/blogSlice";
+import reminderSlice from "./slices/reminderSlice";
 
 
 const store = configureStore({
@@ -23,6 +25,8 @@ const store = configureStore({
     calculatorSlice: calculatorSlice.reducer,    
     symptomSlice: symptomSlice.reducer,
     reportSlice: reportSlice.reducer,
+    blogSlice: blogSlice.reducer,
+    reminderSlice: reminderSlice.reducer,
 
 
   },

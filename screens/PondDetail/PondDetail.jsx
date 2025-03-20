@@ -1,5 +1,5 @@
 import { Card } from "@ant-design/react-native";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   Image,
   ImageBackground,
@@ -9,10 +9,64 @@ import {
   ScrollView,
   TouchableOpacity,
 } from "react-native";
-import { styles } from "./styles";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
+import WaterParametersChart from "./components/WaterParameterChart"; // Adjust the path
+import { useDispatch, useSelector } from "react-redux";
+import { getPondByID } from "../../redux/slices/pondSlice";
+import { pondByIdSelector } from "../../redux/selector";
+import { styles } from "./styles";
+
 const PondDetail = ({ route }) => {
+  const dispatch = useDispatch();
+  const pondById = useSelector(pondByIdSelector);
   const { pond } = route.params;
+
+  const [selectedParameters, setSelectedParameters] = useState([]);
+
+  // Transform pondParameters into chart-compatible data
+  const transformPondParameters = (pondParameters) => {
+    if (!pondParameters || !Array.isArray(pondParameters)) return [];
+
+    const dataMap = {};
+    pondParameters.forEach((param) => {
+      param.valueInfors.forEach((valueInfo) => {
+        const dateKey = valueInfo.caculateDay;
+        if (!dataMap[dateKey]) {
+          dataMap[dateKey] = { calculatedDate: dateKey };
+        }
+        dataMap[dateKey][param.parameterName] = valueInfo.value;
+      });
+    });
+
+    return Object.values(dataMap);
+  };
+
+  const waterParameterData = transformPondParameters(pondById?.pondParameters);
+
+  const parameters = pondById?.pondParameters?.map((param) => param.parameterName) || [];
+
+  const toggleParameter = (parameter) => {
+    if (selectedParameters.includes(parameter)) {
+      setSelectedParameters(selectedParameters.filter((param) => param !== parameter));
+    } else {
+      setSelectedParameters([...selectedParameters, parameter]);
+    }
+  };
+
+  useEffect(() => {
+    dispatch(getPondByID(pond?.pondID));
+  }, [dispatch, pond?.pondID]);
+
+  // Split parameters into rows of 3
+  const chunkArray = (array, chunkSize) => {
+    const result = [];
+    for (let i = 0; i < array.length; i += chunkSize) {
+      result.push(array.slice(i, i + chunkSize));
+    }
+    return result;
+  };
+
+  const parameterRows = chunkArray(parameters, 3);
 
   return (
     <ImageBackground
@@ -47,7 +101,6 @@ const PondDetail = ({ route }) => {
                 <Text style={styles.pondText}>
                   <Text style={styles.label}>Pumping Capacity: </Text>20,000 l/h
                 </Text>
-
                 <TouchableOpacity style={styles.editButton}>
                   <FontAwesome name="pencil-square-o" size={24} color="white" />
                 </TouchableOpacity>
@@ -56,67 +109,30 @@ const PondDetail = ({ route }) => {
           </Card>
         </View>
 
-        {/* Water Parameters Section */}
         <View style={styles.parametersContainer}>
           <Text style={styles.sectionTitle}>Water Parameters</Text>
-          <View style={styles.parametersRow}>
-            <View
-              style={[styles.parameterCard, { backgroundColor: "#FFD29D" }]}
-            >
-              <Text style={styles.parameterLabel}>Nitrate (NO2)</Text>
+          {parameterRows.map((row, rowIndex) => (
+            <View key={rowIndex} style={styles.parametersRow}>
+              {row.map((param) => (
+                <TouchableOpacity
+                  key={param}
+                  onPress={() => toggleParameter(param)}
+                  style={[
+                    styles.parameterCard,
+                    {
+                      backgroundColor: selectedParameters.includes(param)
+                        ? "#FFD29D"
+                        : styles.parameterCard.backgroundColor,
+                    },
+                  ]}
+                >
+                  <Text style={styles.parameterLabel}>{param}</Text>
+                </TouchableOpacity>
+              ))}
             </View>
-            <View
-              style={[styles.parameterCard, { backgroundColor: "#FFD29D" }]}
-            >
-              <Text style={styles.parameterLabel}>Nitrite (NO2)</Text>
-            </View>
-            <View
-              style={[styles.parameterCard, { backgroundColor: "#FFD29D" }]}
-            >
-              <Text style={styles.parameterLabel}>Ammonium (NH4)</Text>
-            </View>
-          </View>
-          <View style={styles.parametersRow}>
-            <View style={styles.parameterCard}>
-              <Text style={styles.parameterLabel}>Phosphate (PO4)</Text>
-            </View>
-            <View style={styles.parameterCard}>
-              <Text style={styles.parameterLabel}>Oxygen (O2)</Text>
-            </View>
-            <View style={styles.parameterCard}>
-              <Text style={styles.parameterLabel}>pH</Text>
-            </View>
-          </View>
-          <View style={styles.parametersRow}>
-            <View style={styles.parameterCard}>
-              <Text style={styles.parameterLabel}>KH</Text>
-            </View>
-            <View style={styles.parameterCard}>
-              <Text style={styles.parameterLabel}>GH</Text>
-            </View>
-            <View style={styles.parameterCard}>
-              <Text style={styles.parameterLabel}>Temp</Text>
-            </View>
-          </View>
-          <View style={styles.parametersRow}>
-            <View style={styles.parameterCard}>
-              <Text style={styles.parameterLabel}>Salt</Text>
-            </View>
-            <View style={styles.parameterCard}>
-              <Text style={styles.parameterLabel}>CO2</Text>
-            </View>
-            <View style={styles.parameterCard}>
-              <Text style={styles.parameterLabel}>Amount</Text>
-            </View>
-          </View>
-          <View style={styles.parametersRow}>
-            <View style={styles.parameterCard}>
-              <Text style={styles.parameterLabel}>Outdoor Temp</Text>
-            </View>
-          </View>
+          ))}
         </View>
 
-        {/* Pond Statistics Section */}
         <View style={styles.statisticsContainer}>
           <View style={styles.statisticCard}>
             <View style={styles.statisticsRow}>
@@ -128,11 +144,11 @@ const PondDetail = ({ route }) => {
                 </TouchableOpacity>
               </View>
             </View>
+            <WaterParametersChart
+              selectedParameters={selectedParameters}
+              waterParameterData={waterParameterData}
+            />
           </View>
-          {/* <Image
-            source={require("../assets/pond_statistics_chart.png")}
-            style={styles.statisticsImage}
-          /> */}
         </View>
       </ScrollView>
     </ImageBackground>

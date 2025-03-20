@@ -10,13 +10,25 @@ import {
   TextInput,
   Modal,
 } from "react-native";
+import {
+  Button,
+  Card,
+  Form,
+  Input,
+  List,
+  Picker,
+  Provider,
+  Toast,
+} from "@ant-design/react-native";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import { styles } from "./styles";
-
+import GrowthChart from "./components/GrowthChart";
+import HealthStatusForm from "./components/HealthStatusForm/HealthStatusForm";
 
 const FishDetail = ({ route }) => {
   const { fish } = route.params;
   const [isModalVisible, setModalVisible] = useState(false);
+  const [isHealthModalVisible, setHealthModalVisible] = useState(false);
   const dummyHealthStatus = [
     {
       date: "03.04.2023",
@@ -25,14 +37,12 @@ const FishDetail = ({ route }) => {
     },
   ];
 
-  const dummyGrowthHistory = [
-    {
-      date: "03.03.2023",
-      length: "15 cm",
-      weight: "12 g",
-      note: "First measurement",
-    },
-  ];
+  const handleHealthRecordSubmit = (values) => {
+    console.log("Health Record Submitted:", values);
+    // Add your API call or state update logic here
+  };
+
+  console.log("a", fish);
 
   return (
     <ImageBackground
@@ -48,7 +58,7 @@ const FishDetail = ({ route }) => {
         <Text style={styles.title}>Fish Details</Text>
         <View style={styles.headerContainer}>
           <View style={styles.imageContainer}>
-            <Image source={{uri:fish.image}} style={styles.fishImage} />
+            <Image source={{ uri: fish.image }} style={styles.fishImage} />
           </View>
           <View style={styles.detailsContainer}>
             <View style={styles.headerTop}>
@@ -101,7 +111,11 @@ const FishDetail = ({ route }) => {
           <Text>
             <Text style={{ fontWeight: "bold" }}>{fish.name}</Text> was bought
             for <Text style={{ fontWeight: "bold" }}>{fish.price} VND</Text> and
-            was bred by <Text style={{ fontWeight: "bold" }}>{fish.variety.varietyName}</Text>.
+            was bred by{" "}
+            <Text style={{ fontWeight: "bold" }}>
+              {fish.variety.varietyName}
+            </Text>
+            .
           </Text>
         </View>
 
@@ -109,9 +123,15 @@ const FishDetail = ({ route }) => {
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
             <Text style={styles.label}>Health Status</Text>
-            <TouchableOpacity>
+            <TouchableOpacity onPress={() => setHealthModalVisible(true)}>
               <FontAwesome name="plus" size={18} color="#6497B1" />
             </TouchableOpacity>
+            <HealthStatusForm
+              fishId={fish.koiID}
+              visible={isHealthModalVisible}
+              onClose={() => setHealthModalVisible(false)}
+              onSubmit={handleHealthRecordSubmit}
+            />
           </View>
           {dummyHealthStatus.map((item, index) => (
             <View key={index} style={styles.card}>
@@ -137,21 +157,10 @@ const FishDetail = ({ route }) => {
               <FontAwesome name="plus" size={18} color="#6497B1" />
             </TouchableOpacity>
           </View>
-          {dummyGrowthHistory.map((entry, index) => (
-            <View key={index} style={styles.card}>
-              <View style={{ padding: 15 }}>
-                <Image
-                  source={require("../../assets/610128 1.png")}
-                  style={{ height: 70, width: 70 }}
-                />
-              </View>
-              <View style={styles.cardContent}>
-                <Text style={styles.cardDate}>{entry.date}</Text>
-                <Text>Length: {entry.length}(First Measurement)</Text>
-                <Text>Weight: {entry.weight}</Text>
-              </View>
-            </View>
-          ))}
+
+          <View style={styles.card}>
+            <GrowthChart fishReportInfos={fish?.fishReportInfos}></GrowthChart>
+          </View>
         </View>
 
         {/* Notes */}
@@ -167,6 +176,7 @@ const FishDetail = ({ route }) => {
             the plus symbol in the top right of the section.
           </Text>
         </View>
+
         <Modal
           visible={isModalVisible}
           transparent={true}
@@ -261,11 +271,11 @@ const FishDetail = ({ route }) => {
                     <Text style={styles.deceasedButtonText}>Koi Deceased</Text>
                   </View>
                   <View>
-                  <TouchableOpacity style={styles.deleteButton}>
-                    <FontAwesome name="trash" size={24} color="#fff" />
-                  </TouchableOpacity>
-                  <Text style={styles.deleteButtonText}>Delete Koi</Text>
-                </View>
+                    <TouchableOpacity style={styles.deleteButton}>
+                      <FontAwesome name="trash" size={24} color="#fff" />
+                    </TouchableOpacity>
+                    <Text style={styles.deleteButtonText}>Delete Koi</Text>
+                  </View>
                 </View>
               </View>
             </View>
@@ -275,7 +285,5 @@ const FishDetail = ({ route }) => {
     </ImageBackground>
   );
 };
-
-
 
 export default FishDetail;

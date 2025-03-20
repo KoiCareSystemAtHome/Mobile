@@ -5,10 +5,10 @@ import { Alert } from "react-native";
 let accessToken = null;
 let isRefreshing = false;
 let refreshPromise = null;
-
+//https://http://14.225.206.203:8080/api/Vnpay/CallbackWithUserInfo?email=tonynhatanh911@gmail.com
 // Axios Client
 export const axiosClientVer2 = axios.create({
-  baseURL: "http://14.225.206.203:5444/api/",
+  baseURL: "http://14.225.206.203:8080/api/",
   headers: {
     "Content-Type": "application/json",
     Accept: "application/json",

@@ -1,0 +1,75 @@
+import { StyleSheet } from "react-native";
+
+export const styles = StyleSheet.create({
+  background: {
+    flex: 1,
+  },
+  overlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: "rgba(255, 255, 255, 0.5)",
+  },
+  container: {
+    flex: 1,
+    paddingHorizontal: 20,
+    paddingTop: 60,
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: "bold",
+    color: "#333",
+    textAlign: "center",
+    marginVertical: 20,
+  },
+  subtitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "#fff",
+    marginTop: 20,
+    marginBottom: 10,
+  },
+  selector: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    backgroundColor: "transparent",
+    padding: 10,
+    borderRadius: 10,
+    width: "50%",
+  },
+  selectorText: {
+    fontSize: 16,
+    color: "#000",
+  },
+  dropdown: {
+    backgroundColor: "#fff",
+    borderRadius: 10,
+    marginTop: 5,
+    padding: 10,
+    width: "50%",
+  },
+  dropdownItem: {
+    fontSize: 16,
+    paddingVertical: 5,
+  },
+  saveButton: {
+    position: "absolute",
+    bottom: 20,
+    right: 20,
+    backgroundColor: "#FFA500", // Orange color
+    width: 60,
+    height: 60,
+    borderRadius: 10,
+    justifyContent: "center",
+    alignItems: "center",
+    elevation: 5,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+  },
+  saveButtonText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "bold",
+  },
+})
