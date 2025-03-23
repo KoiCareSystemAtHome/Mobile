@@ -7,6 +7,7 @@ import {
   StyleSheet,
   ActivityIndicator,
   Alert,
+  ImageBackground,
 } from "react-native";
 import axios from "axios";
 import WebView from "react-native-webview";
@@ -30,8 +31,8 @@ const DepositScreen = ({ navigation }) => {
       Alert.alert("Error", "Please fill in all fields");
       return;
     }
-    const email = isLoggedIn?.email
-    const values = {money, description, email}
+    const email = isLoggedIn?.email;
+    const values = { money, description, email };
     dispatch(getPaymentUrl(values))
       .unwrap()
       .then((response) => {
@@ -50,7 +51,7 @@ const DepositScreen = ({ navigation }) => {
       const transactionStatus = urlParams.get("vnp_TransactionStatus");
       if (transactionStatus === "00") {
         Alert.alert("Success", "Giao dịch thành công. Giao dịch thành công.");
-        navigation.navigate("MainTabs")
+        navigation.navigate("MainTabs");
         dispatch(getWallet(isLoggedIn?.id));
       } else {
         Alert.alert("Error", "Payment failed. Please try again.");
@@ -70,10 +71,14 @@ const DepositScreen = ({ navigation }) => {
 
     getData();
   }, []);
-  
 
   return (
-    <View style={styles.container}>
+    <ImageBackground
+      source={require("../../assets/koimain3.jpg")}
+      style={styles.container}
+      // resizeMode="cover"
+    >
+    <View style={styles.overlay} />
       {!showWebView ? (
         <>
           <Text style={styles.title}>VNPay Payment</Text>
@@ -93,12 +98,12 @@ const DepositScreen = ({ navigation }) => {
             onChangeText={setDescription}
           />
 
-       
-
           {loading ? (
             <ActivityIndicator size="large" color="#0000ff" />
           ) : (
+            <View style={{marginHorizontal:20}}>
             <Button title="Create Payment" onPress={handleCreatePayment} />
+            </View>
           )}
         </>
       ) : (
@@ -109,21 +114,20 @@ const DepositScreen = ({ navigation }) => {
           startInLoadingState
         />
       )}
-    </View>
+    </ImageBackground>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
-    backgroundColor: "#f5f5f5",
   },
   title: {
     fontSize: 24,
     fontWeight: "bold",
     marginBottom: 20,
     textAlign: "center",
+    marginTop:40
   },
   input: {
     borderWidth: 1,
@@ -132,9 +136,14 @@ const styles = StyleSheet.create({
     marginBottom: 15,
     borderRadius: 5,
     backgroundColor: "#fff",
+    marginHorizontal:20
   },
   webview: {
     flex: 1,
+  },
+  overlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: "rgba(255, 255, 255, 0.5)",
   },
 });
 

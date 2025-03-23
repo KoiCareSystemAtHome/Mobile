@@ -45,21 +45,21 @@ const membershipData = [
 ];
 
 const TransactionScreen = ({ navigation }) => {
-    const dispatch = useDispatch()
+  const dispatch = useDispatch()
+  
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [activeTab, setActiveTab] = useState("Thanh toán");
-    const orderTransactionData = useSelector(orderTransactionSelector)
-    const packageTransactionData = useSelector(packageTransactionSelector)
-    const depositeTransactionData = useSelector(depositTransactionOrder)
-  // Determine which data to display based on the active tab
+  const orderTransactionData = useSelector(orderTransactionSelector)
+  const packageTransactionData = useSelector(packageTransactionSelector)
+  const depositeTransactionData = useSelector(depositTransactionOrder)
   const getDataForTab = () => {
     switch (activeTab) {
       case "Thanh toán":
         return depositeTransactionData;
       case "Sản phẩm":
-        return productData;
+        return orderTransactionData;
       case "Gói member":
-        return membershipData;
+        return packageTransactionData;
       default:
         return paymentData;
     }
@@ -105,7 +105,6 @@ const TransactionScreen = ({ navigation }) => {
         }
       }, [isLoggedIn?.id, dispatch]);
     
-      console.log(depositeTransactionData)
 
   return (
     <ImageBackground

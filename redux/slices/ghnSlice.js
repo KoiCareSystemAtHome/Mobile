@@ -91,7 +91,7 @@ export const getOrderByAccount = createAsyncThunk(
       const res = await getRequest(`Order?AccountId=${values}`);
       return res.data;
     } catch (error) {
-      Alert.alert("Error", "Failed to load category data.");
+      Alert.alert("Error", "Failed to load  data.");
     }
   }
 );
@@ -102,7 +102,7 @@ export const getOrderDetail = createAsyncThunk(
       const res = await getRequest(`Order/detail?orderId=${values}`);
       return res.data;
     } catch (error) {
-      Alert.alert("Error", "Failed to load category data.");
+      Alert.alert("Error", "Failed to load  data.");
     }
   }
 );

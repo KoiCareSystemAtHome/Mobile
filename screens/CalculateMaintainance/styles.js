@@ -72,4 +72,26 @@ export const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "bold",
   },
+  maintenanceCard: {
+        backgroundColor: "rgba(255, 255, 255, 0.95)",
+        borderRadius: 12,
+        padding: 20,
+        marginTop: 30,
+        elevation: 4,
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.3,
+        shadowRadius: 5,
+    },
+    cardTitle: {
+        fontSize: 20,
+        fontWeight: "600",
+        color: "#333",
+        marginBottom: 10,
+    },
+    cardDescription: {
+        fontSize: 16,
+        color: "#666",
+        lineHeight: 24,
+    },
 })

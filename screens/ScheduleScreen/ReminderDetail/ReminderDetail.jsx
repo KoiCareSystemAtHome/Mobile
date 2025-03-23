@@ -1,19 +1,29 @@
-import React, { useState } from "react";
-import { View, Text, TouchableOpacity, StyleSheet, TouchableWithoutFeedback } from "react-native";
+import React, { useEffect, useState } from "react";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  TouchableWithoutFeedback,
+  Alert,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { styles } from "./styles";
+import { useDispatch } from "react-redux";
+import { getReminderByOwner, updateReminder } from "../../../redux/slices/reminderSlice";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const leftArrowIcon = "←";
 const dropdownIcon = "⌄";
 
 const ReminderDetail = ({ navigation, route }) => {
-  // Extract reminder data from navigation params
+  const dispatch = useDispatch();
   const { reminder } = route.params;
-
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   // State for dropdown visibility and selected status
   const [isStatusDropdownVisible, setStatusDropdownVisible] = useState(false);
   const [selectedStatus, setSelectedStatus] = useState(
-    reminder.seenDate !== "0001-01-01T00:00:00" ? "Done" : "Pending"
+    reminder.seenDate !== "0001-01-01T00:00:00" ? "Complete" : "Pending"
   );
 
   // Format the date and time
@@ -36,31 +46,37 @@ const ReminderDetail = ({ navigation, route }) => {
     ? "#FFCC80" // Light orange for Maintenance
     : "#B0BEC5"; // Light gray for Notes
 
-  console.log(reminder);
-
   // Handle status selection
   const handleStatusSelect = (status) => {
     setSelectedStatus(status);
     setStatusDropdownVisible(false);
-
-    // Update the reminder's seenDate based on the selected status
-    // For "Pending", set seenDate to "0001-01-01T00:00:00"
-    // For "Complete", set seenDate to the current date
-    const updatedSeenDate =
-      status === "Pending" ? "0001-01-01T00:00:00" : new Date().toISOString();
-
-    // Here, you should dispatch an action or make an API call to update the reminder
-    // For now, we'll just log the updated value
-    console.log("Updated seenDate:", updatedSeenDate);
-    // Example: dispatch(updateReminder({ ...reminder, seenDate: updatedSeenDate }));
+    if (status === "Complete") {
+      dispatch(updateReminder(reminder?.pondReminderId))
+        .unwrap()
+        .then((res) => {
+          if (res === "success") {
+            Alert.alert("Updated Successfully");
+            dispatch(getReminderByOwner(isLoggedIn?.id));
+          }
+        });
+    }
   };
-
-  // Close dropdown when pressing outside
   const handleOutsidePress = () => {
     if (isStatusDropdownVisible) {
       setStatusDropdownVisible(false);
     }
   };
+  useEffect(() => {
+    const getData = async () => {
+      try {
+        const value = await AsyncStorage.getItem("user");
+        setIsLoggedIn(value ? JSON.parse(value) : null);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    getData();
+  }, []);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -93,7 +109,9 @@ const ReminderDetail = ({ navigation, route }) => {
             <View style={styles.detailRow}>
               <Text style={styles.detailLabel}>TYPE</Text>
               <View style={styles.detailValueContainer}>
-                <View style={[styles.typeDot, { backgroundColor: typeDotColor }]} />
+                <View
+                  style={[styles.typeDot, { backgroundColor: typeDotColor }]}
+                />
                 <Text style={styles.detailValue}>{reminder?.reminderType}</Text>
               </View>
             </View>
@@ -111,11 +129,12 @@ const ReminderDetail = ({ navigation, route }) => {
               <Text style={styles.detailLabel}>STATUS</Text>
               <TouchableOpacity
                 style={styles.detailValueContainer}
-                onPress={() => setStatusDropdownVisible(!isStatusDropdownVisible)}
+                onPress={() =>
+                  setStatusDropdownVisible(!isStatusDropdownVisible)
+                }
               >
                 <Text style={styles.detailValue}>{selectedStatus}</Text>
                 <Text style={styles.dropdownIcon}>{dropdownIcon}</Text>
-
               </TouchableOpacity>
             </View>
 
@@ -144,7 +163,5 @@ const ReminderDetail = ({ navigation, route }) => {
     </SafeAreaView>
   );
 };
-
-
 
 export default ReminderDetail;

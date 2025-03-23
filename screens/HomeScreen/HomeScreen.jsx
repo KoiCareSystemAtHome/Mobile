@@ -279,7 +279,6 @@ const HomeScreen = ({ navigation }) => {
           {/* Section: My Koi */}
           <View style={styles.sectionHeader}>
             <Text style={styles.sectionTitle}>My Koi</Text>
-            <Badge text="i" style={styles.badge} />
           </View>
 
           <View style={styles.buttonGroup}>
@@ -300,7 +299,6 @@ const HomeScreen = ({ navigation }) => {
           {/* Section: My Pond */}
           <View style={styles.sectionHeader}>
             <Text style={styles.sectionTitle}>My Pond</Text>
-            <Badge text="i" style={styles.badge} />
           </View>
 
           <View style={styles.buttonGroup}>

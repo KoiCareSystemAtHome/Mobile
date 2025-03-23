@@ -19,6 +19,7 @@ import { loadAsync } from "expo-font";
 import { getWallet } from "../../redux/slices/authSlice";
 import { walletSelector } from "../../redux/selector";
 import RadioGroup from "react-native-radio-buttons-group";
+import { payOrder, payPackage } from "../../redux/slices/transactionSlice";
 
 const CartScreen = ({ navigation }) => {
   const dispatch = useDispatch();
@@ -33,22 +34,18 @@ const CartScreen = ({ navigation }) => {
   const tax = 0.0;
   const total = subtotal + shippingCost + tax;
 
-  // Define radio buttons data directly with selected state based on paymentMethod
   const radioButtons = [
     {
       id: "COD",
       label: "Cash on Delivery (COD)",
       value: "COD",
-      selected: paymentMethod === "COD",
     },
     {
       id: "Online Banking",
       label: "Online Banking",
       value: "Online Banking",
-      selected: paymentMethod === "Online Banking",
     },
   ];
-
   useEffect(() => {
     const fetchCart = async () => {
       try {
@@ -148,15 +145,21 @@ const CartScreen = ({ navigation }) => {
         .unwrap()
         .then(async (res) => {
           const orderIds = res.map((item) => item.message);
-          console.log("Order IDs:", orderIds);
-          Toast.success("Order Created Successfully");
+          const email = isLoggedIn?.email
+          const values = {email, orderIds}
+          dispatch(payOrder(values))
+          .unwrap()
+          .then((res)=>{
+            dispatch(getWallet(isLoggedIn?.id))
+          })
+          Toast.success("Order Paid Successfully");
           await AsyncStorage.removeItem("cart");
           setTimeout(() => {
             navigation.navigate("Shopping");
           }, 2000);
         })
         .catch((error) => {
-          Toast.fail("Failed to create order");
+          Toast.fail("Failed to pay order");
           console.error(error);
         });
     } else {
@@ -176,11 +179,9 @@ const CartScreen = ({ navigation }) => {
     }
   };
 
-  const onPressRadioButton = (radioButtonsArray) => {
-    const selected = radioButtonsArray?.find((rb) => rb.selected);
-    if (selected) {
-      setPaymentMethod(selected.value);
-    }
+  const onPressRadioButton = (updatedRadioButtons) => {
+    console.log(updatedRadioButtons);
+    setPaymentMethod(updatedRadioButtons);
   };
 
   if (!fontLoaded) {
@@ -215,7 +216,9 @@ const CartScreen = ({ navigation }) => {
         {address ? (
           <View style={styles.addressInfo}>
             <Text>{`${address.provinceName}, ${address.districtName}, ${address.wardName}`}</Text>
-            <TouchableOpacity onPress={() => navigation.navigate("AddressForm")}>
+            <TouchableOpacity
+              onPress={() => navigation.navigate("AddressForm")}
+            >
               <Text style={{ color: "blue" }}>Change address</Text>
             </TouchableOpacity>
           </View>
@@ -245,14 +248,18 @@ const CartScreen = ({ navigation }) => {
                 <View style={styles.quantityContainer}>
                   <TouchableOpacity
                     style={styles.quantityButton}
-                    onPress={() => handleQuantityChange(item.productId, "decrease")}
+                    onPress={() =>
+                      handleQuantityChange(item.productId, "decrease")
+                    }
                   >
                     <AntDesign name="minus" size={16} color="white" />
                   </TouchableOpacity>
                   <Text style={styles.quantityText}>{item.quantity}</Text>
                   <TouchableOpacity
                     style={styles.quantityButton}
-                    onPress={() => handleQuantityChange(item.productId, "increase")}
+                    onPress={() =>
+                      handleQuantityChange(item.productId, "increase")
+                    }
                   >
                     <AntDesign name="plus" size={16} color="white" />
                   </TouchableOpacity>
@@ -269,7 +276,9 @@ const CartScreen = ({ navigation }) => {
         </View>
         <View style={styles.summaryContainer}>
           <Text style={styles.summaryText}>Shipping Cost</Text>
-          <Text style={styles.summaryPrice}>{`$${shippingCost.toFixed(2)}`}</Text>
+          <Text style={styles.summaryPrice}>{`$${shippingCost.toFixed(
+            2
+          )}`}</Text>
         </View>
         <View style={styles.summaryContainer}>
           <Text style={styles.summaryText}>Tax</Text>
@@ -285,22 +294,11 @@ const CartScreen = ({ navigation }) => {
           <Text style={styles.paymentMethodLabel}>Payment Method:</Text>
           <RadioGroup
             radioButtons={radioButtons}
-            onPress={onPressRadioButton}
+            onPress={setPaymentMethod}
+            selectedId={paymentMethod}
             layout="column"
             containerStyle={styles.radioGroup}
           />
-        </View>
-
-        {/* Coupon Input */}
-        <View style={styles.couponContainer}>
-          <TextInput
-            style={styles.couponInput}
-            placeholderTextColor="#9a979f"
-            placeholder="Enter Coupon Code"
-          />
-          <TouchableOpacity style={styles.applyCouponButton}>
-            <AntDesign name="arrowright" size={20} color="white" />
-          </TouchableOpacity>
         </View>
 
         {/* Checkout Button */}

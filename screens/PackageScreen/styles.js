@@ -94,4 +94,28 @@ export const styles = StyleSheet.create({
     transform: [{ rotate: '90deg' }],
     width: 100, // To accommodate the rotated text
   },
+  balanceContainer: {
+    backgroundColor: '#fff',
+    padding: 10,
+    borderRadius: 8,
+    marginVertical: 10,
+    alignItems: 'center',
+  },
+  balanceText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#333',
+  },
+  chooseButton: {
+    backgroundColor: '#FF6F61',
+    paddingVertical: 8,
+    paddingHorizontal: 20,
+    borderRadius: 20,
+    alignSelf: 'flex-start',
+    marginTop: 5,
+  },
+  disabledButton: {
+    backgroundColor: '#cccccc', // Gray color for disabled state
+    opacity: 0.7,
+  },
 });

@@ -113,7 +113,7 @@ export const updateReminder = createAsyncThunk(
   "testSlice/updateReminder",
   async (payload, { rejectWithValue }) => {
     try {
-      const res = await putRequest(`Reminder/update-reminder`, payload);
+      const res = await putRequest(`PondReminder/update?Id=${payload}`);
       return res.data;
     } catch (error) {
       return rejectWithValue("Update failed");

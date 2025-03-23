@@ -25,8 +25,8 @@ export const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "bold",
     color: "#333", // Changed to match the image
-    marginTop: 20,
-    marginBottom: 10,
+    // marginTop: 20,
+    // marginBottom: 10,
   },
   selector: {
     flexDirection: "row",

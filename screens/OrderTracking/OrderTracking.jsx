@@ -51,6 +51,7 @@ const OrderTracking = () => {
   useEffect(() => {
     dispatch(getOrderDetail(orderId));
   }, [dispatch]);
+  
   useEffect(() => {
     if (orderDetail?.oder_code) {
       const order_code = orderDetail?.oder_code;

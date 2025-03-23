@@ -42,17 +42,25 @@ const PondDetail = ({ route }) => {
   };
 
   const waterParameterData = transformPondParameters(pondById?.pondParameters);
-  const parameters = pondById?.pondParameters?.map((param) => param.parameterName) || [];
+  const parameters =
+    pondById?.pondParameters?.map((param) => param.parameterName) || [];
 
   // Map recommended products
-  const recommendedProducts = pondById?.recomment?.map((rec) => {
-    const product = products.find((prod) => prod.productId === rec.productid);
-    return product || { productId: rec.productid, productName: "Unknown Product" }; // Fallback if no match
-  }) || [];
+  const recommendedProducts =
+    pondById?.recomment?.map((rec) => {
+      const product = products?.find(
+        (prod) => prod.productId === rec.productid
+      );
+      return (
+        product || { productId: rec.productid, productName: "Unknown Product" }
+      ); // Fallback if no match
+    }) || [];
 
   const toggleParameter = (parameter) => {
     if (selectedParameters.includes(parameter)) {
-      setSelectedParameters(selectedParameters.filter((param) => param !== parameter));
+      setSelectedParameters(
+        selectedParameters.filter((param) => param !== parameter)
+      );
     } else {
       setSelectedParameters([...selectedParameters, parameter]);
     }
@@ -163,20 +171,30 @@ const PondDetail = ({ route }) => {
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={styles.productList}
           >
-            {pondById?.recomment.length > 0 && recommendedProducts?.map((item) => (
-              <TouchableOpacity key={item.productId} style={styles.productCard}>
-                <Image
-                  source={{ uri: item.image || "https://via.placeholder.com/128" }}
-                  style={styles.productImage}
-                />
-                <Text style={styles.productName}>{item.productName}</Text>
-                <Text style={styles.productName}>{item?.shop || "Unknown Shop"}</Text>
-                <Text style={styles.productPrice}>{item.price || "N/A"} VND</Text>
-                <TouchableOpacity style={styles.addToCartButton}>
-                  <Text style={styles.addToCartText}>Add to cart</Text>
+            {pondById?.recomment.length > 0 &&
+              recommendedProducts?.map((item) => (
+                <TouchableOpacity
+                  key={item.productId}
+                  style={styles.productCard}
+                >
+                  <Image
+                    source={{
+                      uri: item.image || "https://via.placeholder.com/128",
+                    }}
+                    style={styles.productImage}
+                  />
+                  <Text style={styles.productName}>{item.productName}</Text>
+                  <Text style={styles.productName}>
+                    {item?.shop || "Unknown Shop"}
+                  </Text>
+                  <Text style={styles.productPrice}>
+                    {item.price || "N/A"} VND
+                  </Text>
+                  <TouchableOpacity style={styles.addToCartButton}>
+                    <Text style={styles.addToCartText}>Add to cart</Text>
+                  </TouchableOpacity>
                 </TouchableOpacity>
-              </TouchableOpacity>
-            ))}
+              ))}
           </ScrollView>
         </View>
       </ScrollView>

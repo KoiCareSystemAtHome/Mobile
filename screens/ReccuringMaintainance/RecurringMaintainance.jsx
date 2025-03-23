@@ -76,8 +76,9 @@ const CalculateMaintainance = () => {
       dispatch(reccuringMaintainance(values))
         .unwrap()
         .then((res) => {
+          console.log("endDate:", endDate);
+          console.log("maintain date:", res );
           console.log("Recurring Maintenance Saved", res);
-          // Check if res is an array with at least one object
           if (Array.isArray(res) && res.length > 0) {
             Alert.alert("Success", "Recurring Maintenance Saved");
           }
@@ -164,10 +165,6 @@ const CalculateMaintainance = () => {
           </View>
 
           <View>
-            <Text style={styles.subtitle}>{maintainanceData?.title}</Text>
-            <Text style={styles.selectorText}>
-              {maintainanceData?.description}
-            </Text>
 
             {/* Date Picker */}
             <Text style={styles.label}>DATE END OF SCHEDULE</Text>
@@ -224,9 +221,6 @@ const CalculateMaintainance = () => {
               </TouchableOpacity>
             </Picker>
 
-            {/* Display ISO Format */}
-            <Text style={styles.label}>SELECTED END DATE (ISO)</Text>
-            <Text style={styles.selectorText}>{endDate.toISOString()}</Text>
 
             {/* Cycle Days Toggle */}
             <Text style={styles.label}>CYCLE DAYS</Text>

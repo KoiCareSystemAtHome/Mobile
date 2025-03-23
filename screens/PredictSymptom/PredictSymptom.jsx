@@ -46,7 +46,6 @@ const PredictSymptom = ({ route }) => {
     }
   }, [selectedValues]);
 
-  console.log(symptomPrediction);
   const selectedSymptoms = symptomPrediction?.symptomPredicts
     ?.filter((symptom) => selectedValues?.includes(symptom.symtompId))
     .map((symptom) => symptom.name);

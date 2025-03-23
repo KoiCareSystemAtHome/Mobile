@@ -7,6 +7,7 @@ import {
   Image,
   TouchableOpacity,
   StyleSheet,
+  LogBox,
 } from "react-native";
 import { styles } from "./styles";
 import { useDispatch, useSelector } from "react-redux";
@@ -17,6 +18,11 @@ import { useWindowDimensions } from "react-native";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 
+
+LogBox.ignoreLogs([
+  "Warning: TNodeChildrenRenderer: Support for defaultProps will be removed",
+  "Warning: Text strings must be rendered within a <Text> component",
+]);
 const BlogScreen = ({ navigation }) => {
   const dispatch = useDispatch();
   const blogData = useSelector(approvedBlogsSelector);

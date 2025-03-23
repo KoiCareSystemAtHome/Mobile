@@ -1,33 +1,29 @@
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import React, { useEffect, useState } from "react";
 import {
-    Alert,
-  ImageBackground,
-  ScrollView,
-  Text,
-  TouchableOpacity,
   View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+  ActivityIndicator,
+  Alert,
+  ImageBackground,
 } from "react-native";
-import { getPondByOwner } from "../../redux/slices/pondSlice";
-import { useDispatch, useSelector } from "react-redux";
+import WebView from "react-native-webview";
+import AntDesign from "react-native-vector-icons/AntDesign";
+import { getPaymentUrl } from "../../redux/slices/transactionSlice";
+import { useDispatch } from "react-redux";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { styles } from "./styles";
-import Icon from "react-native-vector-icons/AntDesign";
-import {
-  calculatedMaintainanceSelector,
-  pondByOwnerSelector,
-} from "../../redux/selector";
-import {
-  calculateMaintainance,
-  saveMaintainance,
-} from "../../redux/slices/reminderSlice";
 
-const CalculateMaintainance = () => {
+const DepositScreen = ({ navigation }) => {
   const dispatch = useDispatch();
-  const pondData = useSelector(pondByOwnerSelector);
-  const maintainanceData = useSelector(calculatedMaintainanceSelector);
-  const [homePond, setHomePond] = useState(null);
-  const [homePondOpen, setHomePondOpen] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [money, setMoney] = useState("");
+  const [description, setDescription] = useState("");
+  const [paymentUrl, setPaymentUrl] = useState(null);
+  const [isLoggedIn, setIsLoggedIn] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [showWebView, setShowWebView] = useState(false);
 
   useEffect(() => {
     const getData = async () => {
@@ -35,35 +31,48 @@ const CalculateMaintainance = () => {
         const value = await AsyncStorage.getItem("user");
         setIsLoggedIn(value ? JSON.parse(value) : null);
       } catch (error) {
-        console.error(error);
+        console.error("Error fetching user data:", error);
       }
     };
-
     getData();
   }, []);
 
-  useEffect(() => {
-    if (isLoggedIn?.id) {
-      dispatch(getPondByOwner(isLoggedIn.id));
+  const handleCreatePayment = () => {
+    if (!money || !description) {
+      Alert.alert("Error", "Please fill in all fields");
+      return;
     }
-  }, [isLoggedIn?.id, dispatch]);
-
-  useEffect(() => {
-    if (homePond) {
-      const pondId = homePond?.pondID;
-      dispatch(calculateMaintainance({ pondId }));
-    }
-  }, [homePond, dispatch]);
-
-  const handleSave = () => {
-    if (maintainanceData) {
-      dispatch(saveMaintainance(maintainanceData))
+    setLoading(true);
+    const email = isLoggedIn?.email;
+    const values = { money, description, email };
+    dispatch(getPaymentUrl(values))
       .unwrap()
-      .then((res) => {
-        if(res.message){
-            Alert.alert(res.message)
-        }
+      .then((response) => {
+        setPaymentUrl(response.data);
+        setShowWebView(true);
+        setLoading(false);
       })
+      .catch((error) => {
+        setLoading(false);
+        Alert.alert("Error", "Failed to create payment URL");
+        console.error(error);
+      });
+  };
+
+  const handleWebViewNavigationStateChange = (navState) => {
+    const { url } = navState;
+    if (url.includes("http://14.225.206.203:8080/api/Vnpay/CallbackWithUserInfo")) {
+      setShowWebView(false);
+      setPaymentUrl(null);
+      const urlParams = new URLSearchParams(url.split("?")[1]);
+      const transactionStatus = urlParams.get("vnp_TransactionStatus");
+      if (transactionStatus === "00") {
+        Alert.alert("Success", "Transaction completed successfully!");
+        navigation.navigate("MainTabs");
+        dispatch(getWallet(isLoggedIn?.id));
+      } else {
+        Alert.alert("Error", "Payment failed. Please try again.");
+      }
     }
   };
 
@@ -74,54 +83,64 @@ const CalculateMaintainance = () => {
       resizeMode="cover"
     >
       <View style={styles.overlay} />
-      <ScrollView contentContainerStyle={styles.container}>
-        {/* Title */}
-        <Text style={styles.title}>Maintainance Schedule</Text>
-
-        <View style={{ justifyContent: "center", flexDirection: "row" }}>
-          <TouchableOpacity
-            onPress={() => setHomePondOpen(!homePondOpen)}
-            style={styles.selector}
-          >
-            <Text style={styles.selectorText}>
-              {homePond ? homePond?.name : "Select a Pond"}
-            </Text>
-            <Icon name="down" size={16} color="#000" />
-          </TouchableOpacity>
-        </View>
-        <View style={{ justifyContent: "center", flexDirection: "row" }}>
-          {homePondOpen && (
-            <View style={styles.dropdown}>
-              {pondData?.map((item) => (
-                <TouchableOpacity
-                  key={item?.pondID}
-                  onPress={() => {
-                    setHomePond(item);
-                    setHomePondOpen(false);
-                  }}
-                >
-                  <Text style={styles.dropdownItem}>{item?.name}</Text>
-                </TouchableOpacity>
-              ))}
-            </View>
+      {showWebView ? (
+        <WebView
+          source={{ uri: paymentUrl }}
+          style={styles.webview}
+          onNavigationStateChange={handleWebViewNavigationStateChange}
+          startInLoadingState={true}
+          renderLoading={() => (
+            <ActivityIndicator
+              size="large"
+              color="#FFA500"
+              style={styles.loading}
+            />
           )}
-        </View>
-        {homePond && maintainanceData && (
-          <View>
-            <Text style={styles.subtitle}>{maintainanceData?.title}</Text>
-            <Text style={styles.selectorText}>
-              {maintainanceData?.description}
-            </Text>
+        />
+      ) : (
+        <View style={styles.container}>
+          {/* Header */}
+          <View style={styles.header}>
+            <TouchableOpacity onPress={() => navigation.goBack()}>
+              <AntDesign name="left" size={24} color="#fff" />
+            </TouchableOpacity>
+            <Text style={styles.title}>Deposit</Text>
+            <View style={styles.headerSpacer} />
           </View>
-        )}
-      </ScrollView>
-      {homePond && maintainanceData && (
-        <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
-          <Text style={styles.saveButtonText}>Lưu</Text>
-        </TouchableOpacity>
+
+          {/* Form */}
+          <View style={styles.formContainer}>
+            <TextInput
+              style={styles.input}
+              placeholder="Amount (VND)"
+              placeholderTextColor="#999"
+              keyboardType="numeric"
+              value={money}
+              onChangeText={setMoney}
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="Description"
+              placeholderTextColor="#999"
+              value={description}
+              onChangeText={setDescription}
+            />
+            <TouchableOpacity
+              style={[styles.button, loading && styles.buttonDisabled]}
+              onPress={handleCreatePayment}
+              disabled={loading}
+            >
+              {loading ? (
+                <ActivityIndicator size="small" color="#fff" />
+              ) : (
+                <Text style={styles.buttonText}>Create Payment</Text>
+              )}
+            </TouchableOpacity>
+          </View>
+        </View>
       )}
     </ImageBackground>
   );
 };
 
-export default CalculateMaintainance;
+export default DepositScreen;
