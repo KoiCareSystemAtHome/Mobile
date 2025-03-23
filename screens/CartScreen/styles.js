@@ -18,22 +18,33 @@ export const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: "bold",
   },
-  addressBar:{
-    height:"auto",
-    backgroundColor:"white",
-    margin:10,
-    padding:10,
-    borderRadius:10,
-    flexDirection:"row",
-    justifyContent:"space-between",
-    alignItems:"center"
+  walletContainer: {
+    padding: 10,
+    backgroundColor: "#fff",
+    marginHorizontal: 20,
+    borderRadius: 10,
+    marginBottom: 10,
   },
-  addressInfo:{
-    height:"auto",
-    backgroundColor:"white",
-    margin:10,
-    padding:10,
-    borderRadius:10,
+  walletText: {
+    fontSize: 16,
+    color: "#333",
+  },
+  addressBar: {
+    height: "auto",
+    backgroundColor: "white",
+    margin: 10,
+    padding: 10,
+    borderRadius: 10,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  addressInfo: {
+    height: "auto",
+    backgroundColor: "white",
+    margin: 10,
+    padding: 10,
+    borderRadius: 10,
   },
   cartItem: {
     flexDirection: "row",
@@ -95,6 +106,28 @@ export const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "bold",
   },
+  paymentMethodContainer: {
+    padding: 20,
+    backgroundColor: "#fff",
+    marginHorizontal: 20,
+    borderRadius: 10,
+    marginVertical: 10,
+  },
+  paymentMethodLabel: {
+    fontSize: 16,
+    fontWeight: "bold",
+    marginBottom: 10,
+  },
+  radioGroup: {
+    flexDirection: "column",
+  },
+  radioItem: {
+    marginVertical: 5,
+  },
+  radioText: {
+    fontSize: 16,
+    marginLeft: 10,
+  },
   couponContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -115,7 +148,7 @@ export const styles = StyleSheet.create({
     marginHorizontal: 20,
     marginBottom: 20,
     padding: 15,
-    height:"auto",
+    height: "auto",
     alignItems: "center",
   },
   checkoutText: {

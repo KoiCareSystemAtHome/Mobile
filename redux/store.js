@@ -11,6 +11,7 @@ import symptomSlice from "./slices/symptomSlice";
 import reportSlice from "./slices/reportSlice";
 import blogSlice from "./slices/blogSlice";
 import reminderSlice from "./slices/reminderSlice";
+import transactionSlice from "./slices/transactionSlice";
 
 
 const store = configureStore({
@@ -27,6 +28,7 @@ const store = configureStore({
     reportSlice: reportSlice.reducer,
     blogSlice: blogSlice.reducer,
     reminderSlice: reminderSlice.reducer,
+    transactionSlice: transactionSlice.reducer,
 
 
   },

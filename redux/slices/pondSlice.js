@@ -56,7 +56,6 @@ export const getPondByID = createAsyncThunk(
   "pondSlice/getPondByID",
   async (pondId) => {
     try {
-      console.log("a",pondId)
       const res = await getRequest(`Pond/get-pond/${pondId}`);
       return res.data;
     } catch (error) {

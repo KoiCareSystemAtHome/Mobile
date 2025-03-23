@@ -29,22 +29,20 @@ const ScheduleScreen = ({ navigation }) => {
   useEffect(() => {
     if (reminderByOwner && reminderByOwner.length > 0) {
       const newMarkedDates = {};
-      
-      reminderByOwner.forEach(reminder => {
+
+      reminderByOwner.forEach((reminder) => {
         const date = reminder.maintainDate.split("T")[0]; // Get YYYY-MM-DD format
         const isFinished = reminder.seenDate !== "0001-01-01T00:00:00";
-        
-        // Initialize date object if it doesn't exist
+
         if (!newMarkedDates[date]) {
           newMarkedDates[date] = { dots: [] };
         }
 
-        // Add dot based on status
         newMarkedDates[date].dots.push({
           key: reminder.pondReminderId,
-          color: isFinished ? "#4CAF50" : "#FF6B6B", // Green for finished, Red for unfinished
+          color: isFinished ? "#4CAF50" : "#FF6B6B",
           selectedDotColor: isFinished ? "#4CAF50" : "#FF6B6B",
-          reminder: reminder // Store full reminder data for modal
+          reminder: reminder,
         });
       });
 
@@ -52,16 +50,18 @@ const ScheduleScreen = ({ navigation }) => {
     }
   }, [reminderByOwner]);
 
-  // Handle date press
+
   const handleDayPress = (day) => {
     const dateString = day.dateString;
     if (markedDates[dateString] && markedDates[dateString].dots) {
       const date = new Date(dateString);
-      const formattedDate = date.toLocaleDateString("en-US", {
-        month: "long",
-        day: "numeric",
-        year: "numeric",
-      });
+      const formattedDate = date
+        .toLocaleDateString("en-US", {
+          weekday: "long",
+          day: "numeric",
+          month: "short",
+        })
+        .toUpperCase(); // Format like "WEDNESDAY, 1 JAN"
 
       setSelectedDate(formattedDate);
       setSelectedDateEvents(markedDates[dateString].dots);
@@ -87,6 +87,26 @@ const ScheduleScreen = ({ navigation }) => {
     }
   }, [isLoggedIn?.id, dispatch]);
 
+
+  const getTimeRange = (maintainDate) => {
+    const date = new Date(maintainDate);
+    const hours = date.getHours();
+    const minutes = date.getMinutes();
+    const startHour = hours.toString().padStart(2, "0");
+    const startMinutes = minutes.toString().padStart(2, "0");
+    const endHour = (hours + 2) % 24; // Assuming a 2-hour duration for simplicity
+    const endHourStr = endHour.toString().padStart(2, "0");
+    return `${startHour}:${startMinutes}-${endHourStr}:${startMinutes}`;
+  };
+
+  // Helper function to determine icon based on title
+  const getIconForEvent = (title) => {
+    if (title.toLowerCase().includes("feeding")) return "🟢"; // Green circle for Feeding
+    if (title.toLowerCase().includes("maintenance")) return "🟡"; // Yellow circle for Maintenance
+    return "⚪"; // White circle for Notes or others
+  };
+
+
   return (
     <SafeAreaView style={styles.container}>
       {/* Header */}
@@ -106,7 +126,7 @@ const ScheduleScreen = ({ navigation }) => {
 
       {/* Calendar */}
       <Calendar
-        current={"2025-03-20"} // Updated to a more relevant date
+        current={"2025-03-20"}
         markedDates={markedDates}
         markingType={"multi-dot"}
         theme={{
@@ -167,31 +187,50 @@ const ScheduleScreen = ({ navigation }) => {
         style={styles.modal}
       >
         <View style={styles.modalContent}>
-          <Text style={styles.modalTitle}>{selectedDate}</Text>
-          {selectedDateEvents.map((event, index) => (
-            <View key={index} style={styles.modalEvent}>
-              <View
-                style={[styles.modalEventDot, { backgroundColor: event.color }]}
-              />
-              <View>
+          {/* Modal Header */}
+          <View style={styles.modalHeader}>
+            <TouchableOpacity onPress={() => setModalVisible(false)}>
+              <Text style={styles.modalHeaderIcon}>{leftArrowIcon}</Text>
+            </TouchableOpacity>
+            <Text style={styles.modalTitle}>VIEW REMINDER</Text>
+          </View>
+
+          {/* Modal Body */}
+          <View style={styles.modalBody}>
+            <Text style={styles.modalDate}>{selectedDate}</Text>
+            {selectedDateEvents.map((event, index) => (
+              <TouchableOpacity
+                key={index}
+                style={[
+                  styles.modalEvent,
+                  {
+                    backgroundColor: event.reminder.title
+                      .toLowerCase()
+                      .includes("feeding")
+                      ? "#E6F4EA" // Light green for Feeding
+                      : event.reminder.title
+                          .toLowerCase()
+                          .includes("maintenance")
+                      ? "#FFF3E0" // Light orange for Maintenance
+                      : "#E0E0E0", // Light gray for Notes
+                  },
+                ]}
+                onPress={() => {
+                  setModalVisible(false); // Close the modal
+                  navigation.navigate("ReminderDetail", {
+                    reminder: event.reminder,
+                  });
+                }}
+              >
+                <Text style={styles.modalEventTime}>
+                  {getTimeRange(event.reminder.maintainDate).split("-")[0]}
+                </Text>
                 <Text style={styles.modalEventText}>
                   {event.reminder.title}
                 </Text>
-                <Text style={styles.modalEventDescription}>
-                  {event.reminder.description}
-                </Text>
-                <Text style={styles.modalEventStatus}>
-                  Status: {event.reminder.seenDate === "0001-01-01T00:00:00" ? "Unfinished" : "Finished"}
-                </Text>
-              </View>
-            </View>
-          ))}
-          <TouchableOpacity
-            style={styles.modalCloseButton}
-            onPress={() => setModalVisible(false)}
-          >
-            <Text style={styles.modalCloseButtonText}>Close</Text>
-          </TouchableOpacity>
+              </TouchableOpacity>
+            ))}
+          </View>
         </View>
       </Modal>
     </SafeAreaView>

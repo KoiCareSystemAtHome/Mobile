@@ -111,7 +111,6 @@ export const getOrderTracking = createAsyncThunk(
   "ghnSlice/getOrderTracking",
   async (values) => {
     try {
-      console.log("a",values)
       const res = await postRequest(`Ghn/tracking-order`, values);
       return res.data.data;
     } catch (error) {

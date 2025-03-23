@@ -76,7 +76,7 @@ const CalculateMaintainance = () => {
       <View style={styles.overlay} />
       <ScrollView contentContainerStyle={styles.container}>
         {/* Title */}
-        <Text style={styles.title}>Food Calculator</Text>
+        <Text style={styles.title}>Maintainance Schedule</Text>
 
         <View style={{ justifyContent: "center", flexDirection: "row" }}>
           <TouchableOpacity

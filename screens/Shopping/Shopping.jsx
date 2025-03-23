@@ -7,9 +7,8 @@ import {
   TouchableOpacity,
   FlatList,
   ScrollView,
-  ImageBackground,
 } from "react-native";
-import { styles } from "./styles"; // Assume styles are in styles.js
+import { styles } from "./styles";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import AntDesign from "react-native-vector-icons/AntDesign";
 import { useDispatch, useSelector } from "react-redux";
@@ -22,6 +21,9 @@ const Shopping = ({ navigation }) => {
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [searchText, setSearchText] = useState("");
   const [cart, setCart] = useState(false);
+  // Pagination states
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10; // 10 products per page
 
   const products = useSelector(productSelector);
   const categories = useSelector(categorySelector);
@@ -33,7 +35,6 @@ const Shopping = ({ navigation }) => {
   }, [dispatch]);
 
   useEffect(() => {
-    // Set default category when categories are loaded
     if (categories?.length > 0) {
       setSelectedCategory(categories[0].categoryId);
     }
@@ -46,8 +47,17 @@ const Shopping = ({ navigation }) => {
       product.productName.toLowerCase().includes(searchText.toLowerCase())
   );
 
+  // Calculate total pages based on filtered products
+  const totalPages = Math.ceil(filteredProducts?.length / itemsPerPage);
+
+  // Slice filtered products for current page
+  const paginatedProducts = filteredProducts?.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
   useEffect(() => {
-    const getData = async (key) => {
+    const getData = async () => {
       try {
         const cartData = await AsyncStorage.getItem("cart");
         setCart(cartData ? JSON.parse(cartData) : null);
@@ -55,9 +65,21 @@ const Shopping = ({ navigation }) => {
         console.error(error);
       }
     };
-
     getData();
   }, []);
+
+  // Pagination controls
+  const handlePreviousPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+    }
+  };
+
+  const handleNextPage = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage(currentPage + 1);
+    }
+  };
 
   return (
     <View style={styles.background} resizeMode="cover">
@@ -100,7 +122,10 @@ const Shopping = ({ navigation }) => {
               styles.categoryButton,
               selectedCategory === category.categoryId && styles.activeCategory,
             ]}
-            onPress={() => setSelectedCategory(category.categoryId)}
+            onPress={() => {
+              setSelectedCategory(category.categoryId);
+              setCurrentPage(1); // Reset to first page when category changes
+            }}
           >
             <Text
               style={[
@@ -117,7 +142,7 @@ const Shopping = ({ navigation }) => {
 
       {/* Product List */}
       <FlatList
-        data={filteredProducts}
+        data={paginatedProducts} // Use paginated products instead of filteredProducts
         keyExtractor={(item) => item.productId}
         numColumns={2}
         contentContainerStyle={styles.productList}
@@ -138,6 +163,35 @@ const Shopping = ({ navigation }) => {
           </TouchableOpacity>
         )}
       />
+
+      {/* Pagination Controls */}
+      {filteredProducts?.length > 0 && (
+        <View style={styles.paginationContainer}>
+          <TouchableOpacity
+            style={[
+              styles.paginationButton,
+              currentPage === 1 && styles.disabledButton,
+            ]}
+            onPress={handlePreviousPage}
+            disabled={currentPage === 1}
+          >
+            <Text style={styles.paginationText}>Previous</Text>
+          </TouchableOpacity>
+          <Text style={styles.pageText}>
+            {currentPage}/{totalPages}
+          </Text>
+          <TouchableOpacity
+            style={[
+              styles.paginationButton,
+              currentPage === totalPages && styles.disabledButton,
+            ]}
+            onPress={handleNextPage}
+            disabled={currentPage === totalPages}
+          >
+            <Text style={styles.paginationText}>Next</Text>
+          </TouchableOpacity>
+        </View>
+      )}
     </View>
   );
 };

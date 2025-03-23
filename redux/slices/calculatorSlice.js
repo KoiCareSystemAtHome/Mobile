@@ -12,6 +12,7 @@ const initialState = {
   food: null,
   salt: null,
   instructions: null,
+  foodSuggestion: null
 };
 
 export const calculatorSlice = createSlice({
@@ -32,7 +33,10 @@ export const calculatorSlice = createSlice({
       })
       .addCase(additionProccess.fulfilled, (state, action) => {
         state.instructions = action.payload;
-      });
+      })
+      .addCase(recommendFood.fulfilled, (state, action) => {
+        state.foodSuggestion = action.payload;
+      })
   },
 });
 
@@ -40,9 +44,19 @@ export const calculateFood = createAsyncThunk(
   "calculatorSlice/calculateFood",
   async (values) => {
     try {
-      console.log(values);
       const res = await getRequestParams(`FoodCalculate`, values);
-      console.log("res", res);
+      return res.data;
+    } catch (error) {
+      Alert.alert("Error", "Failed to load category data.");
+    }
+  }
+);
+
+export const recommendFood = createAsyncThunk(
+  "calculatorSlice/recommendFood",
+  async (pondId) => {
+    try {
+      const res = await getRequest(`FoodCalculate/suggest-food?pondId=${pondId}`);
       return res.data;
     } catch (error) {
       Alert.alert("Error", "Failed to load category data.");
@@ -54,7 +68,6 @@ export const calculateSalt = createAsyncThunk(
   "calculatorSlice/calculateSalt",
   async (values) => {
     try {
-      console.log("a", values);
       const res = await postRequest(`SaltCalculate/calculate`, values);
       return res.data;
     } catch (error) {

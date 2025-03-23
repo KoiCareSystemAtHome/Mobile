@@ -35,6 +35,14 @@ import ReminderScreen from './screens/ReminderScreen/ReminderScreen';
 import ScheduleScreen from './screens/ScheduleScreen/ScheduleScreen';
 import CalculateMaintainance from './screens/CalculateMaintainance/CalculateMaintainance';
 import RecurringMaintainance from './screens/ReccuringMaintainance/RecurringMaintainance';
+import SuggestFood from './screens/SuggestFood/SuggestFood';
+import DepositScreen from './screens/DepositScreen/DepositScreen';
+import CreateKoiProfile from './screens/CreateKoiProfile/CreateKoiProfile';
+import AddFish from './screens/FishStatistic/AddFish/AddFish';
+import EditFish from './screens/FishStatistic/EditFish/EditFish';
+import ReminderDetail from './screens/ScheduleScreen/ReminderDetail/ReminderDetail';
+import TransactionScreen from './screens/TransactionScreen/TransactionScreen';
+import PackageScreen from './screens/PackageScreen/PackageScreen';
 
 
 
@@ -243,6 +251,46 @@ export default function App() {
         <Stack.Screen
           name="RecurringMaintainance"
           component={RecurringMaintainance}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="SuggestFood"
+          component={SuggestFood}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="DepositScreen"
+          component={DepositScreen}
+          options={{ headerShown: false }}
+        />
+         <Stack.Screen
+          name="CreateKoiProfile"
+          component={CreateKoiProfile}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="AddFish"
+          component={AddFish}
+          options={{ headerShown: false }}
+        />
+         <Stack.Screen
+          name="EditFish"
+          component={EditFish}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="ReminderDetail"
+          component={ReminderDetail}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="TransactionScreen"
+          component={TransactionScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="PackageScreen"
+          component={PackageScreen}
           options={{ headerShown: false }}
         />
           <Stack.Screen

@@ -118,4 +118,56 @@ export const styles = StyleSheet.create({
     fontWeight: "bold",
     color: "#333",
   },
+  suggestedContainer: {
+    marginTop: 20,
+  },
+  productList: {
+    paddingVertical: 10,
+  },
+  productCard: {
+    width: 180,
+    backgroundColor: "white",
+    borderRadius: 10,
+    padding: 10,
+    marginRight: 10, // Space between cards
+    alignItems: "center",
+    justifyContent: "center",
+    height: 300,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  productImage: {
+    width: 128,
+    height: 128,
+    resizeMode: "contain",
+  },
+  productName: {
+    fontSize: 14,
+    textAlign: "center",
+  },
+  productPrice: {
+    fontSize: 16,
+    fontWeight: "bold",
+    marginBottom: 0,
+  },
+  addToCartButton: {
+    position: "absolute",
+    bottom: 0,
+    backgroundColor: "#20A920",
+    borderRadius: 20,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    marginTop: 10,
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 10,
+  },
+  addToCartText: {
+    color: "white",
+    fontSize: 16,
+    fontWeight: "bold",
+  },
 });

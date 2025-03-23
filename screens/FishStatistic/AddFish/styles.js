@@ -13,6 +13,12 @@ export const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingTop: 60,
   },
+  formContainer: {  
+    backgroundColor:"transparent",
+    paddingHorizontal: 20,
+    paddingTop: 60,
+    paddingBottom: 20,
+  },
   title: {
     fontSize: 24,
     fontWeight: "bold",
@@ -137,7 +143,7 @@ export const styles = StyleSheet.create({
     fontSize: 16,
   },
   modalFields: {
-    backgroundColor: "#fff",
+    backgroundColor: "transparent",
     width: "100%",
     marginVertical: 10,
   },
@@ -166,15 +172,6 @@ export const styles = StyleSheet.create({
   modalFooter: {
     flexDirection: "row",
     justifyContent: "space-between",
-  },
-  twoColumnContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginBottom: 20,
-  },
-  column: {
-    flex: 1,
-    marginHorizontal: 5,
   },
   imageContainer: {
     alignItems: "center",
@@ -222,18 +219,6 @@ export const styles = StyleSheet.create({
     color: "#fff",
     fontSize: 16,
     fontWeight: "500",
-  },
-  dateModalOverlay: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
-  },
-  dateModalContainer: {
-    backgroundColor: "#fff",
-    padding: 20,
-    borderRadius: 10,
-    alignItems: "center",
   },
   dateText: {
     fontSize: 16,

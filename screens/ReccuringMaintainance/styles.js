@@ -94,4 +94,35 @@ export const styles = StyleSheet.create({
     fontWeight: "bold",
     textTransform: "uppercase",
   },
+  toggleContainer: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    backgroundColor: "rgba(255, 255, 255, 0.3)",
+    borderRadius: 10,
+    padding: 10,
+  },
+  toggleButton: {
+    flex: 1,
+    paddingVertical: 10,
+    marginHorizontal: 5,
+    borderRadius: 10,
+    alignItems: "center",
+  },
+  activeToggle: {
+    backgroundColor: "#FFA500", // Orange for active
+  },
+  toggleText: {
+    fontSize: 12,
+    color: "#fff",
+  },
+  activeText: {
+    fontWeight: "bold",
+    color: "#000",
+  },
+  infoText: {
+    fontSize: 14,
+    color: "#fff",
+    marginTop: 20,
+    textAlign: "justify",
+  },
 });

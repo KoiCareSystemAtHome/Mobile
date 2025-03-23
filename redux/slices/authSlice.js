@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { postRequest, postRequestFormData, postRequestMultipartFormData } from "../../services/httpMethods";
+import { getRequest, postRequest, postRequestFormData, postRequestMultipartFormData } from "../../services/httpMethods";
 import { Alert } from "react-native";
 import { handleLogin } from "../../axios/axiosInterceptor";
 
@@ -30,6 +30,17 @@ export const getImage = createAsyncThunk(
     }
   }
 );
+export const getWallet = createAsyncThunk(
+  "authSlice/getWallet",
+  async (ownerId, { rejectWithValue }) => {
+    try {
+      const response = await getRequest(`Account/wallet?ownerid=${ownerId}`);
+      return response.data;
+    } catch (error) {
+      return rejectWithValue("Upload failed");
+    }
+  }
+);
 
 export const register = createAsyncThunk(
   "authSlice/register",
@@ -52,6 +63,7 @@ const initialState = {
   token: null,
   loading: false,
   error: null,
+  wallet:null,
 };
 
 const authSlice = createSlice({
@@ -79,7 +91,11 @@ const authSlice = createSlice({
       .addCase(login.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
-      });
+      })
+      .addCase(getWallet.fulfilled, (state, action) => {
+        state.wallet = action.payload
+        handleLogin(action.payload);
+      })
   },
 });
 

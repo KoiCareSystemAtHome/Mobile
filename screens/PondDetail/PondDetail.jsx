@@ -13,14 +13,14 @@ import FontAwesome from "react-native-vector-icons/FontAwesome";
 import WaterParametersChart from "./components/WaterParameterChart"; // Adjust the path
 import { useDispatch, useSelector } from "react-redux";
 import { getPondByID } from "../../redux/slices/pondSlice";
-import { pondByIdSelector } from "../../redux/selector";
+import { pondByIdSelector, productSelector } from "../../redux/selector";
 import { styles } from "./styles";
 
 const PondDetail = ({ route }) => {
   const dispatch = useDispatch();
   const pondById = useSelector(pondByIdSelector);
+  const products = useSelector(productSelector);
   const { pond } = route.params;
-
   const [selectedParameters, setSelectedParameters] = useState([]);
 
   // Transform pondParameters into chart-compatible data
@@ -42,8 +42,13 @@ const PondDetail = ({ route }) => {
   };
 
   const waterParameterData = transformPondParameters(pondById?.pondParameters);
-
   const parameters = pondById?.pondParameters?.map((param) => param.parameterName) || [];
+
+  // Map recommended products
+  const recommendedProducts = pondById?.recomment?.map((rec) => {
+    const product = products.find((prod) => prod.productId === rec.productid);
+    return product || { productId: rec.productid, productName: "Unknown Product" }; // Fallback if no match
+  }) || [];
 
   const toggleParameter = (parameter) => {
     if (selectedParameters.includes(parameter)) {
@@ -149,6 +154,30 @@ const PondDetail = ({ route }) => {
               waterParameterData={waterParameterData}
             />
           </View>
+        </View>
+
+        <View style={styles.suggestedContainer}>
+          <Text style={styles.sectionTitle}>Suggested Products</Text>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.productList}
+          >
+            {pondById?.recomment.length > 0 && recommendedProducts?.map((item) => (
+              <TouchableOpacity key={item.productId} style={styles.productCard}>
+                <Image
+                  source={{ uri: item.image || "https://via.placeholder.com/128" }}
+                  style={styles.productImage}
+                />
+                <Text style={styles.productName}>{item.productName}</Text>
+                <Text style={styles.productName}>{item?.shop || "Unknown Shop"}</Text>
+                <Text style={styles.productPrice}>{item.price || "N/A"} VND</Text>
+                <TouchableOpacity style={styles.addToCartButton}>
+                  <Text style={styles.addToCartText}>Add to cart</Text>
+                </TouchableOpacity>
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
         </View>
       </ScrollView>
     </ImageBackground>

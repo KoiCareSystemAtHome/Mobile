@@ -25,11 +25,9 @@ const FoodCalculator = ({navigation}) => {
   const [token, setToken] = useState();
   const [food, setFood] = useState();
 
-  // State for Desired Growth Toggle
   const [growth, setGrowth] = useState("Medium");
   const growthOptions = ["Low", "Medium", "High"];
 
-  // State for Water Temperature Toggle
   const temperatureOptions = [
     { label: "6 - 8º", temperatureLower: 6, temperatureUpper: 8 },
     { label: "9 - 12º", temperatureLower: 9, temperatureUpper: 12 },
@@ -53,6 +51,7 @@ const FoodCalculator = ({navigation}) => {
 
     getData();
   }, []);
+
   useEffect(() => {
     if (isLoggedIn?.id) {
       dispatch(getPondByOwner(isLoggedIn.id));
@@ -92,8 +91,7 @@ const FoodCalculator = ({navigation}) => {
       resizeMode="cover"
     >
       <View style={styles.overlay} />
-      <ScrollView contentContainerStyle={styles.container}>
-        {/* Title */}
+      <ScrollView contentContainerStyle={[styles.container, { paddingBottom: 80 }]}>
         <Text style={styles.title}>Food Calculator</Text>
 
         <View style={{ justifyContent: "center", flexDirection: "row" }}>
@@ -107,6 +105,7 @@ const FoodCalculator = ({navigation}) => {
             <Icon name="down" size={16} color="#000" />
           </TouchableOpacity>
         </View>
+        
         <View style={{ justifyContent: "center", flexDirection: "row" }}>
           {homePondOpen && (
             <View style={styles.dropdown}>
@@ -124,7 +123,7 @@ const FoodCalculator = ({navigation}) => {
             </View>
           )}
         </View>
-        {/* Desired Growth Toggle */}
+
         <Text style={styles.subtitle}>Desired Growth</Text>
         <View style={styles.toggleContainer}>
           {growthOptions.map((option) => (
@@ -148,7 +147,6 @@ const FoodCalculator = ({navigation}) => {
           ))}
         </View>
 
-        {/* Water Temperature Toggle */}
         <Text style={styles.subtitle}>Water Temperature</Text>
         <View style={styles.toggleContainer}>
           {temperatureOptions.map((option) => (
@@ -172,35 +170,49 @@ const FoodCalculator = ({navigation}) => {
           ))}
         </View>
 
-        {/* Feeding Information */}
         <Text style={styles.infoText}>
           The recommended amount of food should be split evenly into 3 - 5
           feedings per day. This way the koi will ingest the food better...
         </Text>
 
-        {/* Recommended Amount */}
         <View style={styles.recommendationButton}>
           <Text style={styles.recommendationText}>
             {homePond ? `Recommended Amount: ${food}g` : "Please Select A Pond"}
           </Text>
         </View>
-        <Text
-          style={[
-            styles.recommendationText,
-            { marginTop: 20, color: "#FFCC00" },
-          ]}
-        >
-          Have your fish finished eating the recommended amount of food in the
-          last 15 minutes?
-        </Text>
-        <TouchableOpacity onPress={() => navigation.navigate("SymptomScreen")}>
-          <View style={[styles.recommendationButton, { marginTop: 0 }]}>
-            <Text style={styles.recommendationText}>
-              Click here to provide possible symptoms
-            </Text>
-          </View>
-        </TouchableOpacity>
+
+        {homePond && (
+          <TouchableOpacity 
+            style={styles.suggestButton}
+            onPress={() => navigation.navigate("SuggestFood", { pondId: homePond?.pondID })}
+          >
+            <Text style={styles.recommendationText}>New</Text>
+          </TouchableOpacity>
+        )}
+
+
       </ScrollView>
+
+      <TouchableOpacity
+        style={{
+          position: 'absolute',
+          bottom: 20,
+          right: 20,
+          backgroundColor: '#007AFF',
+          paddingVertical: 10,
+          paddingHorizontal: 20,
+          borderRadius: 25,
+        }}
+        onPress={() => navigation.navigate("SymptomScreen")}
+      >
+        <Text style={{
+          color: '#FFFFFF',
+          fontSize: 16,
+          fontWeight: 'bold',
+        }}>
+          Next
+        </Text>
+      </TouchableOpacity>
     </ImageBackground>
   );
 };

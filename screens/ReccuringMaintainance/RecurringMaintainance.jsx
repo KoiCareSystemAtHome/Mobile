@@ -6,7 +6,7 @@ import {
   Text,
   TouchableOpacity,
   View,
-  TextInput,
+  Alert, // Added Alert import
 } from "react-native";
 import { getPondByOwner } from "../../redux/slices/pondSlice";
 import { useDispatch, useSelector } from "react-redux";
@@ -32,9 +32,12 @@ const CalculateMaintainance = () => {
   const [homePondOpen, setHomePondOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [endDate, setEndDate] = useState(new Date());
-  const [cycleDays, setCycleDays] = useState("");
+  const [cycleDays, setCycleDays] = useState("30"); // Default to 30 days
   const [isDatePickerVisible, setDatePickerVisible] = useState(false);
   const [isTimePickerVisible, setTimePickerVisible] = useState(false);
+
+  // Toggle options for cycle days
+  const cycleOptions = ["30", "60", "90"];
 
   const isMounted = useRef(true);
 
@@ -59,23 +62,31 @@ const CalculateMaintainance = () => {
     };
     getData();
   }, []);
-    useEffect(() => {
-      if (isLoggedIn?.id) {
-        dispatch(getPondByOwner(isLoggedIn.id));
-      }
-    }, [isLoggedIn?.id, dispatch]);
+
+  useEffect(() => {
+    if (isLoggedIn?.id) {
+      dispatch(getPondByOwner(isLoggedIn.id));
+    }
+  }, [isLoggedIn?.id, dispatch]);
 
   const handleSave = () => {
-    if(homePond?.pondID){
-        const pondId = homePond?.pondID;
-        const values = {pondId, endDate, cycleDays}
-        dispatch(reccuringMaintainance(values))
+    if (homePond?.pondID) {
+      const pondId = homePond?.pondID;
+      const values = { pondId, endDate, cycleDays };
+      dispatch(reccuringMaintainance(values))
         .unwrap()
-        .then((res)=>{
-            console.log("Recurring Maintenance Saved", res)
+        .then((res) => {
+          console.log("Recurring Maintenance Saved", res);
+          // Check if res is an array with at least one object
+          if (Array.isArray(res) && res.length > 0) {
+            Alert.alert("Success", "Recurring Maintenance Saved");
+          }
         })
+        .catch((error) => {
+          console.error("Error saving maintenance:", error);
+          Alert.alert("Error", "Failed to save maintenance");
+        });
     }
-   
   };
 
   const handleDatePickerChange = (date) => {
@@ -90,16 +101,14 @@ const CalculateMaintainance = () => {
   const handleTimePickerChange = (time) => {
     if (isMounted.current) {
       const [hours, minutes] = time;
-      // Use UTC methods to avoid local timezone offset
       const newDate = new Date(endDate);
       newDate.setUTCHours(hours, minutes, 0, 0);
       setEndDate(newDate);
       setTimePickerVisible(false);
-      console.log("Selected Time (UTC):", newDate.toISOString()); // Debug log
+      console.log("Selected Time (UTC):", newDate.toISOString());
     }
   };
 
-  // Generate time options (hours 0-23, minutes 0-59)
   const timeData = [
     Array.from({ length: 24 }, (_, i) => ({
       value: i,
@@ -192,7 +201,7 @@ const CalculateMaintainance = () => {
               data={timeData}
               cols={2}
               cascade={false}
-              value={[endDate.getUTCHours(), endDate.getUTCMinutes()]} // Use UTC values
+              value={[endDate.getUTCHours(), endDate.getUTCMinutes()]}
               onChange={handleTimePickerChange}
               visible={isTimePickerVisible}
               onDismiss={() => setTimePickerVisible(false)}
@@ -208,7 +217,7 @@ const CalculateMaintainance = () => {
                     hour: "2-digit",
                     minute: "2-digit",
                     hour12: false,
-                    timeZone: "UTC", // Display in UTC
+                    timeZone: "UTC",
                   })}
                 </Text>
                 <Icon name="clockcircleo" size={20} color="#000" />
@@ -219,16 +228,29 @@ const CalculateMaintainance = () => {
             <Text style={styles.label}>SELECTED END DATE (ISO)</Text>
             <Text style={styles.selectorText}>{endDate.toISOString()}</Text>
 
-            {/* Cycle Days Input */}
+            {/* Cycle Days Toggle */}
             <Text style={styles.label}>CYCLE DAYS</Text>
-            <TextInput
-              style={styles.input}
-              value={cycleDays}
-              onChangeText={setCycleDays}
-              keyboardType="numeric"
-              placeholder="Enter number of days"
-              placeholderTextColor="#999"
-            />
+            <View style={styles.toggleContainer}>
+              {cycleOptions.map((option) => (
+                <TouchableOpacity
+                  key={option}
+                  style={[
+                    styles.toggleButton,
+                    cycleDays === option && styles.activeToggle,
+                  ]}
+                  onPress={() => setCycleDays(option)}
+                >
+                  <Text
+                    style={[
+                      styles.toggleText,
+                      cycleDays === option && styles.activeText,
+                    ]}
+                  >
+                    {option} days
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
           </View>
         </ScrollView>
 

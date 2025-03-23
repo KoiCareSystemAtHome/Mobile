@@ -127,4 +127,32 @@ addToCartText: {
   fontSize: 16,
   fontWeight: "bold",
 },
+paginationContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginVertical: 10,
+    paddingHorizontal: 20,
+    paddingBottom: 20,
+  },
+  paginationButton: {
+    backgroundColor: "#20A920", // Match your theme color
+    borderRadius: 8,
+    paddingVertical: 10,
+    width: 70,
+  },
+  paginationText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "500",
+    textAlign: "center",
+  },
+  disabledButton: {
+    backgroundColor: "#ccc",
+  },
+  pageText: {
+    color: "#333",
+    fontSize: 16,
+    fontWeight: "500",
+  },
 });

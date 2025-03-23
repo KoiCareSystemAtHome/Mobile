@@ -29,23 +29,30 @@ export const styles = StyleSheet.create({
       fontWeight: "bold",
       color: "#fff",
     },
-    depositCard: {
-      marginBottom: 20,
-      backgroundColor: "#4da6ff",
-      borderRadius: 15,
-      overflow: "hidden",
-    },
-    depositText: {
-      fontSize: 24,
-      color: "#fff",
-    },
-    amount: {
-      fontWeight: "bold",
-    },
-    depositLink: {
-      color: "#fff",
-      fontSize: 18,
-    },
+depositCard: {
+    marginBottom: 20,
+    borderRadius: 15,
+    overflow: "hidden",
+  },
+  depositGradient: {
+    padding: 15,
+  },
+  depositHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  depositText: {
+    fontSize: 24,
+    color: "#fff",
+  },
+  amount: {
+    fontWeight: "bold",
+  },
+  depositLink: {
+    color: "#fff",
+    fontSize: 18,
+  },
     cardDescription: {
       color: "#fff",
       fontSize: 14,

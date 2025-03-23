@@ -78,52 +78,76 @@ export const styles = StyleSheet.create({
   },
   todayLabelText: {
     fontSize: 14,
-    color: "#FF0000", // Red for "Today"
+    color: "#FF0000",
     fontWeight: "bold",
   },
   // Modal styles
-  modal: {
+modal: {
     justifyContent: "center",
-    margin: 20,
+    margin: 0,
   },
   modalContent: {
     backgroundColor: "#FFF",
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
     padding: 20,
-    borderRadius: 10,
+    height: "50%", // Adjust height as needed
+  },
+  modalHeader: {
+    flexDirection: "row",
     alignItems: "center",
+    marginBottom: 20,
+  },
+  modalHeaderIcon: {
+    fontSize: 24,
+    marginRight: 20,
   },
   modalTitle: {
     fontSize: 18,
     fontWeight: "bold",
-    marginBottom: 15,
     color: "#000",
+  },
+  modalBody: {
+    flex: 1,
+  },
+  modalDate: {
+    fontSize: 16,
+    fontWeight: "bold",
+    color: "#000",
+    marginBottom: 20,
   },
   modalEvent: {
     flexDirection: "row",
     alignItems: "center",
-    marginVertical: 5,
+    padding: 10,
+    borderRadius: 10,
+    marginBottom: 10,
   },
-  modalEventDot: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-    marginRight: 10,
+  modalEventTime: {
+    fontSize: 14,
+    fontWeight: "bold",
+    color: "#000",
+    marginRight: 20,
   },
   modalEventText: {
     fontSize: 16,
     color: "#000",
-    textTransform: "capitalize", // Capitalize "unfinished" and "finished"
   },
-  modalCloseButton: {
-    marginTop: 20,
-    backgroundColor: "#000",
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 5,
+  modalEventDescription: {
+    fontSize: 14,
+    color: "#666",
   },
-  modalCloseButtonText: {
+  modalTodayLabel: {
+    alignSelf: "center",
+    backgroundColor: "#6A5ACD", // Purple like the header
+    paddingVertical: 5,
+    paddingHorizontal: 15,
+    borderRadius: 15,
+    marginBottom: 10,
+  },
+  modalTodayLabelText: {
+    fontSize: 14,
     color: "#FFF",
-    fontSize: 16,
     fontWeight: "bold",
   },
 });

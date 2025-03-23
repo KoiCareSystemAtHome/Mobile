@@ -8,7 +8,10 @@ export const styles = StyleSheet.create({
     ...StyleSheet.absoluteFillObject,
     backgroundColor: "rgba(255, 255, 255, 0.5)",
   },
-  container: { flex: 1, padding: 20 },
+  container: { 
+    flex: 1, 
+    padding: 20 
+  },
   headerContainer: {
     flexDirection: "row",
     alignItems: "flex-start",
@@ -134,64 +137,63 @@ export const styles = StyleSheet.create({
     backgroundColor: "#fff",
     width: "90%",
     borderRadius: 10,
-    padding: 10,
+    padding: 20, // Increased padding for more internal space
   },
   modalHeader: {
     flexDirection: "row",
-    justifyContent: "space-around",
+    justifyContent: "space-between", // Changed to space-between for better header layout
     alignItems: "center",
-
     marginBottom: 20,
-    marginTop: 20,
+    marginTop: 10,
   },
-
   modalCancelText: {
     color: "#ff4d4f",
     fontWeight: "bold",
+    fontSize: 16,
   },
   modalTitle: {
     fontSize: 20,
     fontWeight: "bold",
   },
-
   modalSaveText: {
     color: "#4caf50",
     fontWeight: "bold",
+    fontSize: 16,
   },
   modalFields: {
     width: "100%",
-    marginVertical: 10,
+    marginVertical: 15,
   },
   modalFooter: {
     flexDirection: "row",
     justifyContent: "center",
     gap: 35,
+    marginTop: 20,
+    marginBottom: 10,
   },
   inputLabel: {
     fontSize: 14,
     fontWeight: "bold",
     marginBottom: 5,
-    borderRadius: 30,
+    color: "#333",
   },
   input: {
     borderWidth: 1,
     borderColor: "#ddd",
     padding: 10,
     height: 40,
-    borderRadius: 10,
+    borderRadius: 8,
+    backgroundColor: "#fff",
+    fontSize: 14,
   },
   row: {
     flexDirection: "row",
     justifyContent: "space-between",
-    marginBottom: 10,
+    marginBottom: 15, // Increased spacing between rows
   },
   inputRow: {
     flex: 1,
-    marginHorizontal: 5, // Add spacing between columns
-  },
-  modalFields: {
-    width: "100%",
-    marginVertical: 10,
+    marginHorizontal: 8, // Increased horizontal margin for better spacing
   },
   imageButtonText: {
     color: "#6497B1",
@@ -200,7 +202,7 @@ export const styles = StyleSheet.create({
   imageButton: {
     borderWidth: 1,
     borderColor: "#ddd",
-    padding: 10,
+    padding: 15,
     borderRadius: 5,
     marginBottom: 20,
     alignItems: "center",
@@ -212,22 +214,21 @@ export const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: "#ff9800",
     padding: 10,
-    borderRadius: "50%",
-
+    borderRadius: 25,
     width: 50,
     height: 50,
   },
   deceasedButtonText: {
     fontSize: 14,
     fontWeight: "bold",
-    // marginTop: 5,
+    marginTop: 5,
   },
   deleteButton: {
     flexDirection: "column",
     alignItems: "center",
     backgroundColor: "#f44336",
     padding: 10,
-    borderRadius: "50%",
+    borderRadius: 25,
     width: 50,
     height: 50,
   },
@@ -236,5 +237,4 @@ export const styles = StyleSheet.create({
     fontWeight: "bold",
     marginTop: 5,
   },
-
 });

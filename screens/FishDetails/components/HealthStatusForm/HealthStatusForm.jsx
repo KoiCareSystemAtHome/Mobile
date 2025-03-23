@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { View, Text, ScrollView, TouchableOpacity } from "react-native";
 import {
   Modal,
@@ -12,8 +12,12 @@ import {
 } from "@ant-design/react-native";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import { styles } from "./styles";
+import { useDispatch, useSelector } from "react-redux";
+import { getFishById } from "../../../../redux/slices/fishSlice";
+import { fishByIdSelector } from "../../../../redux/selector";
 
 const HealthStatusForm = ({ fishId, visible, onClose, onSubmit }) => {
+
   const [form] = Form.useForm();
   const [symptoms, setSymptoms] = useState([{ symptomID: "", value: "" }]);
 

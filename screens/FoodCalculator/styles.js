@@ -88,7 +88,7 @@ export const styles = StyleSheet.create({
     borderRadius: 10,
     paddingVertical: 15,
     paddingHorizontal: 20,
-    width: "80%", // Adjust based on layout
+    width: "80%",
     alignItems: "center",
     justifyContent: "center",
     shadowColor: "#000",
@@ -97,7 +97,22 @@ export const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 5, // For Android shadow
   },
-
+  suggestButton: {
+    backgroundColor: "#FF0000", // Red background
+    borderRadius: 25, // Circular shape
+    width: 50, // Fixed width
+    height: 50, // Fixed height for a circle
+    position: 'absolute',
+    top: 20,
+    right: 20,
+    alignItems: 'center', // Center text horizontally
+    justifyContent: 'center', // Center text vertically
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 5, // For Android shadow
+  },
   recommendationText: {
     color: "#fff",
     fontSize: 16,
