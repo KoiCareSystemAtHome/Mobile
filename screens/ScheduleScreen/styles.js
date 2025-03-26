@@ -52,7 +52,7 @@ export const styles = StyleSheet.create({
   },
   fab: {
     position: "absolute",
-    bottom: 80,
+    bottom: 20,
     right: 20,
     width: 50,
     height: 50,
@@ -150,4 +150,45 @@ modal: {
     color: "#FFF",
     fontWeight: "bold",
   },
+  nextReminderContainer: {
+  backgroundColor: "#FFF",
+  borderRadius: 10,
+  marginHorizontal: 10,
+  marginVertical: 15,
+  padding: 15,
+  shadowColor: "#000",
+  shadowOffset: {
+    width: 0,
+    height: 2,
+  },
+  shadowOpacity: 0.1,
+  shadowRadius: 4,
+  elevation: 3,
+},
+nextReminderTitle: {
+  fontSize: 14,
+  fontWeight: "bold",
+  color: "#666",
+  marginBottom: 10,
+},
+nextReminderDetails: {
+  paddingLeft: 10,
+},
+nextReminderDate: {
+  fontSize: 16,
+  fontWeight: "bold",
+  color: "#000",
+  marginBottom: 5,
+},
+nextReminderText: {
+  fontSize: 18,
+  fontWeight: "500",
+  color: "#333",
+  marginBottom: 5,
+},
+nextReminderDescription: {
+  fontSize: 14,
+  color: "#666",
+  lineHeight: 20,
+},
 });

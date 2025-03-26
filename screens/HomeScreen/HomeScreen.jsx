@@ -114,7 +114,7 @@ const HomeScreen = ({ navigation }) => {
               source={require("../../assets/comments.png")}
               style={styles.drawerItemImage}
             />
-            <Text style={styles.drawerItemText}>Membership Package</Text>
+            <Text style={styles.drawerItemText}>Gói thành viên</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.drawerItem}
@@ -126,7 +126,7 @@ const HomeScreen = ({ navigation }) => {
               source={require("../../assets/bookmark.png")}
               style={styles.drawerItemImage}
             />
-            <Text style={styles.drawerItemText}>Blogs</Text>
+            <Text style={styles.drawerItemText}>Bài Viết</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.drawerItem}
@@ -138,7 +138,7 @@ const HomeScreen = ({ navigation }) => {
               source={require("../../assets/download-removebg-preview (1) 1.png")}
               style={styles.drawerItemImage}
             />
-            <Text style={styles.drawerItemText}>Reminder</Text>
+            <Text style={styles.drawerItemText}>Nhắc Nhở</Text>
           </TouchableOpacity>
           {isLoggedIn || userState ? (
             <TouchableOpacity
@@ -151,7 +151,7 @@ const HomeScreen = ({ navigation }) => {
                 source={require("../../assets/user.png")}
                 style={styles.drawerItemImage}
               />
-              <Text style={styles.drawerItemText}>Profile</Text>
+              <Text style={styles.drawerItemText}>Hồ Sơ</Text>
             </TouchableOpacity>
           ) : (
             <></>
@@ -164,7 +164,7 @@ const HomeScreen = ({ navigation }) => {
               source={require("../../assets/history_svgrepo.com.png")}
               style={styles.drawerItemImage}
             />
-            <Text style={styles.drawerItemText}>Order History</Text>
+            <Text style={styles.drawerItemText}>Lịch Sử Đơn Hàng</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.drawerItem}
@@ -174,7 +174,7 @@ const HomeScreen = ({ navigation }) => {
               source={require("../../assets/history_svgrepo.com.png")}
               style={styles.drawerItemImage}
             />
-            <Text style={styles.drawerItemText}>Transaction History</Text>
+            <Text style={styles.drawerItemText}>Lịch Sử Giao Dịch</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.drawerItem}
@@ -184,7 +184,7 @@ const HomeScreen = ({ navigation }) => {
               source={require("../../assets/Calendar.png")}
               style={styles.drawerItemImage}
             />
-            <Text style={styles.drawerItemText}>Schedule</Text>
+            <Text style={styles.drawerItemText}>Lịch Trình</Text>
           </TouchableOpacity>
         </View>
       </Animated.View>
@@ -221,7 +221,7 @@ const HomeScreen = ({ navigation }) => {
                         setTooltipVisible(false);
                       }}
                     >
-                      <Text style={styles.tooltipText}>Log In</Text>
+                      <Text style={styles.tooltipText}>Đăng Nhập</Text>
                     </TouchableOpacity>
                     <View style={styles.tooltipDivider} />
                     <TouchableOpacity
@@ -230,7 +230,7 @@ const HomeScreen = ({ navigation }) => {
                         setTooltipVisible(false);
                       }}
                     >
-                      <Text style={styles.tooltipText}>Register</Text>
+                      <Text style={styles.tooltipText}>Đăng Ký</Text>
                     </TouchableOpacity>
                   </View>
                 }
@@ -267,18 +267,18 @@ const HomeScreen = ({ navigation }) => {
                   <Text style={styles.currency}> VND</Text>
                 </Text>
                 <TouchableOpacity onPress={() => navigation.navigate("DepositScreen")}>
-                  <Text style={styles.depositLink}>Deposit</Text>
+                  <Text style={styles.depositLink}>Nạp Tiền</Text>
                 </TouchableOpacity>
               </View>
               <Text style={styles.cardDescription}>
-                Deposit funds now to unlock premium Koi care-system services!
+                Nạp tiền ngay để mở khóa các dịch vụ cao cấp của hệ thống chăm sóc Koi!
               </Text>
             </LinearGradient>
           </View>
 
           {/* Section: My Koi */}
           <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>My Koi</Text>
+            <Text style={styles.sectionTitle}>Koi Của Tôi</Text>
           </View>
 
           <View style={styles.buttonGroup}>
@@ -286,19 +286,19 @@ const HomeScreen = ({ navigation }) => {
               onPress={() => navigation.navigate("FishStatistic")}
               style={styles.button}
             >
-              Fish Statistic
+              Thống Kê Cá 
             </Button>
             <Button
               onPress={() => navigation.navigate("Shopping")}
               style={styles.button}
             >
-              Shopping
+              Mua Sắm
             </Button>
           </View>
 
           {/* Section: My Pond */}
           <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>My Pond</Text>
+            <Text style={styles.sectionTitle}>Hồ Của Tôi</Text>
           </View>
 
           <View style={styles.buttonGroup}>
@@ -307,7 +307,7 @@ const HomeScreen = ({ navigation }) => {
               type="primary"
               style={styles.pondButton}
             >
-              Pond Statistic
+              Thống Kê Hồ
             </Button>
             <Button
               type="primary"
@@ -316,7 +316,7 @@ const HomeScreen = ({ navigation }) => {
                 navigation.navigate("WaterParameter");
               }}
             >
-              Water Parameters
+              Thông Số Nước
             </Button>
             <Button
               type="primary"
@@ -325,7 +325,7 @@ const HomeScreen = ({ navigation }) => {
                 navigation.navigate("FoodCalculator");
               }}
             >
-              Food Calculator
+              Tính Thức Ăn
             </Button>
             <Button
               type="primary"
@@ -334,7 +334,7 @@ const HomeScreen = ({ navigation }) => {
                 navigation.navigate("SaltCalculator");
               }}
             >
-              Salt Calculator
+              Tính Muối
             </Button>
           </View>
         </View>

@@ -5,7 +5,6 @@ import { Calendar } from "react-native-calendars";
 import Modal from "react-native-modal";
 import { styles } from "./styles";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { getPondByOwner } from "../../redux/slices/pondSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { reminderByOwnerSelector } from "../../redux/selector";
 import { getReminderByOwner } from "../../redux/slices/reminderSlice";
@@ -24,14 +23,40 @@ const ScheduleScreen = ({ navigation }) => {
   const [selectedDateEvents, setSelectedDateEvents] = useState([]);
   const [selectedDate, setSelectedDate] = useState("");
   const [markedDates, setMarkedDates] = useState({});
+  const [nextReminder, setNextReminder] = useState(null);
+  const [filterType, setFilterType] = useState("RecurringMaintenance");
 
-  // Process reminders into markedDates format
+  // Process reminders into markedDates format and find next reminder
   useEffect(() => {
     if (reminderByOwner && reminderByOwner.length > 0) {
       const newMarkedDates = {};
+      const today = new Date();
 
-      reminderByOwner.forEach((reminder) => {
-        const date = reminder.maintainDate.split("T")[0]; // Get YYYY-MM-DD format
+      // Set next reminder (unfiltered)
+      const futureReminders = reminderByOwner.filter((reminder) => {
+        const maintainDate = new Date(reminder.maintainDate);
+        return maintainDate >= today;
+      });
+
+      if (futureReminders.length > 0) {
+        const closestReminder = futureReminders.reduce((prev, curr) => {
+          const prevDate = new Date(prev.maintainDate);
+          const currDate = new Date(curr.maintainDate);
+          return currDate < prevDate ? curr : prev;
+        });
+        setNextReminder(closestReminder);
+      } else {
+        setNextReminder(null);
+      }
+
+      // Filter reminders for calendar marking
+      const filteredReminders = reminderByOwner.filter((reminder) =>
+        reminder.reminderType === filterType
+      );
+
+      // Process marked dates
+      filteredReminders.forEach((reminder) => {
+        const date = reminder.maintainDate.split("T")[0];
         const isFinished = reminder.seenDate !== "0001-01-01T00:00:00";
 
         if (!newMarkedDates[date]) {
@@ -48,8 +73,7 @@ const ScheduleScreen = ({ navigation }) => {
 
       setMarkedDates(newMarkedDates);
     }
-  }, [reminderByOwner]);
-
+  }, [reminderByOwner, filterType]);
 
   const handleDayPress = (day) => {
     const dateString = day.dateString;
@@ -61,7 +85,7 @@ const ScheduleScreen = ({ navigation }) => {
           day: "numeric",
           month: "short",
         })
-        .toUpperCase(); // Format like "WEDNESDAY, 1 JAN"
+        .toUpperCase();
 
       setSelectedDate(formattedDate);
       setSelectedDateEvents(markedDates[dateString].dots);
@@ -87,25 +111,33 @@ const ScheduleScreen = ({ navigation }) => {
     }
   }, [isLoggedIn?.id, dispatch]);
 
-
   const getTimeRange = (maintainDate) => {
     const date = new Date(maintainDate);
     const hours = date.getHours();
     const minutes = date.getMinutes();
     const startHour = hours.toString().padStart(2, "0");
     const startMinutes = minutes.toString().padStart(2, "0");
-    const endHour = (hours + 2) % 24; // Assuming a 2-hour duration for simplicity
+    const endHour = (hours + 2) % 24;
     const endHourStr = endHour.toString().padStart(2, "0");
     return `${startHour}:${startMinutes}-${endHourStr}:${startMinutes}`;
   };
 
-  // Helper function to determine icon based on title
   const getIconForEvent = (title) => {
-    if (title.toLowerCase().includes("feeding")) return "🟢"; // Green circle for Feeding
-    if (title.toLowerCase().includes("maintenance")) return "🟡"; // Yellow circle for Maintenance
-    return "⚪"; // White circle for Notes or others
+    if (title.toLowerCase().includes("feeding")) return "🟢";
+    if (title.toLowerCase().includes("maintenance")) return "🟡";
+    return "⚪";
   };
 
+  const formatNextReminderDate = (maintainDate) => {
+    const date = new Date(maintainDate);
+    return date
+      .toLocaleDateString("en-US", {
+        weekday: "long",
+        day: "numeric",
+        month: "short",
+      })
+      .toUpperCase();
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -124,9 +156,71 @@ const ScheduleScreen = ({ navigation }) => {
         </View>
       </View>
 
-      {/* Calendar */}
+      {nextReminder && (
+        <View style={styles.nextReminderContainer}>
+          <Text style={styles.nextReminderTitle}>NEXT REMINDER</Text>
+          <View style={styles.nextReminderDetails}>
+            <Text style={styles.nextReminderDate}>
+              {formatNextReminderDate(nextReminder.maintainDate)} at{" "}
+              {getTimeRange(nextReminder.maintainDate).split("-")[0]}
+            </Text>
+            <Text style={styles.nextReminderText}>{nextReminder.title}</Text>
+            <Text style={styles.nextReminderDescription}>
+              {nextReminder.description}
+            </Text>
+          </View>
+        </View>
+      )}
+
+      {/* Toggle Switch */}
+      <View style={{
+        flexDirection: 'row',
+        backgroundColor: '#E0E0E0',
+        borderRadius: 20,
+        margin: 10,
+        width: 220,
+        alignSelf: 'center',
+      }}>
+        <TouchableOpacity
+          style={{
+            flex: 1,
+            padding: 10,
+            borderRadius: 20,
+            backgroundColor: filterType === "RecurringMaintenance" ? "#6A5ACD" : "transparent",
+            alignItems: 'center',
+          }}
+          onPress={() => setFilterType("RecurringMaintenance")}
+        >
+          <Text style={{
+            color: filterType === "RecurringMaintenance" ? "#FFF" : "#000",
+            fontWeight: "bold",
+            fontSize: 12
+          }}>
+            Recurring
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={{
+            flex: 1,
+            padding: 10,
+            borderRadius: 20,
+            backgroundColor: filterType === "Maintenance" ? "#6A5ACD" : "transparent",
+            alignItems: 'center',
+          }}
+          onPress={() => setFilterType("Maintenance")}
+        >
+          <Text style={{
+            color: filterType === "Maintenance" ? "#FFF" : "#000",
+            fontWeight: "bold",
+            fontSize: 12
+          }}>
+            Maintenance
+          </Text>
+        </TouchableOpacity>
+      </View>
+
       <Calendar
-        current={"2025-03-20"}
+        current={new Date().toISOString().split("T")[0]}
         markedDates={markedDates}
         markingType={"multi-dot"}
         theme={{
@@ -169,16 +263,11 @@ const ScheduleScreen = ({ navigation }) => {
       <TouchableOpacity
         style={styles.fab}
         onPress={() => {
-          console.log("Add new reminder");
+          navigation.navigate("ReminderScreen");
         }}
       >
         <Text style={styles.fabText}>{addIcon}</Text>
       </TouchableOpacity>
-
-      {/* Today Label */}
-      <View style={styles.todayLabel}>
-        <Text style={styles.todayLabelText}>Today</Text>
-      </View>
 
       {/* Modal for Event Details */}
       <Modal
@@ -187,7 +276,6 @@ const ScheduleScreen = ({ navigation }) => {
         style={styles.modal}
       >
         <View style={styles.modalContent}>
-          {/* Modal Header */}
           <View style={styles.modalHeader}>
             <TouchableOpacity onPress={() => setModalVisible(false)}>
               <Text style={styles.modalHeaderIcon}>{leftArrowIcon}</Text>
@@ -195,7 +283,6 @@ const ScheduleScreen = ({ navigation }) => {
             <Text style={styles.modalTitle}>VIEW REMINDER</Text>
           </View>
 
-          {/* Modal Body */}
           <View style={styles.modalBody}>
             <Text style={styles.modalDate}>{selectedDate}</Text>
             {selectedDateEvents.map((event, index) => (
@@ -207,16 +294,16 @@ const ScheduleScreen = ({ navigation }) => {
                     backgroundColor: event.reminder.title
                       .toLowerCase()
                       .includes("feeding")
-                      ? "#E6F4EA" // Light green for Feeding
+                      ? "#E6F4EA"
                       : event.reminder.title
                           .toLowerCase()
                           .includes("maintenance")
-                      ? "#FFF3E0" // Light orange for Maintenance
-                      : "#E0E0E0", // Light gray for Notes
+                      ? "#FFF3E0"
+                      : "#E0E0E0",
                   },
                 ]}
                 onPress={() => {
-                  setModalVisible(false); // Close the modal
+                  setModalVisible(false);
                   navigation.navigate("ReminderDetail", {
                     reminder: event.reminder,
                   });

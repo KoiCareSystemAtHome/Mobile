@@ -66,7 +66,6 @@ const FishStatistic = ({ navigation }) => {
     };
     loadFontAsync();
   }, []);
-
   const renderFishCard = ({ item }) => (
     <TouchableOpacity
       onPress={() => navigation.navigate("FishDetail", { fish: item })}
@@ -74,6 +73,14 @@ const FishStatistic = ({ navigation }) => {
       <Card style={styles.card}>
         <View style={styles.cardContent}>
           <Image source={{ uri: item.image }} style={styles.fishImage} />
+          <View style={{flexDirection:"row", justifyContent:"flex-end"}}>
+            <FontAwesome
+              name={item.gender === "male" ? "mars" : "venus"}
+              size={20}
+              color="#6497B1"
+              style={{paddingRight:20, marginTop:5}}
+            />
+          </View>
           <View style={styles.fishInfo}>
             <View style={styles.infoRow}>
               <Text style={styles.fishText}>
@@ -83,12 +90,6 @@ const FishStatistic = ({ navigation }) => {
               <Text style={styles.fishText}>
                 <Text style={styles.label}>Variety: </Text>
                 {item.variety.varietyName}{" "}
-                <FontAwesome
-                  name={item.gender === "male" ? "mars" : "venus"}
-                  size={20}
-                  color="#6497B1"
-                  style={{ paddingRight: 10 }}
-                />
               </Text>
             </View>
             <View style={styles.infoRow}>

@@ -61,6 +61,18 @@ export const createFish = createAsyncThunk(
   }
 );
 
+export const updateFish = createAsyncThunk(
+  "fishSlice/updateFish",
+  async (payload, { rejectWithValue }) => {
+    try {
+      const res = await putRequest(`Fish/update-fish`, payload);
+      return res.data;
+    } catch (error) {
+      console.log(error)
+    }
+  }
+);
+
 export const createKoiProfile = createAsyncThunk(
   "fishSlice/createKoiProfile",
   async (payload, { rejectWithValue }) => {

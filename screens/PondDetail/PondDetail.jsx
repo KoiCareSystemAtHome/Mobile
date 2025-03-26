@@ -190,7 +190,7 @@ const PondDetail = ({ route }) => {
                   <Text style={styles.productPrice}>
                     {item.price || "N/A"} VND
                   </Text>
-                  <TouchableOpacity style={styles.addToCartButton}>
+                  <TouchableOpacity style={styles.addToCartButton} onPress={()=>{}}>
                     <Text style={styles.addToCartText}>Add to cart</Text>
                   </TouchableOpacity>
                 </TouchableOpacity>

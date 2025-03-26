@@ -13,7 +13,8 @@ export const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingTop: 60,
   },
-  formContainer: { // Added for EditFishScreen
+  formContainer: {
+    // Added for EditFishScreen
     paddingHorizontal: 20,
     paddingTop: 60,
     paddingBottom: 20,
@@ -157,17 +158,25 @@ export const styles = StyleSheet.create({
     color: "#4caf50",
     fontWeight: "bold",
   },
-  imageButton: {
-    borderWidth: 1,
-    borderColor: "#ddd",
-    padding: 10,
-    borderRadius: 5,
-    marginBottom: 20,
+  imageContainer: {
     alignItems: "center",
   },
-  imageButtonText: {
-    color: "#6497B1",
-    fontSize: 16,
+  selectedImage: {
+    width: 200,
+    height: 200,
+    borderRadius: 10,
+    marginBottom: 10,
+  },
+  changeImageButton: {
+    backgroundColor: "#16a085",
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderRadius: 5,
+  },
+  changeImageText: {
+    color: "white",
+    fontSize: 14,
+    fontWeight: "bold",
   },
   modalFields: {
     backgroundColor: "transparent",

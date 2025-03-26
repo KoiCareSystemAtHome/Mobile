@@ -41,7 +41,7 @@ export const styles = StyleSheet.create({
     // marginLeft: 10,
   },
   fishText: {
-    marginTop: 16,
+    marginTop: 5,
     fontSize: 16,
     // marginBottom: 15,
   },

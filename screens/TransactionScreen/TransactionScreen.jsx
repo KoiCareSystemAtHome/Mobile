@@ -10,9 +10,17 @@ import {
 import { AntDesign } from "@expo/vector-icons"; // Assuming you're using expo-vector-icons
 import { styles } from "./styles";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { getDepositTransaction, getOrderTransaction, getPackageTransaction } from "../../redux/slices/transactionSlice";
+import {
+  getDepositTransaction,
+  getOrderTransaction,
+  getPackageTransaction,
+} from "../../redux/slices/transactionSlice";
 import { useDispatch, useSelector } from "react-redux";
-import { depositTransactionOrder, orderTransactionSelector, packageTransactionSelector } from "../../redux/selector";
+import {
+  depositTransactionOrder,
+  orderTransactionSelector,
+  packageTransactionSelector,
+} from "../../redux/selector";
 import dayjs from "dayjs";
 
 const paymentData = [
@@ -45,13 +53,13 @@ const membershipData = [
 ];
 
 const TransactionScreen = ({ navigation }) => {
-  const dispatch = useDispatch()
-  
+  const dispatch = useDispatch();
+
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [activeTab, setActiveTab] = useState("Thanh toán");
-  const orderTransactionData = useSelector(orderTransactionSelector)
-  const packageTransactionData = useSelector(packageTransactionSelector)
-  const depositeTransactionData = useSelector(depositTransactionOrder)
+  const orderTransactionData = useSelector(orderTransactionSelector);
+  const packageTransactionData = useSelector(packageTransactionSelector);
+  const depositeTransactionData = useSelector(depositTransactionOrder);
   const getDataForTab = () => {
     switch (activeTab) {
       case "Thanh toán":
@@ -68,11 +76,11 @@ const TransactionScreen = ({ navigation }) => {
   // Render each transaction item
   const renderDepositData = ({ item }) => (
     <View style={styles.transactionCard}>
-      <Text style={styles.orderNumber}>ĐƠN SỐ #{item.vnPayTransactionId}</Text>
+      <Text style={styles.orderNumber}>{item?.pakageName ? `Gói ${item?.pakageName}` : `Đơn ${item?.vnPayTransactionId}` }</Text>
       <Text style={styles.orderDetails}>
         Mua ngày: {dayjs(item.transactionDate).format("ddd, D MMMM YYYY")}
       </Text>
-    <Text style={styles.orderTotal}>Tổng tiền: {item.amount}</Text>
+      <Text style={styles.orderTotal}>Tổng tiền: {item.amount}</Text>
       <View style={styles.buttonContainer}>
         <TouchableOpacity style={styles.reviewButton}>
           <Text style={styles.buttonText}>Đánh giá</Text>
@@ -84,27 +92,27 @@ const TransactionScreen = ({ navigation }) => {
     </View>
   );
 
-    useEffect(() => {
-      const getData = async () => {
-        try {
-          const value = await AsyncStorage.getItem("user");
-          setIsLoggedIn(value ? JSON.parse(value) : null);
-        } catch (error) {
-          console.error(error);
-        }
-      };
-  
-      getData();
-    }, []);
+  useEffect(() => {
+    const getData = async () => {
+      try {
+        const value = await AsyncStorage.getItem("user");
+        setIsLoggedIn(value ? JSON.parse(value) : null);
+      } catch (error) {
+        console.error(error);
+      }
+    };
 
-     useEffect(() => {
-        if (isLoggedIn?.id) {
-          dispatch(getOrderTransaction(isLoggedIn.id));
-          dispatch(getPackageTransaction(isLoggedIn.id));
-          dispatch(getDepositTransaction(isLoggedIn.id));
-        }
-      }, [isLoggedIn?.id, dispatch]);
-    
+    getData();
+  }, []);
+
+
+  useEffect(() => {
+    if (isLoggedIn?.id) {
+      dispatch(getOrderTransaction(isLoggedIn.id));
+      dispatch(getPackageTransaction(isLoggedIn.id));
+      dispatch(getDepositTransaction(isLoggedIn.id));
+    }
+  }, [isLoggedIn?.id, dispatch]);
 
   return (
     <ImageBackground

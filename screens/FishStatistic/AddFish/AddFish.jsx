@@ -70,7 +70,7 @@ const AddFish = ({ navigation }) => {
     }
 
     let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      mediaTypes: ImagePicker.Images,
       allowsEditing: true,
       quality: 1,
     });
@@ -81,7 +81,7 @@ const AddFish = ({ navigation }) => {
       const fileMimeType = `image/${fileType === "jpg" ? "jpeg" : fileType}`;
 
       let formData = new FormData();
-      formData.append("filene", {
+      formData.append("file", {
         uri: uri,
         name: `image.${fileType}`,
         type: fileMimeType,
@@ -91,7 +91,8 @@ const AddFish = ({ navigation }) => {
       try {
         const response = await dispatch(getImage(formData)).unwrap();
         if (response) {
-          setUploadResponse(response);
+          console.log(response);
+          setUploadResponse(response.imageUrl);
         }
       } catch (error) {
         console.error("Failed to upload image:", error);
@@ -143,12 +144,16 @@ const AddFish = ({ navigation }) => {
     <Provider locale={enUS}>
       <ImageBackground
         source={require("../../../assets/koimain3.jpg")}
-        style={styles.background}
+        style={styles.background} 
         resizeMode="cover"
       >
         <View style={styles.overlay} />
         <ScrollView contentContainerStyle={styles.formContainer}>
-          <Form form={form} onFinish={onFinish} style={{backgroundColor:"transparent"}}>
+          <Form
+            form={form}
+            onFinish={onFinish}
+            style={{ backgroundColor: "transparent", borderWidth: 0}}
+          >
             <View style={styles.modalHeader}>
               <Text style={styles.modalTitle}>Add New Koi</Text>
             </View>
@@ -226,28 +231,30 @@ const AddFish = ({ navigation }) => {
                 </View>
                 <View style={styles.inputRow}>
                   <Text style={styles.inputLabel}>In Pond Since:</Text>
-                  <DatePicker
-                    value={inPondSince}
-                    mode="date"
-                    minDate={new Date(2000, 0, 1)}
-                    format="DD MMMM YYYY"
-                    onChange={handleDatePickerChange}
-                    visible={isDatePickerVisible}
-                    onDismiss={() => setDatePickerVisible(false)}
-                  >
-                    <TouchableOpacity
-                      style={styles.input}
-                      onPress={() => setDatePickerVisible(true)}
+                  <View style={{ backgroundColor: "white", borderRadius: 5 }}>
+                    <DatePicker
+                      value={inPondSince}
+                      mode="date"
+                      minDate={new Date(2000, 0, 1)}
+                      format="DD MMMM YYYY"
+                      onChange={handleDatePickerChange}
+                      visible={isDatePickerVisible}
+                      onDismiss={() => setDatePickerVisible(false)}
                     >
-                      <Text style={styles.dateText}>
-                        {inPondSince.toLocaleDateString("en-GB", {
-                          day: "numeric",
-                          month: "long",
-                          year: "numeric",
-                        })}
-                      </Text>
-                    </TouchableOpacity>
-                  </DatePicker>
+                      <TouchableOpacity
+                        style={styles.input}
+                        onPress={() => setDatePickerVisible(true)}
+                      >
+                        <Text style={styles.dateText}>
+                          {inPondSince.toLocaleDateString("en-GB", {
+                            day: "numeric",
+                            month: "long",
+                            year: "numeric",
+                          })}
+                        </Text>
+                      </TouchableOpacity>
+                    </DatePicker>
+                  </View>
                 </View>
               </View>
               <View style={styles.row}>
@@ -260,7 +267,7 @@ const AddFish = ({ navigation }) => {
                 <View style={styles.inputRow}>
                   <Text style={styles.inputLabel}>Purchase Price:</Text>
                   <Form.Item name="price" style={styles.input} extra="VND">
-                    <Input placeholder="Purchase Price" />
+                    <Input placeholder="Price" />
                   </Form.Item>
                 </View>
               </View>
