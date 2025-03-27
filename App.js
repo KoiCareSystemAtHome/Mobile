@@ -89,16 +89,16 @@ const MainTabNavigator = () => (
       }}
     />
     <Tab.Screen
-      name="Overview"
-      component={OverviewScreen}
-      options={{
-        tabBarLabel: 'Blog',
-        tabBarIcon: ({ color }) => (
-          <Ionicons name="list-outline" size={24} color={color} />
-        ),
-        headerShown: false,
-      }}
-    />
+  name="Blog"
+  component={BlogScreen} // Đổi từ OverviewScreen -> BlogScreen
+  options={{
+    tabBarLabel: "Blog",
+    tabBarIcon: ({ color }) => (
+      <Ionicons name="list-outline" size={24} color={color} />
+    ),
+    headerShown: false,
+  }}
+/>
     <Tab.Screen
       name="FAQ"
       component={FAQScreen}

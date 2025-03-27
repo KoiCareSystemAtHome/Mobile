@@ -119,18 +119,6 @@ const HomeScreen = ({ navigation }) => {
           <TouchableOpacity
             style={styles.drawerItem}
             onPress={() => {
-              navigation.navigate("BlogScreen");
-            }}
-          >
-            <Image
-              source={require("../../assets/bookmark.png")}
-              style={styles.drawerItemImage}
-            />
-            <Text style={styles.drawerItemText}>Bài Viết</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.drawerItem}
-            onPress={() => {
               navigation.navigate("ReminderScreen");
             }}
           >

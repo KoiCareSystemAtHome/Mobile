@@ -95,22 +95,6 @@ const BlogScreen = ({ navigation }) => {
           contentContainerStyle={styles.listContent}
         />
       </ImageBackground>
-
-      {/* Footer Navigation */}
-      <View style={styles.footer}>
-        <TouchableOpacity style={styles.footerButton}>
-          <FontAwesome name="home" size={24} color="#666" />
-          <Text style={styles.footerText}>Home</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.footerButton}>
-          <FontAwesome5 name="chart-bar" size={24} color="#6497B1" />
-          <Text style={[styles.footerText, { color: "#6497B1" }]}>Overview</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.footerButton}>
-          <FontAwesome name="question-circle" size={24} color="#666" />
-          <Text style={styles.footerText}>FAQ's</Text>
-        </TouchableOpacity>a
-      </View>
     </View>
   );
 };
