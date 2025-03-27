@@ -35,15 +35,15 @@ export const styles = StyleSheet.create({
     paddingTop: 10,
   },
   blogCard: {
-    backgroundColor: "#fff",
-    borderRadius: 10,
+    backgroundColor: 'rgba(255, 255, 255, 0.5)', // Làm mờ nền
     padding: 15,
-    marginBottom: 15,
+    borderRadius: 10,
+    marginVertical: 10,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 5,
-    elevation: 3,
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 5, // Tạo độ nổi trên Android
   },
   blogTitle: {
     fontSize: 18,
@@ -67,7 +67,7 @@ export const styles = StyleSheet.create({
     width: "100%",
     height: 200,
     borderRadius: 10,
-    marginTop: 10,
+    marginBottom: 10,
   },
   footer: {
     flexDirection: "row",
