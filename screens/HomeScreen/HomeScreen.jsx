@@ -101,8 +101,8 @@ const HomeScreen = ({ navigation }) => {
           </TouchableOpacity>
           <View style={styles.drawerProfile}>
             <FontAwesome name="user-circle" size={50} color="#6497B1" />
-            <Text style={styles.drawerUserName}>User</Text>
-            <Text style={styles.drawerUserRole}>UX/UI Designer</Text>
+            <Text style={styles.drawerUserName}>Hello,</Text>
+            <Text style={styles.drawerUserRole}>Anynomous user</Text>
           </View>
         </View>
         <View style={styles.divider} />

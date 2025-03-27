@@ -43,6 +43,7 @@ import EditFish from './screens/FishStatistic/EditFish/EditFish';
 import ReminderDetail from './screens/ScheduleScreen/ReminderDetail/ReminderDetail';
 import TransactionScreen from './screens/TransactionScreen/TransactionScreen';
 import PackageScreen from './screens/PackageScreen/PackageScreen';
+import FAQScreen from './screens/FAQ/faq';
 
 
 
@@ -54,15 +55,10 @@ const Stack = createStackNavigator();
 // Placeholder Screens
 const OverviewScreen = () => (
   <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-    <Text>Overview Screen</Text>
+    <Text>Blog screen, Add block dùm tui dớiii</Text>
   </View>
 );
 
-const FAQScreen = () => (
-  <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-    <Text>FAQ Screen</Text>
-  </View>
-);
 
 // Bottom Tab Navigation for Home/Overview/FAQ
 const MainTabNavigator = () => (
@@ -96,7 +92,7 @@ const MainTabNavigator = () => (
       name="Overview"
       component={OverviewScreen}
       options={{
-        tabBarLabel: 'Overview',
+        tabBarLabel: 'Blog',
         tabBarIcon: ({ color }) => (
           <Ionicons name="list-outline" size={24} color={color} />
         ),
