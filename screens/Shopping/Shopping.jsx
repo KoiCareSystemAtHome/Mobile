@@ -8,6 +8,7 @@ import {
   FlatList,
   ScrollView,
 } from "react-native";
+import { ImageBackground } from "react-native";
 import { styles } from "./styles";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import AntDesign from "react-native-vector-icons/AntDesign";
@@ -16,6 +17,7 @@ import { getProduct } from "../../redux/slices/productSlice";
 import { getCategory } from "../../redux/slices/categorySlice";
 import { categorySelector, productSelector } from "../../redux/selector";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+
 
 const Shopping = ({ navigation }) => {
   const [selectedCategory, setSelectedCategory] = useState(null);
@@ -82,7 +84,11 @@ const Shopping = ({ navigation }) => {
   };
 
   return (
-    <View style={styles.background} resizeMode="cover">
+    <ImageBackground 
+    source={require('../../assets/koiimg.jpg')}  
+    style={styles.background}
+    resizeMode="cover"
+  >
       <View style={styles.overlay} />
 
       {/* Header */}
@@ -147,19 +153,14 @@ const Shopping = ({ navigation }) => {
         numColumns={2}
         contentContainerStyle={styles.productList}
         renderItem={({ item }) => (
-          <TouchableOpacity style={styles.productCard}>
+          <TouchableOpacity style={styles.productCard}
+          onPress={() => {
+            navigation.navigate("ProductDetail", { product: item });
+          }}>
             <Image source={{ uri: item.image }} style={styles.productImage} />
             <Text style={styles.productName}>{item.productName}</Text>
-            <Text style={styles.productName}>{item?.shop}</Text>
+            {item?.shop && <Text style={styles.productName}>{item.shop}</Text>}
             <Text style={styles.productPrice}>{item.price} VND</Text>
-            <TouchableOpacity
-              style={styles.addToCartButton}
-              onPress={() => {
-                navigation.navigate("ProductDetail", { product: item });
-              }}
-            >
-              <Text style={styles.addToCartText}>Add to cart</Text>
-            </TouchableOpacity>
           </TouchableOpacity>
         )}
       />
@@ -175,7 +176,9 @@ const Shopping = ({ navigation }) => {
             onPress={handlePreviousPage}
             disabled={currentPage === 1}
           >
-            <Text style={styles.paginationText}>Previous</Text>
+            <Text style={styles.paginationText}>
+              <AntDesign name="left" size={20} color="black" />
+            </Text>
           </TouchableOpacity>
           <Text style={styles.pageText}>
             {currentPage}/{totalPages}
@@ -188,11 +191,13 @@ const Shopping = ({ navigation }) => {
             onPress={handleNextPage}
             disabled={currentPage === totalPages}
           >
-            <Text style={styles.paginationText}>Next</Text>
+            <Text style={styles.paginationText}>
+              <AntDesign name="right" size={20} color="black" />
+            </Text>
           </TouchableOpacity>
         </View>
       )}
-    </View>
+     </ImageBackground>
   );
 };
 
