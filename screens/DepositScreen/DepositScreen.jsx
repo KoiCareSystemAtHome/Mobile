@@ -81,11 +81,11 @@ const DepositScreen = ({ navigation }) => {
     <View style={styles.overlay} />
       {!showWebView ? (
         <>
-          <Text style={styles.title}>VNPay Payment</Text>
+          <Text style={styles.title}>Nạp tiền</Text>
 
           <TextInput
             style={styles.input}
-            placeholder="Amount (VND)"
+            placeholder="Số tiền (VND)"
             keyboardType="numeric"
             value={money}
             onChangeText={setMoney}
@@ -93,7 +93,7 @@ const DepositScreen = ({ navigation }) => {
 
           <TextInput
             style={styles.input}
-            placeholder="Description"
+            placeholder="Mô tả"
             value={description}
             onChangeText={setDescription}
           />
@@ -102,7 +102,7 @@ const DepositScreen = ({ navigation }) => {
             <ActivityIndicator size="large" color="#0000ff" />
           ) : (
             <View style={{marginHorizontal:20}}>
-            <Button title="Create Payment" onPress={handleCreatePayment} />
+            <Button title="Tạo giao dịch" onPress={handleCreatePayment} />
             </View>
           )}
         </>
@@ -127,7 +127,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     marginBottom: 20,
     textAlign: "center",
-    marginTop:40
+    marginTop:60
   },
   input: {
     borderWidth: 1,

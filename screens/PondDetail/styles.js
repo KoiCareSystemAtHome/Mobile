@@ -9,6 +9,7 @@ export const styles = StyleSheet.create({
     backgroundColor: "rgba(255, 255, 255, 0.5)",
   },
   container: {
+    flex:1,
     paddingHorizontal: 20,
     paddingBottom: 40,
   },
@@ -78,8 +79,8 @@ export const styles = StyleSheet.create({
     marginBottom: 3,
   },
   parameterCard: {
-    flexDirection:"row",
-    justifyContent:"center",
+    flexDirection: "row",
+    justifyContent: "center",
     backgroundColor: "#f9f9f9",
     borderRadius: 20,
     alignItems: "center",
@@ -97,7 +98,7 @@ export const styles = StyleSheet.create({
     marginBottom: 5,
   },
   statisticsContainer: {
-    marginBottom: 20,
+    marginBottom: 100,
   },
   statisticsRow: {
     flexDirection: "row",
@@ -167,7 +168,101 @@ export const styles = StyleSheet.create({
   },
   addToCartText: {
     color: "white",
+    fontSize: 14,
+    fontWeight: "bold",
+  },
+  modal:{
+    width:350
+  },
+  modalOverlay: {
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  modalContainer: {
+    backgroundColor: "#fff",
+    width: "90%",
+    borderRadius: 10,
+    padding: 10,
+  },
+  modalHeader: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: 20,
+    marginTop: 20,
+  },
+  modalCancelButton: {
+    padding: 10,
+  },
+  modalCancelText: {
+    color: "#ff4d4f",
+    fontWeight: "bold",
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: "bold",
+  },
+  modalSaveButton: {
+    padding: 10,
+  },
+  modalSaveText: {
+    color: "#4caf50",
+    fontWeight: "bold",
+  },
+  imageButton: {
+    borderWidth: 1,
+    borderColor: "#ddd",
+    padding: 10,
+    borderRadius: 5,
+    marginBottom: 20,
+    alignItems: "center",
+  },
+  imageButtonText: {
+    color: "#6497B1",
     fontSize: 16,
+  },
+  modalFields: {
+    width: "100%",
+    marginVertical: 10,
+  },
+  row: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 10,
+  },
+  inputRow: {
+    flex: 1,
+    marginHorizontal: 5, // Add spacing between columns
+  },
+  inputLabel: {
+    fontSize: 14,
+    fontWeight: "bold",
+    marginBottom: 5,
+    borderRadius: 30,
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: "#ddd",
+    height: 40,
+    borderRadius: 10,
+  },
+  modalFooter: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    backgroundColor:"white"
+  },
+  imageContainer: {
+    alignItems: "center",
+  },
+  selectedImage: {
+    width: 250,
+    height: 250,
+    borderRadius: 10,
+    marginBottom: 10,
+  },
+  changeImageText: {
+    color: "white",
+    fontSize: 14,
     fontWeight: "bold",
   },
 });

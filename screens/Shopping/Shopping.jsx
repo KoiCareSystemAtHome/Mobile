@@ -84,23 +84,23 @@ const Shopping = ({ navigation }) => {
   return (
     <View style={styles.background} resizeMode="cover">
       <View style={styles.overlay} />
-
+  
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.navigate("MainTabs")}>
           <AntDesign name="left" size={24} color="black" />
         </TouchableOpacity>
-        <Text style={styles.title}>Shop</Text>
+        <Text style={styles.title}>Cửa Hàng</Text>
         <TouchableOpacity onPress={() => navigation.navigate("CartScreen")}>
           <AntDesign name="shoppingcart" size={28} color="black" />
         </TouchableOpacity>
       </View>
-
+  
       {/* Search Bar */}
       <View style={styles.searchContainer}>
         <TextInput
           style={styles.searchInput}
-          placeholder="Search products..."
+          placeholder="Tìm kiếm sản phẩm..."
           value={searchText}
           onChangeText={setSearchText}
         />
@@ -108,7 +108,7 @@ const Shopping = ({ navigation }) => {
           <FontAwesome name="search" size={20} color="#888" />
         </TouchableOpacity>
       </View>
-
+  
       {/* Category Selection */}
       <ScrollView
         horizontal
@@ -139,7 +139,7 @@ const Shopping = ({ navigation }) => {
           </TouchableOpacity>
         ))}
       </ScrollView>
-
+  
       {/* Product List */}
       <FlatList
         data={paginatedProducts} // Use paginated products instead of filteredProducts
@@ -158,12 +158,12 @@ const Shopping = ({ navigation }) => {
                 navigation.navigate("ProductDetail", { product: item });
               }}
             >
-              <Text style={styles.addToCartText}>Add to cart</Text>
+              <Text style={styles.addToCartText}>Thêm vào giỏ</Text>
             </TouchableOpacity>
           </TouchableOpacity>
         )}
       />
-
+  
       {/* Pagination Controls */}
       {filteredProducts?.length > 0 && (
         <View style={styles.paginationContainer}>
@@ -175,7 +175,7 @@ const Shopping = ({ navigation }) => {
             onPress={handlePreviousPage}
             disabled={currentPage === 1}
           >
-            <Text style={styles.paginationText}>Previous</Text>
+            <Text style={styles.paginationText}>Trang trước</Text>
           </TouchableOpacity>
           <Text style={styles.pageText}>
             {currentPage}/{totalPages}
@@ -188,7 +188,7 @@ const Shopping = ({ navigation }) => {
             onPress={handleNextPage}
             disabled={currentPage === totalPages}
           >
-            <Text style={styles.paginationText}>Next</Text>
+            <Text style={styles.paginationText}>Trang sau</Text>
           </TouchableOpacity>
         </View>
       )}

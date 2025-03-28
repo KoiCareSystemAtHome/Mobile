@@ -40,7 +40,7 @@ const PredictSymptom = ({ route }) => {
     if(selectedValues?.length > 0) {
       const selectedSymptom = selectedValues.map((id) => ({
         symtompId: id,
-        value: "string",
+        value: "True",
       }));
       dispatch(getExamination(selectedSymptom));
     }
@@ -78,7 +78,7 @@ const PredictSymptom = ({ route }) => {
     >
       <View style={styles.overlay} />
       <View style={styles.container}>
-        <Text style={styles.title}>Predict Symptoms</Text>
+        <Text style={styles.title}>Chẩn Đoán Bệnh</Text>
         <DropDownPicker
           open={open}
           value={selectedValues}
@@ -105,7 +105,7 @@ const PredictSymptom = ({ route }) => {
         {selectedValues?.length > 0 && (
           <View style={styles.symptomCard}>
             <Text style={styles.cardTitle}>
-              Chẩn đoán bệnh:
+              Chẩn đoán bệnh: {diseaseDiagnosis?.diseaseName}
             </Text>
           </View>
         )}

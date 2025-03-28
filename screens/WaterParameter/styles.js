@@ -9,7 +9,6 @@ export const styles = StyleSheet.create({
     backgroundColor: "rgba(255, 255, 255, 0.5)",
   },
   container: {
-    flex: 1,
     paddingHorizontal: 20,
     paddingTop: 60,
   },
@@ -47,6 +46,15 @@ export const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     marginBottom: 20,
+  },
+  parameterRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 5,
+  },
+  scrollView: {
+    maxHeight: 200, // Adjust this value based on your design needs
+    marginVertical: 10,
   },
   column: {
     flex: 1,
@@ -90,17 +98,21 @@ export const styles = StyleSheet.create({
     paddingVertical: 5,
   },
   changeButton: {
-    backgroundColor: "#007BFF", // Blue background
-    borderRadius: 10, // Rounded corners
-    paddingVertical: 12, // Vertical padding for height
-    paddingHorizontal: 25, // Horizontal padding for width
-    alignItems: "center", // Centers the text horizontally
-    justifyContent: "center", // Centers the text vertically
-    elevation: 3, // Adds shadow for Android
-    shadowColor: "#000", // Shadow color for iOS
-    shadowOffset: { width: 0, height: 4 }, // Shadow offset
-    shadowOpacity: 0.1, // Shadow opacity for a subtle effect
-    shadowRadius: 5, // Shadow spread for a smoother shadow
+    position: "absolute",
+    bottom: 20,
+    left: 20,
+    right: 20,
+    backgroundColor: "#007BFF",
+    borderRadius: 10,
+    paddingVertical: 12,
+    paddingHorizontal: 25,
+    alignItems: "center",
+    justifyContent: "center",
+    elevation: 3,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
   },
   changeButtonText: {
     color: "#FFFFFF", // White text color
@@ -108,7 +120,18 @@ export const styles = StyleSheet.create({
     fontWeight: "bold", // Bold text
     textAlign: "center", // Centers the text
   },
-  modal:{
-    width:"350"
-  }
+  modal: {
+    width: "350",
+  },
+  paramRow: {
+    flexDirection: "row",
+  },
+  modalHeader: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignContent: "center",
+  },
+  modalTitle: {
+    fontSize: 20,
+  },
 });

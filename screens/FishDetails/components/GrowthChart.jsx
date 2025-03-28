@@ -74,7 +74,7 @@ const GrowthChart = ({ fishReportInfos }) => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.chartTitle}>Weight and Size Growth Chart</Text>
+      <Text style={styles.chartTitle}>Biểu Đồ Tăng Trưởng Cân Nặng và Kích Thước</Text>
       <Svg width={CHART_WIDTH} height={CHART_HEIGHT + 20} style={styles.chart}>
         {/* Y-axis labels */}
         {yAxisLabels.map((label, index) => (
@@ -89,7 +89,7 @@ const GrowthChart = ({ fishReportInfos }) => {
             {label.value}
           </SvgText>
         ))}
-
+  
         {/* X-axis labels */}
         {xAxisLabels.map((label, index) => (
           <SvgText
@@ -103,7 +103,7 @@ const GrowthChart = ({ fishReportInfos }) => {
             {label.value}
           </SvgText>
         ))}
-
+  
         {/* Y-axis line */}
         <Line
           x1={PADDING}
@@ -113,7 +113,7 @@ const GrowthChart = ({ fishReportInfos }) => {
           stroke="gray"
           strokeWidth="1"
         />
-
+  
         {/* X-axis line */}
         <Line
           x1={PADDING}
@@ -123,7 +123,7 @@ const GrowthChart = ({ fishReportInfos }) => {
           stroke="gray"
           strokeWidth="1"
         />
-
+  
         {/* Weight Line (Blue) */}
         {weightPoints.map((point, index) =>
           index > 0 ? (
@@ -138,7 +138,7 @@ const GrowthChart = ({ fishReportInfos }) => {
             />
           ) : null
         )}
-
+  
         {/* Size Line (Green) */}
         {sizePoints.map((point, index) =>
           index > 0 ? (
@@ -153,7 +153,7 @@ const GrowthChart = ({ fishReportInfos }) => {
             />
           ) : null
         )}
-
+  
         {/* Weight Points (Blue) */}
         {weightPoints.map((point, index) => (
           <Circle 
@@ -164,7 +164,7 @@ const GrowthChart = ({ fishReportInfos }) => {
             fill="blue" 
           />
         ))}
-
+  
         {/* Size Points (Green) */}
         {sizePoints.map((point, index) => (
           <Circle 
@@ -179,11 +179,11 @@ const GrowthChart = ({ fishReportInfos }) => {
       <View style={styles.legend}>
         <View style={styles.legendItem}>
           <View style={[styles.legendColor, { backgroundColor: 'blue' }]} />
-          <Text>Weight (kg)</Text>
+          <Text>Cân nặng (kg)</Text>
         </View>
         <View style={styles.legendItem}>
           <View style={[styles.legendColor, { backgroundColor: 'green' }]} />
-          <Text>Size (cm)</Text>
+          <Text>Kích thước (cm)</Text>
         </View>
       </View>
     </View>

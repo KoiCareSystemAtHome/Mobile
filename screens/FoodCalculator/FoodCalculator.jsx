@@ -15,7 +15,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { getPondByOwner } from "../../redux/slices/pondSlice";
 import { calculateFood } from "../../redux/slices/calculatorSlice";
 
-const FoodCalculator = ({navigation}) => {
+const FoodCalculator = ({ navigation }) => {
   const dispatch = useDispatch();
 
   const pondData = useSelector(pondByOwnerSelector);
@@ -25,8 +25,8 @@ const FoodCalculator = ({navigation}) => {
   const [token, setToken] = useState();
   const [food, setFood] = useState();
 
-  const [growth, setGrowth] = useState("Medium");
-  const growthOptions = ["Low", "Medium", "High"];
+  const [growth, setGrowth] = useState("Trung bình");
+  const growthOptions = ["Thấp", "Trung bình", "Cao"];
 
   const temperatureOptions = [
     { label: "6 - 8º", temperatureLower: 6, temperatureUpper: 8 },
@@ -92,7 +92,7 @@ const FoodCalculator = ({navigation}) => {
     >
       <View style={styles.overlay} />
       <ScrollView contentContainerStyle={[styles.container, { paddingBottom: 80 }]}>
-        <Text style={styles.title}>Food Calculator</Text>
+        <Text style={styles.title}>Tính Lượng Thức Ăn</Text>
 
         <View style={{ justifyContent: "center", flexDirection: "row" }}>
           <TouchableOpacity
@@ -100,7 +100,7 @@ const FoodCalculator = ({navigation}) => {
             style={styles.selector}
           >
             <Text style={styles.selectorText}>
-              {homePond ? homePond?.name : "Select a Pond"}
+              {homePond ? homePond?.name : "Chọn Một Ao"}
             </Text>
             <Icon name="down" size={16} color="#000" />
           </TouchableOpacity>
@@ -124,7 +124,7 @@ const FoodCalculator = ({navigation}) => {
           )}
         </View>
 
-        <Text style={styles.subtitle}>Desired Growth</Text>
+        <Text style={styles.subtitle}>Mức Tăng Trưởng Mong Muốn</Text>
         <View style={styles.toggleContainer}>
           {growthOptions.map((option) => (
             <TouchableOpacity
@@ -147,7 +147,7 @@ const FoodCalculator = ({navigation}) => {
           ))}
         </View>
 
-        <Text style={styles.subtitle}>Water Temperature</Text>
+        <Text style={styles.subtitle}>Nhiệt Độ Nước</Text>
         <View style={styles.toggleContainer}>
           {temperatureOptions.map((option) => (
             <TouchableOpacity
@@ -171,13 +171,13 @@ const FoodCalculator = ({navigation}) => {
         </View>
 
         <Text style={styles.infoText}>
-          The recommended amount of food should be split evenly into 3 - 5
-          feedings per day. This way the koi will ingest the food better...
+          Lượng thức ăn được khuyến nghị nên được chia đều thành 3 - 5 lần cho ăn mỗi ngày. 
+          Bằng cách này, cá koi sẽ tiêu hóa thức ăn tốt hơn...
         </Text>
 
         <View style={styles.recommendationButton}>
           <Text style={styles.recommendationText}>
-            {homePond ? `Recommended Amount: ${food}g` : "Please Select A Pond"}
+            {homePond ? `Lượng Đề Xuất: ${food}g` : "Vui Lòng Chọn Một Ao"}
           </Text>
         </View>
 
@@ -186,10 +186,9 @@ const FoodCalculator = ({navigation}) => {
             style={styles.suggestButton}
             onPress={() => navigation.navigate("SuggestFood", { pondId: homePond?.pondID })}
           >
-            <Text style={styles.recommendationText}>New</Text>
+            <Text style={styles.recommendationText}>Mới</Text>
           </TouchableOpacity>
         )}
-
 
       </ScrollView>
 
@@ -210,7 +209,7 @@ const FoodCalculator = ({navigation}) => {
           fontSize: 16,
           fontWeight: 'bold',
         }}>
-          Next
+          Tiếp Theo
         </Text>
       </TouchableOpacity>
     </ImageBackground>

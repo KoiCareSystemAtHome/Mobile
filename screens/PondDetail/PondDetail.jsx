@@ -1,29 +1,34 @@
-import { Card } from "@ant-design/react-native";
+import { Card, Form, Button, Input, Modal, Provider } from "@ant-design/react-native";
 import React, { useEffect, useState } from "react";
 import {
   Image,
   ImageBackground,
-  StyleSheet,
   Text,
   View,
   ScrollView,
   TouchableOpacity,
 } from "react-native";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
-import WaterParametersChart from "./components/WaterParameterChart"; // Adjust the path
+import WaterParametersChart from "./components/WaterParameterChart";
 import { useDispatch, useSelector } from "react-redux";
-import { getPondByID } from "../../redux/slices/pondSlice";
+import { getPondByID, updatePond } from "../../redux/slices/pondSlice";
+import { getProduct } from "../../redux/slices/productSlice";
 import { pondByIdSelector, productSelector } from "../../redux/selector";
 import { styles } from "./styles";
+import * as ImagePicker from "expo-image-picker";
+import { getImage } from "../../redux/slices/authSlice"; // Assuming this is available
 
-const PondDetail = ({ route }) => {
+const PondDetail = ({ navigation, route }) => {
   const dispatch = useDispatch();
   const pondById = useSelector(pondByIdSelector);
   const products = useSelector(productSelector);
   const { pond } = route.params;
   const [selectedParameters, setSelectedParameters] = useState([]);
+  const [isModalVisible, setModalVisible] = useState(false);
+  const [imageBlob, setImageBlob] = useState(pond?.image);
+  const [uploadResponse, setUploadResponse] = useState(null);
+  const [form] = Form.useForm();
 
-  // Transform pondParameters into chart-compatible data
   const transformPondParameters = (pondParameters) => {
     if (!pondParameters || !Array.isArray(pondParameters)) return [];
 
@@ -45,15 +50,17 @@ const PondDetail = ({ route }) => {
   const parameters =
     pondById?.pondParameters?.map((param) => param.parameterName) || [];
 
-  // Map recommended products
   const recommendedProducts =
     pondById?.recomment?.map((rec) => {
       const product = products?.find(
-        (prod) => prod.productId === rec.productid
+        (prod) => prod?.productId === rec.productid
       );
       return (
-        product || { productId: rec.productid, productName: "Unknown Product" }
-      ); // Fallback if no match
+        product || {
+          productId: rec.productid,
+          productName: "Sản Phẩm Không Xác Định",
+        }
+      );
     }) || [];
 
   const toggleParameter = (parameter) => {
@@ -68,9 +75,9 @@ const PondDetail = ({ route }) => {
 
   useEffect(() => {
     dispatch(getPondByID(pond?.pondID));
+    dispatch(getProduct());
   }, [dispatch, pond?.pondID]);
 
-  // Split parameters into rows of 3
   const chunkArray = (array, chunkSize) => {
     const result = [];
     for (let i = 0; i < array.length; i += chunkSize) {
@@ -81,7 +88,67 @@ const PondDetail = ({ route }) => {
 
   const parameterRows = chunkArray(parameters, 3);
 
+  const handleImagePick = async () => {
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (status !== "granted") {
+      alert(
+        "Xin lỗi, chúng tôi cần quyền truy cập thư viện ảnh để thực hiện điều này!"
+      );
+      return;
+    }
+
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      quality: 1,
+    });
+
+    if (!result.canceled) {
+      const uri = result.assets[0].uri;
+      const fileType = uri.split(".").pop();
+      const fileMimeType = `image/${fileType === "jpg" ? "jpeg" : fileType}`;
+
+      let formData = new FormData();
+      formData.append("file", {
+        uri: uri,
+        name: `image.${fileType}`,
+        type: fileMimeType,
+      });
+
+      setImageBlob(uri);
+      try {
+        const response = await dispatch(getImage(formData)).unwrap();
+        if (response) {
+          setUploadResponse(response.imageUrl);
+        }
+      } catch (error) {
+        console.error("Failed to upload image:", error);
+      }
+    }
+  };
+
+  const onFinish = (values) => {
+
+    const pondID = pondById?.pondID;
+    const name = pondById?.name;
+    const image = pondById?.image;
+    const createDate = pondById?.createDate;
+    const ownerId = pondById?.ownerId;
+    setModalVisible(false);
+    const updatedPond = {
+      pondID,
+      name,
+      image,
+      createDate,
+      ownerId,
+    };
+        dispatch(updatePond(updatedPond));
+        setModalVisible(false);
+        navigation.navigate("PondStatistic")
+  };
+console.log(pondById)
   return (
+    <Provider>
     <ImageBackground
       source={require("../../assets/koimain3.jpg")}
       style={styles.background}
@@ -89,7 +156,7 @@ const PondDetail = ({ route }) => {
     >
       <View style={styles.overlay} />
       <ScrollView contentContainerStyle={styles.container}>
-        <Text style={styles.title}>Pond Details</Text>
+        <Text style={styles.title}>Chi Tiết Ao</Text>
         <View style={styles.cardContainer}>
           <Card style={styles.card}>
             <View style={styles.cardContent}>
@@ -97,24 +164,27 @@ const PondDetail = ({ route }) => {
               <View style={styles.pondInfo}>
                 <View style={styles.infoRow}>
                   <Text style={styles.pondText}>
-                    <Text style={styles.label}>Name: </Text>
+                    <Text style={styles.label}>Tên: </Text>
                     {pond.name}
                   </Text>
                 </View>
                 <Text style={styles.pondText}>
-                  <Text style={styles.label}>Number of Fish: </Text>5
+                  <Text style={styles.label}>Số Cá: </Text>5
                 </Text>
                 <Text style={styles.pondText}>
-                  <Text style={styles.label}>Volume: </Text>
+                  <Text style={styles.label}>Dung Tích: </Text>
                   {pond.volume} l
                 </Text>
                 <Text style={styles.pondText}>
-                  <Text style={styles.label}>Depth: </Text>1 m
+                  <Text style={styles.label}>Độ Sâu: </Text>1 m
                 </Text>
                 <Text style={styles.pondText}>
-                  <Text style={styles.label}>Pumping Capacity: </Text>20,000 l/h
+                  <Text style={styles.label}>Công Suất Bơm: </Text>20,000 l/h
                 </Text>
-                <TouchableOpacity style={styles.editButton}>
+                <TouchableOpacity
+                  style={styles.editButton}
+                  onPress={() => setModalVisible(true)}
+                >
                   <FontAwesome name="pencil-square-o" size={24} color="white" />
                 </TouchableOpacity>
               </View>
@@ -123,7 +193,7 @@ const PondDetail = ({ route }) => {
         </View>
 
         <View style={styles.parametersContainer}>
-          <Text style={styles.sectionTitle}>Water Parameters</Text>
+          <Text style={styles.sectionTitle}>Thông Số Nước</Text>
           {parameterRows.map((row, rowIndex) => (
             <View key={rowIndex} style={styles.parametersRow}>
               {row.map((param) => (
@@ -149,9 +219,9 @@ const PondDetail = ({ route }) => {
         <View style={styles.statisticsContainer}>
           <View style={styles.statisticCard}>
             <View style={styles.statisticsRow}>
-              <Text style={styles.sectionTitle}>Pond Statistics</Text>
+              <Text style={styles.sectionTitle}>Thống Kê Ao</Text>
               <View style={styles.statisticsRow}>
-                <Text style={styles.statisticsLabel}>This Month</Text>
+                <Text style={styles.statisticsLabel}>Tháng Này</Text>
                 <TouchableOpacity>
                   <Text style={styles.statisticsDropdown}>▼</Text>
                 </TouchableOpacity>
@@ -165,13 +235,13 @@ const PondDetail = ({ route }) => {
         </View>
 
         <View style={styles.suggestedContainer}>
-          <Text style={styles.sectionTitle}>Suggested Products</Text>
+          <Text style={styles.sectionTitle}>Sản Phẩm Đề Xuất</Text>
           <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={styles.productList}
           >
-            {pondById?.recomment.length > 0 &&
+            {pondById?.recomment?.length > 0 &&
               recommendedProducts?.map((item) => (
                 <TouchableOpacity
                   key={item.productId}
@@ -184,21 +254,86 @@ const PondDetail = ({ route }) => {
                     style={styles.productImage}
                   />
                   <Text style={styles.productName}>{item.productName}</Text>
-                  <Text style={styles.productName}>
-                    {item?.shop || "Unknown Shop"}
-                  </Text>
                   <Text style={styles.productPrice}>
                     {item.price || "N/A"} VND
                   </Text>
-                  <TouchableOpacity style={styles.addToCartButton} onPress={()=>{}}>
-                    <Text style={styles.addToCartText}>Add to cart</Text>
+                  <TouchableOpacity
+                    style={styles.addToCartButton}
+                    onPress={() => {}}
+                  >
+                    <Text style={styles.addToCartText}>Thêm Vào Giỏ</Text>
                   </TouchableOpacity>
                 </TouchableOpacity>
               ))}
           </ScrollView>
         </View>
+
+        <Modal
+          visible={isModalVisible}
+          transparent={true}
+          animationType="fade"
+          onRequestClose={() => setModalVisible(false)}
+          style={styles.modal}
+        >
+          <View style={styles.modalOverlay}>
+            <View style={styles.modalContainer}>
+              <View style={styles.modalHeader}>
+                <Text style={styles.modalTitle}>Chỉnh Sửa Ao</Text>
+              </View>
+
+              {imageBlob ? (
+                <View style={styles.imageContainer}>
+                  <TouchableOpacity onPress={handleImagePick}>
+                    <Image
+                      source={{ uri: uploadResponse || pond.image }}
+                      style={styles.selectedImage}
+                    />
+                  </TouchableOpacity>
+                </View>
+              ) : (
+                <TouchableOpacity
+                  style={styles.imageButton}
+                  onPress={handleImagePick}
+                >
+                  <Text style={styles.imageButtonText}>
+                    Chạm Để Chọn Hình Ảnh
+                  </Text>
+                </TouchableOpacity>
+              )}
+
+              <Form form={form} onFinish={onFinish} style={styles.form}>
+                <Form.Item
+                  name="name"
+                  initialValue={pond.name}
+                  rules={[
+                    { required: true, message: "Vui lòng nhập tên ao" },
+                  ]}
+                >
+                  <Input placeholder="Tên Ao" style={styles.input} />
+                </Form.Item>
+
+                <View style={styles.modalFooter}>
+                  <Button
+                    style={styles.modalCancelButton}
+                    onPress={() => setModalVisible(false)}
+                  >
+                    Hủy
+                  </Button>
+                  <Button
+                    type="primary"
+                    style={styles.modalSaveButton}
+                    onPress={() => form.submit()}
+                  >
+                    Lưu
+                  </Button>
+                </View>
+              </Form>
+            </View>
+          </View>
+        </Modal>
       </ScrollView>
     </ImageBackground>
+    </Provider>
   );
 };
 

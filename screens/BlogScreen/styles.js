@@ -8,12 +8,11 @@ export const styles = StyleSheet.create({
   },
   background: {
     flex: 1,
-    
   },
   overlay: {
-      ...StyleSheet.absoluteFillObject,
-      backgroundColor: "rgba(255, 255, 255, 0.5)",
-    },
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: "rgba(255, 255, 255, 0.5)",
+  },
   header: {
     flexDirection: "row",
     alignItems: "center",
@@ -35,15 +34,10 @@ export const styles = StyleSheet.create({
     paddingTop: 10,
   },
   blogCard: {
-    backgroundColor: "#fff",
+    backgroundColor: "transparent",
     borderRadius: 10,
     padding: 15,
     marginBottom: 15,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 5,
-    elevation: 3,
   },
   blogTitle: {
     fontSize: 18,

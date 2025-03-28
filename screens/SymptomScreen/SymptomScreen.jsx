@@ -99,7 +99,7 @@ const SymptomScreen = ({ navigation }) => {
     >
       <View style={styles.overlay} />
       <View style={styles.container}>
-        <Text style={styles.title}>DIsease Examination</Text>
+        <Text style={styles.title}>Chẩn Đoán Bệnh</Text>
         <Text style={styles.subTitle}>Hãy chọn triệu chứng của cá</Text>
         <DropDownPicker
           open={open}

@@ -73,32 +73,32 @@ const FishStatistic = ({ navigation }) => {
       <Card style={styles.card}>
         <View style={styles.cardContent}>
           <Image source={{ uri: item.image }} style={styles.fishImage} />
-          <View style={{flexDirection:"row", justifyContent:"flex-end"}}>
+          <View style={{ flexDirection: "row", justifyContent: "flex-end" }}>
             <FontAwesome
               name={item.gender === "male" ? "mars" : "venus"}
               size={20}
               color="#6497B1"
-              style={{paddingRight:20, marginTop:5}}
+              style={{ paddingRight: 20, marginTop: 5 }}
             />
           </View>
           <View style={styles.fishInfo}>
             <View style={styles.infoRow}>
               <Text style={styles.fishText}>
-                <Text style={styles.label}>Name: </Text>
+                <Text style={styles.label}>Tên: </Text>
                 {item.name}
               </Text>
               <Text style={styles.fishText}>
-                <Text style={styles.label}>Variety: </Text>
+                <Text style={styles.label}>Giống: </Text>
                 {item.variety.varietyName}{" "}
               </Text>
             </View>
             <View style={styles.infoRow}>
               <Text style={styles.fishText}>
-                <Text style={styles.label}>Age: </Text>
+                <Text style={styles.label}>Tuổi: </Text>
                 {item.age}
               </Text>
               <Text style={styles.fishText}>
-                <Text style={styles.label}>Length: </Text>
+                <Text style={styles.label}>Chiều dài: </Text>
                 {item.length}
               </Text>
             </View>
@@ -129,7 +129,7 @@ const FishStatistic = ({ navigation }) => {
       >
         <View style={styles.overlay} />
         <View style={styles.container}>
-          <Text style={styles.title}>Fish Statistic</Text>
+          <Text style={styles.title}>Thống Kê Cá</Text>
           <FlatList
             data={paginatedFishData}
             renderItem={renderFishCard}
@@ -146,7 +146,7 @@ const FishStatistic = ({ navigation }) => {
                 onPress={handlePreviousPage}
                 disabled={currentPage === 1}
               >
-                <Text style={styles.paginationText}>Previous</Text>
+                <Text style={styles.paginationText}>Trang Trước</Text>
               </TouchableOpacity>
               <Text style={styles.pageText}>
                 {currentPage}/{totalPages}
@@ -159,13 +159,13 @@ const FishStatistic = ({ navigation }) => {
                 onPress={handleNextPage}
                 disabled={currentPage === totalPages}
               >
-                <Text style={styles.paginationText}>Next</Text>
+                <Text style={styles.paginationText}>Trang Sau</Text>
               </TouchableOpacity>
             </View>
           )}
           <View style={styles.footer}>
             <View style={styles.badge}>
-              <Text style={styles.badgeText}>{fishData?.length} Fish(s)</Text>
+              <Text style={styles.badgeText}>{fishData?.length} Cá</Text>
             </View>
             <TouchableOpacity
               style={styles.addButton}

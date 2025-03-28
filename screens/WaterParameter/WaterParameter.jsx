@@ -63,43 +63,85 @@ const WaterParameter = () => {
       ownerId,
       requirementPondParam,
     };
-    console.log(updatedPond)
+    console.log(updatedPond);
     dispatch(updatePond(updatedPond));
     setModalVisible(false);
   };
-  const renderPondParameters = (parameters) => {
+
+  const renderPondCards = (parameters) => {
     if (!parameters || parameters.length === 0) return null;
 
-    const columns = [[], []];
+    // Step 1: Collect all unique caculateDay values and their parameters
+    const dayMap = new Map();
 
-    parameters.forEach((param, index) => {
-      columns[index % 2].push(param);
+    parameters.forEach((param) => {
+      param.valueInfors.forEach((valueInfo) => {
+        const day = new Date(valueInfo.caculateDay).toLocaleDateString(); // Group by date only (ignore time)
+        if (!dayMap.has(day)) {
+          dayMap.set(day, new Map());
+        }
+        // Store only the latest value for each parameter per day
+        const paramMap = dayMap.get(day);
+        if (
+          !paramMap.has(param.parameterName) ||
+          new Date(valueInfo.caculateDay) >
+            new Date(paramMap.get(param.parameterName).caculateDay)
+        ) {
+          paramMap.set(param.parameterName, {
+            parameterName: param.parameterName,
+            unitName: param.unitName,
+            value: valueInfo.value,
+            caculateDay: valueInfo.caculateDay,
+          });
+        }
+      });
     });
 
-    const renderColumn = (column) => (
-      <View style={styles.column}>
-        {column.map((param) => (
-          <Text key={param.parameterUnitID} style={styles.greenText}>
-            {param.unitName}:
-            <Text style={styles.boldText}>
-              {param.valueInfors?.[0]?.value || 0} {param.unitName}
-            </Text>
-          </Text>
-        ))}
-      </View>
+    // Step 2: Sort days in descending order (most recent first)
+    const sortedDays = Array.from(dayMap.entries()).sort(
+      (a, b) =>
+        new Date(b[1].values().next().value.caculateDay) -
+        new Date(a[1].values().next().value.caculateDay)
     );
 
-    return (
-      <View style={styles.columns}>
-        {columns.map((col, index) => (
-          <React.Fragment key={index}>{renderColumn(col)}</React.Fragment>
-        ))}
-      </View>
-    );
+    // Step 3: Render a card for each day with ScrollView and 2 parameters per row
+    return sortedDays.map(([day, paramMap], index) => {
+      const params = Array.from(paramMap.values());
+      const rows = [];
+      for (let i = 0; i < params.length; i += 2) {
+        rows.push(params.slice(i, i + 2));
+      }
+
+      return (
+        <View key={index} style={styles.card}>
+          <Text style={styles.cardTitle}>{homePond?.name}</Text>
+          <Text style={styles.cardDate}>
+            {day} {/* Display only the date */}
+          </Text>
+          <ScrollView nestedScrollEnabled={true} style={styles.scrollView}>
+            {rows.map((row, rowIndex) => (
+              <View key={rowIndex} style={styles.parameterRow}>
+                {row.map((param, paramIndex) => (
+                  <Text key={paramIndex} style={styles.greenText}>
+                    {param.parameterName}:{" "}
+                    <Text style={styles.boldText}>
+                      {param.value} {param.unitName}
+                    </Text>
+                  </Text>
+                ))}
+              </View>
+            ))}
+          </ScrollView>
+          <Text style={styles.infoText}>
+            Outdoor Temp: need to be supervised regularly
+          </Text>
+        </View>
+      );
+    });
   };
 
   useEffect(() => {
-    const getData = async (key) => {
+    const getData = async () => {
       try {
         const value = await AsyncStorage.getItem("user");
         setIsLoggedIn(value ? JSON.parse(value) : null);
@@ -110,6 +152,7 @@ const WaterParameter = () => {
 
     getData();
   }, []);
+
   useEffect(() => {
     dispatch(getRequiredParams());
     if (isLoggedIn?.id) {
@@ -123,7 +166,6 @@ const WaterParameter = () => {
         });
     }
   }, [isLoggedIn?.id, dispatch, homePond]);
-
 
   return (
     <Provider>
@@ -163,24 +205,8 @@ const WaterParameter = () => {
               </View>
             )}
           </View>
-          
-          <View style={styles.card}>
-            <Text style={styles.cardTitle}>{homePond?.name}</Text>
-            <Text style={styles.cardDate}>01/01/2023 - 8:30</Text>
 
-            {renderPondParameters(selectedPond?.pondParameters)}
-
-            <Text style={styles.infoText}>
-              Outdoor Temp: need to be supervised regularly
-            </Text>
-
-            <TouchableOpacity
-              style={styles.changeButton}
-              onPress={handleChangeParameters}
-            >
-              <Text style={styles.changeButtonText}>Change Parameters</Text>
-            </TouchableOpacity>
-          </View>
+          {homePond && renderPondCards(selectedPond?.pondParameters)}
         </ScrollView>
         <Modal
           visible={isModalVisible}
@@ -223,6 +249,12 @@ const WaterParameter = () => {
             </View>
           </ScrollView>
         </Modal>
+            <TouchableOpacity
+              style={styles.changeButton}
+              onPress={handleChangeParameters}
+            >
+              <Text style={styles.changeButtonText}>Add Parameters</Text>
+            </TouchableOpacity>
       </ImageBackground>
     </Provider>
   );

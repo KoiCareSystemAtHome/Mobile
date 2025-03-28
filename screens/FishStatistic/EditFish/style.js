@@ -135,7 +135,7 @@ export const styles = StyleSheet.create({
   },
   modalHeader: {
     flexDirection: "row",
-    justifyContent: "space-between",
+    justifyContent: "center",
     alignItems: "center",
     marginBottom: 20,
     marginTop: 20,
@@ -162,17 +162,12 @@ export const styles = StyleSheet.create({
     alignItems: "center",
   },
   selectedImage: {
-    width: 200,
-    height: 200,
+    width: 250,
+    height: 250,
     borderRadius: 10,
     marginBottom: 10,
   },
-  changeImageButton: {
-    backgroundColor: "#16a085",
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    borderRadius: 5,
-  },
+
   changeImageText: {
     color: "white",
     fontSize: 14,

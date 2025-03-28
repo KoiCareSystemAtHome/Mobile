@@ -76,6 +76,19 @@ const HomeScreen = ({ navigation }) => {
     }
   }, [isLoggedIn, dispatch]);
 
+  const handleLogout = async () => {
+    try {
+      await AsyncStorage.removeItem("user");
+      await AsyncStorage.removeItem("accessToken");
+      setIsLoggedIn(null);
+      setToken(null);
+      setTooltipVisible(false);
+      navigation.navigate("Login"); 
+    } catch (error) {
+      console.error("Logout failed:", error);
+    }
+  };
+
   return (
     <ImageBackground
       source={require("../../assets/koimain3.jpg")}
@@ -107,9 +120,12 @@ const HomeScreen = ({ navigation }) => {
         </View>
         <View style={styles.divider} />
         <View style={styles.drawerItems}>
-          <TouchableOpacity style={styles.drawerItem}  onPress={() => {
+          <TouchableOpacity
+            style={styles.drawerItem}
+            onPress={() => {
               navigation.navigate("PackageScreen");
-            }}>
+            }}
+          >
             <Image
               source={require("../../assets/comments.png")}
               style={styles.drawerItemImage}
@@ -192,24 +208,23 @@ const HomeScreen = ({ navigation }) => {
       {/* Main Content with Outside Press Detection */}
       <TouchableWithoutFeedback onPress={handleOutsidePress}>
         <View style={styles.container}>
-          {/* Header with Drawer Toggle */}
-          {token ? (
-            <View style={styles.headerNav}>
-              <TouchableOpacity onPress={toggleDrawer}>
-                <Entypo name="menu" size={40} color="#6497B1" />
-              </TouchableOpacity>
-              <TouchableOpacity onPress={() => setTooltipVisible(true)}>
-                <FontAwesome name="user-circle" size={40} color="#6497B1" />
-              </TouchableOpacity>
-            </View>
-          ) : (
-            <View style={styles.headerNav}>
-              <TouchableOpacity onPress={toggleDrawer}>
-                <Entypo name="menu" size={40} color="#6497B1" />
-              </TouchableOpacity>
-              <Tooltip
-                isVisible={tooltipVisible}
-                content={
+          <View style={styles.headerNav}>
+            <TouchableOpacity onPress={toggleDrawer}>
+              <Entypo name="menu" size={40} color="#6497B1" />
+            </TouchableOpacity>
+            <Tooltip
+              isVisible={tooltipVisible}
+              content={
+                token ? (
+                  <View style={styles.tooltipContainer}>
+                    <TouchableOpacity
+                      style={styles.tooltipOption}
+                      onPress={handleLogout}
+                    >
+                      <Text style={styles.tooltipText}>Đăng Xuất</Text>
+                    </TouchableOpacity>
+                  </View>
+                ) : (
                   <View style={styles.tooltipContainer}>
                     <TouchableOpacity
                       style={[
@@ -227,27 +242,28 @@ const HomeScreen = ({ navigation }) => {
                     <TouchableOpacity
                       style={styles.tooltipOption}
                       onPress={() => {
+                        navigation.navigate("Register"); // Assuming there's a Register screen
                         setTooltipVisible(false);
                       }}
                     >
                       <Text style={styles.tooltipText}>Đăng Ký</Text>
                     </TouchableOpacity>
                   </View>
-                }
-                placement="bottom"
-                contentStyle={{
-                  width: 100,
-                  borderWidth: 1,
-                  justifyContent: "center",
-                }}
-                onClose={() => setTooltipVisible(false)}
-              >
-                <TouchableOpacity onPress={() => setTooltipVisible(true)}>
-                  <FontAwesome name="user-circle" size={40} color="#6497B1" />
-                </TouchableOpacity>
-              </Tooltip>
-            </View>
-          )}
+                )
+              }
+              placement="bottom"
+              contentStyle={{
+                width: 100,
+                borderWidth: 1,
+                justifyContent: "center",
+              }}
+              onClose={() => setTooltipVisible(false)}
+            >
+              <TouchableOpacity onPress={() => setTooltipVisible(true)}>
+                <FontAwesome name="user-circle" size={40} color="#6497B1" />
+              </TouchableOpacity>
+            </Tooltip>
+          </View>
 
           <View style={styles.header}>
             <Text style={styles.userText}>
@@ -255,26 +271,29 @@ const HomeScreen = ({ navigation }) => {
             </Text>
           </View>
 
-          {/* Deposit Section */}
-          <View style={styles.depositCard}>
-            <LinearGradient
-              colors={["#4da6ff", "#80bfff"]}
-              style={styles.depositGradient}
-            >
-              <View style={styles.depositHeader}>
-                <Text style={styles.depositText}>
-                  <Text style={styles.amount}>{walletData?.amount || "100000"}</Text>
-                  <Text style={styles.currency}> VND</Text>
+          {token ? (
+            <View style={styles.depositCard}>
+              <LinearGradient
+                colors={["#4da6ff", "#80bfff"]}
+                style={styles.depositGradient}
+              >
+                <View style={styles.depositHeader}>
+                  <Text style={styles.depositText}>
+                    <Text style={styles.amount}>{walletData?.amount || "100000"}</Text>
+                    <Text style={styles.currency}> VND</Text>
+                  </Text>
+                  <TouchableOpacity onPress={() => navigation.navigate("DepositScreen")}>
+                    <Text style={styles.depositLink}>Nạp Tiền</Text>
+                  </TouchableOpacity>
+                </View>
+                <Text style={styles.cardDescription}>
+                  Nạp tiền ngay để mở khóa các dịch vụ cao cấp của hệ thống chăm sóc Koi!
                 </Text>
-                <TouchableOpacity onPress={() => navigation.navigate("DepositScreen")}>
-                  <Text style={styles.depositLink}>Nạp Tiền</Text>
-                </TouchableOpacity>
-              </View>
-              <Text style={styles.cardDescription}>
-                Nạp tiền ngay để mở khóa các dịch vụ cao cấp của hệ thống chăm sóc Koi!
-              </Text>
-            </LinearGradient>
-          </View>
+              </LinearGradient>
+            </View>
+          ) : (
+            <></>
+          )}
 
           {/* Section: My Koi */}
           <View style={styles.sectionHeader}>

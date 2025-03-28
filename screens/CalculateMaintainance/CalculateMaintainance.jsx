@@ -76,7 +76,7 @@ const CalculateMaintainance = () => {
       <View style={styles.overlay} />
       <ScrollView contentContainerStyle={styles.container}>
         {/* Title */}
-        <Text style={styles.title}>Maintainance Schedule</Text>
+        <Text style={styles.title}>Lịch Trình Bảo Trì</Text>
 
         <View style={{ justifyContent: "center", flexDirection: "row" }}>
           <TouchableOpacity
@@ -84,7 +84,7 @@ const CalculateMaintainance = () => {
             style={styles.selector}
           >
             <Text style={styles.selectorText}>
-              {homePond ? homePond?.name : "Select a Pond"}
+              {homePond ? homePond?.name : "Chọn một ao"}
             </Text>
             <Icon name="down" size={16} color="#000" />
           </TouchableOpacity>

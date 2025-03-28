@@ -24,7 +24,7 @@ const ReminderScreen = ({ navigation }) => {
         resizeMode="cover"
       >
         <View style={styles.overlay} />
-
+  
         {/* Back Arrow */}
         <TouchableOpacity
           style={styles.backButton}
@@ -32,10 +32,10 @@ const ReminderScreen = ({ navigation }) => {
         >
           <Text style={styles.backArrow}>←</Text>
         </TouchableOpacity>
-
+  
         <ScrollView contentContainerStyle={styles.scrollContainer}>
-          <Text style={styles.title}>Schedule</Text>
-
+          <Text style={styles.title}>Lịch Trình</Text>
+  
           {/* Regular Schedule Button */}
           <TouchableOpacity
             style={styles.button}
@@ -43,13 +43,13 @@ const ReminderScreen = ({ navigation }) => {
           >
             <Image source={feedingIcon} style={styles.buttonIcon} />
             <View style={styles.buttonTextContainer}>
-              <Text style={styles.buttonTitle}>REGULATE SCHEDULE</Text>
+              <Text style={styles.buttonTitle}>LỊCH TRÌNH ĐỊNH KỲ</Text>
               <Text style={styles.buttonSubtitle}>
-                Create a fish feeding schedule
+                Tạo lịch cho ăn cho cá
               </Text>
             </View>
           </TouchableOpacity>
-
+  
           {/* Maintenance Schedule Button */}
           <TouchableOpacity
             style={styles.button}
@@ -57,9 +57,9 @@ const ReminderScreen = ({ navigation }) => {
           >
             <Image source={maintenanceIcon} style={styles.buttonIcon} />
             <View style={styles.buttonTextContainer}>
-              <Text style={styles.buttonTitle}>MAINTENANCE SCHEDULE</Text>
+              <Text style={styles.buttonTitle}>LỊCH TRÌNH BẢO TRÌ</Text>
               <Text style={styles.buttonSubtitle}>
-                Create maintenance schedule
+                Tạo lịch bảo trì
               </Text>
             </View>
           </TouchableOpacity>

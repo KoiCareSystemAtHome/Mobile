@@ -93,13 +93,13 @@ const EditFish = ({ route, navigation }) => {
       image,
       pondID: fish.pond?.pondID,
     };
-    console.log(updatedFish)
+    console.log(updatedFish);
     dispatch(updateFish(updatedFish))
-    .unwrap()
-    .then(()=>{
-      Toast.success("Fish Updated Successfully");
-      dispatch(getFishByOwner(isLoggedIn?.id));
-    })
+      .unwrap()
+      .then(() => {
+        Toast.success("Fish Updated Successfully");
+        dispatch(getFishByOwner(isLoggedIn?.id));
+      });
     navigation.navigate("FishStatistic");
   };
 
@@ -153,27 +153,16 @@ const EditFish = ({ route, navigation }) => {
             style={{ backgroundColor: "transparent" }}
           >
             <View style={styles.modalHeader}>
-              <TouchableOpacity
-                style={styles.modalCancelButton}
-                onPress={() => navigation.goBack()}
-              >
-                <Text style={styles.modalCancelText}>Cancel</Text>
-              </TouchableOpacity>
-              <Text style={styles.modalTitle}>Edit Koi</Text>
-              {/* Removed Save button from header */}
+              <Text style={styles.modalTitle}>Chỉnh Sửa Cá Koi</Text>
             </View>
 
             {imageBlob ? (
               <View style={styles.imageContainer}>
-                <Image
-                  source={{ uri: uploadResponse }}
-                  style={styles.selectedImage}
-                />
-                <TouchableOpacity
-                  style={styles.changeImageButton}
-                  onPress={handleImagePick}
-                >
-                  <Text style={styles.changeImageText}>Change Picture</Text>
+                <TouchableOpacity onPress={handleImagePick}>
+                  <Image
+                    source={{ uri: uploadResponse }}
+                    style={styles.selectedImage}
+                  />
                 </TouchableOpacity>
               </View>
             ) : (
@@ -181,62 +170,64 @@ const EditFish = ({ route, navigation }) => {
                 style={styles.imageButton}
                 onPress={handleImagePick}
               >
-                <Text style={styles.imageButtonText}>Tap To Select Image</Text>
+                <Text style={styles.imageButtonText}>
+                  Chạm để Chọn Hình Ảnh
+                </Text>
               </TouchableOpacity>
             )}
 
             <View style={styles.modalFields}>
               <View style={styles.row}>
                 <View style={styles.inputRow}>
-                  <Text style={styles.inputLabel}>Name:</Text>
+                  <Text style={styles.inputLabel}>Tên:</Text>
                   <Form.Item name="name" style={styles.input}>
-                    <Input placeholder="Name" />
+                    <Input placeholder="Tên" />
                   </Form.Item>
                 </View>
                 <View style={styles.inputRow}>
-                  <Text style={styles.inputLabel}>Age:</Text>
+                  <Text style={styles.inputLabel}>Tuổi:</Text>
                   <Form.Item name="age" style={styles.input}>
-                    <Input placeholder="Age" />
+                    <Input placeholder="Tuổi" />
                   </Form.Item>
                 </View>
               </View>
               <View style={styles.row}>
                 <View style={styles.inputRow}>
-                  <Text style={styles.inputLabel}>Length:</Text>
+                  <Text style={styles.inputLabel}>Chiều dài:</Text>
                   <Form.Item name="length" style={styles.input} extra="cm">
-                    <Input placeholder="Length" />
+                    <Input placeholder="Chiều dài" />
                   </Form.Item>
                 </View>
                 <View style={styles.inputRow}>
-                  <Text style={styles.inputLabel}>Weight:</Text>
+                  <Text style={styles.inputLabel}>Cân nặng:</Text>
                   <Form.Item name="weight" style={styles.input} extra="kg">
-                    <Input placeholder="Weight" />
+                    <Input placeholder="Cân nặng" />
                   </Form.Item>
                 </View>
               </View>
               <View style={styles.row}>
                 <View style={styles.inputRow}>
-                  <Text style={styles.inputLabel}>Sex:</Text>
+                  <Text style={styles.inputLabel}>Giới tính:</Text>
                   <Form.Item name="sex" style={styles.input}>
-                    <Input placeholder="Sex" />
+                    <Input placeholder="Giới tính" />
                   </Form.Item>
                 </View>
                 <View style={styles.inputRow}>
-                  <Text style={styles.inputLabel}>Variety:</Text>
+                  <Text style={styles.inputLabel}>Giống:</Text>
                   <Form.Item name="varietyName" style={styles.input}>
-                    <Input placeholder="Variety" />
+                    <Input placeholder="Giống" />
                   </Form.Item>
                 </View>
               </View>
               <View style={styles.row}>
                 <View style={styles.inputRow}>
-                  <Text style={styles.inputLabel}>Pond:</Text>
+                  <Text style={styles.inputLabel}>Ao:</Text>
                   <Form.Item name="pond" style={styles.input}>
-                    <Input placeholder="Pond" disabled />
+                    <Input placeholder="Ao" disabled />
                   </Form.Item>
                 </View>
                 <View style={styles.inputRow}>
-                  <Text style={styles.inputLabel}>In Pond Since:</Text>
+                  <Text style={styles.inputLabel}>Trong ao từ:</Text>
                   <DatePicker
                     value={inPondSince}
                     mode="date"
@@ -251,7 +242,7 @@ const EditFish = ({ route, navigation }) => {
                       onPress={() => setDatePickerVisible(true)}
                     >
                       <Text style={styles.dateText}>
-                        {inPondSince.toLocaleDateString("en-GB", {
+                        {inPondSince.toLocaleDateString("vi-VN", {
                           day: "numeric",
                           month: "long",
                           year: "numeric",
@@ -263,27 +254,27 @@ const EditFish = ({ route, navigation }) => {
               </View>
               <View style={styles.row}>
                 <View style={styles.inputRow}>
-                  <Text style={styles.inputLabel}>Breeder:</Text>
+                  <Text style={styles.inputLabel}>Nhà lai tạo:</Text>
                   <Form.Item name="breeder" style={styles.input}>
-                    <Input placeholder="Breeder" />
+                    <Input placeholder="Nhà lai tạo" />
                   </Form.Item>
                 </View>
                 <View style={styles.inputRow}>
-                  <Text style={styles.inputLabel}>Purchase Price:</Text>
+                  <Text style={styles.inputLabel}>Giá mua:</Text>
                   <Form.Item
                     name="purchasePrice"
                     style={styles.input}
                     extra="VND"
                   >
-                    <Input placeholder="Purchase Price" />
+                    <Input placeholder="Giá mua" />
                   </Form.Item>
                 </View>
               </View>
               <View style={styles.row}>
                 <View style={styles.inputRow}>
-                  <Text style={styles.inputLabel}>Condition:</Text>
+                  <Text style={styles.inputLabel}>Tình trạng:</Text>
                   <Form.Item name="condition" style={styles.input}>
-                    <Input placeholder="Condition" />
+                    <Input placeholder="Tình trạng" />
                   </Form.Item>
                 </View>
               </View>
@@ -293,14 +284,9 @@ const EditFish = ({ route, navigation }) => {
                   style={styles.modalSaveButton}
                   onPress={() => form.submit()}
                 >
-                  <Text style={styles.modalSaveText}>Save</Text>
+                  <Text style={styles.modalSaveText}>Lưu</Text>
                 </TouchableOpacity>
-                <View>
-                  <TouchableOpacity style={styles.deleteButton}>
-                    <FontAwesome name="trash" size={24} color="#fff" />
-                  </TouchableOpacity>
-                  <Text style={styles.deleteButtonText}>Delete Koi</Text>
-                </View>
+                <View></View>
               </View>
             </View>
           </Form>

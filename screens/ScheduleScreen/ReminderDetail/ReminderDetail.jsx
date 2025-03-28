@@ -87,7 +87,6 @@ const ReminderDetail = ({ navigation, route }) => {
     };
     getData();
   }, []);
-
   return (
     <SafeAreaView style={styles.container}>
       <TouchableWithoutFeedback onPress={handleOutsidePress}>
@@ -98,22 +97,22 @@ const ReminderDetail = ({ navigation, route }) => {
             </TouchableOpacity>
             <Text style={styles.headerDate}>
               {date
-                .toLocaleDateString("en-US", { day: "numeric", month: "short" })
+                .toLocaleDateString("vi-VN", { day: "numeric", month: "short" })
                 .toUpperCase()}
             </Text>
-            <Text style={styles.headerTitle}>REMINDER DETAIL</Text>
+            <Text style={styles.headerTitle}>CHI TIẾT LỜI NHẮC</Text>
           </View>
-
+  
           <View style={styles.titleContainer}>
             <Text style={styles.title}>{reminder.title}</Text>
             <Text style={styles.dateTime}>
               {formattedDate}, {timeRange}
             </Text>
           </View>
-
+  
           <View style={styles.detailsContainer}>
             <View style={styles.detailRow}>
-              <Text style={styles.detailLabel}>{reminder?.reminderType}</Text>
+              <Text style={styles.detailLabel}>{reminder?.pondName}</Text>
               <View style={styles.detailValueContainer}>
                 <View
                   style={[styles.typeDot, { backgroundColor: typeDotColor }]}
@@ -129,7 +128,7 @@ const ReminderDetail = ({ navigation, route }) => {
                       { color: isComplete ? "#4CAF50" : "#000" }
                     ]}
                   >
-                    {selectedStatus}
+                    {selectedStatus === "Complete" ? "Hoàn thành" : "Đang chờ"}
                   </Text>
                   {!isComplete && (
                     <Text style={styles.dropdownIcon}>{dropdownIcon}</Text>
@@ -142,27 +141,27 @@ const ReminderDetail = ({ navigation, route }) => {
                         style={styles.dropdownItem}
                         onPress={() => handleStatusSelect("Pending")}
                       >
-                        <Text style={styles.dropdownItemText}>Pending</Text>
+                        <Text style={styles.dropdownItemText}>Đang chờ</Text>
                       </TouchableOpacity>
                       <TouchableOpacity
                         style={styles.dropdownItem}
                         onPress={() => handleStatusSelect("Complete")}
                       >
-                        <Text style={styles.dropdownItemText}>Complete</Text>
+                        <Text style={styles.dropdownItemText}>Hoàn thành</Text>
                       </TouchableOpacity>
                     </View>
                   </TouchableWithoutFeedback>
                 )}
               </View>
             </View>
-
+  
             <View style={styles.description}>
-              <Text style={styles.detailLabel}>DESCRIPTION</Text>
+              <Text style={styles.detailLabel}>MÔ TẢ</Text>
               <View style={styles.detailValueContainer}>
                 <Text style={styles.detailValue}>{reminder.description}</Text>
               </View>
             </View>
-
+  
             {/* GIF added here */}
             <View style={{ alignItems: 'center', marginTop: 20 }}>
               <Image

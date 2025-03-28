@@ -149,11 +149,13 @@ depositCard: {
       fontSize: 16,
       color: "#000",
     },
+
     tooltipOption:{
       width:80,
       fontSize:16,
+      whitespace:"nowrap"
     },
     tooltipText:{
-      fontSize:20
+      fontSize:16
     }
   });

@@ -144,7 +144,7 @@ const AddFish = ({ navigation }) => {
     <Provider locale={enUS}>
       <ImageBackground
         source={require("../../../assets/koimain3.jpg")}
-        style={styles.background} 
+        style={styles.background}
         resizeMode="cover"
       >
         <View style={styles.overlay} />
@@ -152,22 +152,18 @@ const AddFish = ({ navigation }) => {
           <Form
             form={form}
             onFinish={onFinish}
-            style={{ backgroundColor: "transparent", borderWidth: 0}}
+            style={{ backgroundColor: "transparent", borderWidth: 0 }}
           >
             <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>Add New Koi</Text>
+              <Text style={styles.modalTitle}>Thêm Cá Koi Mới</Text>
             </View>
             {imageBlob ? (
               <View style={styles.imageContainer}>
-                <Image
-                  source={{ uri: uploadResponse }}
-                  style={styles.selectedImage}
-                />
-                <TouchableOpacity
-                  style={styles.changeImageButton}
-                  onPress={handleImagePick}
-                >
-                  <Text style={styles.changeImageText}>Change Picture</Text>
+                <TouchableOpacity onPress={handleImagePick}>
+                  <Image
+                    source={{ uri: uploadResponse }}
+                    style={styles.selectedImage}
+                  />
                 </TouchableOpacity>
               </View>
             ) : (
@@ -175,62 +171,62 @@ const AddFish = ({ navigation }) => {
                 style={styles.imageButton}
                 onPress={handleImagePick}
               >
-                <Text style={styles.imageButtonText}>Tap To Select Image</Text>
+                <Text style={styles.imageButtonText}>Chạm để Chọn Hình Ảnh</Text>
               </TouchableOpacity>
             )}
-
+  
             <View style={styles.modalFields}>
               <View style={styles.row}>
                 <View style={styles.inputRow}>
-                  <Text style={styles.inputLabel}>Name:</Text>
+                  <Text style={styles.inputLabel}>Tên:</Text>
                   <Form.Item name="name" style={styles.input}>
-                    <Input placeholder="Name" />
+                    <Input placeholder="Tên" />
                   </Form.Item>
                 </View>
                 <View style={styles.inputRow}>
-                  <Text style={styles.inputLabel}>Age:</Text>
+                  <Text style={styles.inputLabel}>Tuổi:</Text>
                   <Form.Item name="age" style={styles.input}>
-                    <Input placeholder="Age" />
+                    <Input placeholder="Tuổi" />
                   </Form.Item>
                 </View>
               </View>
               <View style={styles.row}>
                 <View style={styles.inputRow}>
-                  <Text style={styles.inputLabel}>Length:</Text>
+                  <Text style={styles.inputLabel}>Chiều dài:</Text>
                   <Form.Item name="length" style={styles.input} extra="cm">
-                    <Input placeholder="Length" />
+                    <Input placeholder="Chiều dài" />
                   </Form.Item>
                 </View>
                 <View style={styles.inputRow}>
-                  <Text style={styles.inputLabel}>Weight:</Text>
+                  <Text style={styles.inputLabel}>Cân nặng:</Text>
                   <Form.Item name="weight" style={styles.input} extra="kg">
-                    <Input placeholder="Weight" />
+                    <Input placeholder="Cân nặng" />
                   </Form.Item>
                 </View>
               </View>
               <View style={styles.row}>
                 <View style={styles.inputRow}>
-                  <Text style={styles.inputLabel}>Sex:</Text>
+                  <Text style={styles.inputLabel}>Giới tính:</Text>
                   <Form.Item name="sex" style={styles.input}>
-                    <Input placeholder="Sex" />
+                    <Input placeholder="Giới tính" />
                   </Form.Item>
                 </View>
                 <View style={styles.inputRow}>
-                  <Text style={styles.inputLabel}>Variety:</Text>
+                  <Text style={styles.inputLabel}>Giống:</Text>
                   <Form.Item name="varietyName" style={styles.input}>
-                    <Input placeholder="Variety" />
+                    <Input placeholder="Giống" />
                   </Form.Item>
                 </View>
               </View>
               <View style={styles.row}>
                 <View style={styles.inputRow}>
-                  <Text style={styles.inputLabel}>Condition:</Text>
+                  <Text style={styles.inputLabel}>Tình trạng:</Text>
                   <Form.Item name="condition" style={styles.input}>
-                    <Input placeholder="Condition" />
+                    <Input placeholder="Tình trạng" />
                   </Form.Item>
                 </View>
                 <View style={styles.inputRow}>
-                  <Text style={styles.inputLabel}>In Pond Since:</Text>
+                  <Text style={styles.inputLabel}>Trong ao từ:</Text>
                   <View style={{ backgroundColor: "white", borderRadius: 5 }}>
                     <DatePicker
                       value={inPondSince}
@@ -246,7 +242,7 @@ const AddFish = ({ navigation }) => {
                         onPress={() => setDatePickerVisible(true)}
                       >
                         <Text style={styles.dateText}>
-                          {inPondSince.toLocaleDateString("en-GB", {
+                          {inPondSince.toLocaleDateString("vi-VN", {
                             day: "numeric",
                             month: "long",
                             year: "numeric",
@@ -259,21 +255,21 @@ const AddFish = ({ navigation }) => {
               </View>
               <View style={styles.row}>
                 <View style={styles.inputRow}>
-                  <Text style={styles.inputLabel}>Breeder:</Text>
+                  <Text style={styles.inputLabel}>Nhà lai tạo:</Text>
                   <Form.Item name="breeder" style={styles.input}>
-                    <Input placeholder="Breeder" />
+                    <Input placeholder="Nhà lai tạo" />
                   </Form.Item>
                 </View>
                 <View style={styles.inputRow}>
-                  <Text style={styles.inputLabel}>Purchase Price:</Text>
+                  <Text style={styles.inputLabel}>Giá mua:</Text>
                   <Form.Item name="price" style={styles.input} extra="VND">
-                    <Input placeholder="Price" />
+                    <Input placeholder="Giá mua" />
                   </Form.Item>
                 </View>
               </View>
               <View style={styles.row}>
                 <View style={styles.inputRow}>
-                  <Text style={styles.inputLabel}>Pond:</Text>
+                  <Text style={styles.inputLabel}>Ao:</Text>
                   <DropDownPicker
                     open={open}
                     value={selectedPond}
@@ -284,7 +280,7 @@ const AddFish = ({ navigation }) => {
                     containerStyle={styles.dropdownContainer}
                     style={styles.dropdown}
                     dropDownStyle={styles.dropdownBox}
-                    placeholder="Select a Pond"
+                    placeholder="Chọn một ao"
                     listMode="SCROLLVIEW"
                   />
                 </View>
@@ -294,14 +290,14 @@ const AddFish = ({ navigation }) => {
                   style={styles.modalCancelButton}
                   onPress={() => navigation.goBack()}
                 >
-                  <Text style={styles.modalCancelText}>Cancel</Text>
+                  <Text style={styles.modalCancelText}>Hủy</Text>
                 </TouchableOpacity>
                 <Button
                   type="ghost"
                   style={styles.modalSaveButton}
                   onPress={() => form.submit()}
                 >
-                  <Text style={styles.modalSaveText}>Save</Text>
+                  <Text style={styles.modalSaveText}>Lưu</Text>
                 </Button>
               </View>
             </View>

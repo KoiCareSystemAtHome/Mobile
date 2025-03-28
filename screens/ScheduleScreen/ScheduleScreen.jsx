@@ -155,13 +155,13 @@ const ScheduleScreen = ({ navigation }) => {
           </TouchableOpacity>
         </View>
       </View>
-
+  
       {nextReminder && (
         <View style={styles.nextReminderContainer}>
-          <Text style={styles.nextReminderTitle}>NEXT REMINDER</Text>
+          <Text style={styles.nextReminderTitle}>LỜI NHẮC TIẾP THEO</Text>
           <View style={styles.nextReminderDetails}>
             <Text style={styles.nextReminderDate}>
-              {formatNextReminderDate(nextReminder.maintainDate)} at{" "}
+              {formatNextReminderDate(nextReminder.maintainDate)} lúc{" "}
               {getTimeRange(nextReminder.maintainDate).split("-")[0]}
             </Text>
             <Text style={styles.nextReminderText}>{nextReminder.title}</Text>
@@ -171,7 +171,7 @@ const ScheduleScreen = ({ navigation }) => {
           </View>
         </View>
       )}
-
+  
       {/* Toggle Switch */}
       <View style={{
         flexDirection: 'row',
@@ -196,7 +196,7 @@ const ScheduleScreen = ({ navigation }) => {
             fontWeight: "bold",
             fontSize: 12
           }}>
-            Recurring
+            Định kỳ
           </Text>
         </TouchableOpacity>
         <TouchableOpacity
@@ -214,11 +214,11 @@ const ScheduleScreen = ({ navigation }) => {
             fontWeight: "bold",
             fontSize: 12
           }}>
-            Maintenance
+            Bảo trì
           </Text>
         </TouchableOpacity>
       </View>
-
+  
       <Calendar
         current={new Date().toISOString().split("T")[0]}
         markedDates={markedDates}
@@ -246,19 +246,19 @@ const ScheduleScreen = ({ navigation }) => {
         )}
         style={styles.calendar}
       />
-
+  
       {/* Legend */}
       <View style={styles.legendContainer}>
         <View style={styles.legendItem}>
           <View style={[styles.legendDot, { backgroundColor: "#FF6B6B" }]} />
-          <Text style={styles.legendText}>Unfinished</Text>
+          <Text style={styles.legendText}>Chưa hoàn thành</Text>
         </View>
         <View style={styles.legendItem}>
           <View style={[styles.legendDot, { backgroundColor: "#4CAF50" }]} />
-          <Text style={styles.legendText}>Finished</Text>
+          <Text style={styles.legendText}>Đã hoàn thành</Text>
         </View>
       </View>
-
+  
       {/* Floating Action Button */}
       <TouchableOpacity
         style={styles.fab}
@@ -268,7 +268,7 @@ const ScheduleScreen = ({ navigation }) => {
       >
         <Text style={styles.fabText}>{addIcon}</Text>
       </TouchableOpacity>
-
+  
       {/* Modal for Event Details */}
       <Modal
         isVisible={isModalVisible}
@@ -280,9 +280,9 @@ const ScheduleScreen = ({ navigation }) => {
             <TouchableOpacity onPress={() => setModalVisible(false)}>
               <Text style={styles.modalHeaderIcon}>{leftArrowIcon}</Text>
             </TouchableOpacity>
-            <Text style={styles.modalTitle}>VIEW REMINDER</Text>
+            <Text style={styles.modalTitle}>XEM LỜI NHẮC</Text>
           </View>
-
+  
           <View style={styles.modalBody}>
             <Text style={styles.modalDate}>{selectedDate}</Text>
             {selectedDateEvents.map((event, index) => (

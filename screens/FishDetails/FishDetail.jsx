@@ -38,7 +38,6 @@ const FishDetail = ({ route, navigation }) => {
     dispatch(getFishById(fish?.koiID));
   }, [fish, dispatch]);
 
-  console.log(fish);
 
   return (
     <Provider>
@@ -52,7 +51,7 @@ const FishDetail = ({ route, navigation }) => {
           style={styles.container}
           contentContainerStyle={{ paddingBottom: 20 }}
         >
-          <Text style={styles.title}>Fish Details</Text>
+          <Text style={styles.title}>Chi Tiết Cá</Text>
           <View style={styles.headerContainer}>
             <View style={styles.imageContainer}>
               <Image source={{ uri: fish.image }} style={styles.fishImage} />
@@ -72,52 +71,51 @@ const FishDetail = ({ route, navigation }) => {
                 </TouchableOpacity>
               </View>
               <Text style={styles.variety}>{fish.variety.varietyName}</Text>
-              <Text style={styles.price}>$100</Text>
+              <Text style={styles.price}>100 USD</Text>
               <View style={styles.infoRow}>
                 <View style={styles.infoBlock}>
-                  <Text style={styles.infoLabel}>Age</Text>
+                  <Text style={styles.infoLabel}>Tuổi</Text>
                   <Text style={styles.infoValue}>{fish.age}</Text>
                 </View>
                 <View style={styles.infoBlock}>
-                  <Text style={styles.infoLabel}>Length</Text>
+                  <Text style={styles.infoLabel}>C.dài</Text>
                   <Text style={styles.infoValue}>{fish.length}</Text>
                 </View>
                 <View style={styles.infoBlock}>
-                  <Text style={styles.infoLabel}>Weight</Text>
+                  <Text style={styles.infoLabel}>C.nặng</Text>
                   <Text style={styles.infoValue}>4.33 g</Text>
                 </View>
               </View>
             </View>
           </View>
-
+  
           {/* Condition */}
           <View style={styles.section}>
-            <Text style={styles.label}>Condition: Healthy</Text>
+            <Text style={styles.label}>Tình trạng: Khỏe mạnh</Text>
           </View>
-
+  
           {/* Pond and Breeder Information */}
           <View style={styles.section}>
             <Text>
-              <Text style={{ fontWeight: "bold" }}>{fish.name}</Text> has been
-              swimming in the pond{" "}
-              <Text style={{ fontWeight: "bold" }}>"{fish.pond.name}"</Text>{" "}
-              since <Text style={{ fontWeight: "bold" }}>10.10.2018</Text>
+              <Text style={{ fontWeight: "bold" }}>{fish.name}</Text> đã bơi trong
+              ao <Text style={{ fontWeight: "bold" }}>"{fish.pond.name}"</Text>{" "}
+              từ <Text style={{ fontWeight: "bold" }}>10.10.2018</Text>
             </Text>
             <Text>
-              <Text style={{ fontWeight: "bold" }}>{fish.name}</Text> was bought
-              for <Text style={{ fontWeight: "bold" }}>{fish.price} VND</Text>{" "}
-              and was bred by{" "}
+              <Text style={{ fontWeight: "bold" }}>{fish.name}</Text> được mua với
+              giá <Text style={{ fontWeight: "bold" }}>{fish.price} VND</Text> và
+              được lai tạo bởi{" "}
               <Text style={{ fontWeight: "bold" }}>
                 {fish.variety.varietyName}
               </Text>
               .
             </Text>
           </View>
-
+  
           {/* Health Status */}
           <View style={styles.section}>
             <View style={styles.sectionHeader}>
-              <Text style={styles.label}>Health Status</Text>
+              <Text style={styles.label}>Tình Trạng Sức Khỏe</Text>
               <TouchableOpacity onPress={() => setHealthModalVisible(true)}>
                 <FontAwesome name="plus" size={18} color="#6497B1" />
               </TouchableOpacity>
@@ -136,18 +134,20 @@ const FishDetail = ({ route, navigation }) => {
                 <View style={styles.cardContent}>
                   <Text style={styles.cardDate}>{item.date}</Text>
                   <Text style={{ marginBottom: 5 }}>
-                    Overall Status: {item.status}
+                    Tình trạng tổng quát: {item.status === "Healthy / Sick" ? "Khỏe mạnh / Ốm" : item.status}
                   </Text>
-                  <Text>Treatment: {item.treatment}</Text>
+                  <Text>
+                    Điều trị: {item.treatment === "No treatment needed / Use product '-----' to cure the koi" ? "Không cần điều trị / Sử dụng sản phẩm '-----' để chữa trị cho cá koi" : item.treatment}
+                  </Text>
                 </View>
               </View>
             ))}
           </View>
-
+  
           {/* Growth History */}
           <View style={styles.section}>
             <View style={styles.sectionHeader}>
-              <Text style={styles.label}>Growth History</Text>
+              <Text style={styles.label}>Lịch Sử Tăng Trưởng</Text>
               <TouchableOpacity>
                 <FontAwesome name="plus" size={18} color="#6497B1" />
               </TouchableOpacity>
@@ -156,18 +156,18 @@ const FishDetail = ({ route, navigation }) => {
               <GrowthChart fishReportInfos={fish?.fishReportInfos}></GrowthChart>
             </View>
           </View>
-
+  
           {/* Notes */}
           <View style={styles.section}>
             <View style={styles.sectionHeader}>
-              <Text style={styles.label}>Notes</Text>
+              <Text style={styles.label}>Ghi Chú</Text>
               <TouchableOpacity>
                 <FontAwesome name="plus" size={18} color="#6497B1" />
               </TouchableOpacity>
             </View>
             <Text style={styles.noteText}>
-              You didn’t add any notes yet. Please add a new note by tapping on
-              the plus symbol in the top right of the section.
+              Bạn chưa thêm bất kỳ ghi chú nào. Vui lòng thêm ghi chú mới bằng cách
+              chạm vào biểu tượng dấu cộng ở góc trên bên phải của phần này.
             </Text>
           </View>
         </ScrollView>

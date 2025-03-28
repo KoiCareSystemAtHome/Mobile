@@ -124,23 +124,33 @@ export const styles = StyleSheet.create({
   },
   modalSaveButton: {
     padding: 10,
-    borderColor: "white",
+    borderWidth:0
   },
   modalSaveText: {
     color: "#4caf50",
     fontWeight: "bold",
   },
   imageButton: {
-    borderWidth: 1,
-    borderColor: "#ddd",
-    padding: 10,
-    borderRadius: 5,
+    borderWidth: 2,
+    borderColor: "#3498db", // Vibrant blue border
+    borderStyle: "dashed", // Dashed border for a modern touch
+    paddingVertical: 15,
+    paddingHorizontal: 20,
+    borderRadius: 12, // Softer rounded corners
     marginBottom: 20,
     alignItems: "center",
+    backgroundColor: "rgba(255, 255, 255, 0.9)", // Slightly transparent white background
+    shadowColor: "#000", // Subtle shadow for depth
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2, // Android shadow
   },
   imageButtonText: {
-    color: "#6497B1",
+    color: "#3498db", // Matching blue text
     fontSize: 16,
+    fontWeight: "600", // Bolder text for emphasis
+    letterSpacing: 0.5, // Slight letter spacing for readability
   },
   modalFields: {
     backgroundColor: "transparent",
@@ -177,17 +187,12 @@ export const styles = StyleSheet.create({
     alignItems: "center",
   },
   selectedImage: {
-    width: 200,
-    height: 200,
+    width: 250,
+    height: 250,
     borderRadius: 10,
     marginBottom: 10,
   },
-  changeImageButton: {
-    backgroundColor: "#16a085",
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    borderRadius: 5,
-  },
+
   changeImageText: {
     color: "white",
     fontSize: 14,

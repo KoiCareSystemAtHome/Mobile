@@ -46,12 +46,8 @@ const PondStatistic = ({ navigation }) => {
 
   // Pagination states
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 5; // Number of ponds per page
-
-  // Calculate the total number of pages
+  const itemsPerPage = 5;
   const totalPages = Math.ceil(pondData?.length / itemsPerPage);
-
-  // Slice the pondData array to show only the current page's items
   const paginatedPondData = pondData?.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
@@ -69,7 +65,7 @@ const PondStatistic = ({ navigation }) => {
           <View style={styles.pondInfo}>
             <View style={styles.infoRow}>
               <Text style={styles.pondText}>
-                <Text style={styles.label}>Name: </Text>
+                <Text style={styles.label}>Tên: </Text>
                 {item.name} {" "}
               </Text>
               <Text style={styles.pondText}>
@@ -104,29 +100,29 @@ const PondStatistic = ({ navigation }) => {
       .then((response) => {
         if (response?.status === "201") {
           console.log(response);
-          Toast.success("Pond Added Successfully");
-          dispatch(getPondByOwner(isLoggedIn.id)); // Refresh pond data
+          Toast.success("Ao Đã Được Thêm Thành Công");
+          dispatch(getPondByOwner(isLoggedIn.id));
           form.resetFields();
           setTimeout(() => {
             setModalVisible(false);
           });
         } else {
-          Toast.fail("Failed to add pond");
+          Toast.fail("Thêm Ao Thất Bại");
           setModalVisible(false);
         }
       });
-    setModalVisible(false); // Close modal after submission
+    setModalVisible(false);
   };
 
   const handleImagePick = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (status !== "granted") {
-      alert("Sorry, we need camera roll permissions to make this work!");
+      alert("Xin lỗi, chúng tôi cần quyền truy cập thư viện ảnh để thực hiện điều này!");
       return;
     }
 
     let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images, // Correct format for Expo 49+
+      mediaTypes: ImagePicker.Images,
       allowsEditing: true,
       quality: 1,
     });
@@ -137,7 +133,7 @@ const PondStatistic = ({ navigation }) => {
       const fileMimeType = `image/${fileType === "jpg" ? "jpeg" : fileType}`;
 
       let formData = new FormData();
-      formData.append("filene", {
+      formData.append("file", {
         uri: uri,
         name: `image.${fileType}`,
         type: fileMimeType,
@@ -147,7 +143,7 @@ const PondStatistic = ({ navigation }) => {
       try {
         const response = await dispatch(getImage(formData)).unwrap();
         if (response) {
-          setUploadResponse(response);
+          setUploadResponse(response.imageUrl);
         }
       } catch (error) {
         console.error("Failed to upload image:", error);
@@ -188,7 +184,6 @@ const PondStatistic = ({ navigation }) => {
     loadFontAsync();
   }, []);
 
-  // Pagination controls
   const handlePreviousPage = () => {
     if (currentPage > 1) {
       setCurrentPage(currentPage - 1);
@@ -210,16 +205,15 @@ const PondStatistic = ({ navigation }) => {
       >
         <View style={styles.overlay} />
         <View style={styles.container}>
-          <Text style={styles.title}>Pond Statistic</Text>
+          <Text style={styles.title}>Thống Kê Ao</Text>
 
           <FlatList
-            data={paginatedPondData} // Use paginated data instead of pondData
+            data={paginatedPondData}
             renderItem={renderPondCard}
             keyExtractor={(item) => item.pondID}
             contentContainerStyle={styles.listContent}
           />
 
-          {/* Pagination Controls */}
           {pondData?.length > 0 && (
             <View style={styles.paginationContainer}>
               <TouchableOpacity
@@ -230,7 +224,7 @@ const PondStatistic = ({ navigation }) => {
                 onPress={handlePreviousPage}
                 disabled={currentPage === 1}
               >
-                <Text style={styles.paginationText}>Previous</Text>
+                <Text style={styles.paginationText}>Trước</Text>
               </TouchableOpacity>
               <Text style={styles.pageText}>
                 {currentPage}/{totalPages}
@@ -243,7 +237,7 @@ const PondStatistic = ({ navigation }) => {
                 onPress={handleNextPage}
                 disabled={currentPage === totalPages}
               >
-                <Text style={styles.paginationText}>Next</Text>
+                <Text style={styles.paginationText}>Tiếp</Text>
               </TouchableOpacity>
             </View>
           )}
@@ -251,7 +245,7 @@ const PondStatistic = ({ navigation }) => {
           <View style={styles.footer}>
             <View style={styles.badge}>
               <Text style={styles.badgeText}>
-                {pondData?.length} {`Pond${pondData?.length > 1 ? "s" : ""}`}
+                {pondData?.length} Ao
               </Text>
             </View>
             <TouchableOpacity
@@ -263,7 +257,6 @@ const PondStatistic = ({ navigation }) => {
           </View>
         </View>
 
-        {/* Modal */}
         <Modal
           visible={isModalVisible}
           transparent={true}
@@ -273,20 +266,18 @@ const PondStatistic = ({ navigation }) => {
           <View style={styles.modalOverlay}>
             <View style={styles.modalContainer}>
               <View style={styles.modalHeader}>
-                <Text style={styles.modalTitle}>Add New Pond</Text>
+                <Text style={styles.modalTitle}>Thêm Ao Mới</Text>
               </View>
 
               {imageBlob ? (
                 <View style={styles.imageContainer}>
+                  <TouchableOpacity
+                    onPress={handleImagePick}
+                  >
                   <Image
                     source={{ uri: uploadResponse }}
                     style={styles.selectedImage}
                   />
-                  <TouchableOpacity
-                    style={styles.changeImageButton}
-                    onPress={handleImagePick}
-                  >
-                    <Text style={styles.changeImageText}>Change Picture</Text>
                   </TouchableOpacity>
                 </View>
               ) : (
@@ -294,21 +285,18 @@ const PondStatistic = ({ navigation }) => {
                   style={styles.imageButton}
                   onPress={handleImagePick}
                 >
-                  <Text style={styles.imageButtonText}>
-                    Tap To Select Image
-                  </Text>
+                  <Text style={styles.imageButtonText}>Chạm Để Chọn Hình Ảnh</Text>
                 </TouchableOpacity>
               )}
 
-              {/* Form Fields */}
               <Form form={form} onFinish={onFinish} style={styles.form}>
                 <Form.Item
                   name="name"
                   rules={[
-                    { required: true, message: "Please enter the pond name" },
+                    { required: true, message: "Vui lòng nhập tên ao" },
                   ]}
                 >
-                  <Input placeholder="Pond Name" style={styles.input} />
+                  <Input placeholder="Tên Ao" style={styles.input} />
                 </Form.Item>
 
                 <View style={styles.modalFooter}>
@@ -316,14 +304,14 @@ const PondStatistic = ({ navigation }) => {
                     style={styles.modalCancelButton}
                     onPress={() => setModalVisible(false)}
                   >
-                    Cancel
+                    Hủy
                   </Button>
                   <Button
                     type="primary"
                     style={styles.modalSaveButton}
                     onPress={() => form.submit()}
                   >
-                    Save
+                    Lưu
                   </Button>
                 </View>
               </Form>

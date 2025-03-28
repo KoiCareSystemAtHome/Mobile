@@ -200,37 +200,37 @@ const CartScreen = ({ navigation }) => {
           <TouchableOpacity onPress={() => navigation.navigate("Shopping")}>
             <AntDesign name="left" size={24} color="black" />
           </TouchableOpacity>
-          <Text style={styles.title}>Cart</Text>
+          <Text style={styles.title}>Giỏ Hàng</Text>
           <TouchableOpacity>
             <FontAwesome name="bell" size={24} color="black" />
           </TouchableOpacity>
         </View>
-
+  
         {/* Wallet Amount */}
         <View style={styles.walletContainer}>
           <Text style={styles.walletText}>
-            Wallet Balance: ${walletData?.amount?.toFixed(2) || "0.00"}
+            Số dư ví: {walletData?.amount?.toFixed(2) || "0.00"} VND
           </Text>
         </View>
-
+  
         {address ? (
           <View style={styles.addressInfo}>
             <Text>{`${address.provinceName}, ${address.districtName}, ${address.wardName}`}</Text>
             <TouchableOpacity
               onPress={() => navigation.navigate("AddressForm")}
             >
-              <Text style={{ color: "blue" }}>Change address</Text>
+              <Text style={{ color: "blue" }}>Thay đổi địa chỉ</Text>
             </TouchableOpacity>
           </View>
         ) : (
           <TouchableOpacity onPress={() => navigation.navigate("AddressForm")}>
             <View style={styles.addressBar}>
-              <Text>Add an address</Text>
+              <Text>Thêm địa chỉ</Text>
               <AntDesign name="arrowright" size={20} color="black" />
             </View>
           </TouchableOpacity>
         )}
-
+  
         {/* Cart Items */}
         <FlatList
           data={cart}
@@ -243,7 +243,7 @@ const CartScreen = ({ navigation }) => {
                   <Text style={styles.productName}>{item.productName}</Text>
                   <Text style={styles.productPrice}>{`${item.price.toFixed(
                     0
-                  )}đ`}</Text>
+                  )} VND`}</Text>
                 </View>
                 <View style={styles.quantityContainer}>
                   <TouchableOpacity
@@ -268,46 +268,57 @@ const CartScreen = ({ navigation }) => {
             </View>
           )}
         />
-
+  
         {/* Order Summary */}
         <View style={styles.summaryContainer}>
-          <Text style={styles.summaryText}>Subtotal</Text>
-          <Text style={styles.summaryPrice}>{`$${subtotal.toFixed(2)}`}</Text>
+          <Text style={styles.summaryText}>Tổng phụ</Text>
+          <Text style={styles.summaryPrice}>{`${subtotal.toFixed(2)} VND`}</Text>
         </View>
         <View style={styles.summaryContainer}>
-          <Text style={styles.summaryText}>Shipping Cost</Text>
-          <Text style={styles.summaryPrice}>{`$${shippingCost.toFixed(
+          <Text style={styles.summaryText}>Phí vận chuyển</Text>
+          <Text style={styles.summaryPrice}>{`${shippingCost.toFixed(
             2
-          )}`}</Text>
+          )} VND`}</Text>
         </View>
         <View style={styles.summaryContainer}>
-          <Text style={styles.summaryText}>Tax</Text>
-          <Text style={styles.summaryPrice}>{`$${tax.toFixed(2)}`}</Text>
+          <Text style={styles.summaryText}>Thuế</Text>
+          <Text style={styles.summaryPrice}>{`${tax.toFixed(2)} VND`}</Text>
         </View>
         <View style={styles.summaryContainer}>
-          <Text style={styles.totalText}>Total</Text>
-          <Text style={styles.totalPrice}>{`$${total.toFixed(2)}`}</Text>
+          <Text style={styles.totalText}>Tổng cộng</Text>
+          <Text style={styles.totalPrice}>{`${total.toFixed(2)} VND`}</Text>
         </View>
-
+  
         {/* Payment Method Selection */}
         <View style={styles.paymentMethodContainer}>
-          <Text style={styles.paymentMethodLabel}>Payment Method:</Text>
+          <Text style={styles.paymentMethodLabel}>Phương thức thanh toán:</Text>
           <RadioGroup
-            radioButtons={radioButtons}
+            radioButtons={[
+              {
+                id: "COD",
+                label: "Thanh toán khi nhận hàng (COD)",
+                value: "COD",
+              },
+              {
+                id: "Online Banking",
+                label: "Ngân hàng trực tuyến",
+                value: "Online Banking",
+              },
+            ]}
             onPress={setPaymentMethod}
             selectedId={paymentMethod}
             layout="column"
             containerStyle={styles.radioGroup}
           />
         </View>
-
+  
         {/* Checkout Button */}
         <Button
           type="primary"
           style={styles.checkoutButton}
           onPress={handleCheckout}
         >
-          <Text style={styles.checkoutText}>Checkout</Text>
+          <Text style={styles.checkoutText}>Thanh toán</Text>
         </Button>
       </ImageBackground>
     </Provider>

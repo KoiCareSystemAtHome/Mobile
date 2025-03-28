@@ -88,7 +88,7 @@ const PackageScreen = ({ navigation }) => {
         <TouchableOpacity onPress={() => navigation.goBack()}>
           <AntDesign name="left" size={24} color="black" />
         </TouchableOpacity>
-        <Text style={styles.title}>Package</Text>
+        <Text style={styles.title}>Gói Thành Viên</Text>
         <View style={{ width: 24 }} />
       </View>
 
@@ -97,7 +97,7 @@ const PackageScreen = ({ navigation }) => {
         {/* Wallet Balance */}
         <View style={styles.balanceContainer}>
           <Text style={styles.balanceText}>
-            Your Balance: {walletData?.amount ? walletData.amount.toLocaleString('vi-VN') : '0'} VND
+            Số dư: {walletData?.amount ? walletData.amount.toLocaleString('vi-VN') : '0'} VND
           </Text>
         </View>
 
@@ -130,7 +130,7 @@ const PackageScreen = ({ navigation }) => {
                   onPress={() => !isDisabled && handleChoosePackage(pkg)}
                   disabled={isDisabled}
                 >
-                  <Text style={styles.chooseButtonText}>Choose</Text>
+                  <Text style={styles.chooseButtonText}>Chọn</Text>
                 </TouchableOpacity>
               </View>
               <View style={styles.cardIcon}>

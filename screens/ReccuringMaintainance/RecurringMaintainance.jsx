@@ -132,8 +132,8 @@ const CalculateMaintainance = () => {
       >
         <View style={styles.overlay} />
         <ScrollView contentContainerStyle={styles.container}>
-          <Text style={styles.title}>Maintenance Schedule</Text>
-
+          <Text style={styles.title}>Lịch Trình Bảo Trì</Text>
+  
           {/* Pond Dropdown */}
           <View style={{ justifyContent: "center", flexDirection: "row" }}>
             <TouchableOpacity
@@ -141,7 +141,7 @@ const CalculateMaintainance = () => {
               style={styles.selector}
             >
               <Text style={styles.selectorText}>
-                {homePond ? homePond?.name : "Select a Pond"}
+                {homePond ? homePond?.name : "Chọn một ao"}
               </Text>
               <Icon name="down" size={16} color="#000" />
             </TouchableOpacity>
@@ -163,11 +163,10 @@ const CalculateMaintainance = () => {
               </View>
             )}
           </View>
-
+  
           <View>
-
             {/* Date Picker */}
-            <Text style={styles.label}>DATE END OF SCHEDULE</Text>
+            <Text style={styles.label}>NGÀY KẾT THÚC LỊCH TRÌNH</Text>
             <DatePicker
               value={endDate}
               mode="date"
@@ -182,7 +181,7 @@ const CalculateMaintainance = () => {
                 onPress={() => setDatePickerVisible(true)}
               >
                 <Text style={styles.dateText}>
-                  {endDate.toLocaleDateString("en-GB", {
+                  {endDate.toLocaleDateString("vi-VN", {
                     day: "numeric",
                     month: "long",
                     year: "numeric",
@@ -191,9 +190,9 @@ const CalculateMaintainance = () => {
                 <Icon name="calendar" size={20} color="#000" />
               </TouchableOpacity>
             </DatePicker>
-
+  
             {/* Time Picker */}
-            <Text style={styles.label}>TIME END OF SCHEDULE</Text>
+            <Text style={styles.label}>GIỜ KẾT THÚC LỊCH TRÌNH</Text>
             <Picker
               data={timeData}
               cols={2}
@@ -202,15 +201,15 @@ const CalculateMaintainance = () => {
               onChange={handleTimePickerChange}
               visible={isTimePickerVisible}
               onDismiss={() => setTimePickerVisible(false)}
-              okText="Confirm"
-              dismissText="Cancel"
+              okText="Xác nhận"
+              dismissText="Hủy"
             >
               <TouchableOpacity
                 style={styles.datePickerContainer}
                 onPress={() => setTimePickerVisible(true)}
               >
                 <Text style={styles.dateText}>
-                  {endDate.toLocaleTimeString("en-GB", {
+                  {endDate.toLocaleTimeString("vi-VN", {
                     hour: "2-digit",
                     minute: "2-digit",
                     hour12: false,
@@ -220,10 +219,9 @@ const CalculateMaintainance = () => {
                 <Icon name="clockcircleo" size={20} color="#000" />
               </TouchableOpacity>
             </Picker>
-
-
+  
             {/* Cycle Days Toggle */}
-            <Text style={styles.label}>CYCLE DAYS</Text>
+            <Text style={styles.label}>NGÀY CHU KỲ</Text>
             <View style={styles.toggleContainer}>
               {cycleOptions.map((option) => (
                 <TouchableOpacity
@@ -240,16 +238,16 @@ const CalculateMaintainance = () => {
                       cycleDays === option && styles.activeText,
                     ]}
                   >
-                    {option} days
+                    {option} ngày
                   </Text>
                 </TouchableOpacity>
               ))}
             </View>
           </View>
         </ScrollView>
-
+  
         <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
-          <Text style={styles.saveButtonText}>Save</Text>
+          <Text style={styles.saveButtonText}>Lưu</Text>
         </TouchableOpacity>
       </ImageBackground>
     </Provider>

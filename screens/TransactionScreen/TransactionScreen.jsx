@@ -76,7 +76,11 @@ const TransactionScreen = ({ navigation }) => {
   // Render each transaction item
   const renderDepositData = ({ item }) => (
     <View style={styles.transactionCard}>
-      <Text style={styles.orderNumber}>{item?.pakageName ? `Gói ${item?.pakageName}` : `Đơn ${item?.vnPayTransactionId}` }</Text>
+      <Text style={styles.orderNumber}>
+        {item?.pakageName
+          ? `Gói ${item?.pakageName}`
+          : `Đơn ${item?.vnPayTransactionId}`}
+      </Text>
       <Text style={styles.orderDetails}>
         Mua ngày: {dayjs(item.transactionDate).format("ddd, D MMMM YYYY")}
       </Text>
@@ -105,7 +109,6 @@ const TransactionScreen = ({ navigation }) => {
     getData();
   }, []);
 
-
   useEffect(() => {
     if (isLoggedIn?.id) {
       dispatch(getOrderTransaction(isLoggedIn.id));
@@ -127,10 +130,9 @@ const TransactionScreen = ({ navigation }) => {
           <TouchableOpacity onPress={() => navigation.goBack()}>
             <AntDesign name="left" size={24} color="black" />
           </TouchableOpacity>
-          <Text style={styles.title}>Purchase History</Text>
-          <TouchableOpacity onPress={() => console.log("Logout")}>
-            <Text style={styles.logoutText}>Logout</Text>
-          </TouchableOpacity>
+          <Text style={styles.title}>Lịch Sử Giao Dịch</Text>
+          <View style={{ width: 24 }} />{" "}
+          {/* Placeholder to balance the layout */}
         </View>
 
         {/* Tabs */}

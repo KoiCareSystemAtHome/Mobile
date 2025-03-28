@@ -176,12 +176,7 @@ export const styles = StyleSheet.create({
     marginBottom: 10,
   },
 
-  changeImageButton: {
-    backgroundColor: "#16a085",
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    borderRadius: 5,
-  },
+
 
   changeImageText: {
     color: "white",
