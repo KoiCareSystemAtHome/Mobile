@@ -3,7 +3,6 @@ import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
-  TextInput,
   TouchableOpacity,
   ImageBackground,
   Image,
@@ -16,10 +15,13 @@ import { useDispatch } from "react-redux";
 import { login } from "../../redux/slices/authSlice";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { loadAsync } from "expo-font";
+import FontAwesome from "react-native-vector-icons/FontAwesome"; // Add this import
 
 const LoginScreen = ({ navigation }) => {
   const dispatch = useDispatch();
   const [form] = Form.useForm();
+  const [showPassword, setShowPassword] = useState(false); // State to toggle password visibility
+
   const onSubmit = () => {
     form.submit();
   };
@@ -42,7 +44,7 @@ const LoginScreen = ({ navigation }) => {
       .catch((error) => {
         console.error("Login Failed:", error);
         Alert.alert("Login Error", "An error occurred. Please try again.");
-      }); // Ensure this line is properly closed
+      });
   };
 
   useEffect(() => {
@@ -103,29 +105,30 @@ const LoginScreen = ({ navigation }) => {
                   placeholderTextColor="#C4C4C4"
                 />
               </Form.Item>
-              <Image
-                source={require("../../assets/adaptive-icon.png")}
-                style={styles.icon}
-              />
             </View>
 
             <View style={styles.inputContainer}>
               <Form.Item name="password" noStyle>
                 <Input
                   placeholder="Password"
-                  secureTextEntry
+                  secureTextEntry={!showPassword} // Toggle visibility based on state
                   style={styles.input}
                   placeholderTextColor="#C4C4C4"
                 />
               </Form.Item>
-              <Image
-                source={require("../../assets/adaptive-icon.png")}
-                style={styles.icon}
-              />
+              <TouchableOpacity
+                onPress={() => setShowPassword(!showPassword)} // Toggle password visibility
+                style={{marginRight:10}} 
+              >
+                <FontAwesome
+                  name={showPassword ? "eye" : "eye-slash"} // Switch between eye and eye-slash icons
+                  size={24}
+                  color="#6497B1" // Adjust color as needed
+                />
+              </TouchableOpacity>
             </View>
 
             <View style={styles.row}>
-              {/* <CheckBox value={true} /> */}
               <Text style={styles.remember}>Remember password</Text>
               <TouchableOpacity>
                 <Text style={styles.forgot}>Forget password</Text>
