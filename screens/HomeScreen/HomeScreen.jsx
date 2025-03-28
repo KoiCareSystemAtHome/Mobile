@@ -114,8 +114,8 @@ const HomeScreen = ({ navigation }) => {
           </TouchableOpacity>
           <View style={styles.drawerProfile}>
             <FontAwesome name="user-circle" size={50} color="#6497B1" />
-            <Text style={styles.drawerUserName}>User</Text>
-            <Text style={styles.drawerUserRole}>UX/UI Designer</Text>
+            <Text style={styles.drawerUserName}>Hello,</Text>
+            <Text style={styles.drawerUserRole}>Anynomous user</Text>
           </View>
         </View>
         <View style={styles.divider} />
@@ -131,18 +131,6 @@ const HomeScreen = ({ navigation }) => {
               style={styles.drawerItemImage}
             />
             <Text style={styles.drawerItemText}>Gói thành viên</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.drawerItem}
-            onPress={() => {
-              navigation.navigate("BlogScreen");
-            }}
-          >
-            <Image
-              source={require("../../assets/bookmark.png")}
-              style={styles.drawerItemImage}
-            />
-            <Text style={styles.drawerItemText}>Bài Viết</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.drawerItem}

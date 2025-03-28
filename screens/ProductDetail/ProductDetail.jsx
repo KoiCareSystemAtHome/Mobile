@@ -90,7 +90,7 @@ const ProductDetail = ({ navigation }) => {
       {/* Buttons */}
       <View style={styles.buttonContainer}>
         <TouchableOpacity style={styles.heartButton}>
-          <AntDesign name="hearto" size={24} color="#ddd" />
+          <AntDesign name="staro" size={24} color="#ddd" />
         </TouchableOpacity>
         <Button
           type="primary"

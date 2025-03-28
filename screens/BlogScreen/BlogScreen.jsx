@@ -35,13 +35,27 @@ const BlogScreen = ({ navigation }) => {
   const renderBlogItem = ({ item }) => (
     <View style={styles.blogCard}>
       {/* Blog Title */}
-      <Text style={styles.blogTitle}>{item.title.toUpperCase()}</Text>
+      <View style={{ flexDirection: "row", alignItems: "center", marginBottom: 10 }}>
+      <Image
+        source={require("../../assets/shopImage.jpg")}
+        style={{ width: 50, height: 50, borderRadius: 25, marginRight: 10 }}
+      />
+      <Text style={{
+         fontSize: 12, fontWeight: "bold", fontFamily: "serif",
+         width: 300}}>
+        {item.title.toUpperCase()}
+      </Text>
+      </View>
+
 
       {/* Blog Content */}
       <HTML
         source={{ html: item.content }}
         contentWidth={width - 40} // Adjust content width for padding
-        baseStyle={styles.blogContent}
+        baseStyle={{ ...styles.blogContent,
+           paddingLeft: 8, 
+           paddingRight:8,
+           textAlign: "justify" }}
         tagsStyles={{
           h1: styles.blogContentHeading,
           ul: { marginVertical: 5 },
@@ -52,8 +66,9 @@ const BlogScreen = ({ navigation }) => {
 
       {/* Blog Image */}
       {item.images && (
-        <Image source={{ uri: item.images }} style={styles.blogImage} />
+        <Image source={{ uri: item.images }} style={[styles.blogImage, { paddingBottom: 20 }]} />
       )}
+
     </View>
   );
 
@@ -80,22 +95,6 @@ const BlogScreen = ({ navigation }) => {
           contentContainerStyle={styles.listContent}
         />
       </ImageBackground>
-
-      {/* Footer Navigation */}
-      <View style={styles.footer}>
-        <TouchableOpacity style={styles.footerButton}>
-          <FontAwesome name="home" size={24} color="#666" />
-          <Text style={styles.footerText}>Home</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.footerButton}>
-          <FontAwesome5 name="chart-bar" size={24} color="#6497B1" />
-          <Text style={[styles.footerText, { color: "#6497B1" }]}>Overview</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.footerButton}>
-          <FontAwesome name="question-circle" size={24} color="#666" />
-          <Text style={styles.footerText}>FAQ's</Text>
-        </TouchableOpacity>
-      </View>
     </View>
   );
 };
