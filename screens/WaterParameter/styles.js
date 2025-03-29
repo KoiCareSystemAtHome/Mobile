@@ -63,9 +63,12 @@ export const styles = StyleSheet.create({
   greenText: {
     color: "green",
     marginBottom: 10,
+    fontSize:10
   },
   boldText: {
     fontWeight: "bold",
+    fontSize:10
+
   },
   infoText: {
     color: "gray",

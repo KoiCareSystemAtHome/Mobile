@@ -9,7 +9,7 @@ export const styles = StyleSheet.create({
     backgroundColor: "rgba(255, 255, 255, 0.5)",
   },
   container: {
-    flex:1,
+    // flex:1,
     paddingHorizontal: 20,
     paddingBottom: 40,
   },

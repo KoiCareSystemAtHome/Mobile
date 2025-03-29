@@ -68,7 +68,7 @@ const SuggestFood = ({ route, navigation }) => {
                 });
               }}
             >
-              <Text style={styles.addToCartText}>View Details</Text>
+              <Text style={styles.addToCartText}>Thêm vào giỏ</Text>
             </TouchableOpacity>
           </TouchableOpacity>
         )}

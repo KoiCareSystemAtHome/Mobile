@@ -109,7 +109,7 @@ export const styles = StyleSheet.create({
   
 
   productImage: {
-    marginTop: 46,
+    // marginTop: 50,
     width: "100%",
     height: "50%",
     resizeMode: "cover"
@@ -144,7 +144,6 @@ export const styles = StyleSheet.create({
     alignItems: "flex-end", // Căn phải icon
   },  
   addToCartButton: {
-  position:"absolute",
   bottom:0,
   backgroundColor: "#20A920", // Green color
   borderRadius: 20, // Fully rounded button
@@ -157,7 +156,7 @@ export const styles = StyleSheet.create({
 },
 addToCartText: {
   color: "white",
-  fontSize: 14,
+  fontSize: 12,
   fontWeight: "bold",
 },
 paginationContainer: {
