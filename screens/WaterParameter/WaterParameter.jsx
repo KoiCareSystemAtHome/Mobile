@@ -63,7 +63,6 @@ const WaterParameter = () => {
       ownerId,
       requirementPondParam,
     };
-    console.log(updatedPond);
     dispatch(updatePond(updatedPond));
     setModalVisible(false);
   };

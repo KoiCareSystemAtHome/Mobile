@@ -7,40 +7,75 @@ import {
   TouchableOpacity,
   ImageBackground,
 } from "react-native";
-import { Card, Provider } from "@ant-design/react-native";
+import { Card, Provider, Picker } from "@ant-design/react-native";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import { styles } from "./styles";
 import GrowthChart from "./components/GrowthChart";
 import HealthStatusForm from "./components/HealthStatusForm/HealthStatusForm";
 import { useDispatch, useSelector } from "react-redux";
-import { fishByIdSelector } from "../../redux/selector";
-import { getFishById } from "../../redux/slices/fishSlice";
+import { fishByIdSelector, profileByFishSelector, productSelector } from "../../redux/selector";
+import { getFishById, getKoiProfile } from "../../redux/slices/fishSlice";
+import { getProduct } from "../../redux/slices/productSlice";
+import enUS from "@ant-design/react-native/lib/locale-provider/en_US";
 
 const FishDetail = ({ route, navigation }) => {
   const { fish } = route.params;
   const dispatch = useDispatch();
   const fishById = useSelector(fishByIdSelector);
+  const koiProfile = useSelector(profileByFishSelector);
+  const products = useSelector(productSelector);
   const [isHealthModalVisible, setHealthModalVisible] = useState(false);
+  const [selectedProfile, setSelectedProfile] = useState(null);
 
-  const dummyHealthStatus = [
-    {
-      date: "03.04.2023",
-      status: "Healthy / Sick",
-      treatment: "No treatment needed / Use product '-----' to cure the koi",
-    },
-  ];
+  useEffect(() => {
+    dispatch(getFishById(fish?.koiID));
+    dispatch(getKoiProfile(fish?.koiID));
+    dispatch(getProduct())
+  }, [fish, dispatch]);
+
+  useEffect(() => {
+    // Set initial selected profile to the first one if available
+    if (koiProfile?.length > 0 && !selectedProfile) {
+      setSelectedProfile(koiProfile[0].koiDiseaseProfileId);
+    }
+  }, [koiProfile]);
 
   const handleHealthRecordSubmit = (values) => {
     console.log("Health Record Submitted:", values);
   };
 
-  useEffect(() => {
-    dispatch(getFishById(fish?.koiID));
-  }, [fish, dispatch]);
+  console.log(products)
 
+  const getMedicineName = (medicineId) => {
+    const product = products?.find(p => p.productId === medicineId);
+    return product?.productName || "Không xác định";
+  };
+
+  const renderHealthCard = (profile) => {
+    const statusText = profile.status === 0 ? "Ốm" : "Khỏe mạnh";
+    const treatmentText = profile.status === 0 
+      ? `Sử dụng ${getMedicineName(profile.medicineId)} để chữa trị`
+      : "Không cần điều trị";
+
+    return (
+      <View style={styles.card}>
+        <View>
+          <Image source={{ uri: fish.image }} style={styles.cardImage} />
+        </View>
+        <View style={styles.cardContent}>
+          <Text style={styles.cardDate}>{new Date(profile.createddate).toLocaleDateString()}</Text>
+          <Text style={{ marginBottom: 5 }}>
+            Tình trạng tổng quát: {statusText}
+          </Text>
+          <Text>Điều trị: {treatmentText}</Text>
+          {profile.note && <Text>Ghi chú: {profile.note}</Text>}
+        </View>
+      </View>
+    );
+  };
 
   return (
-    <Provider>
+    <Provider locale={enUS}>
       <ImageBackground
         source={require("../../assets/koimain3.jpg")}
         style={styles.background}
@@ -52,6 +87,7 @@ const FishDetail = ({ route, navigation }) => {
           contentContainerStyle={{ paddingBottom: 20 }}
         >
           <Text style={styles.title}>Chi Tiết Cá</Text>
+          {/* Existing header section remains unchanged */}
           <View style={styles.headerContainer}>
             <View style={styles.imageContainer}>
               <Image source={{ uri: fish.image }} style={styles.fishImage} />
@@ -88,12 +124,12 @@ const FishDetail = ({ route, navigation }) => {
               </View>
             </View>
           </View>
-  
+
           {/* Condition */}
           <View style={styles.section}>
             <Text style={styles.label}>Tình trạng: Khỏe mạnh</Text>
           </View>
-  
+
           {/* Pond and Breeder Information */}
           <View style={styles.section}>
             <Text>
@@ -111,37 +147,42 @@ const FishDetail = ({ route, navigation }) => {
               .
             </Text>
           </View>
-  
+
           {/* Health Status */}
           <View style={styles.section}>
             <View style={styles.sectionHeader}>
               <Text style={styles.label}>Tình Trạng Sức Khỏe</Text>
-              <TouchableOpacity onPress={() => setHealthModalVisible(true)}>
-                <FontAwesome name="plus" size={18} color="#6497B1" />
-              </TouchableOpacity>
-              <HealthStatusForm
-                fishId={fish.koiID}
-                visible={isHealthModalVisible}
-                onClose={() => setHealthModalVisible(false)}
-                onSubmit={handleHealthRecordSubmit}
-              />
-            </View>
-            {dummyHealthStatus.map((item, index) => (
-              <View key={index} style={styles.card}>
-                <View>
-                  <Image source={fish.image} style={styles.cardImage} />
-                </View>
-                <View style={styles.cardContent}>
-                  <Text style={styles.cardDate}>{item.date}</Text>
-                  <Text style={{ marginBottom: 5 }}>
-                    Tình trạng tổng quát: {item.status === "Healthy / Sick" ? "Khỏe mạnh / Ốm" : item.status}
-                  </Text>
-                  <Text>
-                    Điều trị: {item.treatment === "No treatment needed / Use product '-----' to cure the koi" ? "Không cần điều trị / Sử dụng sản phẩm '-----' để chữa trị cho cá koi" : item.treatment}
-                  </Text>
-                </View>
+              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <TouchableOpacity onPress={() => setHealthModalVisible(true)}>
+                  <FontAwesome name="plus" size={18} color="#6497B1" style={{ marginRight: 10 }} />
+                </TouchableOpacity>
+                <Picker
+                  data={koiProfile?.map(profile => ({
+                    value: profile.koiDiseaseProfileId,
+                    label: new Date(profile.createddate).toLocaleDateString()
+                  })) || []}
+                  cols={1}
+                  value={selectedProfile}
+                  onChange={value => setSelectedProfile(value)}
+                  style={{ width: 120 }}
+                >
+                  <TouchableOpacity>
+                    <FontAwesome name="caret-down" size={18} color="#6497B1" />
+                  </TouchableOpacity>
+                </Picker>
               </View>
-            ))}
+            </View>
+            <HealthStatusForm
+              fishId={fish.koiID}
+              visible={isHealthModalVisible}
+              onClose={() => setHealthModalVisible(false)}
+              onSubmit={handleHealthRecordSubmit}
+            />
+            {koiProfile?.length > 0 ? (
+              renderHealthCard(koiProfile.find(p => p.koiDiseaseProfileId === selectedProfile) || koiProfile[0])
+            ) : (
+              <Text>Chưa có hồ sơ sức khỏe nào</Text>
+            )}
           </View>
   
           {/* Growth History */}

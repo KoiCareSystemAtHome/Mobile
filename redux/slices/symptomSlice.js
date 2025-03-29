@@ -6,6 +6,7 @@ const initialState = {
   symptomByType: null,
   symptomPredict: null,
   symptomExamination: null,
+  diseaseById:null,
 };
 
 export const symptomSlice = createSlice({
@@ -25,6 +26,9 @@ export const symptomSlice = createSlice({
     })
     .addCase(getExamination.fulfilled, (state, action) => {
       state.symptomExamination = action.payload;
+    })
+    .addCase(getDiseaseById.fulfilled, (state, action) => {
+      state.diseaseById = action.payload;
     })
     // .addCase(getRequiredParams.fulfilled, (state, action) => {
     //   state.params = action.payload;
@@ -83,6 +87,18 @@ export const getSymptomByID = createAsyncThunk(
   async (symptomId) => {
     try {
       const res = await getRequest(`Symptom/get-symptom/${symptomId}`);
+      return res.data;
+    } catch (error) {
+      Alert.alert("Error", "Failed to load symptom data.");
+    }
+  }
+);
+
+export const getDiseaseById = createAsyncThunk(
+  "symptomSlice/getDiseaseById",
+  async (id) => {
+    try {
+      const res = await getRequest(`Diseases/${id}`);
       return res.data;
     } catch (error) {
       Alert.alert("Error", "Failed to load symptom data.");

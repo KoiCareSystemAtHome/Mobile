@@ -61,7 +61,7 @@ const PredictSymptom = ({ route }) => {
   const handleCreateProfile = () => {
     const symptomsData = selectedValues.map(symptomId => ({
       symptomID: symptomId,
-      value: "string"
+      value: "True"
     }));
 
     navigation.navigate('CreateKoiProfile', {

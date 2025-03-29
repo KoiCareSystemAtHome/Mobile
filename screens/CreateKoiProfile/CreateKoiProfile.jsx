@@ -10,15 +10,17 @@ import AntDesign from "react-native-vector-icons/AntDesign";
 import { styles } from "./styles";
 import { createKoiProfile, getFishByOwner } from "../../redux/slices/fishSlice";
 import { useDispatch, useSelector } from "react-redux";
-import { fishByOwnerSelector } from "../../redux/selector";
+import { diseaseByIdSelector, fishByOwnerSelector } from "../../redux/selector";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Picker, DatePicker, Provider } from "@ant-design/react-native";
 import enUS from "@ant-design/react-native/lib/locale-provider/en_US";
+import { getDiseaseById } from "../../redux/slices/symptomSlice";
 
 const CreateKoiProfile = ({ route, navigation }) => {
   const { diseaseId, symptoms } = route.params;
   const dispatch = useDispatch();
   const fishByOwner = useSelector(fishByOwnerSelector);
+  const diseaseById = useSelector(diseaseByIdSelector);
   const [isLoggedIn, setIsLoggedIn] = useState(null);
   const [selectedFishId, setSelectedFishId] = useState("");
   const [note, setNote] = useState("");
@@ -53,6 +55,7 @@ const CreateKoiProfile = ({ route, navigation }) => {
     if (isLoggedIn?.id) {
       dispatch(getFishByOwner(isLoggedIn.id));
     }
+    dispatch(getDiseaseById(diseaseId))
   }, [isLoggedIn?.id, dispatch]);
 
   const handleDatePickerChange = (date) => {
@@ -70,8 +73,8 @@ const CreateKoiProfile = ({ route, navigation }) => {
       endDate: endDate.toISOString(),
       note,
       diseaseId,
-      status:1,
-      medicineId: "7a111134-941b-49f1-8657-f487562349e7",
+      status:"Pending",
+      medicineId: "74ed7d14-c451-4fa3-a039-6931de98101a",
       symptoms
     };
     console.log("Saving profile with values:", values);
@@ -85,6 +88,7 @@ const CreateKoiProfile = ({ route, navigation }) => {
       label: fish.name
     })) || [])
   ];
+
 
   return (
     <Provider locale={enUS}>

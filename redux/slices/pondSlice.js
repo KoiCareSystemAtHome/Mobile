@@ -78,11 +78,12 @@ export const createPond = createAsyncThunk(
 );
 
 export const updatePond = createAsyncThunk(
-  "testSlice/updatePond",
+  "pondSlice/updatePond",
   async (payload, { rejectWithValue }) => {
     try {
+      console.log("a",payload)
       const res = await putRequest(`Pond/update-pond`, payload);
-      return res.data;
+      return res.data
     } catch (error) {
       return rejectWithValue("Update failed");
     }

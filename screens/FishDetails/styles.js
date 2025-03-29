@@ -30,8 +30,8 @@ export const styles = StyleSheet.create({
     resizeMode: "cover",
   },
   cardImage: {
-    height: 100,
-    width: 100,
+    height: 150,
+    width: 150,
     borderTopLeftRadius: 8,
     borderBottomLeftRadius: 8,
   },

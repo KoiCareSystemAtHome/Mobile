@@ -128,25 +128,46 @@ const PondDetail = ({ navigation, route }) => {
   };
 
   const onFinish = (values) => {
-
     const pondID = pondById?.pondID;
-    const name = pondById?.name;
-    const image = pondById?.image;
+    const name = values.name;
+    const image = uploadResponse;
     const createDate = pondById?.createDate;
     const ownerId = pondById?.ownerId;
+  
+    // Create requirementPondParam array from pondParameters
+    const requirementPondParam = pondById?.pondParameters?.flatMap(param =>
+      param.valueInfors.map(valueInfo => ({
+        historyId: param.parameterUnitID,
+        value: valueInfo.value
+      }))
+    ) || [];
+  
     setModalVisible(false);
+    
     const updatedPond = {
       pondID,
       name,
       image,
       createDate,
       ownerId,
+      maxVolume: 1,
+      requirementPondParam
     };
-        dispatch(updatePond(updatedPond));
-        setModalVisible(false);
-        navigation.navigate("PondStatistic")
+    
+    console.log(updatedPond);
+    
+    dispatch(updatePond(updatedPond))
+      .unwrap()
+      .then((res) => {
+        console.log(res);
+      })
+      .catch((error) => {
+        console.error('Failed to update pond:', error);
+      });
+      
+    setModalVisible(false);
+    navigation.goBack();
   };
-console.log(pondById)
   return (
     <Provider>
     <ImageBackground

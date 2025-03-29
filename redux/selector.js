@@ -10,6 +10,7 @@ export const userSelector = (state) => state.pondSlice.user;
 // Fish Selectors
 export const fishByOwnerSelector = (state) => state.fishSlice.fishByOwner;
 export const fishByIdSelector = (state) => state.fishSlice.fishById;
+export const profileByFishSelector = (state) => state.fishSlice.profileByFish;
 
 // Product Selectors
 export const productSelector = (state) => state.productSlice.product;
@@ -35,6 +36,7 @@ export const instructionSelector = (state) => state.calculatorSlice.instructions
 export const symptomByTypeSelector = (state) => state.symptomSlice.symptomByType;
 export const symptomPredictionSelector = (state) => state.symptomSlice.symptomPredict;
 export const symptomExaminationSelector = (state) => state.symptomSlice.symptomExamination;
+export const diseaseByIdSelector = (state) => state.symptomSlice.diseaseById;
 
 // Blog Selectors
 export const approvedBlogsSelector = (state) => state.blogSlice.approvedBlogs;

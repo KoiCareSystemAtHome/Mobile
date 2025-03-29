@@ -4,7 +4,8 @@ import { Alert } from "react-native";
 
 const initialState = {
   fishByOwner: null,
-  fishById:null
+  fishById:null,
+  profileByFish: null
 };
 
 export const fishSlice = createSlice({
@@ -21,6 +22,9 @@ export const fishSlice = createSlice({
     })
     .addCase(getFishById.fulfilled, (state, action) => {
       state.fishById = action.payload;
+    })
+    .addCase(getKoiProfile.fulfilled, (state, action) => {
+      state.profileByFish = action.payload;
     })
   },
 });
@@ -73,11 +77,24 @@ export const updateFish = createAsyncThunk(
   }
 );
 
+export const getKoiProfile = createAsyncThunk(
+  "fishSlice/createKoiProfile",
+  async (fishId, { rejectWithValue }) => {
+    try {
+      const res = await getRequest(`KoiProfile/fish?fishId=${fishId}`);
+      return res.data;
+    } catch (error) {
+      console.log(error)
+    }
+  }
+);
+
 export const createKoiProfile = createAsyncThunk(
   "fishSlice/createKoiProfile",
   async (payload, { rejectWithValue }) => {
     try {
       const res = await postRequest(`KoiProfile/create`, payload);
+      console.log(res.data)
       return res.data;
     } catch (error) {
       console.log(error)
