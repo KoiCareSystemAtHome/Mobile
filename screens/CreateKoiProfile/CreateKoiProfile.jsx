@@ -82,7 +82,7 @@ const CreateKoiProfile = ({ route, navigation }) => {
   };
 
   const fishData = [
-    { value: "", label: "Select a fish" },
+    { value: "", label: "Chọn con cá đang gặp vấn đề" },
     ...(fishByOwner?.map(fish => ({
       value: fish.koiID,
       label: fish.name
@@ -104,7 +104,7 @@ const CreateKoiProfile = ({ route, navigation }) => {
           <TouchableOpacity onPress={() => navigation.goBack()}>
             <AntDesign name="left" size={24} color="black" />
           </TouchableOpacity>
-          <Text style={styles.title}>Create Koi Profile</Text>
+          <Text style={styles.title}>Lịch sử bệnh cá</Text>
           <View style={{ width: 24 }} />
         </View>
 
@@ -112,7 +112,7 @@ const CreateKoiProfile = ({ route, navigation }) => {
         <View style={styles.formContainer}>
           {/* Fish Selection */}
           <View style={styles.inputContainer}>
-            <Text style={styles.label}>Select Koi Fish</Text>
+            <Text style={styles.label}>Tên cá koi:</Text>
             <Picker
               data={fishData}
               cols={1}
@@ -121,7 +121,7 @@ const CreateKoiProfile = ({ route, navigation }) => {
             >
               <TouchableOpacity style={styles.pickerContainer}>
                 <Text style={styles.pickerText}>
-                  {fishData.find(fish => fish.value === selectedFishId)?.label || "Select a fish"}
+                  {fishData.find(fish => fish.value === selectedFishId)?.label || "Chọn con cá đang gặp vấn đề"}
                 </Text>
                 <AntDesign name="down" size={16} color="#000" />
               </TouchableOpacity>
@@ -130,7 +130,7 @@ const CreateKoiProfile = ({ route, navigation }) => {
 
           {/* End Date Picker */}
           <View style={styles.inputContainer}>
-            <Text style={styles.label}>End Date</Text>
+            <Text style={styles.label}>Ngày hết điều trị (dự kiến)</Text>
             <DatePicker
               value={endDate}
               mode="date"
@@ -158,12 +158,12 @@ const CreateKoiProfile = ({ route, navigation }) => {
 
           {/* Note Input */}
           <View style={styles.inputContainer}>
-            <Text style={styles.label}>Note</Text>
+            <Text style={styles.label}>Ghi chú</Text>
             <TextInput
               style={styles.textInput}
               value={note}
               onChangeText={setNote}
-              placeholder="Enter notes here..."
+              placeholder="Thêm thông tin ghi chú về thuốc và thức ăn để chăm sóc cá của bạn tốt hơn"
               multiline
               numberOfLines={4}
             />
@@ -174,7 +174,7 @@ const CreateKoiProfile = ({ route, navigation }) => {
             style={styles.submitButton}
             onPress={handleSave}
           >
-            <Text style={styles.submitButtonText}>Save Profile</Text>
+            <Text style={styles.submitButtonText}>Lưu</Text>
           </TouchableOpacity>
         </View>
       </ImageBackground>

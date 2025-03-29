@@ -93,7 +93,7 @@ const SaltCalculator = ({ navigation }) => { // Added navigation prop
     >
       <View style={styles.overlay} />
       <ScrollView contentContainerStyle={styles.scrollContainer}>
-        <Text style={styles.title}>Salt Calculator</Text>
+        <Text style={styles.title}>Ước tính lượng muối</Text>
 
         <View style={styles.selectorContainer}>
           <TouchableOpacity
@@ -101,7 +101,7 @@ const SaltCalculator = ({ navigation }) => { // Added navigation prop
             style={styles.selector}
           >
             <Text style={styles.selectorText}>
-              {homePond ? homePond?.name : "Select a Pond"}
+              {homePond ? homePond?.name : "Vui lòng chọn hồ"}
             </Text>
             <Icon name="down" size={16} color="#000" />
           </TouchableOpacity>
@@ -125,13 +125,13 @@ const SaltCalculator = ({ navigation }) => { // Added navigation prop
 
         <View style={styles.card}>
           <Text style={styles.label}>
-            Pond volume: <Text style={styles.value}>{pondVolume}L</Text>
+            Thể tích hồ: <Text style={styles.value}>{pondVolume}L</Text>
           </Text>
         </View>
 
         {/* Desired Concentration */}
         <View style={styles.card}>
-          <Text style={styles.label}>Desired Concentration: </Text>
+          <Text style={styles.label}>Nồng độ mong muốn: </Text>
           <View style={styles.toggleContainer}>
             {growthOptions.map((option) => (
               <TouchableOpacity
@@ -157,7 +157,7 @@ const SaltCalculator = ({ navigation }) => { // Added navigation prop
 
         <View style={styles.card}>
           <Text style={styles.label}>
-            Water change:{" "}
+            Lượng nước sẽ thay:{" "}
             <Text style={styles.value}>
               {previewValue}L ({((previewValue / pondVolume) * 100).toFixed(0)}
               %)
@@ -180,16 +180,16 @@ const SaltCalculator = ({ navigation }) => { // Added navigation prop
         {/* Salt Amount Display */}
         <View style={styles.saltBox}>
           <Text style={styles.saltText}>
-            Amount of current salt: {saltData?.saltCurrent}kg
+            Lượng muối hiện tại: {saltData?.saltCurrent}kg
           </Text>
           <Text style={styles.saltText}>
-            Amount of salt needed: {saltData?.saltNeeded}kg
+            Lượng muối cần thiết: {saltData?.saltNeeded}kg
           </Text>
           <Text style={styles.saltText}>
-            Total salt: {saltData?.totalSalt}kg
+            Tổng muối: {saltData?.totalSalt}kg
           </Text>
           <Text style={styles.saltText}>
-            Water needed: {saltData?.waterNeeded}L
+            Lượng nước cần thiết: {saltData?.waterNeeded}L
           </Text>
         </View>
         {instructionData?.instructions && (
@@ -223,7 +223,7 @@ const SaltCalculator = ({ navigation }) => { // Added navigation prop
         }}
         disabled={!homePond} // Disable the button if homePond is null
       >
-        <Text style={styles.nextButtonText}>Next</Text>
+        <Text style={styles.nextButtonText}>Tiếp theo</Text>
       </TouchableOpacity>
     </ImageBackground>
   );

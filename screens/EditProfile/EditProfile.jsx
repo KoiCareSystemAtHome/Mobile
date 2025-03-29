@@ -36,7 +36,7 @@ const EditProfile = () => {
       <View style={styles.overlay} />
       <View style={styles.container}>
         <View style={styles.header}>
-          <Text style={styles.title}>Edit Profile</Text>
+          <Text style={styles.title}>Hồ sơ cá nhân</Text>
         </View>
         <Form
           form={form}
@@ -45,7 +45,7 @@ const EditProfile = () => {
           style={styles.formContainer}
         >
           <Form.Item name="name" initialValue={isLoggedIn?.name} noStyle>
-            <Input placeholder="Full name" style={styles.inputField} />
+            <Input placeholder="Họ và tên" style={styles.inputField} />
           </Form.Item>
 
           <Form.Item
@@ -61,16 +61,15 @@ const EditProfile = () => {
             />
           </Form.Item>
 
-          <Form.Item name="gender" initialValue="Male" noStyle>
-            <Input placeholder="Gender" style={styles.inputField} />
+          <Form.Item name="gender" noStyle>
+            <Input placeholder="Giới tính" style={styles.inputField} />
           </Form.Item>
 
           <Form.Item
             name="address"
-            initialValue="45 New Avenue, New York"
             noStyle
           >
-            <Input placeholder="Address" style={styles.inputField} />
+            <Input placeholder="Nhập địa chỉ của bạn" style={styles.inputField} />
           </Form.Item>
 
           {/* Submit Button */}
@@ -79,7 +78,7 @@ const EditProfile = () => {
             style={styles.submitButton}
             onPress={() => form.submit()}
           >
-            <Text style={styles.submitButtonText}>SUBMIT</Text>
+            <Text style={styles.submitButtonText}>Lưu</Text>
           </Button>
         </Form>
       </View>
