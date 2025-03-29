@@ -115,7 +115,7 @@ const PredictSymptom = ({ route }) => {
             style={styles.createButton}
             onPress={handleCreateProfile}
           >
-            <Text style={styles.createButtonText}>Create Profile</Text>
+            <Text style={styles.createButtonText}>Lưu lịch sử bệnh</Text>
           </TouchableOpacity>
         )}
       </View>

@@ -99,12 +99,12 @@ const ProductDetail = ({ navigation }) => {
         >
           <View style={styles.buttonContent}>
             <AntDesign name="shoppingcart" size={18} color="#fff" />
-            <Text style={styles.buttonText}> Add to cart</Text>
+            <Text style={styles.buttonText}> Thêm vào giỏ</Text>
           </View>
         </Button>
       </View>
       <View style={styles.feedbackSection}>
-        <Text style={styles.feedbackTitle}>Customer Reviews</Text>
+        <Text style={styles.feedbackTitle}>Đánh giá sản phẩm</Text>
         {feedbacks.length > 0 ? (
           <FlatList
             data={feedbacks}
@@ -112,7 +112,7 @@ const ProductDetail = ({ navigation }) => {
             keyExtractor={(item) => item.feedbackId}
           />
         ) : (
-          <Text style={styles.noFeedbackText}>No reviews yet</Text>
+          <Text style={styles.noFeedbackText}>Chưa có đánh giá</Text>
         )}
       </View>
     </View>

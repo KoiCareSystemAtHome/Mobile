@@ -31,7 +31,7 @@ const LoginScreen = ({ navigation }) => {
       .unwrap()
       .then(async (response) => {
         if (response?.user?.status === "Active") {
-          Toast.success("Login Successful");
+          Toast.success("Đăng nhập thành công");
           await AsyncStorage.setItem("accessToken", response?.token);
           await AsyncStorage.setItem("user", JSON.stringify(response?.user));
           setTimeout(() => {
@@ -77,18 +77,18 @@ const LoginScreen = ({ navigation }) => {
       >
         <View style={styles.overlay} />
         <View style={styles.container}>
-          <Text style={styles.title}>Login</Text>
+          <Text style={styles.title}>Đăng nhập</Text>
           <Text style={styles.terms}>
-            By signing in you are agreeing to our{" "}
-            <Text style={styles.link}>Term and privacy policy</Text>
+          Khi đăng nhập hệ thống, bạn đồng ý vớir{" "}
+            <Text style={styles.link}>Điều khoản và chính sách bảo mật</Text>
           </Text>
 
           <View style={styles.tabs}>
             <TouchableOpacity onPress={() => navigation.navigate("Login")}>
-              <Text style={[styles.tab, styles.activeTab]}>Login</Text>
+              <Text style={[styles.tab, styles.activeTab]}>Đăng nhập</Text>
             </TouchableOpacity>
             <TouchableOpacity onPress={() => navigation.navigate("Register")}>
-              <Text style={styles.tab}>Register</Text>
+              <Text style={styles.tab}>Đăng ký</Text>
             </TouchableOpacity>
           </View>
           <Form
@@ -100,7 +100,7 @@ const LoginScreen = ({ navigation }) => {
             <View style={styles.inputContainer}>
               <Form.Item name="username" noStyle>
                 <Input
-                  placeholder="Email Address"
+                  placeholder="Email"
                   style={styles.input}
                   placeholderTextColor="#C4C4C4"
                 />
@@ -110,7 +110,7 @@ const LoginScreen = ({ navigation }) => {
             <View style={styles.inputContainer}>
               <Form.Item name="password" noStyle>
                 <Input
-                  placeholder="Password"
+                  placeholder="Mật khẩu"
                   secureTextEntry={!showPassword} // Toggle visibility based on state
                   style={styles.input}
                   placeholderTextColor="#C4C4C4"
@@ -129,12 +129,10 @@ const LoginScreen = ({ navigation }) => {
             </View>
 
             <View style={styles.row}>
-              <Text style={styles.remember}>Remember password</Text>
               <TouchableOpacity>
-                <Text style={styles.forgot}>Forget password</Text>
+                <Text style={styles.forgot}>Quên mật khẩu?</Text>
               </TouchableOpacity>
-            </View>
-            <View style={styles.row}>
+            
               <TouchableOpacity>
                 <Text
                   style={styles.forgot}
@@ -142,31 +140,17 @@ const LoginScreen = ({ navigation }) => {
                     navigation.navigate("MainTabs");
                   }}
                 >
-                  Log in as guest?
+                  Bỏ qua  
                 </Text>
-              </TouchableOpacity>
+              </TouchableOpacity>  
             </View>
 
             <Button style={styles.loginButton} onPress={onSubmit}>
-              <Text style={styles.loginText}>Login</Text>
+              <Text style={styles.loginText}>Đăng nhập</Text>
             </Button>
           </Form>
-          <Text style={styles.connectText}>or connect with</Text>
-
-          <View style={styles.socialContainer}>
-            <TouchableOpacity>
-              <Image
-                source={require("../../assets/facebook 1.png")}
-                style={styles.socialIcon}
-              />
-            </TouchableOpacity>
-            <TouchableOpacity>
-              <Image
-                source={require("../../assets/google-icon-2048x2048-czn3g8x8 1.png")}
-                style={styles.socialIcon}
-              />
-            </TouchableOpacity>
-          </View>
+          
+          
         </View>
       </ImageBackground>
     </Provider>

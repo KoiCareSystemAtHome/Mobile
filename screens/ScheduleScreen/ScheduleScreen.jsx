@@ -146,12 +146,13 @@ const ScheduleScreen = ({ navigation }) => {
         <TouchableOpacity onPress={() => navigation.goBack()}>
           <Text style={styles.headerIcon}>{leftArrowIcon}</Text>
         </TouchableOpacity>
+        <Text style={styles.headerIcon}>Lịch trình</Text>
         <View style={styles.headerIcons}>
           <TouchableOpacity>
-            <Text style={styles.headerIcon}>{searchIcon}</Text>
+            <Text style={styles.headerIcon}>{}</Text>
           </TouchableOpacity>
           <TouchableOpacity>
-            <Text style={styles.headerIcon}>{settingsIcon}</Text>
+            <Text style={styles.headerIcon}>{}</Text>
           </TouchableOpacity>
         </View>
       </View>

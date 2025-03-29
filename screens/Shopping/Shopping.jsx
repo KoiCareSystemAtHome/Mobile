@@ -161,14 +161,7 @@ const Shopping = ({ navigation }) => {
             <Text style={styles.productName}>{item.productName}</Text>
             {item?.shop && <Text style={styles.productName}>{item.shop}</Text>}
             <Text style={styles.productPrice}>{item.price} VND</Text>
-            <TouchableOpacity
-              style={styles.addToCartButton}
-              onPress={() => {
-                navigation.navigate("ProductDetail", { product: item });
-              }}
-            >
-              <Text style={styles.addToCartText}>Thêm vào giỏ</Text>
-            </TouchableOpacity>
+            
           </TouchableOpacity>
         )}
       />

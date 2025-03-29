@@ -20,23 +20,23 @@ const RegisterScreen = ({ navigation }) => {
     >
       <View style={styles.overlay} />
       <View style={styles.container}>
-        <Text style={styles.title}>Register</Text>
+        <Text style={styles.title}>Đăng ký</Text>
         <Text style={styles.terms}>
-          By signing in you are agreeing to our{' '}
-          <Text style={styles.link}>Term and privacy policy</Text>
+          Khi đăng nhập hệ thống, bạn đồng ý với{' '}
+          <Text style={styles.link}>Điều khoản và chính sách bảo mật</Text>
         </Text>
 
         <View style={styles.tabs}>
           <TouchableOpacity onPress={() => navigation.navigate('Login')}>
-            <Text style={styles.tab}>Login</Text>
+            <Text style={styles.tab}>Đăng nhập</Text>
           </TouchableOpacity>
           <TouchableOpacity onPress={() => navigation.navigate('Register')}>
-            <Text style={[styles.tab, styles.activeTab]}>Register</Text>
+            <Text style={[styles.tab, styles.activeTab]}>Đăng ký</Text>
           </TouchableOpacity>
         </View>
         <View style={styles.inputContainer}>
           <TextInput
-            placeholder="Username"
+            placeholder="Họ và tên"
             style={styles.input}
             placeholderTextColor="#C4C4C4"
           />
@@ -47,7 +47,7 @@ const RegisterScreen = ({ navigation }) => {
         </View>
         <View style={styles.inputContainer}>
           <TextInput
-            placeholder="Email Address"
+            placeholder="Email"
             style={styles.input}
             placeholderTextColor="#C4C4C4"
           />
@@ -59,7 +59,7 @@ const RegisterScreen = ({ navigation }) => {
 
         <View style={styles.inputContainer}>
           <TextInput
-            placeholder="Password"
+            placeholder="Mật khẩu"
             secureTextEntry
             style={styles.input}
             placeholderTextColor="#C4C4C4"
@@ -71,7 +71,7 @@ const RegisterScreen = ({ navigation }) => {
         </View>
         <View style={styles.inputContainer}>
           <TextInput
-            placeholder="Confirm Password"
+            placeholder="Nhập lại mật khẩu"
             secureTextEntry
             style={styles.input}
             placeholderTextColor="#C4C4C4"
@@ -84,32 +84,20 @@ const RegisterScreen = ({ navigation }) => {
 
         <View style={styles.row}>
           {/* <CheckBox value={true} /> */}
-          <Text style={styles.remember}>Remember password</Text>
+          <Text style={styles.remember}>
+            {/* Remember password */}
+            </Text>
           <TouchableOpacity>
-            <Text style={styles.forgot}>Forget password</Text>
+            <Text style={styles.forgot}>Quên mật khẩu?</Text>
           </TouchableOpacity>
         </View>
 
         <TouchableOpacity style={styles.loginButton}>
-          <Text style={styles.loginText}>Login</Text>
+          <Text style={styles.loginText}>Đăng ký</Text>
         </TouchableOpacity>
 
-        <Text style={styles.connectText}>or connect with</Text>
-
-        <View style={styles.socialContainer}>
-          <TouchableOpacity>
-            <Image
-              source={require('../../assets/facebook 1.png')}
-              style={styles.socialIcon}
-            />
-          </TouchableOpacity>
-          <TouchableOpacity>
-            <Image
-              source={require('../../assets/google-icon-2048x2048-czn3g8x8 1.png')}
-              style={styles.socialIcon}
-            />
-          </TouchableOpacity>
-        </View>
+       
+        
       </View>
     </ImageBackground>
   );
