@@ -44,6 +44,7 @@ import ReminderDetail from './screens/ScheduleScreen/ReminderDetail/ReminderDeta
 import TransactionScreen from './screens/TransactionScreen/TransactionScreen';
 import PackageScreen from './screens/PackageScreen/PackageScreen';
 import FAQScreen from './screens/FAQ/faq';
+import OTPScreen from './screens/OTPScreen/OTPScreen';
 
 
 
@@ -127,6 +128,11 @@ export default function App() {
           <Stack.Screen
             name="Register"
             component={RegisterScreen}
+            options={{ headerShown: false }}
+          />
+          <Stack.Screen
+            name="OTP"
+            component={OTPScreen}
             options={{ headerShown: false }}
           />
           <Stack.Screen

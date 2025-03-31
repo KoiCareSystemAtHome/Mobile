@@ -14,7 +14,7 @@ import FontAwesome from "react-native-vector-icons/FontAwesome";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { styles } from "./styles";
 import { useDispatch, useSelector } from "react-redux";
-import { createOrder } from "../../redux/slices/ghnSlice";
+import { createOrder, updateOrderStatus } from "../../redux/slices/ghnSlice";
 import { loadAsync } from "expo-font";
 import { getWallet } from "../../redux/slices/authSlice";
 import { walletSelector } from "../../redux/selector";
@@ -30,9 +30,8 @@ const CartScreen = ({ navigation }) => {
   const [fontLoaded, setFontLoaded] = useState(false);
   const [address, setAddress] = useState(null);
   const [paymentMethod, setPaymentMethod] = useState("COD"); // Default to COD
-  const shippingCost = 8.0;
   const tax = 0.0;
-  const total = subtotal + shippingCost + tax;
+  const total = subtotal;
 
   const radioButtons = [
     {
@@ -135,53 +134,60 @@ const CartScreen = ({ navigation }) => {
       paymentMethod: paymentMethod,
     };
 
-    if (paymentMethod === "Online Banking") {
-      if (walletData?.amount < total) {
-        Toast.fail("Insufficient wallet balance");
-        return;
-      }
-
-      dispatch(createOrder(order))
-        .unwrap()
-        .then(async (res) => {
-          const orderIds = res.map((item) => item.message);
-          const email = isLoggedIn?.email
-          const values = {email, orderIds}
-          dispatch(payOrder(values))
-          .unwrap()
-          .then((res)=>{
-            dispatch(getWallet(isLoggedIn?.id))
-          })
-          Toast.success("Order Paid Successfully");
-          await AsyncStorage.removeItem("cart");
-          setTimeout(() => {
-            navigation.navigate("Shopping");
-          }, 2000);
-        })
-        .catch((error) => {
-          Toast.fail("Failed to pay order");
-          console.error(error);
-        });
+    if (address === null) {
+      Toast.fail("Please select an address");
     } else {
-      dispatch(createOrder(order))
-        .unwrap()
-        .then(async (res) => {
-          Toast.success("Order Created Successfully");
-          await AsyncStorage.removeItem("cart");
-          setTimeout(() => {
-            navigation.navigate("Shopping");
-          }, 2000);
-        })
-        .catch((error) => {
-          Toast.fail("Failed to create order");
-          console.error(error);
-        });
-    }
-  };
+      if (paymentMethod === "Online Banking") {
+        if (walletData?.amount < total) {
+          Toast.fail("Insufficient wallet balance");
+          return;
+        }
 
-  const onPressRadioButton = (updatedRadioButtons) => {
-    console.log(updatedRadioButtons);
-    setPaymentMethod(updatedRadioButtons);
+        dispatch(createOrder(order))
+          .unwrap()
+          .then(async (res) => {
+            const orderIds = res.map((item) => item.message);
+            const email = isLoggedIn?.email;
+            const values = { email, orderIds };
+            dispatch(payOrder(values))
+              .unwrap()
+              .then((res) => {
+                if (!res) {
+                  Toast.fail("Failed to pay order");
+                } else {
+                  dispatch(getWallet(isLoggedIn?.id));
+                  Toast.success("Order Paid Successfully");
+                  AsyncStorage.removeItem("cart");
+                  setTimeout(() => {
+                    navigation.navigate("Shopping");
+                  }, 2000);
+                }
+              });
+          })
+
+          .catch((error) => {
+            Toast.fail("Failed to pay order");
+            console.error(error);
+          });
+      } else {
+        dispatch(createOrder(order))
+          .unwrap()
+          .then(async (res) => {
+            if (res !== undefined) {
+              Toast.success("Order Created Successfully");
+              await AsyncStorage.removeItem("cart");
+              setTimeout(() => {
+                navigation.navigate("Shopping");
+              }, 2000);
+            } else {
+            }
+          })
+          .catch((error) => {
+            Toast.fail("Failed to create order");
+            console.error(error);
+          });
+      }
+    }
   };
 
   if (!fontLoaded) {
@@ -205,14 +211,14 @@ const CartScreen = ({ navigation }) => {
             <FontAwesome name="bell" size={24} color="black" />
           </TouchableOpacity>
         </View>
-  
+
         {/* Wallet Amount */}
         <View style={styles.walletContainer}>
           <Text style={styles.walletText}>
             Số dư ví: {walletData?.amount?.toFixed(2) || "0.00"} VND
           </Text>
         </View>
-  
+
         {address ? (
           <View style={styles.addressInfo}>
             <Text>{`${address.provinceName}, ${address.districtName}, ${address.wardName}`}</Text>
@@ -230,7 +236,7 @@ const CartScreen = ({ navigation }) => {
             </View>
           </TouchableOpacity>
         )}
-  
+
         {/* Cart Items */}
         <FlatList
           data={cart}
@@ -268,27 +274,20 @@ const CartScreen = ({ navigation }) => {
             </View>
           )}
         />
-  
+
         {/* Order Summary */}
         <View style={styles.summaryContainer}>
           <Text style={styles.summaryText}>Tổng phụ</Text>
-          <Text style={styles.summaryPrice}>{`${subtotal.toFixed(2)} VND`}</Text>
-        </View>
-        <View style={styles.summaryContainer}>
-          <Text style={styles.summaryText}>Phí vận chuyển</Text>
-          <Text style={styles.summaryPrice}>{`${shippingCost.toFixed(
+          <Text style={styles.summaryPrice}>{`${subtotal.toFixed(
             2
           )} VND`}</Text>
         </View>
-        <View style={styles.summaryContainer}>
-          <Text style={styles.summaryText}>Thuế</Text>
-          <Text style={styles.summaryPrice}>{`${tax.toFixed(2)} VND`}</Text>
-        </View>
+
         <View style={styles.summaryContainer}>
           <Text style={styles.totalText}>Tổng cộng</Text>
           <Text style={styles.totalPrice}>{`${total.toFixed(2)} VND`}</Text>
         </View>
-  
+
         {/* Payment Method Selection */}
         <View style={styles.paymentMethodContainer}>
           <Text style={styles.paymentMethodLabel}>Phương thức thanh toán:</Text>
@@ -311,7 +310,7 @@ const CartScreen = ({ navigation }) => {
             containerStyle={styles.radioGroup}
           />
         </View>
-  
+
         {/* Checkout Button */}
         <Button
           type="primary"

@@ -126,7 +126,31 @@ export const createOrder = createAsyncThunk(
       const res = await postRequest(`Order/create`, values);
       return res.data;
     } catch (error) {
-      Alert.alert("Error", "Failed to load category data.");
+      console.log(error)
+    }
+  }
+);
+
+export const updateShipType = createAsyncThunk(
+  "ghnSlice/updateShipType",
+  async (values) => {
+    try {
+      const res = await putRequest(`Order/updateOrderShipType`, values);
+      return res.data;
+    } catch (error) {
+      console.log(error)
+    }
+  }
+);
+
+export const updateOrderStatus = createAsyncThunk(
+  "ghnSlice/updateOrderStatus",
+  async (values) => {
+    try {
+      const res = await postRequest(`Order/updateOrderStatus`, values);
+      return res.data;
+    } catch (error) {
+      console.log(error)
     }
   }
 );

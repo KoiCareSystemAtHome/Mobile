@@ -4,13 +4,11 @@ import {
   ImageBackground,
   ScrollView,
   Text,
-  TouchableOpacity,
   View,
 } from "react-native";
 import { styles } from "./styles";
 import { useRoute } from "@react-navigation/native";
 import {
-  getOrderByAccount,
   getOrderDetail,
   getOrderTracking,
 } from "../../redux/slices/ghnSlice";
@@ -68,7 +66,7 @@ const OrderTracking = () => {
         });
     }
   }, [dispatch, orderDetail]);
-  console.log(orderTrack?.status);
+
   return (
     <Provider>
       <ImageBackground
@@ -115,7 +113,7 @@ const OrderTracking = () => {
                   progress >= 0 && styles.stepTextActive,
                 ]}
               >
-                Đã vận chuyển
+                Đã xác nhận
               </Text>
               <Text
                 style={[

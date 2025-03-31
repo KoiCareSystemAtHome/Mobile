@@ -23,7 +23,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import enUS from "@ant-design/react-native/lib/locale-provider/en_US";
 import { pondByOwnerSelector } from "../../../redux/selector";
 import { getImage } from "../../../redux/slices/authSlice";
-import { createFish } from "../../../redux/slices/fishSlice";
+import { createFish, getFishByOwner } from "../../../redux/slices/fishSlice";
 import { styles } from "./styles";
 
 const AddFish = ({ navigation }) => {
@@ -124,9 +124,8 @@ const AddFish = ({ navigation }) => {
       .then((response) => {
         if (response?.status === "201") {
           Toast.success("Fish Added Successfully");
-          dispatch(getFishByOwner(isLoggedIn.id));
+          dispatch(getFishByOwner(isLoggedIn?.id));
           form.resetFields();
-          setInPondSince(new Date());
           navigation.goBack();
         } else {
           Toast.fail("Failed to add fish");

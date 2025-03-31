@@ -63,7 +63,17 @@ const WaterParameter = () => {
       ownerId,
       requirementPondParam,
     };
-    dispatch(updatePond(updatedPond));
+    dispatch(updatePond(updatedPond))
+      .unwrap()
+      .then(() => {
+        dispatch(getRequiredParams());
+        dispatch(getPondByOwner(isLoggedIn.id))
+        dispatch(getPondByID(homePond?.pondID))
+          .unwrap()
+          .then((response) => {
+            setSelectedPond(response);
+          });
+      });
     setModalVisible(false);
   };
 
@@ -248,12 +258,12 @@ const WaterParameter = () => {
             </View>
           </ScrollView>
         </Modal>
-            <TouchableOpacity
-              style={styles.changeButton}
-              onPress={handleChangeParameters}
-            >
-              <Text style={styles.changeButtonText}>Add Parameters</Text>
-            </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.changeButton}
+          onPress={handleChangeParameters}
+        >
+          <Text style={styles.changeButtonText}>Add Parameters</Text>
+        </TouchableOpacity>
       </ImageBackground>
     </Provider>
   );

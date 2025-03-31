@@ -1,5 +1,12 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { getRequest, postRequest, postRequestFormData, postRequestMultipartFormData } from "../../services/httpMethods";
+import {
+  getRequest,
+  postRequest,
+  postRequestFormData,
+  postRequestMultipartFormData,
+  postRequestParams,
+  putRequest,
+} from "../../services/httpMethods";
 import { Alert } from "react-native";
 import { handleLogin } from "../../axios/axiosInterceptor";
 
@@ -44,11 +51,12 @@ export const getWallet = createAsyncThunk(
 
 export const register = createAsyncThunk(
   "authSlice/register",
-  async (credentials, { rejectWithValue }) => {
+  async (values, { rejectWithValue }) => {
     try {
+      console.log(values);
       const response = await postRequest(
-        "authentication/register",
-        credentials
+        `Account/register?Email=${values.Email}&UserName=${values.UserName}&Name=${values.Name}&Password=${values.Password}&Role=${values.Role}&Gender=${values.Gender}&Address=${values.Address}`,
+        values
       );
       return response.data;
     } catch (error) {
@@ -58,12 +66,46 @@ export const register = createAsyncThunk(
   }
 );
 
+export const activateAccount = createAsyncThunk(
+  "authSlice/login",
+  async (credentials, { rejectWithValue }) => {
+    try {
+      console.log(credentials)
+      const response = await putRequest(
+        `Account/activate?email=${credentials.email}&code=${credentials.otp}`
+      );
+   
+      return response.data;
+    } catch (error) {
+      Alert.alert("Error", "Login failed. Please try again.");
+      return rejectWithValue("Login failed");
+    }
+  }
+);
+
+export const resendCode = createAsyncThunk(
+  "authSlice/resendCode",
+  async (credentials, { rejectWithValue }) => {
+    try {
+      console.log(credentials)
+      const response = await putRequest(
+        `Account/resend-code?email=${credentials.email}`
+      );
+
+      return response.data;
+    } catch (error) {
+      Alert.alert("Error", "Login failed. Please try again.");
+      return rejectWithValue("Login failed");
+    }
+  }
+);
+
 const initialState = {
   user: null,
   token: null,
   loading: false,
   error: null,
-  wallet:null,
+  wallet: null,
 };
 
 const authSlice = createSlice({
@@ -93,9 +135,8 @@ const authSlice = createSlice({
         state.error = action.payload;
       })
       .addCase(getWallet.fulfilled, (state, action) => {
-        state.wallet = action.payload
-        handleLogin(action.payload);
-      })
+        state.wallet = action.payload;
+      });
   },
 });
 

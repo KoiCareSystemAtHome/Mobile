@@ -1,7 +1,7 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import React, { useEffect, useState } from "react";
 import {
-    Alert,
+  Alert,
   ImageBackground,
   ScrollView,
   Text,
@@ -20,6 +20,7 @@ import {
   calculateMaintainance,
   saveMaintainance,
 } from "../../redux/slices/reminderSlice";
+import dayjs from "dayjs";
 
 const CalculateMaintainance = () => {
   const dispatch = useDispatch();
@@ -58,15 +59,15 @@ const CalculateMaintainance = () => {
   const handleSave = () => {
     if (maintainanceData) {
       dispatch(saveMaintainance(maintainanceData))
-      .unwrap()
-      .then((res) => {
-        if(res.message){
-            Alert.alert(res.message)
-        }
-      })
+        .unwrap()
+        .then((res) => {
+          if (res.message) {
+            Alert.alert(res.message);
+          }
+        });
     }
   };
-
+  console.log(maintainanceData);
   return (
     <ImageBackground
       source={require("../../assets/koimain3.jpg")}
@@ -111,6 +112,10 @@ const CalculateMaintainance = () => {
             <Text style={styles.subtitle}>{maintainanceData?.title}</Text>
             <Text style={styles.selectorText}>
               {maintainanceData?.description}
+            </Text>
+            <Text style={styles.selectorText}>
+              Bảo trì ngày:{" "}
+              {dayjs(maintainanceData.maintainDate).format("ddd, D MMMM YYYY")}
             </Text>
           </View>
         )}

@@ -79,10 +79,10 @@ const LoginScreen = ({ navigation }) => {
         <View style={styles.container}>
           <Text style={styles.title}>Đăng nhập</Text>
           <Text style={styles.terms}>
-          Khi đăng nhập hệ thống, bạn đồng ý vớir{" "}
+            Khi đăng nhập hệ thống, bạn đồng ý với{" "}
             <Text style={styles.link}>Điều khoản và chính sách bảo mật</Text>
           </Text>
-
+  
           <View style={styles.tabs}>
             <TouchableOpacity onPress={() => navigation.navigate("Login")}>
               <Text style={[styles.tab, styles.activeTab]}>Đăng nhập</Text>
@@ -106,7 +106,7 @@ const LoginScreen = ({ navigation }) => {
                 />
               </Form.Item>
             </View>
-
+  
             <View style={styles.inputContainer}>
               <Form.Item name="password" noStyle>
                 <Input
@@ -118,7 +118,7 @@ const LoginScreen = ({ navigation }) => {
               </Form.Item>
               <TouchableOpacity
                 onPress={() => setShowPassword(!showPassword)} // Toggle password visibility
-                style={{marginRight:10}} 
+                style={{ marginRight: 10 }}
               >
                 <FontAwesome
                   name={showPassword ? "eye" : "eye-slash"} // Switch between eye and eye-slash icons
@@ -127,12 +127,12 @@ const LoginScreen = ({ navigation }) => {
                 />
               </TouchableOpacity>
             </View>
-
+  
             <View style={styles.row}>
               <TouchableOpacity>
                 <Text style={styles.forgot}>Quên mật khẩu?</Text>
               </TouchableOpacity>
-            
+  
               <TouchableOpacity>
                 <Text
                   style={styles.forgot}
@@ -140,17 +140,15 @@ const LoginScreen = ({ navigation }) => {
                     navigation.navigate("MainTabs");
                   }}
                 >
-                  Bỏ qua  
+                  Bỏ qua
                 </Text>
-              </TouchableOpacity>  
+              </TouchableOpacity>
             </View>
-
+  
             <Button style={styles.loginButton} onPress={onSubmit}>
               <Text style={styles.loginText}>Đăng nhập</Text>
             </Button>
           </Form>
-          
-          
         </View>
       </ImageBackground>
     </Provider>

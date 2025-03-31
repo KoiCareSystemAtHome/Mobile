@@ -43,10 +43,14 @@ const WaterParametersChart = ({ selectedParameters = [], waterParameterData }) =
   const MAX_Y_VALUE = 50; // Adjust this based on your data range
   const yAxisInterval = 10;
 
-  const normalizeData = (data, property) =>
-    data.map((d) => {
+  // Updated normalizeData to only include entries with the specified property
+  const normalizeData = (data, property) => {
+    // Filter data to only include entries that have the property
+    const validData = data.filter(d => d.hasOwnProperty(property) && d[property] != null);
+    
+    return validData.map((d) => {
       const dateValue = new Date(d.calculatedDate).getTime();
-      const value = d[property] || 0;
+      const value = d[property];
       return {
         x: (dateRange > 0)
           ? PADDING + ((dateValue - minDate) / dateRange) * (CHART_WIDTH - PADDING * 2)
@@ -54,6 +58,7 @@ const WaterParametersChart = ({ selectedParameters = [], waterParameterData }) =
         y: (1 - value / MAX_Y_VALUE) * (CHART_HEIGHT - PADDING * 2) + PADDING,
       };
     });
+  };
 
   const parameterPoints = selectedParameters.reduce((acc, param) => {
     acc[param] = normalizeData(filteredData, param);

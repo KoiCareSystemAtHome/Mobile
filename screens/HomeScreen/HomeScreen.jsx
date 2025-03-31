@@ -88,7 +88,6 @@ const HomeScreen = ({ navigation }) => {
       console.error("Logout failed:", error);
     }
   };
-
   return (
     <ImageBackground
       source={require("../../assets/koimain3.jpg")}
@@ -267,7 +266,7 @@ const HomeScreen = ({ navigation }) => {
               >
                 <View style={styles.depositHeader}>
                   <Text style={styles.depositText}>
-                    <Text style={styles.amount}>{walletData?.amount || "100000"}</Text>
+                    <Text style={styles.amount}>{walletData?.amount || "0"}</Text>
                     <Text style={styles.currency}> VND</Text>
                   </Text>
                   <TouchableOpacity onPress={() => navigation.navigate("DepositScreen")}>

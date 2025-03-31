@@ -21,32 +21,15 @@ const OrderHistory = ({ navigation }) => {
   const productData = useSelector(productSelector);
   const orderData = useSelector(orderbyAccountSelector);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const orders = [
-    {
-      id: 1,
-      store: "Bán Sỉ Giá Kho",
-      status: "Hoàn thành",
-      title: "Keo Xịt PJ77 Đa Năng Chuyên Dùng (600ml)",
-      originalPrice: 63000,
-      discountedPrice: 50400,
-      quantity: 1,
-      totalPrice: 142500,
-      reviewDeadline: "09 Th04",
-      coins: 200,
-    },
-    {
-      id: 2,
-      store: "Bàn Phím Universe",
-      status: "Hoàn thành",
-      title: "[Sẵn] Switch Sillyworks Hyacinth V2U",
-      originalPrice: 10798,
-      discountedPrice: 10390,
-      quantity: 13,
-      totalPrice: 173861,
-      reviewDeadline: "21 Th03",
-      coins: 200,
-    },
-  ];
+
+  // Pagination states
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 5; // Number of orders per page
+  const totalPages = Math.ceil(orderData?.length / itemsPerPage); // Calculate total pages
+  const paginatedOrderData = orderData?.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  ); // Slice the data for the current page
 
   useEffect(() => {
     const getData = async (key) => {
@@ -65,6 +48,20 @@ const OrderHistory = ({ navigation }) => {
     dispatch(getProduct());
     dispatch(getOrderByAccount(isLoggedIn?.id));
   }, [dispatch, isLoggedIn]);
+
+  // Handlers for pagination
+  const handlePreviousPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+    }
+  };
+
+  const handleNextPage = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage(currentPage + 1);
+    }
+  };
+
   return (
     <Provider>
       <ImageBackground
@@ -73,10 +70,10 @@ const OrderHistory = ({ navigation }) => {
         resizeMode="cover"
       >
         <View style={styles.overlay} />
-        <ScrollView contentContainerStyle={styles.container}>
+        <View style={styles.container}>
           <Text style={styles.title}>Order History</Text>
-          <ScrollView>
-            {orderData?.map((order) => (
+          <ScrollView contentContainerStyle={styles.listContent}>
+            {paginatedOrderData?.map((order) => (
               <View key={order.orderId} style={styles.orderCard}>
                 <Text style={styles.storeName}>{order.store}</Text>
                 <Text style={styles.status}>{order.status}</Text>
@@ -142,24 +139,57 @@ const OrderHistory = ({ navigation }) => {
                       <Text style={styles.returnText}>Báo cáo</Text>
                     </TouchableOpacity>
                   ) : (
-                    (<></>)
+                    <></>
                   )}
 
-                  <TouchableOpacity
-                    style={styles.reviewButton}
-                    onPress={() => {
-                      navigation.navigate("OrderTracking", {
-                        orderId: order.orderId,
-                      });
-                    }}
-                  >
-                    <Text style={styles.reviewText}>Theo dõi đơn hàng</Text>
-                  </TouchableOpacity>
+                  {order?.status === "Pending" ? (
+                    <></>
+                  ) : (
+                    <TouchableOpacity
+                      style={styles.reviewButton}
+                      onPress={() => {
+                        navigation.navigate("OrderTracking", {
+                          orderId: order.orderId,
+                        });
+                      }}
+                    >
+                      <Text style={styles.reviewText}>Theo dõi đơn hàng</Text>
+                    </TouchableOpacity>
+                  )}
                 </View>
               </View>
             ))}
           </ScrollView>
-        </ScrollView>
+
+          {/* Pagination Controls */}
+          {orderData?.length > 0 && (
+            <View style={styles.paginationContainer}>
+              <TouchableOpacity
+                style={[
+                  styles.paginationButton,
+                  currentPage === 1 && styles.disabledButton,
+                ]}
+                onPress={handlePreviousPage}
+                disabled={currentPage === 1}
+              >
+                <Text style={styles.paginationText}>Trang Trước</Text>
+              </TouchableOpacity>
+              <Text style={styles.pageText}>
+                {currentPage}/{totalPages}
+              </Text>
+              <TouchableOpacity
+                style={[
+                  styles.paginationButton,
+                  currentPage === totalPages && styles.disabledButton,
+                ]}
+                onPress={handleNextPage}
+                disabled={currentPage === totalPages}
+              >
+                <Text style={styles.paginationText}>Trang Sau</Text>
+              </TouchableOpacity>
+            </View>
+          )}
+        </View>
       </ImageBackground>
     </Provider>
   );

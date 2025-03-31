@@ -57,6 +57,13 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     paddingLeft: 10,
   },
+  pickerInput: {
+    flex: 1,
+    fontSize: 16,
+    paddingVertical: 10,
+    paddingLeft: 10,
+    color:"#C4C4C4"
+  },
   icon: {
     width: 20,
     height: 20,
@@ -76,10 +83,8 @@ const styles = StyleSheet.create({
   },
   loginButton: {
     backgroundColor: '#6497B1',
-    paddingVertical: 15,
     borderRadius: 8,
     alignItems: 'center',
-    marginBottom: 20,
   },
   loginText: {
     color: '#fff',

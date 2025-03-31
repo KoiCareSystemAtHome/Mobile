@@ -24,7 +24,7 @@ const getRequestParams = async (url, params) => {
 
 const postRequestParams = async (url, params) => {
   try {
-    const res = await axiosClientVer2.post(`${url}`, { params: params });
+    const res = await axiosClientVer2.post(`${url}`, { params });
     return res;
   } catch (error) {
     return handleError(error);
