@@ -105,4 +105,34 @@ export const styles = StyleSheet.create({
       color: "#333",
       fontWeight: "500",
     },
+    paginationContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginVertical: 10,
+    paddingHorizontal: 20,
+    paddingBottom: 20,
+  },
+  paginationButton: {
+    backgroundColor: "transparent", // You might want to adjust this color
+    borderRadius: 8,
+    paddingVertical: 10,
+    width: 70,
+    fontWeight: "bold",
+  },
+  paginationText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "500",
+    textAlign: "center",
+  },
+  disabledButton: {
+    backgroundColor: "transparent",
+    opacity: 0.3,
+  },
+  pageText: {
+    color: "#333",
+    fontSize: 16,
+    fontWeight: "500",
+  },
   });

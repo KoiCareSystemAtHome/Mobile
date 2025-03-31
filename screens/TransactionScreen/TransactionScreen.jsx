@@ -7,7 +7,7 @@ import {
   FlatList,
   SafeAreaView,
 } from "react-native";
-import { AntDesign } from "@expo/vector-icons"; // Assuming you're using expo-vector-icons
+import { AntDesign } from "@expo/vector-icons";
 import { styles } from "./styles";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {
@@ -23,43 +23,19 @@ import {
 } from "../../redux/selector";
 import dayjs from "dayjs";
 
-const paymentData = [
-  {
-    id: "123",
-    date: "Wed, 1 November 2023",
-    total: "200,000",
-  },
-  {
-    id: "124",
-    date: "Thu, 2 November 2023",
-    total: "300,000",
-  },
-];
-
-const productData = [
-  {
-    id: "125",
-    date: "Fri, 3 November 2023",
-    total: "150,000",
-  },
-];
-
-const membershipData = [
-  {
-    id: "126",
-    date: "Sat, 4 November 2023",
-    total: "500,000",
-  },
-];
-
 const TransactionScreen = ({ navigation }) => {
   const dispatch = useDispatch();
-
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [activeTab, setActiveTab] = useState("Thanh toán");
+  
+  // Pagination states
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10; // 10 transactions per page
+
   const orderTransactionData = useSelector(orderTransactionSelector);
   const packageTransactionData = useSelector(packageTransactionSelector);
   const depositeTransactionData = useSelector(depositTransactionOrder);
+
   const getDataForTab = () => {
     switch (activeTab) {
       case "Thanh toán":
@@ -69,9 +45,17 @@ const TransactionScreen = ({ navigation }) => {
       case "Gói member":
         return packageTransactionData;
       default:
-        return paymentData;
+        return [];
     }
   };
+
+  // Get transactions data and calculate pagination
+  const transactions = getDataForTab();
+  const totalPages = Math.ceil(transactions?.length / itemsPerPage);
+  const paginatedTransactions = transactions?.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
 
   // Render each transaction item
   const renderDepositData = ({ item }) => (
@@ -105,7 +89,6 @@ const TransactionScreen = ({ navigation }) => {
         console.error(error);
       }
     };
-
     getData();
   }, []);
 
@@ -116,6 +99,24 @@ const TransactionScreen = ({ navigation }) => {
       dispatch(getDepositTransaction(isLoggedIn.id));
     }
   }, [isLoggedIn?.id, dispatch]);
+
+  // Pagination controls
+  const handlePreviousPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+    }
+  };
+
+  const handleNextPage = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage(currentPage + 1);
+    }
+  };
+
+  // Reset page when tab changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [activeTab]);
 
   return (
     <ImageBackground
@@ -131,8 +132,7 @@ const TransactionScreen = ({ navigation }) => {
             <AntDesign name="left" size={24} color="black" />
           </TouchableOpacity>
           <Text style={styles.title}>Lịch Sử Giao Dịch</Text>
-          <View style={{ width: 24 }} />{" "}
-          {/* Placeholder to balance the layout */}
+          <View style={{ width: 24 }} />
         </View>
 
         {/* Tabs */}
@@ -180,16 +180,43 @@ const TransactionScreen = ({ navigation }) => {
 
         {/* Transaction List */}
         <FlatList
-          data={getDataForTab()}
+          data={paginatedTransactions}
           renderItem={renderDepositData}
           keyExtractor={(item) => item.transactionId}
           contentContainerStyle={styles.listContainer}
         />
+
+        {/* Pagination Controls */}
+        {transactions?.length > 0 && (
+          <View style={styles.paginationContainer}>
+            <TouchableOpacity
+              style={[
+                styles.paginationButton,
+                currentPage === 1 && styles.disabledButton,
+              ]}
+              onPress={handlePreviousPage}
+              disabled={currentPage === 1}
+            >
+              <Text style={styles.paginationText}>Trang trước</Text>
+            </TouchableOpacity>
+            <Text style={styles.pageText}>
+              {currentPage}/{totalPages}
+            </Text>
+            <TouchableOpacity
+              style={[
+                styles.paginationButton,
+                currentPage === totalPages && styles.disabledButton,
+              ]}
+              onPress={handleNextPage}
+              disabled={currentPage === totalPages}
+            >
+              <Text style={styles.paginationText}>Trang sau</Text>
+            </TouchableOpacity>
+          </View>
+        )}
       </SafeAreaView>
     </ImageBackground>
   );
 };
-
-// Update styles.js
 
 export default TransactionScreen;

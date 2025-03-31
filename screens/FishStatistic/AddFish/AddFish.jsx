@@ -124,14 +124,16 @@ const AddFish = ({ navigation }) => {
       .then((response) => {
         if (response?.status === "201") {
           Toast.success("Fish Added Successfully");
-          dispatch(getFishByOwner(isLoggedIn?.id));
-          form.resetFields();
-          navigation.goBack();
+          return dispatch(getFishByOwner(isLoggedIn?.id)).unwrap();
         } else {
           Toast.fail("Failed to add fish");
           navigation.goBack();
         }
-      });
+      })
+      .then(() => {
+        form.resetFields();
+        navigation.goBack();
+      })
   };
 
   const handleDatePickerChange = (date) => {
