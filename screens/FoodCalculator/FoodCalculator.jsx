@@ -84,6 +84,8 @@ const FoodCalculator = ({ navigation }) => {
     }
   }, [homePond, growth, temperature, dispatch]);
 
+  
+
   return (
     <ImageBackground
       source={require("../../assets/koimain3.jpg")}

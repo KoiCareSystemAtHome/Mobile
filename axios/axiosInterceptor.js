@@ -8,7 +8,7 @@ let refreshPromise = null;
 //https://http://14.225.206.203:8080/api/Vnpay/CallbackWithUserInfo?email=tonynhatanh911@gmail.com
 
 export const axiosClientVer2 = axios.create({
-  baseURL: "http://14.225.206.203:8080/api/",
+  baseURL: "https://loco.com.co/api/",
   headers: {
     "Content-Type": "application/json",
     Accept: "application/json",

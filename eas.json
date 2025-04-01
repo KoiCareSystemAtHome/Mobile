@@ -15,8 +15,12 @@
       "developmentClient": false,
       "distribution": "store",
       "android": {
-        "buildType": "apk"
-      }
+        "buildType": "apk",
+        "image": "default"
+      },
+      "cache": {
+    "disabled": true
+  }
     }
   },
   "submit": {

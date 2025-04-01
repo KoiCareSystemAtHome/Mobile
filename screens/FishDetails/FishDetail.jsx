@@ -153,7 +153,7 @@ const FishDetail = ({ route, navigation }) => {
             <View style={styles.sectionHeader}>
               <Text style={styles.label}>Tình Trạng Sức Khỏe</Text>
               <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                <TouchableOpacity onPress={() => setHealthModalVisible(true)}>
+                <TouchableOpacity onPress={() => navigation.navigate("SymptomScreen")}>
                   <FontAwesome name="plus" size={18} color="#6497B1" style={{ marginRight: 10 }} />
                 </TouchableOpacity>
                 <Picker
