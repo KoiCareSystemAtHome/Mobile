@@ -8,11 +8,10 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useDispatch, useSelector } from "react-redux";
 import { reminderByOwnerSelector } from "../../redux/selector";
 import { getReminderByOwner } from "../../redux/slices/reminderSlice";
+import * as Notifications from "expo-notifications";
 
 const leftArrowIcon = "←";
 const rightArrowIcon = "→";
-const searchIcon = "🔍";
-const settingsIcon = "⚙️";
 const addIcon = "+";
 
 const ScheduleScreen = ({ navigation }) => {
@@ -26,11 +25,63 @@ const ScheduleScreen = ({ navigation }) => {
   const [nextReminder, setNextReminder] = useState(null);
   const [filterType, setFilterType] = useState("RecurringMaintenance");
 
-  // Process reminders into markedDates format and find next reminder
+  // Request notification permissions on mount
+  useEffect(() => {
+    const setupNotifications = async () => {
+      const { status } = await Notifications.requestPermissionsAsync();
+      if (status !== "granted") {
+        console.warn("Notification permissions not granted!");
+      }
+    };
+    setupNotifications();
+  }, []);
+
+  useEffect(() => {
+    const subscription = Notifications.addNotificationResponseReceivedListener((response) => {
+      const reminderId = response.notification.request.content.data.reminderId;
+      if (reminderId) {
+        navigation.navigate("ReminderDetail", { reminder: { pondReminderId: reminderId } });
+      }
+    });
+    return () => subscription.remove();
+  }, [navigation]);
+
+  // Function to schedule a notification
+  const scheduleNotification = async (reminder) => {
+    try {
+      const maintainDate = new Date(reminder.maintainDate);
+      const now = new Date();
+
+      if (maintainDate > now && reminder.seenDate === "0001-01-01T00:00:00") {
+        await Notifications.scheduleNotificationAsync({
+          content: {
+            title: reminder.title,
+            body: reminder.description || "You have a scheduled reminder!",
+            data: { reminderId: reminder.pondReminderId },
+            sound: true, // Play default sound
+            vibrate: [0, 250, 250, 250], // Vibration pattern
+          },
+          trigger: {
+            date: maintainDate, // Expo uses a Date object directly
+          },
+        });
+        console.log(`Notification scheduled for ${reminder.title} at ${maintainDate}`);
+      }
+    } catch (error) {
+      console.error("Error scheduling notification:", error);
+    }
+  };
+
+  // Process reminders into markedDates format, find next reminder, and schedule notification
   useEffect(() => {
     if (reminderByOwner && reminderByOwner.length > 0) {
       const newMarkedDates = {};
       const today = new Date();
+
+      // Cancel all previous notifications to avoid duplicates
+      Notifications.cancelAllScheduledNotificationsAsync().catch((error) => {
+        console.error("Error canceling notifications:", error);
+      });
 
       // Set next reminder (unfiltered)
       const futureReminders = reminderByOwner.filter((reminder) => {
@@ -45,6 +96,7 @@ const ScheduleScreen = ({ navigation }) => {
           return currDate < prevDate ? curr : prev;
         });
         setNextReminder(closestReminder);
+        scheduleNotification(closestReminder); // Schedule only for the next reminder
       } else {
         setNextReminder(null);
       }
@@ -149,14 +201,14 @@ const ScheduleScreen = ({ navigation }) => {
         <Text style={styles.headerIcon}>Lịch trình</Text>
         <View style={styles.headerIcons}>
           <TouchableOpacity>
-            <Text style={styles.headerIcon}>{}</Text>
+            <Text style={styles.headerIcon}></Text>
           </TouchableOpacity>
           <TouchableOpacity>
-            <Text style={styles.headerIcon}>{}</Text>
+            <Text style={styles.headerIcon}></Text>
           </TouchableOpacity>
         </View>
       </View>
-  
+
       {nextReminder && (
         <View style={styles.nextReminderContainer}>
           <Text style={styles.nextReminderTitle}>LỜI NHẮC TIẾP THEO</Text>
@@ -172,31 +224,36 @@ const ScheduleScreen = ({ navigation }) => {
           </View>
         </View>
       )}
-  
+
       {/* Toggle Switch */}
-      <View style={{
-        flexDirection: 'row',
-        backgroundColor: '#E0E0E0',
-        borderRadius: 20,
-        margin: 10,
-        width: 220,
-        alignSelf: 'center',
-      }}>
+      <View
+        style={{
+          flexDirection: "row",
+          backgroundColor: "#E0E0E0",
+          borderRadius: 20,
+          margin: 10,
+          width: 220,
+          alignSelf: "center",
+        }}
+      >
         <TouchableOpacity
           style={{
             flex: 1,
             padding: 10,
             borderRadius: 20,
-            backgroundColor: filterType === "RecurringMaintenance" ? "#6A5ACD" : "transparent",
-            alignItems: 'center',
+            backgroundColor:
+              filterType === "RecurringMaintenance" ? "#6A5ACD" : "transparent",
+            alignItems: "center",
           }}
           onPress={() => setFilterType("RecurringMaintenance")}
         >
-          <Text style={{
-            color: filterType === "RecurringMaintenance" ? "#FFF" : "#000",
-            fontWeight: "bold",
-            fontSize: 12
-          }}>
+          <Text
+            style={{
+              color: filterType === "RecurringMaintenance" ? "#FFF" : "#000",
+              fontWeight: "bold",
+              fontSize: 12,
+            }}
+          >
             Định kỳ
           </Text>
         </TouchableOpacity>
@@ -205,21 +262,24 @@ const ScheduleScreen = ({ navigation }) => {
             flex: 1,
             padding: 10,
             borderRadius: 20,
-            backgroundColor: filterType === "Maintenance" ? "#6A5ACD" : "transparent",
-            alignItems: 'center',
+            backgroundColor:
+              filterType === "Maintenance" ? "#6A5ACD" : "transparent",
+            alignItems: "center",
           }}
           onPress={() => setFilterType("Maintenance")}
         >
-          <Text style={{
-            color: filterType === "Maintenance" ? "#FFF" : "#000",
-            fontWeight: "bold",
-            fontSize: 12
-          }}>
+          <Text
+            style={{
+              color: filterType === "Maintenance" ? "#FFF" : "#000",
+              fontWeight: "bold",
+              fontSize: 12,
+            }}
+          >
             Bảo trì
           </Text>
         </TouchableOpacity>
       </View>
-  
+
       <Calendar
         current={new Date().toISOString().split("T")[0]}
         markedDates={markedDates}
@@ -247,7 +307,7 @@ const ScheduleScreen = ({ navigation }) => {
         )}
         style={styles.calendar}
       />
-  
+
       {/* Legend */}
       <View style={styles.legendContainer}>
         <View style={styles.legendItem}>
@@ -259,7 +319,7 @@ const ScheduleScreen = ({ navigation }) => {
           <Text style={styles.legendText}>Đã hoàn thành</Text>
         </View>
       </View>
-  
+
       {/* Floating Action Button */}
       <TouchableOpacity
         style={styles.fab}
@@ -269,7 +329,7 @@ const ScheduleScreen = ({ navigation }) => {
       >
         <Text style={styles.fabText}>{addIcon}</Text>
       </TouchableOpacity>
-  
+
       {/* Modal for Event Details */}
       <Modal
         isVisible={isModalVisible}
@@ -283,7 +343,7 @@ const ScheduleScreen = ({ navigation }) => {
             </TouchableOpacity>
             <Text style={styles.modalTitle}>XEM LỜI NHẮC</Text>
           </View>
-  
+
           <View style={styles.modalBody}>
             <Text style={styles.modalDate}>{selectedDate}</Text>
             {selectedDateEvents.map((event, index) => (
@@ -313,9 +373,7 @@ const ScheduleScreen = ({ navigation }) => {
                 <Text style={styles.modalEventTime}>
                   {getTimeRange(event.reminder.maintainDate).split("-")[0]}
                 </Text>
-                <Text style={styles.modalEventText}>
-                  {event.reminder.title}
-                </Text>
+                <Text style={styles.modalEventText}>{event.reminder.title}</Text>
               </TouchableOpacity>
             ))}
           </View>
