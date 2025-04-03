@@ -177,7 +177,9 @@ const Shopping = ({ navigation }) => {
             onPress={handlePreviousPage}
             disabled={currentPage === 1}
           >
-            <Text style={styles.paginationText}>Trang trước</Text>
+            <Text style={styles.paginationText}>
+               <AntDesign name="left" size={20} color="black" />
+             </Text>
           </TouchableOpacity>
           <Text style={styles.pageText}>
             {currentPage}/{totalPages}
@@ -190,7 +192,9 @@ const Shopping = ({ navigation }) => {
             onPress={handleNextPage}
             disabled={currentPage === totalPages}
           >
-            <Text style={styles.paginationText}>Trang sau</Text>
+            <Text style={styles.paginationText}>
+               <AntDesign name="right" size={20} color="black" />
+             </Text>
           </TouchableOpacity>
         </View>
       )}

@@ -34,7 +34,7 @@ export const styles = StyleSheet.create({
     paddingTop: 10,
   },
   blogCard: {
-    backgroundColor: "transparent",
+    backgroundColor: "rgba(255, 255, 255, 0.5)",
     borderRadius: 10,
     padding: 15,
     marginBottom: 15,

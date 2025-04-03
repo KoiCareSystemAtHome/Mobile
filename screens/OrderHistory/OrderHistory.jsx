@@ -15,6 +15,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { getOrderByAccount } from "../../redux/slices/ghnSlice";
 import { orderbyAccountSelector, productSelector } from "../../redux/selector";
 import { getProduct } from "../../redux/slices/productSlice";
+import AntDesign from "react-native-vector-icons/AntDesign";
 
 const OrderHistory = ({ navigation }) => {
   const dispatch = useDispatch();
@@ -172,7 +173,9 @@ const OrderHistory = ({ navigation }) => {
                 onPress={handlePreviousPage}
                 disabled={currentPage === 1}
               >
-                <Text style={styles.paginationText}>Trang Trước</Text>
+                <Text style={styles.paginationText}>
+               <AntDesign name="left" size={20} color="black" />
+             </Text>
               </TouchableOpacity>
               <Text style={styles.pageText}>
                 {currentPage}/{totalPages}
@@ -185,7 +188,9 @@ const OrderHistory = ({ navigation }) => {
                 onPress={handleNextPage}
                 disabled={currentPage === totalPages}
               >
-                <Text style={styles.paginationText}>Trang Sau</Text>
+                <Text style={styles.paginationText}>
+               <AntDesign name="right" size={20} color="black" />
+             </Text>
               </TouchableOpacity>
             </View>
           )}

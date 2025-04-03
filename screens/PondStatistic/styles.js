@@ -45,6 +45,7 @@ export const styles = StyleSheet.create({
     fontSize: 16,
     alignContent: "center",
     textAlign:"center",
+    marginRight: 8
     // marginBottom: 15,
   },
   label: {
@@ -203,7 +204,7 @@ export const styles = StyleSheet.create({
     textAlign: "center",
   },
   disabledButton: {
-    backgroundColor: "#ccc",
+    backgroundColor: "transparent",
   },
   pageText: {
     color: "#fff",

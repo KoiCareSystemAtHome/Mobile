@@ -216,7 +216,7 @@ export const styles = StyleSheet.create({
     textAlign: "center",
   },
   disabledButton: {
-    backgroundColor: "#ccc",
+    backgroundColor: "transparent",
   },
   pageText: {
     color: "#fff",

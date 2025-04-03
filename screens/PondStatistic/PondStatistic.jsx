@@ -32,6 +32,7 @@ import utc from "dayjs/plugin/utc";
 import * as ImagePicker from "expo-image-picker";
 import { getImage } from "../../redux/slices/authSlice";
 import { loadAsync } from "expo-font";
+import AntDesign from "react-native-vector-icons/AntDesign";
 dayjs.extend(utc);
 
 const PondStatistic = ({ navigation }) => {
@@ -224,7 +225,9 @@ const PondStatistic = ({ navigation }) => {
                 onPress={handlePreviousPage}
                 disabled={currentPage === 1}
               >
-                <Text style={styles.paginationText}>Trước</Text>
+                <Text style={styles.paginationText}>
+               <AntDesign name="left" size={20} color="black" />
+             </Text>
               </TouchableOpacity>
               <Text style={styles.pageText}>
                 {currentPage}/{totalPages}
@@ -237,7 +240,9 @@ const PondStatistic = ({ navigation }) => {
                 onPress={handleNextPage}
                 disabled={currentPage === totalPages}
               >
-                <Text style={styles.paginationText}>Tiếp</Text>
+                <Text style={styles.paginationText}>
+               <AntDesign name="right" size={20} color="black" />
+             </Text>
               </TouchableOpacity>
             </View>
           )}
