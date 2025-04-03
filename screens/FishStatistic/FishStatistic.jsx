@@ -17,6 +17,7 @@ import { fishByOwnerSelector, pondByOwnerSelector } from "../../redux/selector";
 import { getFishByOwner } from "../../redux/slices/fishSlice";
 import { loadAsync } from "expo-font";
 import enUS from "@ant-design/react-native/lib/locale-provider/en_US";
+import AntDesign from "react-native-vector-icons/AntDesign";
 
 const FishStatistic = ({ navigation }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -148,7 +149,9 @@ const FishStatistic = ({ navigation }) => {
                 onPress={handlePreviousPage}
                 disabled={currentPage === 1}
               >
-                <Text style={styles.paginationText}>Trang Trước</Text>
+                <Text style={styles.paginationText}>
+               <AntDesign name="left" size={20} color="black" />
+             </Text>
               </TouchableOpacity>
               <Text style={styles.pageText}>
                 {currentPage}/{totalPages}
@@ -161,7 +164,9 @@ const FishStatistic = ({ navigation }) => {
                 onPress={handleNextPage}
                 disabled={currentPage === totalPages}
               >
-                <Text style={styles.paginationText}>Trang Sau</Text>
+                <Text style={styles.paginationText}>
+               <AntDesign name="right" size={20} color="black" />
+             </Text>
               </TouchableOpacity>
             </View>
           )}

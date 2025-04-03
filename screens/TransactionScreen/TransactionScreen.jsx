@@ -23,6 +23,7 @@ import {
 } from "../../redux/selector";
 import dayjs from "dayjs";
 
+
 const TransactionScreen = ({ navigation }) => {
   const dispatch = useDispatch();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -197,7 +198,9 @@ const TransactionScreen = ({ navigation }) => {
               onPress={handlePreviousPage}
               disabled={currentPage === 1}
             >
-              <Text style={styles.paginationText}>Trang trước</Text>
+              <Text style={styles.paginationText}>
+               <AntDesign name="left" size={20} color="black" />
+             </Text>
             </TouchableOpacity>
             <Text style={styles.pageText}>
               {currentPage}/{totalPages}
@@ -210,7 +213,9 @@ const TransactionScreen = ({ navigation }) => {
               onPress={handleNextPage}
               disabled={currentPage === totalPages}
             >
-              <Text style={styles.paginationText}>Trang sau</Text>
+              <Text style={styles.paginationText}>
+               <AntDesign name="right" size={20} color="black" />
+             </Text>
             </TouchableOpacity>
           </View>
         )}

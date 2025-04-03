@@ -140,7 +140,7 @@ export const styles = StyleSheet.create({
     marginHorizontal: 10,
   },
   disabledButton: {
-    backgroundColor: "#ccc",
+    backgroundColor: "transparent",
   },
   paginationText: {
     color: "#fff",
