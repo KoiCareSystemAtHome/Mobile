@@ -1,16 +1,13 @@
 import { Provider } from "@ant-design/react-native";
 import React, { useEffect, useState } from "react";
-import {
-  ImageBackground,
-  ScrollView,
-  Text,
-  View,
-} from "react-native";
+import { ImageBackground, ScrollView, Text, View } from "react-native";
 import { styles } from "./styles";
 import { useRoute } from "@react-navigation/native";
 import {
   getOrderDetail,
   getOrderTracking,
+  updateOrderStatus,
+  updateShipType,
 } from "../../redux/slices/ghnSlice";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -49,7 +46,7 @@ const OrderTracking = () => {
   useEffect(() => {
     dispatch(getOrderDetail(orderId));
   }, [dispatch]);
-  
+
   useEffect(() => {
     if (orderDetail?.oder_code) {
       const order_code = orderDetail?.oder_code;
@@ -58,14 +55,35 @@ const OrderTracking = () => {
         .then((response) => {
           if (response?.status === "delivered") {
             setProgress(2);
-          } else if (response?.status === "picking" || "picked" || "delivering") {
+          } else if (
+            response?.status === "picking" ||
+            "picked" ||
+            "delivering"
+          ) {
             setProgress(1);
-          }else{
-            setProgress(0)
+          } else {
+            setProgress(0);
           }
         });
     }
   }, [dispatch, orderDetail]);
+
+  console.log(orderTrack?.status);
+
+  useEffect(() => {
+    const values = { orderId, status: orderTrack?.status };
+    dispatch(updateShipType(values));
+    if (orderTrack?.status === "picked") {
+      const payload = { orderId, status: "In Progress" };
+      dispatch(updateOrderStatus(payload));
+    } else if (orderTrack?.status === "delivery_fail") {
+      const payload = { orderId, status: "Fail" };
+      dispatch(updateOrderStatus(payload));
+    } else if (orderTrack?.status === "delivered") {
+      const payload = { orderId, status: "Complete" };
+      dispatch(updateOrderStatus(payload));
+    }
+  }, [orderId, dispatch, orderTrack?.status]);
 
   return (
     <Provider>
@@ -156,9 +174,10 @@ const OrderTracking = () => {
               const statusMapping = {
                 delivered: "Đã được giao hàng",
                 delivering: "Đang được giao hàng, xin hãy chú ý điện thoại",
-                storing:"Đang đóng hàng",
+                storing: "Đang đóng hàng",
                 picked: "Đã nhận hàng",
                 picking: "Đang nhận hàng",
+                delivery_fail:"Nổ lực giao hàng không thành công"
               };
               return (
                 <View key={index} style={styles.item}>

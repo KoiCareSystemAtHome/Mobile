@@ -41,7 +41,7 @@ export const getPaymentUrl = createAsyncThunk(
   "transactionSlice/getPaymentUrl",
   async (values) => {
     try {
-      const res = await getRequest(`Vnpay/CreatePaymentUrl?money=${values.money}&description=${values.description}&returnUrl=http://14.225.206.203:8080/api/Vnpay/CallbackWithUserInfo?email=${values.email}`);
+      const res = await getRequest(`Vnpay/CreatePaymentUrl?money=${values.money}&description=${values.description}&returnUrl=https://loco.com.co/api/Vnpay/CallbackWithUserInfo?email=${values.email}`);
       return res;
     } catch (error) {
       Alert.alert("Error", "Failed to load url data.");

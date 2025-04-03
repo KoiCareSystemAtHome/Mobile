@@ -66,13 +66,15 @@ const FishStatistic = ({ navigation }) => {
     };
     loadFontAsync();
   }, []);
+
+
   const renderFishCard = ({ item }) => (
     <TouchableOpacity
       onPress={() => navigation.navigate("FishDetail", { fish: item })}
     >
       <Card style={styles.card}>
         <View style={styles.cardContent}>
-          <Image source={{ uri: item.image }} style={styles.fishImage} />
+          <Image source={item.image ? { uri: item.image } : require('../../assets/defaultkoi.jpg')} style={styles.fishImage} />
           <View style={{ flexDirection: "row", justifyContent: "flex-end" }}>
             <FontAwesome
               name={item.gender === "male" ? "mars" : "venus"}

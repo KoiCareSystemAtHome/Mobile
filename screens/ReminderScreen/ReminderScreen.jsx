@@ -9,34 +9,47 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { styles } from "./styles";
+import { Ionicons } from 'react-native-vector-icons'; // Add this import (requires npm install @expo/vector-icons)
 
-// Icons for the buttons and bottom navigation (you'll need to replace these with your own assets)
-const feedingIcon = require("../../assets/Fish Food 1.png"); // Replace with your feeding icon
-const maintenanceIcon = require("../../assets/pond_7665081 1.png"); // Replace with your maintenance icon
-
+// Icons for the buttons and bottom navigation
+const feedingIcon = require("../../assets/Fish Food 1.png");
+const maintenanceIcon = require("../../assets/pond_7665081 1.png");
 
 const ReminderScreen = ({ navigation }) => {
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <ImageBackground
-        source={require("../../assets/koimain3.jpg")} // Background image
+        source={require("../../assets/koimain3.jpg")}
         style={styles.background}
         resizeMode="cover"
       >
         <View style={styles.overlay} />
-  
-        {/* Back Arrow */}
+
+        {/* Enhanced Back Arrow Button */}
         <TouchableOpacity
-          style={styles.backButton}
+          style={[styles.backButton, {
+            position: 'absolute',
+            top: 40,
+            left: 15,
+            backgroundColor: 'rgba(255, 255, 255, 0.2)',
+            borderRadius: 20,
+            padding: 8,
+            zIndex: 1,
+          }]}
           onPress={() => navigation.goBack()}
+          activeOpacity={0.7}
         >
-          <Text style={styles.backArrow}>←</Text>
+          <Ionicons 
+            name="arrow-back" 
+            size={24} 
+            color="black" 
+          />
         </TouchableOpacity>
-  
+
         <ScrollView contentContainerStyle={styles.scrollContainer}>
           <Text style={styles.title}>Lịch Trình</Text>
-  
-          {/* Regular Schedule Button */}
+          
+          {/* Rest of your existing code */}
           <TouchableOpacity
             style={styles.button}
             onPress={() => navigation.navigate("RecurringMaintainance")} 
@@ -49,8 +62,7 @@ const ReminderScreen = ({ navigation }) => {
               </Text>
             </View>
           </TouchableOpacity>
-  
-          {/* Maintenance Schedule Button */}
+
           <TouchableOpacity
             style={styles.button}
             onPress={() => navigation.navigate("CalculateMaintainance")} 

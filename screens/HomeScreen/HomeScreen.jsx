@@ -114,7 +114,7 @@ const HomeScreen = ({ navigation }) => {
           <View style={styles.drawerProfile}>
             <FontAwesome name="user-circle" size={50} color="#6497B1" />
             <Text style={styles.drawerUserName}>Hello,</Text>
-            <Text style={styles.drawerUserRole}>Anynomous user</Text>
+            <Text style={styles.drawerUserRole}>{isLoggedIn || userState ? isLoggedIn?.name || userState?.name : "User"}</Text>
           </View>
         </View>
         <View style={styles.divider} />

@@ -23,7 +23,10 @@ LogBox.ignoreLogs([
   "Warning: TNodeChildrenRenderer: Support for defaultProps will be removed",
   "Warning: Text strings must be rendered within a <Text> component",
   "Warning: TNodeChildrenRenderer: Support for defaultProps will be removed from function components in a future major release. Use JavaScript default parameters instead.",
-  "Warning: MemoizedTNodeRenderer: Support for defaultProps will be removed from memo components in a future major release. Use JavaScript default parameters instead."
+  "Warning: MemoizedTNodeRenderer: Support for defaultProps will be removed from memo components in a future major release. Use JavaScript default parameters instead.",
+  "Warning: TNodeChildrenRenderer: Support for defaultProps will be removed from function components in a future major release. Use JavaScript default parameters instead.",
+  "Warning: TRenderEngineProvider: Support for defaultProps will be removed from function components in a future major release. Use JavaScript default parameters instead.",
+
 ]);
 const BlogScreen = ({ navigation }) => {
   const dispatch = useDispatch();

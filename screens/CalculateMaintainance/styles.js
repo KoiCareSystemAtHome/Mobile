@@ -94,4 +94,30 @@ export const styles = StyleSheet.create({
         color: "#666",
         lineHeight: 24,
     },
+    label: {
+    fontSize: 16,
+    fontWeight: "bold",
+    color: "#333",
+    marginTop: 20,
+    marginBottom: 10,
+  },
+  datePickerContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    borderBottomWidth: 1,
+    borderBottomColor: "#000",
+    paddingBottom: 5,
+  },
+  dateText: {
+    fontSize: 16,
+    color: "#000",
+  },
+  input: {
+    borderBottomWidth: 1,
+    borderBottomColor: "#000",
+    fontSize: 16,
+    color: "#000",
+    paddingVertical: 5,
+  },
 })

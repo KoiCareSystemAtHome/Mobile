@@ -43,7 +43,7 @@ const DepositScreen = ({ navigation }) => {
   const handleWebViewNavigationStateChange = (navState) => {
     const { url } = navState;
     if (
-      url.includes("http://14.225.206.203:8080/api/Vnpay/CallbackWithUserInfo")
+      url.includes("https://loco.com.co/api/Vnpay/CallbackWithUserInfo")
     ) {
       setShowWebView(false);
       setPaymentUrl(null);

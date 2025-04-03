@@ -24,12 +24,12 @@ const OrderHistory = ({ navigation }) => {
 
   // Pagination states
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 5; // Number of orders per page
-  const totalPages = Math.ceil(orderData?.length / itemsPerPage); // Calculate total pages
+  const itemsPerPage = 5;
+  const totalPages = Math.ceil(orderData?.length / itemsPerPage);
   const paginatedOrderData = orderData?.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
-  ); // Slice the data for the current page
+  );
 
   useEffect(() => {
     const getData = async (key) => {
@@ -49,7 +49,6 @@ const OrderHistory = ({ navigation }) => {
     dispatch(getOrderByAccount(isLoggedIn?.id));
   }, [dispatch, isLoggedIn]);
 
-  // Handlers for pagination
   const handlePreviousPage = () => {
     if (currentPage > 1) {
       setCurrentPage(currentPage - 1);
@@ -70,6 +69,28 @@ const OrderHistory = ({ navigation }) => {
         resizeMode="cover"
       >
         <View style={styles.overlay} />
+        
+        {/* Back Button */}
+        <TouchableOpacity
+          style={{
+            position: 'absolute',
+            top: 40,
+            left: 15,
+            backgroundColor: 'rgba(255, 255, 255, 0.2)',
+            borderRadius: 20,
+            padding: 8,
+            zIndex: 1,
+          }}
+          onPress={() => navigation.goBack()}
+          activeOpacity={0.7}
+        >
+          <Icon 
+            name="arrowleft" 
+            size={24} 
+            color="black" 
+          />
+        </TouchableOpacity>
+
         <View style={styles.container}>
           <Text style={styles.title}>Order History</Text>
           <ScrollView contentContainerStyle={styles.listContent}>
@@ -161,7 +182,6 @@ const OrderHistory = ({ navigation }) => {
             ))}
           </ScrollView>
 
-          {/* Pagination Controls */}
           {orderData?.length > 0 && (
             <View style={styles.paginationContainer}>
               <TouchableOpacity

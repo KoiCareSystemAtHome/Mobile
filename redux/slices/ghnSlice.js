@@ -147,7 +147,7 @@ export const updateOrderStatus = createAsyncThunk(
   "ghnSlice/updateOrderStatus",
   async (values) => {
     try {
-      const res = await postRequest(`Order/updateOrderStatus`, values);
+      const res = await putRequest(`Order/updateOrderStatus`, values);
       return res.data;
     } catch (error) {
       console.log(error)

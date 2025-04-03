@@ -27,7 +27,7 @@ import { getProduct } from "../../redux/slices/productSlice";
 import { pondByIdSelector, productSelector } from "../../redux/selector";
 import { styles } from "./styles";
 import * as ImagePicker from "expo-image-picker";
-import { getImage } from "../../redux/slices/authSlice"; // Assuming this is available
+import { getImage } from "../../redux/slices/authSlice";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const PondDetail = ({ navigation, route }) => {
@@ -41,6 +41,8 @@ const PondDetail = ({ navigation, route }) => {
   const [uploadResponse, setUploadResponse] = useState(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [form] = Form.useForm();
+  const [isImageUploading, setIsImageUploading] = useState(false); // Tracks upload in progress
+  const [isImageChanged, setIsImageChanged] = useState(false); // Tracks if user decided to change image
 
   const transformPondParameters = (pondParameters) => {
     if (!pondParameters || !Array.isArray(pondParameters)) return [];
@@ -54,11 +56,8 @@ const PondDetail = ({ navigation, route }) => {
         dataMap[dateKey][param.parameterName] = valueInfo.value;
       });
     });
-
     return Object.values(dataMap);
   };
-
-  console.log(products)
 
   const waterParameterData = transformPondParameters(pondById?.pondParameters);
   const parameters =
@@ -130,6 +129,8 @@ const PondDetail = ({ navigation, route }) => {
       });
 
       setImageBlob(uri);
+      setIsImageChanged(true); // User has decided to change the image
+      setIsImageUploading(true); // Start loading
       try {
         const response = await dispatch(getImage(formData)).unwrap();
         if (response) {
@@ -137,6 +138,8 @@ const PondDetail = ({ navigation, route }) => {
         }
       } catch (error) {
         console.error("Failed to upload image:", error);
+      } finally {
+        setIsImageUploading(false); // End loading
       }
     }
   };
@@ -144,24 +147,20 @@ const PondDetail = ({ navigation, route }) => {
   const onFinish = (values) => {
     const pondID = pondById?.pondID;
     const name = values.name;
-    const image = uploadResponse;
+    const image = uploadResponse || pond.image; // Use existing image if no new upload
     const createDate = pondById?.createDate + "Z";
     const ownerId = pondById?.ownerId;
-
+    const maxVolume = Number(values.maxVolume);
     const requirementPondParam = [];
-
-    console.log(createDate);
     const updatedPond = {
       pondID,
       name,
       image,
       createDate,
       ownerId,
-      maxVolume: 1,
+      maxVolume,
       requirementPondParam,
     };
-
-    console.log(updatedPond);
 
     dispatch(updatePond(updatedPond))
       .unwrap()
@@ -187,8 +186,6 @@ const PondDetail = ({ navigation, route }) => {
 
     getData();
   }, []);
-
-  console.log(recommendedProducts)
 
   return (
     <Provider>
@@ -216,7 +213,7 @@ const PondDetail = ({ navigation, route }) => {
                   </Text>
                   <Text style={styles.pondText}>
                     <Text style={styles.label}>Dung Tích: </Text>
-                    {pond.volume} l
+                    {pond.maxVolume}L
                   </Text>
                   <Text style={styles.pondText}>
                     <Text style={styles.label}>Độ Sâu: </Text>1 m
@@ -355,12 +352,26 @@ const PondDetail = ({ navigation, route }) => {
                 <Form form={form} onFinish={onFinish} style={styles.form}>
                   <Form.Item
                     name="name"
-                    initialValue={pond.name}
+                    initialValue={pond?.name}
                     rules={[
                       { required: true, message: "Vui lòng nhập tên ao" },
                     ]}
                   >
                     <Input placeholder="Tên Ao" style={styles.input} />
+                  </Form.Item>
+
+                  <Form.Item
+                    name="maxVolume"
+                    initialValue={pond?.maxVolume.toString()}
+                    rules={[
+                      { required: true, message: "Vui lòng nhập lượng nước" },
+                    ]}
+                  >
+                    <Input
+                      keyboardType="numeric"
+                      placeholder="Lượng Nước Tối Đa"
+                      style={styles.input}
+                    />
                   </Form.Item>
 
                   <View style={styles.modalFooter}>
@@ -374,6 +385,8 @@ const PondDetail = ({ navigation, route }) => {
                       type="primary"
                       style={styles.modalSaveButton}
                       onPress={() => form.submit()}
+                      disabled={isImageChanged && (!uploadResponse || isImageUploading)} // Disable only if image changed and upload incomplete
+                      loading={isImageUploading} // Show loading state during upload
                     >
                       Lưu
                     </Button>

@@ -43,6 +43,7 @@ const PondStatistic = ({ navigation }) => {
   const [imageBlob, setImageBlob] = useState(null);
   const [uploadResponse, setUploadResponse] = useState(null);
   const [fontLoaded, setFontLoaded] = useState(false);
+  const [isImageUploading, setIsImageUploading] = useState(false); // New state for tracking upload
 
   // Pagination states
   const [currentPage, setCurrentPage] = useState(1);
@@ -54,24 +55,23 @@ const PondStatistic = ({ navigation }) => {
   );
 
   const dispatch = useDispatch();
-
+console.log(pondData)
   const renderPondCard = ({ item }) => (
     <TouchableOpacity
       onPress={() => navigation.navigate("PondDetail", { pond: item })}
     >
       <Card style={styles.card}>
         <View style={styles.cardContent}>
-          <Image source={{ uri: item.image }} style={styles.pondImage} />
+          <Image source={item.image ? { uri: item.image } : require('../../assets/defaultpond.jpg')} style={styles.pondImage} />
           <View style={styles.pondInfo}>
             <View style={styles.infoRow}>
               <Text style={styles.pondText}>
                 <Text style={styles.label}>Tên: </Text>
-                {item.name} {" "}
+                {item.name}{" "}
               </Text>
               <Text style={styles.pondText}>
                 <Text style={styles.label}>
-                  {item?.fish?.length}{" "}
-                  <FontAwesome5 name="fish" size={25} />
+                  {item?.fish?.length} <FontAwesome5 name="fish" size={25} />
                 </Text>
               </Text>
             </View>
@@ -85,6 +85,7 @@ const PondStatistic = ({ navigation }) => {
     const createDate = dayjs().utc().format("YYYY-MM-DDTHH:mm:ss.SSS[Z]");
     let image = "string";
     const ownerId = isLoggedIn?.id;
+    values.maxVolume = Number(values.maxVolume)
     if (uploadResponse) {
       image = uploadResponse;
     }
@@ -117,12 +118,14 @@ const PondStatistic = ({ navigation }) => {
   const handleImagePick = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (status !== "granted") {
-      alert("Xin lỗi, chúng tôi cần quyền truy cập thư viện ảnh để thực hiện điều này!");
+      alert(
+        "Xin lỗi, chúng tôi cần quyền truy cập thư viện ảnh để thực hiện điều này!"
+      );
       return;
     }
 
     let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.Images,
+      mediaTypes: ImagePicker.MediaTypeOptions.Images, // Fixed typo: ImagePicker.Images -> MediaTypeOptions.Images
       allowsEditing: true,
       quality: 1,
     });
@@ -140,6 +143,7 @@ const PondStatistic = ({ navigation }) => {
       });
 
       setImageBlob(uri);
+      setIsImageUploading(true); // Start loading state
       try {
         const response = await dispatch(getImage(formData)).unwrap();
         if (response) {
@@ -147,6 +151,8 @@ const PondStatistic = ({ navigation }) => {
         }
       } catch (error) {
         console.error("Failed to upload image:", error);
+      } finally {
+        setIsImageUploading(false); // End loading state
       }
     }
   };
@@ -244,9 +250,7 @@ const PondStatistic = ({ navigation }) => {
 
           <View style={styles.footer}>
             <View style={styles.badge}>
-              <Text style={styles.badgeText}>
-                {pondData?.length} Ao
-              </Text>
+              <Text style={styles.badgeText}>{pondData?.length} Ao</Text>
             </View>
             <TouchableOpacity
               style={styles.addButton}
@@ -271,13 +275,11 @@ const PondStatistic = ({ navigation }) => {
 
               {imageBlob ? (
                 <View style={styles.imageContainer}>
-                  <TouchableOpacity
-                    onPress={handleImagePick}
-                  >
-                  <Image
-                    source={{ uri: uploadResponse }}
-                    style={styles.selectedImage}
-                  />
+                  <TouchableOpacity onPress={handleImagePick}>
+                    <Image
+                      source={{ uri: uploadResponse || imageBlob }} // Show imageBlob if uploadResponse isn't ready
+                      style={styles.selectedImage}
+                    />
                   </TouchableOpacity>
                 </View>
               ) : (
@@ -285,18 +287,31 @@ const PondStatistic = ({ navigation }) => {
                   style={styles.imageButton}
                   onPress={handleImagePick}
                 >
-                  <Text style={styles.imageButtonText}>Chạm Để Chọn Hình Ảnh</Text>
+                  <Text style={styles.imageButtonText}>
+                    Chạm Để Chọn Hình Ảnh
+                  </Text>
                 </TouchableOpacity>
               )}
 
               <Form form={form} onFinish={onFinish} style={styles.form}>
                 <Form.Item
                   name="name"
-                  rules={[
-                    { required: true, message: "Vui lòng nhập tên ao" },
-                  ]}
+                  rules={[{ required: true, message: "Vui lòng nhập tên ao" }]}
                 >
                   <Input placeholder="Tên Ao" style={styles.input} />
+                </Form.Item>
+
+                <Form.Item
+                  name="maxVolume"
+                  rules={[
+                    { required: true, message: "Vui lòng nhập lượng nước" },
+                  ]}
+                >
+                  <Input
+                    keyboardType="numeric"
+                    placeholder="Lượng Nước Tối Đa"
+                    style={styles.input}
+                  />
                 </Form.Item>
 
                 <View style={styles.modalFooter}>
@@ -310,6 +325,8 @@ const PondStatistic = ({ navigation }) => {
                     type="primary"
                     style={styles.modalSaveButton}
                     onPress={() => form.submit()}
+                    disabled={isImageUploading} // Disable while uploading
+                    loading={isImageUploading} // Show loading state
                   >
                     Lưu
                   </Button>
