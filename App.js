@@ -45,6 +45,7 @@ import TransactionScreen from './screens/TransactionScreen/TransactionScreen';
 import PackageScreen from './screens/PackageScreen/PackageScreen';
 import FAQScreen from './screens/FAQ/faq';
 import OTPScreen from './screens/OTPScreen/OTPScreen';
+import ReviewScreen from './screens/ReviewScreen/ReviewScreen';
 
 
 
@@ -293,6 +294,11 @@ export default function App() {
         <Stack.Screen
           name="PackageScreen"
           component={PackageScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="ReviewScreen"
+          component={ReviewScreen}
           options={{ headerShown: false }}
         />
           <Stack.Screen

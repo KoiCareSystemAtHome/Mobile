@@ -15,6 +15,8 @@ export const profileByFishSelector = (state) => state.fishSlice.profileByFish;
 // Product Selectors
 export const productSelector = (state) => state.productSlice.product;
 export const categorySelector = (state) => state.categorySlice.category;
+export const productByIdSelector = (state) => state.productSlice.productById;
+
 
 // Location Selectors (GHN)
 export const provinceSelector = (state) => state.ghnSlice.province;

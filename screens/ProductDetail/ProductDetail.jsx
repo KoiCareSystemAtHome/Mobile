@@ -1,35 +1,40 @@
-import React, { useState } from "react";
-import { View, Text, Image, TouchableOpacity, Alert } from "react-native";
+import React, { useEffect, useState } from "react";
+import { View, Text, Image, TouchableOpacity, Alert, FlatList } from "react-native";
 import { Button } from "@ant-design/react-native";
 import AntDesign from "react-native-vector-icons/AntDesign";
-import AsyncStorage from "@react-native-async-storage/async-storage"; // Import AsyncStorage
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { styles } from "./styles";
 import { useRoute } from "@react-navigation/native";
+import { useDispatch, useSelector } from "react-redux";
+import { getProductById } from "../../redux/slices/productSlice";
+import { productByIdSelector } from "../../redux/selector";
+
+const FEEDBACKS_PER_PAGE = 5;
 
 const ProductDetail = ({ navigation }) => {
+  const dispatch = useDispatch();
   const route = useRoute();
   const { product } = route.params;
+  const productById = useSelector(productByIdSelector);
   const [quantity, setQuantity] = useState(1);
-  const feedbacks = product.feedbacks || [];
+  const [currentPage, setCurrentPage] = useState(1);
+  const feedbacks = productById?.feedbacks || [];
+
   const handleIncrement = () => setQuantity(quantity + 1);
   const handleDecrement = () => quantity > 1 && setQuantity(quantity - 1);
-  console.log(product)
 
   const addToCart = async () => {
     try {
       const cartData = await AsyncStorage.getItem("cart");
       let cart = cartData ? JSON.parse(cartData) : [];
 
-      // Check if product already exists in cart
       const existingProductIndex = cart.findIndex(
         (item) => item.productId === product.productId
       );
 
       if (existingProductIndex !== -1) {
-        // If exists, update quantity
         cart[existingProductIndex].quantity += quantity;
       } else {
-        // Add new product
         cart.push({
           productId: product.productId,
           productName: product.productName,
@@ -48,9 +53,40 @@ const ProductDetail = ({ navigation }) => {
     }
   };
 
+  useEffect(() => {
+    dispatch(getProductById(product.productId));
+  }, [product]);
 
-  return (
-    <View style={styles.container}>
+  // Pagination logic
+  const totalPages = Math.ceil(feedbacks.length / FEEDBACKS_PER_PAGE);
+  const startIndex = (currentPage - 1) * FEEDBACKS_PER_PAGE;
+  const endIndex = startIndex + FEEDBACKS_PER_PAGE;
+  const paginatedFeedbacks = feedbacks.slice(startIndex, endIndex);
+
+  const handleNextPage = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage(currentPage + 1);
+    }
+  };
+
+  const handlePrevPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+    }
+  };
+
+  const renderFeedback = ({ item }) => (
+    <View style={styles.feedbackItem}>
+      <View style={styles.feedbackHeader}>
+        <Text style={styles.feedbackMemberName}>{item.memberName}:</Text>
+        <Text style={styles.feedbackRating}>Rating: {item.rate}/5</Text>
+      </View>
+      <Text style={styles.feedbackContent}>{item.content}</Text>
+    </View>
+  );
+
+  const renderHeader = () => (
+    <>
       {/* Back Button */}
       <TouchableOpacity
         style={styles.backButton}
@@ -103,18 +139,48 @@ const ProductDetail = ({ navigation }) => {
           </View>
         </Button>
       </View>
+
+      {/* Feedback Section Title */}
       <View style={styles.feedbackSection}>
         <Text style={styles.feedbackTitle}>Đánh giá sản phẩm</Text>
-        {feedbacks.length > 0 ? (
-          <FlatList
-            data={feedbacks}
-            renderItem={renderFeedback}
-            keyExtractor={(item) => item.feedbackId}
-          />
-        ) : (
-          <Text style={styles.noFeedbackText}>Chưa có đánh giá</Text>
-        )}
       </View>
+    </>
+  );
+
+  const renderFooter = () => (
+    <View style={styles.paginationContainer}>
+      <TouchableOpacity
+        style={[styles.paginationButton, currentPage === 1 && styles.disabledButton]}
+        onPress={handlePrevPage}
+        disabled={currentPage === 1}
+      >
+        <Text style={styles.paginationText}>Trang Trước</Text>
+      </TouchableOpacity>
+      <Text style={styles.pageInfo}>
+        {currentPage}/{totalPages}
+      </Text>
+      <TouchableOpacity
+        style={[styles.paginationButton, currentPage === totalPages && styles.disabledButton]}
+        onPress={handleNextPage}
+        disabled={currentPage === totalPages}
+      >
+        <Text style={styles.paginationText}>Trang Sau</Text>
+      </TouchableOpacity>
+    </View>
+  );
+
+  return (
+    <View style={styles.container}>
+      <FlatList
+        data={paginatedFeedbacks}
+        renderItem={renderFeedback}
+        keyExtractor={(item) => item.feedbackId}
+        ListHeaderComponent={renderHeader}
+        ListFooterComponent={renderFooter}
+        ListEmptyComponent={
+          <Text style={styles.noFeedbackText}>Chưa có đánh giá</Text>
+        }
+      />
     </View>
   );
 };

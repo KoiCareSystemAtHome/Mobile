@@ -72,7 +72,7 @@ const SymptomScreen = ({ navigation }) => {
       <Text style={styles.symptomText}>
         {item === "Common_Food"
           ? "Thức Ăn"
-          : item === "Common_Environment"
+          : item === "Common_Enviroment"
           ? "Môi trường"
           : item === "Common_Disease"
           ? "Loại bệnh phổ biển"
@@ -86,7 +86,7 @@ const SymptomScreen = ({ navigation }) => {
     navigation.navigate("PredictSymptom", {
       selectedSymptomIds: selectedValues.map((id) => ({
         symtompId: id,
-        value: "string",
+        value: "True",
       })),
     });
   };

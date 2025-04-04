@@ -4,6 +4,7 @@ import { Alert } from "react-native";
 
 const initialState = {
   product: null,
+  productById:null,
 };
 
 export const productSlice = createSlice({
@@ -17,7 +18,10 @@ export const productSlice = createSlice({
   extraReducers: (builder) => {
     builder.addCase(getProduct.fulfilled, (state, action) => {
       state.product = action.payload;
-    });
+    })
+    .addCase(getProductById.fulfilled, (state, action) => {
+      state.productById = action.payload;
+    })
   },
 });
 
@@ -33,6 +37,18 @@ export const getProduct = createAsyncThunk(
   }
 );
 
+export const getProductById = createAsyncThunk(
+  "productSlice/getProductById",
+  async (productId) => {
+    try {
+      const res = await getRequest(`Product/${productId}`);
+      return res.data;
+    } catch (error) {
+      Alert.alert("Error", "Failed to load product data.");
+    }
+  }
+);
+
 export const createProduct = createAsyncThunk(
   "productSlice/createProduct",
   async (payload, { rejectWithValue }) => {
@@ -41,6 +57,20 @@ export const createProduct = createAsyncThunk(
       return res.data;
     } catch (error) {
       Alert.alert("Error", "Failed to add test.");
+      return rejectWithValue("Add failed");
+    }
+  }
+);
+
+export const createFeedback = createAsyncThunk(
+  "productSlice/createFeedback",
+  async (payload, { rejectWithValue }) => {
+    try {
+      const res = await postRequest(`Feedback/create-feedback`, payload);
+      console.log(res.data)
+      return res.data;
+    } catch (error) {
+      Alert.alert("Error", "Failed to add feedback.");
       return rejectWithValue("Add failed");
     }
   }

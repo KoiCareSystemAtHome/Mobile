@@ -150,4 +150,39 @@ export const styles = StyleSheet.create({
     fontSize: 16,
     color: "#333",
   },
+  orderTotalContainer: {
+    marginTop: 12,
+    paddingTop: 8,
+    borderTopWidth: 1,
+    borderTopColor: "#eee",
+  },
+  orderTotalText: {
+    fontSize: 16,
+    color: "#333",
+    fontWeight: "bold",
+  },
+  orderTotalAmount: {
+    color: "#d32f2f",
+    fontWeight: "bold",
+  },
+  productDetails: {
+    flex: 1,
+    marginLeft: 10,
+  },
+  
+  // Add this new style
+  productFooter: {
+    marginLeft: 10,
+    marginTop: 4,
+  },
+
+  productReviewButton: {
+    alignSelf: "flex-start",
+  },
+  
+  productReviewText: {
+    color: "gold",
+    fontSize: 16,
+    fontWeight: "bold",
+  },
 });

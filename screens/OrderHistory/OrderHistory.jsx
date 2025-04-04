@@ -62,6 +62,15 @@ const OrderHistory = ({ navigation }) => {
     }
   };
 
+  const calculateOrderTotal = (order) => {
+    return order?.details?.reduce((total, item) => {
+      const matchedProduct = productData?.find(
+        (product) => product.productId === item.productId
+      );
+      return total + (matchedProduct ? item.quantity * matchedProduct.price : 0);
+    }, 0);
+  };
+
   return (
     <Provider>
       <ImageBackground
@@ -70,14 +79,14 @@ const OrderHistory = ({ navigation }) => {
         resizeMode="cover"
       >
         <View style={styles.overlay} />
-        
+
         {/* Back Button */}
         <TouchableOpacity
           style={{
-            position: 'absolute',
+            position: "absolute",
             top: 40,
             left: 15,
-            backgroundColor: 'rgba(255, 255, 255, 0.2)',
+            backgroundColor: "rgba(255, 255, 255, 0.2)",
             borderRadius: 20,
             padding: 8,
             zIndex: 1,
@@ -85,11 +94,7 @@ const OrderHistory = ({ navigation }) => {
           onPress={() => navigation.goBack()}
           activeOpacity={0.7}
         >
-          <Icon 
-            name="arrowleft" 
-            size={24} 
-            color="black" 
-          />
+          <Icon name="arrowleft" size={24} color="black" />
         </TouchableOpacity>
 
         <View style={styles.container}>
@@ -104,7 +109,6 @@ const OrderHistory = ({ navigation }) => {
                   const matchedProduct = productData?.find(
                     (product) => product.productId === item.productId
                   );
-
                   return (
                     <View key={item.productId} style={styles.productRow}>
                       {matchedProduct && (
@@ -119,7 +123,7 @@ const OrderHistory = ({ navigation }) => {
                             </Text>
                             <Text style={styles.price}>
                               <Text style={styles.originalPrice}>
-                                ₫{matchedProduct.price}
+                                ₫{matchedProduct.price.toLocaleString("vi-VN")}{" "}
                               </Text>{" "}
                               <Text style={styles.discountedPrice}>
                                 {/* ₫{matchedProduct.discountedPrice.toLocaleString()} */}
@@ -129,17 +133,46 @@ const OrderHistory = ({ navigation }) => {
                               x{item.quantity}
                             </Text>
                           </View>
-                          <Text style={styles.totalPrice}>
-                            Tổng số tiền:{" "}
-                            <Text style={styles.highlight}>
-                              ₫{item.quantity * matchedProduct.price}
+                          <View style={styles.productFooter}>
+                            <Text style={styles.totalPrice}>
+                              Tổng số tiền:{" "}
+                              <Text style={styles.highlight}>
+                                ₫
+                                {(
+                                  item.quantity * matchedProduct.price
+                                ).toLocaleString("vi-VN")}{" "}
+                              </Text>
                             </Text>
-                          </Text>
+                            {order.status === "Complete" && (
+                              <TouchableOpacity
+                                style={styles.productReviewButton}
+                                onPress={() => {
+                                  navigation.navigate("ReviewScreen", {
+                                    product: matchedProduct,
+                                  });
+                                }}
+                              >
+                                <Text style={styles.productReviewText}>
+                                 <AntDesign name="star" size={16} color="gold"></AntDesign> Đánh giá
+                                </Text>
+                              </TouchableOpacity>
+                            )}
+                          </View>
                         </>
                       )}
                     </View>
                   );
                 })}
+
+                {/* Order Total */}
+                <View style={styles.orderTotalContainer}>
+                  <Text style={styles.orderTotalText}>
+                    Tổng đơn hàng:{" "}
+                    <Text style={styles.orderTotalAmount}>
+                      ₫{calculateOrderTotal(order).toLocaleString("vi-VN")}
+                    </Text>
+                  </Text>
+                </View>
 
                 <View style={styles.rewardRow}>
                   <Icon name="gift" size={16} color="gold" />
@@ -194,8 +227,8 @@ const OrderHistory = ({ navigation }) => {
                 disabled={currentPage === 1}
               >
                 <Text style={styles.paginationText}>
-               <AntDesign name="left" size={20} color="black" />
-             </Text>
+                  <AntDesign name="left" size={20} color="black" />
+                </Text>
               </TouchableOpacity>
               <Text style={styles.pageText}>
                 {currentPage}/{totalPages}
@@ -209,8 +242,8 @@ const OrderHistory = ({ navigation }) => {
                 disabled={currentPage === totalPages}
               >
                 <Text style={styles.paginationText}>
-               <AntDesign name="right" size={20} color="black" />
-             </Text>
+                  <AntDesign name="right" size={20} color="black" />
+                </Text>
               </TouchableOpacity>
             </View>
           )}

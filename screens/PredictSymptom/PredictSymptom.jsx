@@ -18,7 +18,7 @@ const PredictSymptom = ({ route }) => {
   const symptomPrediction = useSelector(symptomPredictionSelector);
   const diseaseDiagnosis = useSelector(symptomExaminationSelector);
   const { selectedSymptomIds } = route.params;
-
+  
   useEffect(() => {
     if (symptomPrediction) {
       const dropdownItems = symptomPrediction?.symptomPredicts?.map(
@@ -28,7 +28,6 @@ const PredictSymptom = ({ route }) => {
         })
       );
       setItems(dropdownItems);
-      console.log("a", dropdownItems);
     }
   }, [symptomPrediction, dispatch]);
   
@@ -69,7 +68,6 @@ const PredictSymptom = ({ route }) => {
       symptoms: symptomsData
     });
   };
-
   return (
     <ImageBackground
       source={require("../../assets/koimain3.jpg")}

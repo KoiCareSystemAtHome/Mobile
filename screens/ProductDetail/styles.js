@@ -114,28 +114,74 @@ export const styles = StyleSheet.create({
     borderRadius: 20,
     marginRight: 10,
   },
-  feedbackContent: {
-    flex: 1,
+feedbackSection: {
+    marginTop: 20,
+    paddingHorizontal: 10,
   },
-  feedbackUser: {
-    fontSize: 16,
+  feedbackTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "#333",
+    marginBottom: 10,
+  },
+  feedbackList: {
+    maxHeight: 200, // Optional: limits the height of the feedback list
+  },
+  feedbackItem: {
+    backgroundColor: "#fff",
+    borderRadius: 5,
+    padding: 10,
+    marginBottom: 10,
+    shadowColor: "#000",
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  feedbackHeader: {
+
+    marginBottom: 5,
+  },
+  feedbackRating: {
+    fontSize: 14,
+    color: "#FFD700",
     fontWeight: "bold",
   },
-  ratingContainer: {
-    flexDirection: "row",
-    marginVertical: 5,
-  },
-  feedbackText: {
+  feedbackMemberName: {
     fontSize: 14,
-    color: "#444",
+    fontWeight: "bold",
+    color: "#333",
   },
-  feedbackDate: {
-    fontSize: 12,
-    color: "#888",
-    marginTop: 5,
+  feedbackContent: {
+    fontSize: 14,
+    color: "#333",
   },
   noFeedbackText: {
+    fontSize: 14,
+    color: "#666",
     textAlign: "center",
-    color: "#888",
+    marginTop: 10,
+  },
+  paginationContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    padding: 10,
+    marginTop: 10,
+  },
+  paginationButton: {
+    padding: 8,
+    backgroundColor: "#007AFF",
+    borderRadius: 5,
+  },
+  disabledButton: {
+    backgroundColor: "#ccc",
+  },
+  paginationText: {
+    color: "#fff",
+    fontSize: 16,
+  },
+  pageInfo: {
+    fontSize: 16,
+    color: "#333",
   },
 });
