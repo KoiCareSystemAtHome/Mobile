@@ -32,7 +32,7 @@ const WaterParameter = () => {
   const dispatch = useDispatch();
 
   const pondData = useSelector(pondByOwnerSelector);
-  const requiredParams = useSelector(requiredParamsSelector);
+  const   requiredParams = useSelector(requiredParamsSelector);
   const [homePond, setHomePond] = useState(null);
   const [selectedPond, setSelectedPond] = useState(null);
   const [homePondOpen, setHomePondOpen] = useState(false);
@@ -232,18 +232,38 @@ const WaterParameter = () => {
                 </View>
 
                 <Form form={form} onFinish={handleSubmit}>
-                  {requiredParams?.map((param) => (
-                    <View>
-                      <Text style={{ backgroundColor: "white" }}>
-                        {param.parameterName}
+                {requiredParams?.map((param) => (
+                    <View key={param.parameterId} style={styles.paramContainer}>
+                      <Text style={styles.paramName}>
+                        {param.parameterName} ({param.unitName})
                       </Text>
-                      <Form.Item
-                        key={param.parameterId}
-                        name={param.parameterId}
-                        style={{ fontSize: 12 }}
-                      >
+                      <View style={styles.rangeContainer}>
+                        {param.warningLowwer !== null && (
+                          <Text style={styles.warningText}>
+                            Warning Low: {param.warningLowwer}
+                          </Text>
+                        )}
+                        {param.warningUpper !== null && (
+                          <Text style={styles.warningText}>
+                            Warning High: {param.warningUpper}
+                          </Text>
+                        )}
+                        {param.dangerLower !== null && (
+                          <Text style={styles.dangerText}>
+                            Danger Low: {param.dangerLower}
+                          </Text>
+                        )}
+                        {param.dangerUpper !== null && (
+                          <Text style={styles.dangerText}>
+                            Danger High: {param.dangerUpper}
+                          </Text>
+                        )}
+                      </View>
+                      <Form.Item name={param.parameterId}>
                         <Input
-                          placeholder={`Enter value (${param.unitName})`}
+                          placeholder={`Enter value`}
+                          style={styles.paramInput}
+                          keyboardType="numeric"
                         />
                       </Form.Item>
                     </View>

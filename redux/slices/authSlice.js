@@ -66,8 +66,40 @@ export const register = createAsyncThunk(
   }
 );
 
+export const forgotPassword = createAsyncThunk(
+  "authSlice/forgotPassword",
+  async (values, { rejectWithValue }) => {
+    try {
+      const response = await postRequest(
+        `Account/ForgotPassword?email=${values}`
+      );
+      return response.data;
+    } catch (error) {
+      Alert.alert("Error", "Request failed. Please try again.");
+      return rejectWithValue("Registration failed");
+    }
+  }
+);
+
+export const resetPassword = createAsyncThunk(
+  "authSlice/resetPassword",
+  async (values, { rejectWithValue }) => {
+    try {
+      const response = await postRequest(
+        `Account/ConfirmResetPassCode?email=${values.email}&code=${values.code}&newPass=${values.newPass}`
+      );
+      return response.data;
+    } catch (error) {
+      Alert.alert("Error", "Request failed. Please try again.");
+      return rejectWithValue("Registration failed");
+    }
+  }
+);
+
+
+
 export const activateAccount = createAsyncThunk(
-  "authSlice/login",
+  "authSlice/activateAccount",
   async (credentials, { rejectWithValue }) => {
     try {
       console.log(credentials)

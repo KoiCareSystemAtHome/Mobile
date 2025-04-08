@@ -122,12 +122,13 @@ const AddFish = ({ navigation }) => {
     dispatch(createFish(values))
       .unwrap()
       .then((response) => {
+        console.log(response.status)
         if (response?.status === "201") {
           Toast.success("Fish Added Successfully");
           return dispatch(getFishByOwner(isLoggedIn?.id)).unwrap();
         } else {
           Toast.fail("Failed to add fish");
-          navigation.goBack();
+          // navigation.goBack();
         }
       })
       .then(() => {
@@ -194,7 +195,7 @@ const AddFish = ({ navigation }) => {
               <View style={styles.row}>
                 <View style={styles.inputRow}>
                   <Text style={styles.inputLabel}>Chiều dài:</Text>
-                  <Form.Item name="length" style={styles.input} extra="cm">
+                  <Form.Item name="size" style={styles.input} extra="cm">
                     <Input placeholder="Chiều dài" />
                   </Form.Item>
                 </View>

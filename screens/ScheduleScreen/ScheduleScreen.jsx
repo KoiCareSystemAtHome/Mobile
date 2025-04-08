@@ -26,15 +26,7 @@ const ScheduleScreen = ({ navigation }) => {
   const [filterType, setFilterType] = useState("RecurringMaintenance");
 
   // Request notification permissions on mount
-  useEffect(() => {
-    const setupNotifications = async () => {
-      const { status } = await Notifications.requestPermissionsAsync();
-      if (status !== "granted") {
-        console.warn("Notification permissions not granted!");
-      }
-    };
-    setupNotifications();
-  }, []);
+
 
   useEffect(() => {
     const subscription = Notifications.addNotificationResponseReceivedListener((response) => {
@@ -58,11 +50,11 @@ const ScheduleScreen = ({ navigation }) => {
             title: reminder.title,
             body: reminder.description || "You have a scheduled reminder!",
             data: { reminderId: reminder.pondReminderId },
-            sound: true, // Play default sound
-            vibrate: [0, 250, 250, 250], // Vibration pattern
+            sound: true,
+            vibrate: [0, 250, 250, 250],
           },
           trigger: {
-            date: maintainDate, // Expo uses a Date object directly
+            date: maintainDate,
           },
         });
         console.log(`Notification scheduled for ${reminder.title} at ${maintainDate}`);
@@ -95,8 +87,9 @@ const ScheduleScreen = ({ navigation }) => {
           const currDate = new Date(curr.maintainDate);
           return currDate < prevDate ? curr : prev;
         });
+        console.log("closest", closestReminder);
         setNextReminder(closestReminder);
-        scheduleNotification(closestReminder); // Schedule only for the next reminder
+        scheduleNotification(closestReminder);
       } else {
         setNextReminder(null);
       }
@@ -165,8 +158,8 @@ const ScheduleScreen = ({ navigation }) => {
 
   const getTimeRange = (maintainDate) => {
     const date = new Date(maintainDate);
-    const hours = date.getHours();
-    const minutes = date.getMinutes();
+    const hours = date.getUTCHours(); // Use UTC hours
+    const minutes = date.getUTCMinutes(); // Use UTC minutes
     const startHour = hours.toString().padStart(2, "0");
     const startMinutes = minutes.toString().padStart(2, "0");
     const endHour = (hours + 2) % 24;
@@ -190,6 +183,17 @@ const ScheduleScreen = ({ navigation }) => {
       })
       .toUpperCase();
   };
+
+  useEffect(() => {
+    const testReminder = {
+      title: "Test Notification",
+      description: "This is a test!",
+      maintainDate: new Date(Date.now() + 5000).toISOString(),
+      pondReminderId: "test-id",
+      seenDate: "0001-01-01T00:00:00",
+    };
+    scheduleNotification(testReminder);
+  }, []);
 
   return (
     <SafeAreaView style={styles.container}>

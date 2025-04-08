@@ -77,6 +77,7 @@ const CalculateMaintainance = () => {
         ...maintainanceData,
         maintainDate: endDate.toISOString(),
       };
+      console.log(updatedMaintenanceData)
       dispatch(saveMaintainance(updatedMaintenanceData))
         .unwrap()
         .then((res) => {
@@ -99,7 +100,6 @@ const CalculateMaintainance = () => {
       setDatePickerVisible(false);
     }
   };
-  console.log(maintainanceData);
 
   const handleTimePickerChange = (time) => {
     if (isMounted.current) {

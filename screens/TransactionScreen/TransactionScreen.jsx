@@ -70,14 +70,14 @@ const TransactionScreen = ({ navigation }) => {
         Mua ngày: {dayjs(item.transactionDate).format("ddd, D MMMM YYYY")}
       </Text>
       <Text style={styles.orderTotal}>Tổng tiền: {item.amount}</Text>
-      <View style={styles.buttonContainer}>
+      {/* <View style={styles.buttonContainer}>
         <TouchableOpacity style={styles.reviewButton}>
           <Text style={styles.buttonText}>Đánh giá</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.buyAgainButton}>
           <Text style={styles.buttonText}>Mua lại</Text>
         </TouchableOpacity>
-      </View>
+      </View> */}
     </View>
   );
 

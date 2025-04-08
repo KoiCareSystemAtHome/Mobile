@@ -199,18 +199,7 @@ const FishDetail = ({ route, navigation }) => {
           </View>
   
           {/* Notes */}
-          <View style={styles.section}>
-            <View style={styles.sectionHeader}>
-              <Text style={styles.label}>Ghi Chú</Text>
-              <TouchableOpacity>
-                <FontAwesome name="plus" size={18} color="#6497B1" />
-              </TouchableOpacity>
-            </View>
-            <Text style={styles.noteText}>
-              Bạn chưa thêm bất kỳ ghi chú nào. Vui lòng thêm ghi chú mới bằng cách
-              chạm vào biểu tượng dấu cộng ở góc trên bên phải của phần này.
-            </Text>
-          </View>
+
         </ScrollView>
       </ImageBackground>
     </Provider>

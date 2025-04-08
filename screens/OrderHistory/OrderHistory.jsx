@@ -143,7 +143,7 @@ const OrderHistory = ({ navigation }) => {
                                 ).toLocaleString("vi-VN")}{" "}
                               </Text>
                             </Text>
-                            {order.status === "Complete" && (
+                            {order.status === "Completed" && (
                               <TouchableOpacity
                                 style={styles.productReviewButton}
                                 onPress={() => {

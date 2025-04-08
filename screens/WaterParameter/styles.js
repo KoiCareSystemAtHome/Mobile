@@ -137,4 +137,28 @@ export const styles = StyleSheet.create({
   modalTitle: {
     fontSize: 20,
   },
+  paramContainer: {
+    padding: 10,
+    backgroundColor: "white",
+    borderRadius: 8,
+  },
+  paramName: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#333",
+    marginBottom: 5,
+  },
+  rangeContainer: {
+    marginBottom: 10,
+  },
+  warningText: {
+    fontSize: 14,
+    color: "#FFA500",
+    marginBottom: 2,
+  },
+  dangerText: {
+    fontSize: 14,
+    color: "#FF0000",
+    marginBottom: 2,
+  },
 });

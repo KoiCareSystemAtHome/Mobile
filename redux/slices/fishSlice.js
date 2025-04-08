@@ -58,8 +58,6 @@ export const createFish = createAsyncThunk(
   async (payload, { rejectWithValue }) => {
     try {
       const res = await postRequest(`Fish/create-fish`, payload);
-      console.log(res.data)
-
       return res.data;
     } catch (error) {
       console.log(error)

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Provider } from 'react-redux';
 import store from './redux/store';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
@@ -46,7 +46,10 @@ import PackageScreen from './screens/PackageScreen/PackageScreen';
 import FAQScreen from './screens/FAQ/faq';
 import OTPScreen from './screens/OTPScreen/OTPScreen';
 import ReviewScreen from './screens/ReviewScreen/ReviewScreen';
-
+import ForgetPassword from './screens/FogetPassword/ForgetPassword';
+import ResetPasswordForm from './screens/FogetPassword/components/ResetPasswordForm';
+import * as Notifications from 'expo-notifications';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
 // Create Bottom Tab Navigator
@@ -115,8 +118,56 @@ const MainTabNavigator = () => (
   </Tab.Navigator>
 );
 
-// Stack Navigator for Login/Register + Main App Flow
+const requestNotificationPermissions = async () => {
+  try {
+    // Check if we've already asked for permission
+    const hasAsked = await AsyncStorage.getItem('hasAskedForNotificationPermission');
+    if (hasAsked === 'true') return; // Skip if already asked
+
+    const { status: existingStatus } = await Notifications.getPermissionsAsync();
+    let finalStatus = existingStatus;
+
+    if (existingStatus !== 'granted') {
+      const { status } = await Notifications.requestPermissionsAsync({
+        ios: {
+          allowAlert: true,
+          allowBadge: true,
+          allowSound: true,
+        },
+      });
+      finalStatus = status;
+    }
+
+    if (finalStatus !== 'granted') {
+      Alert.alert(
+        'Notification Permission',
+        'Please enable notifications in your settings to receive reminders.',
+        [{ text: 'OK' }]
+      );
+      return;
+    }
+
+    // Mark that we've asked for permission
+    await AsyncStorage.setItem('hasAskedForNotificationPermission', 'true');
+    console.log('Notification permissions granted!');
+  } catch (error) {
+    console.error('Error requesting notification permissions:', error);
+  }
+};
 export default function App() {
+  useEffect(() => {
+    // Request notification permissions when the app loads
+    requestNotificationPermissions();
+
+    // Set notification handler (optional, for foreground notifications)
+    Notifications.setNotificationHandler({
+      handleNotification: async () => ({
+        shouldShowAlert: true,
+        shouldPlaySound: true,
+        shouldSetBadge: false,
+      }),
+    });
+  }, []);
   return (
     <Provider store={store}>
       <NavigationContainer>
@@ -299,6 +350,16 @@ export default function App() {
         <Stack.Screen
           name="ReviewScreen"
           component={ReviewScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="ForgetPassword"
+          component={ForgetPassword}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="ResetPasswordForm"
+          component={ResetPasswordForm}
           options={{ headerShown: false }}
         />
           <Stack.Screen
