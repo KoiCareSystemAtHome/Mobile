@@ -27,6 +27,7 @@ import {
   updatePond,
 } from "../../redux/slices/pondSlice";
 import Icon from "react-native-vector-icons/AntDesign";
+import { color } from "react-native-elements/dist/helpers";
 
 const WaterParameter = () => {
   const dispatch = useDispatch();
@@ -38,12 +39,42 @@ const WaterParameter = () => {
   const [homePondOpen, setHomePondOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isModalVisible, setModalVisible] = useState(false);
+  const [warnings, setWarnings] = useState({});
+
 
   const [form] = Form.useForm();
 
   const handleChangeParameters = () => {
     setModalVisible(true);
   };
+  const handleParamChange = (text, param) => {
+    const value = parseFloat(text);
+    let message = "";
+    let type = "";
+    const dangerLower = param.dangerLower ?? 0;
+    const dangerUpper = param.dangerUpper ?? 100;
+    const warningLower = param.warningLower ?? dangerLower;
+    const warningUpper = param.warningUpper ?? dangerUpper;
+
+    if (!isNaN(value)) {
+      if (value < dangerLower || value > dangerUpper) {
+        message = `Nguy hiểm! (${value}) vượt ngoài ${dangerLower} - ${dangerUpper}`;
+        type = "danger";
+      } else if (
+        (value >= dangerLower && value < warningLower) ||
+        (value > warningUpper && value <= dangerUpper)
+      ) {
+        message = `Cảnh báo! (${value}) ngoài vùng ${warningLower} - ${warningUpper}`;
+        type = "warning";
+      }      
+    }
+  
+    setWarnings((prev) => ({
+      ...prev,
+      [param.parameterId]: { message, type },
+    }));
+  };
+  
 
   const handleSubmit = (values) => {
     const pondID = selectedPond?.pondID;
@@ -237,36 +268,43 @@ const WaterParameter = () => {
                       <Text style={styles.paramName}>
                         {param.parameterName} ({param.unitName})
                       </Text>
-                      <View style={styles.rangeContainer}>
-                        {param.warningLowwer !== null && (
-                          <Text style={styles.warningText}>
-                            Warning Low: {param.warningLowwer}
-                          </Text>
-                        )}
-                        {param.warningUpper !== null && (
-                          <Text style={styles.warningText}>
-                            Warning High: {param.warningUpper}
-                          </Text>
-                        )}
-                        {param.dangerLower !== null && (
-                          <Text style={styles.dangerText}>
-                            Danger Low: {param.dangerLower}
-                          </Text>
-                        )}
-                        {param.dangerUpper !== null && (
-                          <Text style={styles.dangerText}>
-                            Danger High: {param.dangerUpper}
-                          </Text>
-                        )}
-                      </View>
+                      <Text style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
+                      <Text style={styles.dangerText}>
+                      ← {param.dangerLower ?? 0}-- 
+                      </Text>
+                      <Text style={styles.warningText}>
+                        {param.warningLower ?? param.dangerLower ??0}-- 
+                      </Text>
+                      <Text style={styles.greenText}>
+                      an toàn--
+                    </Text>
+                      <Text style={styles.warningText}>
+                        {param.warningUpper ??param.dangerUpper ?? 100}-- 
+                      </Text>
+                      <Text style={styles.dangerText}>
+                        {param.dangerUpper ?? 100}→
+                      </Text>
+                    </Text>
                       <Form.Item name={param.parameterId}>
                         <Input
-                          placeholder={`Enter value`}
+                          placeholder={`Nhập giá trị`}
                           style={styles.paramInput}
                           keyboardType="numeric"
+                          onChangeText={(text) => handleParamChange(text, param)}
                         />
                       </Form.Item>
-                    </View>
+                      {warnings[param.parameterId]?.message ? (
+                      <Text
+                        style={
+                          warnings[param.parameterId].type === "danger"
+                            ? styles.dangerText
+                            : styles.warningText
+                        }
+                      >
+                        {warnings[param.parameterId].message}
+                      </Text>
+                    ) : null}
+                                        </View>
                   ))}
 
                   <Button type="primary" onPress={() => form.submit()}>
