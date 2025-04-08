@@ -1,31 +1,215 @@
 import React, { useEffect, useState } from "react";
-import { ImageBackground, Text, View, TouchableOpacity } from "react-native";
+import {
+  ImageBackground,
+  Text,
+  View,
+  ScrollView,
+  TouchableOpacity,
+  Image,
+} from "react-native";
 import { styles } from "./styles";
 import { Form, Input, Button } from "@ant-design/react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useDispatch, useSelector } from "react-redux";
+import DropDownPicker from "react-native-dropdown-picker";
+import * as ImagePicker from "expo-image-picker";
+import {
+  districtSelector,
+  provinceSelector,
+  wardSelector,
+} from "../../redux/selector";
+import { getDistrict, getProvince, getWard } from "../../redux/slices/ghnSlice";
+import { getImage, updateProfile } from "../../redux/slices/authSlice";
 
 const EditProfile = () => {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [token, setToken] = useState();
+  const [isLoggedIn, setIsLoggedIn] = useState(null); // Initialize as null to distinguish unset state
+  const [token, setToken] = useState(null);
   const [form] = Form.useForm();
+  const dispatch = useDispatch();
 
-  const onFinish = (values) => {
-  };
+  // Image states
+  const [imageBlob, setImageBlob] = useState(null);
+  const [uploadResponse, setUploadResponse] = useState(null);
+
+  // Address-related states
+  const provinceData = useSelector(provinceSelector);
+  const districtData = useSelector(districtSelector);
+  const wardData = useSelector(wardSelector);
+
+  const [selectedProvince, setSelectedProvince] = useState(null);
+  const [selectedDistrict, setSelectedDistrict] = useState(null);
+  const [selectedWard, setSelectedWard] = useState(null);
+
+  const [openProvince, setOpenProvince] = useState(false);
+  const [openDistrict, setOpenDistrict] = useState(false);
+  const [openWard, setOpenWard] = useState(false);
 
   useEffect(() => {
-    const getData = async (key) => {
+    const getData = async () => {
       try {
-        const value = await AsyncStorage.getItem("user");
-        setIsLoggedIn(value ? JSON.parse(value) : null);
+        const userData = await AsyncStorage.getItem("user");
+        const parsedUser = userData ? JSON.parse(userData) : null;
+        setIsLoggedIn(parsedUser);
         const token = await AsyncStorage.getItem("accessToken");
         setToken(token);
+
+        // Set initial values if they exist
+        if (parsedUser?.image) {
+          setImageBlob(parsedUser.image);
+          setUploadResponse(parsedUser.image);
+        }
+        if (parsedUser?.address) {
+          setSelectedProvince(
+            JSON.stringify({
+              provinceId: parsedUser.address.provinceId,
+              provinceName: parsedUser.address.provinceName,
+            })
+          );
+          setSelectedDistrict(
+            JSON.stringify({
+              districtId: parsedUser.address.districtId,
+              districtName: parsedUser.address.districtName,
+            })
+          );
+          setSelectedWard(
+            JSON.stringify({
+              wardCode: parsedUser.address.wardId,
+              wardName: parsedUser.address.wardName,
+            })
+          );
+        }
       } catch (error) {
-        console.error(error);
+        console.error("Error fetching data:", error);
       }
     };
 
     getData();
-  }, []);
+    dispatch(getProvince());
+  }, [dispatch]);
+
+  // Sync form fields with isLoggedIn when it changes
+  useEffect(() => {
+    if (isLoggedIn) {
+      form.setFieldsValue({
+        name: isLoggedIn.name,
+        email: isLoggedIn.email,
+        gender: isLoggedIn.gender,
+      });
+    }
+  }, [isLoggedIn, form]);
+
+  useEffect(() => {
+    if (selectedProvince) {
+      const province = JSON.parse(selectedProvince);
+      dispatch(getDistrict(province.provinceId));
+      if (!selectedDistrict) {
+        setSelectedDistrict(null);
+        setSelectedWard(null);
+      }
+    }
+  }, [selectedProvince, dispatch]);
+
+  useEffect(() => {
+    if (selectedDistrict) {
+      const district = JSON.parse(selectedDistrict);
+      dispatch(getWard(district.districtId));
+      if (!selectedWard) {
+        setSelectedWard(null);
+      }
+    }
+  }, [selectedDistrict, dispatch]);
+
+  const handleImagePick = async () => {
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (status !== "granted") {
+      alert("Sorry, we need camera roll permissions to make this work!");
+      return;
+    }
+
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      quality: 1,
+    });
+
+    if (!result.canceled) {
+      const uri = result.assets[0].uri;
+      const fileType = uri.split(".").pop();
+      const fileMimeType = `image/${fileType === "jpg" ? "jpeg" : fileType}`;
+
+      let formData = new FormData();
+      formData.append("file", {
+        uri: uri,
+        name: `image.${fileType}`,
+        type: fileMimeType,
+      });
+
+      setImageBlob(uri);
+      try {
+        const response = await dispatch(getImage(formData)).unwrap();
+        if (response) {
+          setUploadResponse(response.imageUrl);
+        }
+      } catch (error) {
+        console.error("Failed to upload image:", error);
+      }
+    }
+  };
+
+  const onFinish = async (values) => {
+    const address = {
+      provinceId: selectedProvince
+        ? String(JSON.parse(selectedProvince).provinceId)
+        : "",
+      provinceName: selectedProvince
+        ? JSON.parse(selectedProvince).provinceName
+        : "",
+      districtId: selectedDistrict
+        ? String(JSON.parse(selectedDistrict).districtId)
+        : "",
+      districtName: selectedDistrict
+        ? JSON.parse(selectedDistrict).districtName
+        : "",
+      wardId: selectedWard ? String(JSON.parse(selectedWard).wardCode) : "",
+      wardName: selectedWard ? JSON.parse(selectedWard).wardName : "",
+    };
+
+    try {
+      const existingUserData = await AsyncStorage.getItem("user");
+      const existingUser = existingUserData ? JSON.parse(existingUserData) : {};
+      const updatedProfileForApi= {
+        name: values.name !== undefined ? values.name : existingUser.name,
+        email: values.email !== undefined ? values.email : existingUser.email,
+        gender: values.gender !== undefined ? values.gender : existingUser.gender,
+        address: Object.keys(address).length > 0 ? address : existingUser.address,
+        avatar: uploadResponse || existingUser.image || "",
+        userReminder: "2025-04-08T20:40:01.369Z",
+        shopDescription: "string",
+        bizLicense: "string"
+      }
+      console.log(updatedProfileForApi)
+      dispatch(updateProfile(updatedProfileForApi)).unwrap()
+      .then((res)=>{
+        console.log("Profile updated successfully:", res);
+      })
+      const updatedProfile = {
+        ...existingUser,
+        name: values.name !== undefined ? values.name : existingUser.name,
+        email: values.email !== undefined ? values.email : existingUser.email,
+        gender: values.gender !== undefined ? values.gender : existingUser.gender,
+        address: Object.keys(address).length > 0 ? address : existingUser.address,
+        avatar: uploadResponse || existingUser.image || "",
+        userReminder: "2025-04-08T20:40:01.369Z",
+        shopDescription: "string",
+        bizLicense: "string"
+      };
+
+      // await AsyncStorage.setItem("user", JSON.stringify(updatedProfile));
+      console.log("Profile updated:", updatedProfile);
+    } catch (error) {
+      console.error("Error saving profile:", error);
+    }
+  };
 
   return (
     <ImageBackground
@@ -34,23 +218,38 @@ const EditProfile = () => {
       resizeMode="cover"
     >
       <View style={styles.overlay} />
-      <View style={styles.container}>
+      <ScrollView contentContainerStyle={styles.scrollContainer}>
         <View style={styles.header}>
           <Text style={styles.title}>Hồ sơ cá nhân</Text>
         </View>
+
+        {imageBlob ? (
+          <View style={styles.imageContainer}>
+            <TouchableOpacity onPress={handleImagePick}>
+              <Image
+                source={{ uri: uploadResponse || imageBlob }}
+                style={styles.selectedImage}
+              />
+            </TouchableOpacity>
+          </View>
+        ) : (
+          <TouchableOpacity style={styles.imageButton} onPress={handleImagePick}>
+            <Text style={styles.imageButtonText}>Chạm để Chọn Hình Ảnh</Text>
+          </TouchableOpacity>
+        )}
+
         <Form
           form={form}
           name="edit_profile"
           onFinish={onFinish}
           style={styles.formContainer}
         >
-          <Form.Item name="name" initialValue={isLoggedIn?.name} noStyle>
+          <Form.Item name="name" noStyle>
             <Input placeholder="Họ và tên" style={styles.inputField} />
           </Form.Item>
 
           <Form.Item
             name="email"
-            initialValue={isLoggedIn?.email}
             rules={[{ type: "email", message: "Enter a valid email" }]}
             noStyle
           >
@@ -65,14 +264,76 @@ const EditProfile = () => {
             <Input placeholder="Giới tính" style={styles.inputField} />
           </Form.Item>
 
-          <Form.Item
-            name="address"
-            noStyle
-          >
-            <Input placeholder="Nhập địa chỉ của bạn" style={styles.inputField} />
+          <Form.Item style={styles.dropdownContainer}>
+            <DropDownPicker
+              placeholder="Select Province"
+              open={openProvince}
+              value={selectedProvince}
+              items={
+                provinceData?.map((prov) => ({
+                  label: prov.ProvinceName,
+                  value: JSON.stringify({
+                    provinceId: prov.ProvinceID,
+                    provinceName: prov.ProvinceName,
+                  }),
+                })) || []
+              }
+              setOpen={setOpenProvince}
+              setValue={setSelectedProvince}
+              listMode="SCROLLVIEW"
+              style={openProvince ? { marginBottom: 200 } : {}}
+              dropDownStyle={styles.dropdownBox}
+            />
           </Form.Item>
 
-          {/* Submit Button */}
+          <Form.Item style={styles.dropdownContainer}>
+            <DropDownPicker
+              placeholder={
+                selectedProvince ? "Select District" : "Select Province First"
+              }
+              open={openDistrict}
+              value={selectedDistrict}
+              items={
+                districtData?.map((dist) => ({
+                  label: dist.DistrictName,
+                  value: JSON.stringify({
+                    districtId: dist.DistrictID,
+                    districtName: dist.DistrictName,
+                  }),
+                })) || []
+              }
+              setOpen={setOpenDistrict}
+              setValue={setSelectedDistrict}
+              disabled={!selectedProvince}
+              style={openDistrict ? { marginBottom: 200 } : {}}
+              dropDownStyle={styles.dropdownBox}
+            />
+          </Form.Item>
+
+          <Form.Item style={styles.dropdownContainer}>
+            <DropDownPicker
+              placeholder={
+                selectedDistrict ? "Select Ward" : "Select District First"
+              }
+              open={openWard}
+              value={selectedWard}
+              items={
+                wardData?.map((w) => ({
+                  label: w.WardName,
+                  value: JSON.stringify({
+                    wardCode: w.WardCode,
+                    wardName: w.WardName,
+                  }),
+                })) || []
+              }
+              setOpen={setOpenWard}
+              setValue={setSelectedWard}
+              disabled={!selectedDistrict}
+              style={openWard ? { marginBottom: 200 } : {}}
+              dropDownStyle={styles.dropdownBox}
+            />
+          </Form.Item>
+
           <Button
             type="primary"
             style={styles.submitButton}
@@ -81,7 +342,7 @@ const EditProfile = () => {
             <Text style={styles.submitButtonText}>Lưu</Text>
           </Button>
         </Form>
-      </View>
+      </ScrollView>
     </ImageBackground>
   );
 };

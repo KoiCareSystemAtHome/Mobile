@@ -132,6 +132,23 @@ export const resendCode = createAsyncThunk(
   }
 );
 
+export const updateProfile = createAsyncThunk(
+  "authSlice/updateProfile",
+  async (credentials, { rejectWithValue }) => {
+    try {
+      console.log(credentials)
+      const response = await postRequest(
+        `Account/UpdateProfile`, credentials
+      );
+
+      return response.data;
+    } catch (error) {
+      Alert.alert("Error", "Login failed. Please try again.");
+      return rejectWithValue("Login failed");
+    }
+  }
+);
+
 const initialState = {
   user: null,
   token: null,

@@ -78,7 +78,14 @@ const CreateKoiProfile = ({ route, navigation }) => {
       symptoms
     };
     console.log("Saving profile with values:", values);
-    dispatch(createKoiProfile(values));
+    dispatch(createKoiProfile(values))
+    .unwrap()
+    .then((res)=>{
+      if(res === "Create successfully!"){
+        Alert.alert("Success", "Lưu lịch sử bệnh thành công!");
+        navigation.navigate("MainTabs")
+      }
+    })
   };
 
   const fishData = [

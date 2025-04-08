@@ -130,6 +130,10 @@ export const styles = StyleSheet.create({
     color: "#4caf50",
     fontWeight: "bold",
   },
+  modalSaveTextDisabled: {
+    color: "#ddd",
+    fontWeight: "bold",
+  },
   imageButton: {
     borderWidth: 2,
     borderColor: "#3498db", // Vibrant blue border

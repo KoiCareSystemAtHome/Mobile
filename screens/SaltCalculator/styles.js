@@ -147,4 +147,24 @@ export const styles = StyleSheet.create({
     backgroundColor: "#ccc", // Grayed out when disabled
     opacity: 0.6, // Slightly transparent to indicate disabled state
   },
+  saveReminderButton: {
+    marginTop: 10,
+    backgroundColor: "#007AFF", 
+  },
+  saveReminderText: {
+    color: "#fff",
+    fontSize: 16,
+  },
+  reminderItem: {
+    marginVertical: 5,
+  },
+  reminderText: {
+    fontSize: 16,
+    color: "white",
+  },
+  reminderDate: {
+    fontSize: 14,
+    color: "#666",
+    marginTop: 2,
+  },
 });

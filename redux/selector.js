@@ -33,6 +33,7 @@ export const foodSelector = (state) => state.calculatorSlice.food;
 export const saltSelector = (state) => state.calculatorSlice.salt;
 export const foodSuggestionSelector = (state) => state.calculatorSlice.foodSuggestion;
 export const instructionSelector = (state) => state.calculatorSlice.instructions;
+export const saltReminderSelector = (state) => state.calculatorSlice.saltReminder;
 
 // Symptom Selectors
 export const symptomByTypeSelector = (state) => state.symptomSlice.symptomByType;

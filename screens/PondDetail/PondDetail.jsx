@@ -215,7 +215,20 @@ const PondDetail = ({ navigation, route }) => {
                     <Text style={styles.label}>Dung Tích: </Text>
                     {pond.maxVolume}L
                   </Text>
-
+                  <TouchableOpacity
+                    style={[styles.editButton, styles.addFishButton]}
+                    onPress={() => 
+                      navigation.navigate('AddFish', { 
+                        pondID: pond.pondID 
+                      })
+                    }
+                  >
+                    <FontAwesome
+                      name="plus"
+                      size={24}
+                      color="white"
+                    />
+                  </TouchableOpacity>
                   <TouchableOpacity
                     style={styles.editButton}
                     onPress={() => setModalVisible(true)}

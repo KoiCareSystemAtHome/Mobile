@@ -33,10 +33,6 @@ const AddressForm = ({navigation}) => {
   const [openWard, setOpenWard] = useState(false);
 
   const onFinish = async (values) => {
-    console.log("Form Submitted with values:", values);
-    console.log("Selected Province:", selectedProvince);
-    console.log("Selected District:", selectedDistrict);
-    console.log("Selected Ward:", selectedWard);
     const address = {
       provinceId: String(JSON.parse(selectedProvince).provinceId),
       provinceName: JSON.parse(selectedProvince).provinceName,
@@ -45,11 +41,9 @@ const AddressForm = ({navigation}) => {
       wardId: String(JSON.parse(selectedWard).wardCode),
       wardName: JSON.parse(selectedWard).wardName,
     };
-  
     try {
       await AsyncStorage.setItem('address', JSON.stringify(address));
-      navigation.navigate("CartScreen");
-      console.log('Address saved to AsyncStorage:', address);
+      navigation.navigate("ProfileScreen");
     } catch (error) {
       console.error('Error saving address to AsyncStorage:', error);
     }
@@ -77,11 +71,6 @@ const AddressForm = ({navigation}) => {
       setSelectedWard(null);
     }
   }, [selectedDistrict, dispatch]);
-  useEffect(() => {
-    console.log("Selected Province:", selectedProvince);
-    console.log("Selected District:", selectedDistrict);
-    console.log("Selected Ward:", selectedWard);
-  }, [selectedProvince, selectedDistrict, selectedWard]);
 
   return (
     <ImageBackground

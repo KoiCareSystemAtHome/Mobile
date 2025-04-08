@@ -12,7 +12,8 @@ const initialState = {
   food: null,
   salt: null,
   instructions: null,
-  foodSuggestion: null
+  foodSuggestion: null,
+  saltReminder:null,
 };
 
 export const calculatorSlice = createSlice({
@@ -36,6 +37,9 @@ export const calculatorSlice = createSlice({
       })
       .addCase(recommendFood.fulfilled, (state, action) => {
         state.foodSuggestion = action.payload;
+      })
+      .addCase(generateReminder.fulfilled, (state, action) => {
+        state.saltReminder = action.payload;
       })
   },
 });
@@ -75,6 +79,32 @@ export const calculateSalt = createAsyncThunk(
     }
   }
 );
+
+export const generateReminder = createAsyncThunk(
+  "calculatorSlice/generateReminder",
+  async (values) => {
+    try {
+      const res = await postRequest(`SaltCalculate/generate-salt-reminders`, values);
+      return res.data;
+    } catch (error) {
+      Alert.alert("Error", "Failed to load category data.");
+    }
+  }
+);
+
+
+export const saveReminder = createAsyncThunk(
+  "calculatorSlice/saveReminder",
+  async (values) => {
+    try {
+      const res = await postRequest(`SaltCalculate/save-reminders`, values);
+      return res.data;
+    } catch (error) {
+      Alert.alert("Error", "Failed to load category data.");
+    }
+  }
+);
+
 
 export const updateSalt = createAsyncThunk(
   "calculatorSlice/updateSalt",

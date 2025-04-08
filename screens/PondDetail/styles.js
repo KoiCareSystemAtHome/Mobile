@@ -59,6 +59,10 @@ export const styles = StyleSheet.create({
     shadowRadius: 3,
     elevation: 5,
   },
+  addFishButton: {
+    bottom: 50, // Position it above the edit button
+    right: 0,
+  },
   editButtonText: {
     color: "#fff",
     fontWeight: "bold",

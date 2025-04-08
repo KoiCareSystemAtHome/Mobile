@@ -26,12 +26,14 @@ import { getImage } from "../../../redux/slices/authSlice";
 import { createFish, getFishByOwner } from "../../../redux/slices/fishSlice";
 import { styles } from "./styles";
 
-const AddFish = ({ navigation }) => {
+const AddFish = ({ navigation, route }) => {
   const [form] = Form.useForm();
   const dispatch = useDispatch();
+  const { pondID } = route.params || {}; // Default to empty object if route.params is undefined
+
   const pondData = useSelector(pondByOwnerSelector);
   const [open, setOpen] = useState(false);
-  const [selectedPond, setSelectedPond] = useState(null);
+  const [selectedPond, setSelectedPond] = useState(pondID || null); // Set initial value to pondID if it exists
   const [pondItems, setPondItems] = useState([]);
   const [imageBlob, setImageBlob] = useState(null);
   const [uploadResponse, setUploadResponse] = useState(null);
@@ -53,14 +55,18 @@ const AddFish = ({ navigation }) => {
 
   useEffect(() => {
     if (pondData) {
-      setPondItems(
-        pondData.map((pond) => ({
-          label: pond.name,
-          value: pond.pondID,
-        }))
-      );
+      const items = pondData.map((pond) => ({
+        label: pond.name,
+        value: pond.pondID,
+      }));
+      setPondItems(items);
+      
+      // If pondID exists and matches an item, set it as selected
+      if (pondID && items.some(item => item.value === pondID)) {
+        setSelectedPond(pondID);
+      }
     }
-  }, [pondData]);
+  }, [pondData, pondID]);
 
   const handleImagePick = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -91,7 +97,6 @@ const AddFish = ({ navigation }) => {
       try {
         const response = await dispatch(getImage(formData)).unwrap();
         if (response) {
-          console.log(response);
           setUploadResponse(response.imageUrl);
         }
       } catch (error) {
@@ -101,7 +106,7 @@ const AddFish = ({ navigation }) => {
   };
 
   const onFinish = (values) => {
-    const pondID = selectedPond;
+    const pondIDToUse = selectedPond; // Use selectedPond instead of route param directly
     let image = "string";
     values.age = Number(values?.age);
     values.length = Number(values?.length);
@@ -118,23 +123,21 @@ const AddFish = ({ navigation }) => {
         value: 0,
       },
     ];
-    values = { ...values, pondID, requirementFishParam, image };
+    values = { ...values, pondID: pondIDToUse, requirementFishParam, image };
     dispatch(createFish(values))
       .unwrap()
       .then((response) => {
-        console.log(response.status)
         if (response?.status === "201") {
           Toast.success("Fish Added Successfully");
           return dispatch(getFishByOwner(isLoggedIn?.id)).unwrap();
         } else {
           Toast.fail("Failed to add fish");
-          // navigation.goBack();
         }
       })
       .then(() => {
         form.resetFields();
         navigation.goBack();
-      })
+      });
   };
 
   const handleDatePickerChange = (date) => {
@@ -181,41 +184,76 @@ const AddFish = ({ navigation }) => {
               <View style={styles.row}>
                 <View style={styles.inputRow}>
                   <Text style={styles.inputLabel}>Tên:</Text>
-                  <Form.Item name="name" style={styles.input}>
+                  <Form.Item 
+                    name="name" 
+                    style={styles.input}
+                    rules={[{ required: true, message: 'Vui lòng nhập tên!' }]}
+                  >
                     <Input placeholder="Tên" />
                   </Form.Item>
                 </View>
                 <View style={styles.inputRow}>
                   <Text style={styles.inputLabel}>Tuổi:</Text>
-                  <Form.Item name="age" style={styles.input}>
-                    <Input placeholder="Tuổi" />
+                  <Form.Item 
+                    name="age" 
+                    style={styles.input}
+                    rules={[
+                      { required: true, message: 'Vui lòng nhập tuổi!' },
+                      { pattern: /^[0-9]+$/, message: 'Chỉ được nhập số!' }
+                    ]}
+                  >
+                    <Input placeholder="Tuổi" keyboardType="numeric" />
                   </Form.Item>
                 </View>
               </View>
               <View style={styles.row}>
                 <View style={styles.inputRow}>
                   <Text style={styles.inputLabel}>Chiều dài:</Text>
-                  <Form.Item name="size" style={styles.input} extra="cm">
-                    <Input placeholder="Chiều dài" />
+                  <Form.Item 
+                    name="size" 
+                    style={styles.input} 
+                    extra="cm"
+                    rules={[
+                      { required: true, message: 'Vui lòng nhập chiều dài!' },
+                      { pattern: /^[0-9]+$/, message: 'Chỉ được nhập số!' }
+                    ]}
+                  >
+                    <Input placeholder="Chiều dài" keyboardType="numeric" />
                   </Form.Item>
                 </View>
                 <View style={styles.inputRow}>
                   <Text style={styles.inputLabel}>Cân nặng:</Text>
-                  <Form.Item name="weight" style={styles.input} extra="kg">
-                    <Input placeholder="Cân nặng" />
+                  <Form.Item 
+                    name="weight" 
+                    style={styles.input} 
+                    extra="kg"
+                    rules={[
+                      { required: true, message: 'Vui lòng nhập cân nặng!' },
+                      { pattern: /^[0-9]+$/, message: 'Chỉ được nhập số!' }
+                    ]}
+                  >
+                    <Input placeholder="Cân nặng" keyboardType="numeric" />
                   </Form.Item>
                 </View>
               </View>
               <View style={styles.row}>
                 <View style={styles.inputRow}>
                   <Text style={styles.inputLabel}>Giới tính:</Text>
-                  <Form.Item name="sex" style={styles.input}>
+                  <Form.Item 
+                    name="sex" 
+                    style={styles.input}
+                    rules={[{ required: true, message: 'Vui lòng nhập giới tính!' }]}
+                  >
                     <Input placeholder="Giới tính" />
                   </Form.Item>
                 </View>
                 <View style={styles.inputRow}>
                   <Text style={styles.inputLabel}>Giống:</Text>
-                  <Form.Item name="varietyName" style={styles.input}>
+                  <Form.Item 
+                    name="varietyName" 
+                    style={styles.input}
+                    rules={[{ required: true, message: 'Vui lòng nhập giống!' }]}
+                  >
                     <Input placeholder="Giống" />
                   </Form.Item>
                 </View>
@@ -223,7 +261,11 @@ const AddFish = ({ navigation }) => {
               <View style={styles.row}>
                 <View style={styles.inputRow}>
                   <Text style={styles.inputLabel}>Tình trạng:</Text>
-                  <Form.Item name="condition" style={styles.input}>
+                  <Form.Item 
+                    name="condition" 
+                    style={styles.input}
+                    rules={[{ required: true, message: 'Vui lòng nhập tình trạng!' }]}
+                  >
                     <Input placeholder="Tình trạng" />
                   </Form.Item>
                 </View>
@@ -258,14 +300,32 @@ const AddFish = ({ navigation }) => {
               <View style={styles.row}>
                 <View style={styles.inputRow}>
                   <Text style={styles.inputLabel}>Nhà lai tạo:</Text>
-                  <Form.Item name="breeder" style={styles.input}>
+                  <Form.Item 
+                    name="breeder" 
+                    style={styles.input}
+                    rules={[{ required: true, message: 'Vui lòng nhập nhà lai tạo!' }]}
+                  >
                     <Input placeholder="Nhà lai tạo" />
                   </Form.Item>
                 </View>
                 <View style={styles.inputRow}>
                   <Text style={styles.inputLabel}>Giá mua:</Text>
-                  <Form.Item name="price" style={styles.input} extra="VND">
-                    <Input placeholder="Giá mua" />
+                  <Form.Item 
+                    name="price" 
+                    style={styles.input} 
+                    extra="VND"
+                    rules={[
+                      { required: true, message: 'Vui lòng nhập giá mua!' },
+                      { pattern: /^[0-9]+$/, message: 'Chỉ được nhập số!' },
+                      { 
+                        validator: (_, value) => 
+                          value && Number(value) <= 1000 
+                            ? Promise.reject('Giá phải lớn hơn 1000 VND!') 
+                            : Promise.resolve()
+                      }
+                    ]}
+                  >
+                    <Input placeholder="Giá mua" keyboardType="numeric" />
                   </Form.Item>
                 </View>
               </View>
@@ -298,8 +358,9 @@ const AddFish = ({ navigation }) => {
                   type="ghost"
                   style={styles.modalSaveButton}
                   onPress={() => form.submit()}
+                  disabled={!selectedPond || !imageBlob}
                 >
-                  <Text style={styles.modalSaveText}>Lưu</Text>
+                  <Text style={selectedPond ? styles.modalSaveText : styles.modalSaveTextDisabled}>Lưu</Text>
                 </Button>
               </View>
             </View>
