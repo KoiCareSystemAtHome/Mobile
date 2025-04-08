@@ -215,12 +215,7 @@ const PondDetail = ({ navigation, route }) => {
                     <Text style={styles.label}>Dung Tích: </Text>
                     {pond.maxVolume}L
                   </Text>
-                  <Text style={styles.pondText}>
-                    <Text style={styles.label}>Độ Sâu: </Text>1 m
-                  </Text>
-                  <Text style={styles.pondText}>
-                    <Text style={styles.label}>Công Suất Bơm: </Text>20,000 l/h
-                  </Text>
+
                   <TouchableOpacity
                     style={styles.editButton}
                     onPress={() => setModalVisible(true)}

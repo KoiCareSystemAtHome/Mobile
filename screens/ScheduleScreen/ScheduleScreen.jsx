@@ -5,17 +5,14 @@ import { Calendar } from "react-native-calendars";
 import Modal from "react-native-modal";
 import { styles } from "./styles";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { reminderByOwnerSelector } from "../../redux/selector";
-import { getReminderByOwner } from "../../redux/slices/reminderSlice";
-import * as Notifications from "expo-notifications";
 
 const leftArrowIcon = "←";
 const rightArrowIcon = "→";
 const addIcon = "+";
 
 const ScheduleScreen = ({ navigation }) => {
-  const dispatch = useDispatch();
   const reminderByOwner = useSelector(reminderByOwnerSelector);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isModalVisible, setModalVisible] = useState(false);
@@ -25,57 +22,26 @@ const ScheduleScreen = ({ navigation }) => {
   const [nextReminder, setNextReminder] = useState(null);
   const [filterType, setFilterType] = useState("RecurringMaintenance");
 
-  // Request notification permissions on mount
-
-
+  // Fetch user data
   useEffect(() => {
-    const subscription = Notifications.addNotificationResponseReceivedListener((response) => {
-      const reminderId = response.notification.request.content.data.reminderId;
-      if (reminderId) {
-        navigation.navigate("ReminderDetail", { reminder: { pondReminderId: reminderId } });
+    const getData = async () => {
+      try {
+        const value = await AsyncStorage.getItem("user");
+        setIsLoggedIn(value ? JSON.parse(value) : null);
+      } catch (error) {
+        console.error("Error fetching user data:", error);
       }
-    });
-    return () => subscription.remove();
-  }, [navigation]);
+    };
+    getData();
+  }, []);
 
-  // Function to schedule a notification
-  const scheduleNotification = async (reminder) => {
-    try {
-      const maintainDate = new Date(reminder.maintainDate);
-      const now = new Date();
-
-      if (maintainDate > now && reminder.seenDate === "0001-01-01T00:00:00") {
-        await Notifications.scheduleNotificationAsync({
-          content: {
-            title: reminder.title,
-            body: reminder.description || "You have a scheduled reminder!",
-            data: { reminderId: reminder.pondReminderId },
-            sound: true,
-            vibrate: [0, 250, 250, 250],
-          },
-          trigger: {
-            date: maintainDate,
-          },
-        });
-        console.log(`Notification scheduled for ${reminder.title} at ${maintainDate}`);
-      }
-    } catch (error) {
-      console.error("Error scheduling notification:", error);
-    }
-  };
-
-  // Process reminders into markedDates format, find next reminder, and schedule notification
+  // Process reminders for calendar and next reminder
   useEffect(() => {
     if (reminderByOwner && reminderByOwner.length > 0) {
       const newMarkedDates = {};
       const today = new Date();
 
-      // Cancel all previous notifications to avoid duplicates
-      Notifications.cancelAllScheduledNotificationsAsync().catch((error) => {
-        console.error("Error canceling notifications:", error);
-      });
-
-      // Set next reminder (unfiltered)
+      // Set next reminder
       const futureReminders = reminderByOwner.filter((reminder) => {
         const maintainDate = new Date(reminder.maintainDate);
         return maintainDate >= today;
@@ -87,19 +53,16 @@ const ScheduleScreen = ({ navigation }) => {
           const currDate = new Date(curr.maintainDate);
           return currDate < prevDate ? curr : prev;
         });
-        console.log("closest", closestReminder);
         setNextReminder(closestReminder);
-        scheduleNotification(closestReminder);
       } else {
         setNextReminder(null);
       }
 
-      // Filter reminders for calendar marking
+      // Filter and mark dates
       const filteredReminders = reminderByOwner.filter((reminder) =>
         reminder.reminderType === filterType
       );
 
-      // Process marked dates
       filteredReminders.forEach((reminder) => {
         const date = reminder.maintainDate.split("T")[0];
         const isFinished = reminder.seenDate !== "0001-01-01T00:00:00";
@@ -125,11 +88,7 @@ const ScheduleScreen = ({ navigation }) => {
     if (markedDates[dateString] && markedDates[dateString].dots) {
       const date = new Date(dateString);
       const formattedDate = date
-        .toLocaleDateString("en-US", {
-          weekday: "long",
-          day: "numeric",
-          month: "short",
-        })
+        .toLocaleDateString("en-US", { weekday: "long", day: "numeric", month: "short" })
         .toUpperCase();
 
       setSelectedDate(formattedDate);
@@ -138,28 +97,10 @@ const ScheduleScreen = ({ navigation }) => {
     }
   };
 
-  useEffect(() => {
-    const getData = async () => {
-      try {
-        const value = await AsyncStorage.getItem("user");
-        setIsLoggedIn(value ? JSON.parse(value) : null);
-      } catch (error) {
-        console.error(error);
-      }
-    };
-    getData();
-  }, []);
-
-  useEffect(() => {
-    if (isLoggedIn?.id) {
-      dispatch(getReminderByOwner(isLoggedIn?.id));
-    }
-  }, [isLoggedIn?.id, dispatch]);
-
   const getTimeRange = (maintainDate) => {
     const date = new Date(maintainDate);
-    const hours = date.getUTCHours(); // Use UTC hours
-    const minutes = date.getUTCMinutes(); // Use UTC minutes
+    const hours = date.getUTCHours();
+    const minutes = date.getUTCMinutes();
     const startHour = hours.toString().padStart(2, "0");
     const startMinutes = minutes.toString().padStart(2, "0");
     const endHour = (hours + 2) % 24;
@@ -167,33 +108,12 @@ const ScheduleScreen = ({ navigation }) => {
     return `${startHour}:${startMinutes}-${endHourStr}:${startMinutes}`;
   };
 
-  const getIconForEvent = (title) => {
-    if (title.toLowerCase().includes("feeding")) return "🟢";
-    if (title.toLowerCase().includes("maintenance")) return "🟡";
-    return "⚪";
-  };
-
   const formatNextReminderDate = (maintainDate) => {
     const date = new Date(maintainDate);
     return date
-      .toLocaleDateString("en-US", {
-        weekday: "long",
-        day: "numeric",
-        month: "short",
-      })
+      .toLocaleDateString("en-US", { weekday: "long", day: "numeric", month: "short" })
       .toUpperCase();
   };
-
-  useEffect(() => {
-    const testReminder = {
-      title: "Test Notification",
-      description: "This is a test!",
-      maintainDate: new Date(Date.now() + 5000).toISOString(),
-      pondReminderId: "test-id",
-      seenDate: "0001-01-01T00:00:00",
-    };
-    scheduleNotification(testReminder);
-  }, []);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -204,12 +124,8 @@ const ScheduleScreen = ({ navigation }) => {
         </TouchableOpacity>
         <Text style={styles.headerIcon}>Lịch trình</Text>
         <View style={styles.headerIcons}>
-          <TouchableOpacity>
-            <Text style={styles.headerIcon}></Text>
-          </TouchableOpacity>
-          <TouchableOpacity>
-            <Text style={styles.headerIcon}></Text>
-          </TouchableOpacity>
+          <TouchableOpacity><Text style={styles.headerIcon}></Text></TouchableOpacity>
+          <TouchableOpacity><Text style={styles.headerIcon}></Text></TouchableOpacity>
         </View>
       </View>
 
@@ -222,65 +138,24 @@ const ScheduleScreen = ({ navigation }) => {
               {getTimeRange(nextReminder.maintainDate).split("-")[0]}
             </Text>
             <Text style={styles.nextReminderText}>{nextReminder.title}</Text>
-            <Text style={styles.nextReminderDescription}>
-              {nextReminder.description}
-            </Text>
+            <Text style={styles.nextReminderDescription}>{nextReminder.description}</Text>
           </View>
         </View>
       )}
 
       {/* Toggle Switch */}
-      <View
-        style={{
-          flexDirection: "row",
-          backgroundColor: "#E0E0E0",
-          borderRadius: 20,
-          margin: 10,
-          width: 220,
-          alignSelf: "center",
-        }}
-      >
+      <View style={{ flexDirection: "row", backgroundColor: "#E0E0E0", borderRadius: 20, margin: 10, width: 220, alignSelf: "center" }}>
         <TouchableOpacity
-          style={{
-            flex: 1,
-            padding: 10,
-            borderRadius: 20,
-            backgroundColor:
-              filterType === "RecurringMaintenance" ? "#6A5ACD" : "transparent",
-            alignItems: "center",
-          }}
+          style={{ flex: 1, padding: 10, borderRadius: 20, backgroundColor: filterType === "RecurringMaintenance" ? "#6A5ACD" : "transparent", alignItems: "center" }}
           onPress={() => setFilterType("RecurringMaintenance")}
         >
-          <Text
-            style={{
-              color: filterType === "RecurringMaintenance" ? "#FFF" : "#000",
-              fontWeight: "bold",
-              fontSize: 12,
-            }}
-          >
-            Định kỳ
-          </Text>
+          <Text style={{ color: filterType === "RecurringMaintenance" ? "#FFF" : "#000", fontWeight: "bold", fontSize: 12 }}>Định kỳ</Text>
         </TouchableOpacity>
         <TouchableOpacity
-          style={{
-            flex: 1,
-            padding: 10,
-            borderRadius: 20,
-            backgroundColor:
-              filterType === "Maintenance" ? "#6A5ACD" : "transparent",
-            alignItems: "center",
-          }}
+          style={{ flex: 1, padding: 10, borderRadius: 20, backgroundColor: filterType === "Maintenance" ? "#6A5ACD" : "transparent", alignItems: "center" }}
           onPress={() => setFilterType("Maintenance")}
         >
-          <Text
-            style={{
-              color: filterType === "Maintenance" ? "#FFF" : "#000",
-              fontWeight: "bold",
-              fontSize: 12,
-            }}
-          >
-            Bảo trì
-          </Text>
+          <Text style={{ color: filterType === "Maintenance" ? "#FFF" : "#000", fontWeight: "bold", fontSize: 12 }}>Bảo trì</Text>
         </TouchableOpacity>
       </View>
 
@@ -300,15 +175,11 @@ const ScheduleScreen = ({ navigation }) => {
           textDayHeaderFontSize: 14,
           textDayHeaderFontWeight: "bold",
           arrowColor: "#000",
-          todayTextColor: "#FFF",
+          todayTextColor: "#ddd",
           selectedDayBackgroundColor: "#6A5ACD",
         }}
         onDayPress={handleDayPress}
-        renderArrow={(direction) => (
-          <Text style={styles.arrow}>
-            {direction === "left" ? leftArrowIcon : rightArrowIcon}
-          </Text>
-        )}
+        renderArrow={(direction) => <Text style={styles.arrow}>{direction === "left" ? leftArrowIcon : rightArrowIcon}</Text>}
         style={styles.calendar}
       />
 
@@ -325,21 +196,12 @@ const ScheduleScreen = ({ navigation }) => {
       </View>
 
       {/* Floating Action Button */}
-      <TouchableOpacity
-        style={styles.fab}
-        onPress={() => {
-          navigation.navigate("ReminderScreen");
-        }}
-      >
+      <TouchableOpacity style={styles.fab} onPress={() => navigation.navigate("ReminderScreen")}>
         <Text style={styles.fabText}>{addIcon}</Text>
       </TouchableOpacity>
 
       {/* Modal for Event Details */}
-      <Modal
-        isVisible={isModalVisible}
-        onBackdropPress={() => setModalVisible(false)}
-        style={styles.modal}
-      >
+      <Modal isVisible={isModalVisible} onBackdropPress={() => setModalVisible(false)} style={styles.modal}>
         <View style={styles.modalContent}>
           <View style={styles.modalHeader}>
             <TouchableOpacity onPress={() => setModalVisible(false)}>
@@ -347,36 +209,24 @@ const ScheduleScreen = ({ navigation }) => {
             </TouchableOpacity>
             <Text style={styles.modalTitle}>XEM LỜI NHẮC</Text>
           </View>
-
           <View style={styles.modalBody}>
             <Text style={styles.modalDate}>{selectedDate}</Text>
             {selectedDateEvents.map((event, index) => (
               <TouchableOpacity
                 key={index}
-                style={[
-                  styles.modalEvent,
-                  {
-                    backgroundColor: event.reminder.title
-                      .toLowerCase()
-                      .includes("feeding")
-                      ? "#E6F4EA"
-                      : event.reminder.title
-                          .toLowerCase()
-                          .includes("maintenance")
-                      ? "#FFF3E0"
-                      : "#E0E0E0",
-                  },
-                ]}
+                style={[styles.modalEvent, {
+                  backgroundColor: event.reminder.title.toLowerCase().includes("feeding")
+                    ? "#E6F4EA"
+                    : event.reminder.title.toLowerCase().includes("maintenance")
+                    ? "#FFF3E0"
+                    : "#E0E0E0",
+                }]}
                 onPress={() => {
                   setModalVisible(false);
-                  navigation.navigate("ReminderDetail", {
-                    reminder: event.reminder,
-                  });
+                  navigation.navigate("ReminderDetail", { reminder: event.reminder });
                 }}
               >
-                <Text style={styles.modalEventTime}>
-                  {getTimeRange(event.reminder.maintainDate).split("-")[0]}
-                </Text>
+                <Text style={styles.modalEventTime}>{getTimeRange(event.reminder.maintainDate).split("-")[0]}</Text>
                 <Text style={styles.modalEventText}>{event.reminder.title}</Text>
               </TouchableOpacity>
             ))}
