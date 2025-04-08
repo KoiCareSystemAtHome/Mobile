@@ -270,13 +270,13 @@ const WaterParameter = () => {
                       </Text>
                       <Text style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
                       <Text style={styles.dangerText}>
-                      ← {param.dangerLower ?? 0}-- 
+                      ← {param.dangerLower ?? 0} 
                       </Text>
                       <Text style={styles.warningText}>
-                        {param.warningLower ?? param.dangerLower ??0}-- 
+                        --{param.warningLower ?? param.dangerLower ??0}
                       </Text>
                       <Text style={styles.greenText}>
-                      an toàn--
+                      -- an toàn --
                     </Text>
                       <Text style={styles.warningText}>
                         {param.warningUpper ??param.dangerUpper ?? 100}-- 
