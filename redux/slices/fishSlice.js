@@ -102,6 +102,19 @@ export const createKoiProfile = createAsyncThunk(
   }
 );
 
+export const addFishNote = createAsyncThunk(
+  "fishSlice/addFishNote",
+  async (payload, { rejectWithValue }) => {
+    try {
+      const res = await postRequest(`Fish/note?koiId=${payload.koiId}&note=${payload.note}`);
+      console.log(res.data)
+      return res.data;
+    } catch (error) {
+      console.log(error)
+    }
+  }
+);
+
 export const putTest = createAsyncThunk(
   "testSlice/putTest",
   async (payload, { rejectWithValue }) => {

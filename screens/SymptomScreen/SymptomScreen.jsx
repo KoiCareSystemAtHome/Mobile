@@ -59,6 +59,8 @@ const SymptomScreen = ({ navigation }) => {
     ),
   ];
 
+  console.log(selectedTypes)
+
   // Render individual symptom item
   const renderSymptomItem = ({ item }) => (
     <View style={styles.symptomItem}>

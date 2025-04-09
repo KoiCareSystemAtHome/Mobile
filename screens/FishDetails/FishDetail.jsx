@@ -6,10 +6,17 @@ import {
   ScrollView,
   TouchableOpacity,
   ImageBackground,
+  Modal,
 } from "react-native";
-import { Card, Provider, Picker } from "@ant-design/react-native";
+import {
+  Card,
+  Provider,
+  Picker,
+  Input,
+  Button,
+  Toast,
+} from "@ant-design/react-native";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
-import { styles } from "./styles";
 import GrowthChart from "./components/GrowthChart";
 import HealthStatusForm from "./components/HealthStatusForm/HealthStatusForm";
 import { useDispatch, useSelector } from "react-redux";
@@ -18,18 +25,34 @@ import {
   profileByFishSelector,
   productSelector,
 } from "../../redux/selector";
-import { getFishById, getKoiProfile } from "../../redux/slices/fishSlice";
+import {
+  addFishNote,
+  getFishById,
+  getFishByOwner,
+  getKoiProfile,
+  updateFish,
+} from "../../redux/slices/fishSlice";
 import { getProduct } from "../../redux/slices/productSlice";
 import enUS from "@ant-design/react-native/lib/locale-provider/en_US";
+import { StyleSheet } from "react-native";
+import { styles } from "./styles";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const FishDetail = ({ route, navigation }) => {
   const { fish } = route.params;
   const dispatch = useDispatch();
   const fishById = useSelector(fishByIdSelector);
-  const koiProfile = useSelector(profileByFishSelector) || []; // Default to empty array
-  const products = useSelector(productSelector) || []; // Default to empty array for products
+  const koiProfile = useSelector(profileByFishSelector) || [];
+  const products = useSelector(productSelector) || [];
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isHealthModalVisible, setHealthModalVisible] = useState(false);
+  const [isNoteModalVisible, setNoteModalVisible] = useState(false);
+  const [isGrowthModalVisible, setGrowthModalVisible] = useState(false);
   const [selectedProfile, setSelectedProfile] = useState(null);
+  const [newNote, setNewNote] = useState("");
+  const [notes, setNotes] = useState(fish.notes || []);
+  const [newSize, setNewSize] = useState("");
+  const [newWeight, setNewWeight] = useState("");
 
   useEffect(() => {
     if (fish?.koiID) {
@@ -40,11 +63,22 @@ const FishDetail = ({ route, navigation }) => {
   }, [fish, dispatch]);
 
   useEffect(() => {
-    // Set initial selected profile to the first one if available
     if (koiProfile.length > 0 && !selectedProfile) {
       setSelectedProfile(koiProfile[0].koiDiseaseProfileId);
     }
   }, [koiProfile, selectedProfile]);
+
+  useEffect(() => {
+    const getData = async () => {
+      try {
+        const value = await AsyncStorage.getItem("user");
+        setIsLoggedIn(value ? JSON.parse(value) : null);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    getData();
+  }, []);
 
   const handleHealthRecordSubmit = (values) => {
     console.log("Health Record Submitted:", values);
@@ -78,14 +112,88 @@ const FishDetail = ({ route, navigation }) => {
           </Text>
           <Text>Điều trị: {treatmentText}</Text>
           {profile.note && <Text>Ghi chú: {profile.note}</Text>}
-          {/* {profile.symptoms && (
-            <Text>
-              Triệu chứng: {JSON.parse(profile.symptoms)[0].SymptomID}
-            </Text>
-          )} */}
         </View>
       </View>
     );
+  };
+
+  const handleAddNote = () => {
+    const koiId = fish.koiID;
+    const note = newNote;
+    const value = { koiId, note };
+    dispatch(addFishNote(value))
+      .unwrap()
+      .then((res) => {
+        if (res === true || res === "true") {
+          setNotes([...notes, note]);
+          setNewNote("");
+          setNoteModalVisible(false);
+          dispatch(getFishByOwner(isLoggedIn?.id));
+        }
+      });
+  };
+
+  const handleAddGrowth = () => {
+    if (newSize.trim() && newWeight.trim()) {
+      console.log("New Growth Record:", {
+        koiId: fish.koiID,
+        size: Number(newSize),
+        weight: Number(newWeight),
+      });
+      const koiID = fish.koiID;
+      const name = fish.name;
+      const pondID = fish.pond.pondID;
+      const physique = fishById?.physique;
+      const sex = fish.sex;
+      const breeder = fishById?.breeder;
+      const age = fish.age;
+      const varietyName = fish.variety.varietyName;
+      const inPondSince = fishById?.inPondSince + "Z";
+      const image = fish.image;
+      const price = fish.price;
+      const size = Number(newSize);
+      const weight = Number(newWeight);
+      const value = {
+        koiID,
+        pondID,
+        name,
+        physique,
+        sex,
+        breeder,
+        age,
+        varietyName,
+        inPondSince,
+        image,
+        price,
+        size,
+        weight,
+      };
+      console.log(value);
+      dispatch(updateFish(value))
+        .unwrap()
+        .then((res) => {
+          if (res.status === "200") {
+            Toast.success("Fish Updated Successfully");
+            navigation.goBack()
+            dispatch(getFishByOwner(isLoggedIn?.id));
+          }
+        });
+    }
+  };
+  const renderNotes = () => {
+    if (!notes || notes.length === 0) {
+      return (
+        <Text style={styles.noteText}>
+          Bạn chưa thêm bất kỳ ghi chú nào. Vui lòng thêm ghi chú mới bằng cách
+          chạm vào biểu tượng dấu cộng ở góc trên bên phải của phần này.
+        </Text>
+      );
+    }
+    return notes.map((note, index) => (
+      <Text key={index} style={styles.noteText}>
+        - {note}
+      </Text>
+    ));
   };
 
   return (
@@ -211,7 +319,7 @@ const FishDetail = ({ route, navigation }) => {
           <View style={styles.section}>
             <View style={styles.sectionHeader}>
               <Text style={styles.label}>Lịch Sử Tăng Trưởng</Text>
-              <TouchableOpacity>
+              <TouchableOpacity onPress={() => setGrowthModalVisible(true)}>
                 <FontAwesome name="plus" size={18} color="#6497B1" />
               </TouchableOpacity>
             </View>
@@ -219,7 +327,107 @@ const FishDetail = ({ route, navigation }) => {
               <GrowthChart fishReportInfos={fish?.fishReportInfos} />
             </View>
           </View>
+
+          <View style={styles.section}>
+            <View style={styles.sectionHeader}>
+              <Text style={styles.label}>Ghi Chú</Text>
+              <TouchableOpacity onPress={() => setNoteModalVisible(true)}>
+                <FontAwesome name="plus" size={18} color="#6497B1" />
+              </TouchableOpacity>
+            </View>
+            {renderNotes()}
+          </View>
         </ScrollView>
+
+        {/* Note Modal */}
+        <Modal
+          visible={isNoteModalVisible}
+          transparent={true}
+          animationType="fade"
+          onRequestClose={() => setNoteModalVisible(false)}
+        >
+          <View style={styles.modalOverlay}>
+            <View style={styles.modalContainer}>
+              <View style={styles.modalHeader}>
+                <Text style={styles.modalTitle}>Thêm Ghi Chú</Text>
+              </View>
+              <Input
+                style={[
+                  styles.input,
+                  { height: 100, textAlignVertical: "top" },
+                ]}
+                placeholder="Nhập ghi chú"
+                value={newNote}
+                onChangeText={setNewNote}
+                multiline={true}
+                numberOfLines={4}
+              />
+              <View style={styles.modalFooter}>
+                <Button
+                  style={{ marginRight: 10 }}
+                  onPress={() => setNoteModalVisible(false)}
+                >
+                  Hủy
+                </Button>
+                <Button
+                  type="primary"
+                  onPress={handleAddNote}
+                  disabled={!newNote.trim()}
+                >
+                  Lưu
+                </Button>
+              </View>
+            </View>
+          </View>
+        </Modal>
+
+        {/* Growth Modal */}
+        <Modal
+          visible={isGrowthModalVisible}
+          transparent={true}
+          animationType="fade"
+          onRequestClose={() => setGrowthModalVisible(false)}
+        >
+          <View style={styles.modalOverlay}>
+            <View style={styles.modalContainer}>
+              <View style={styles.modalHeader}>
+                <Text style={styles.modalTitle}>Thêm Bản Ghi Tăng Trưởng</Text>
+              </View>
+              <Input
+                style={[
+                  styles.input,
+                  { height: 55, textAlignVertical: "top", marginBottom: 10 },
+                ]}
+                placeholder="Kích thước (cm)"
+                value={newSize}
+                onChangeText={setNewSize}
+                keyboardType="numeric"
+              />
+              <Input
+                style={[styles.input, { height: 55, textAlignVertical: "top" }]}
+                placeholder="Cân nặng (kg)"
+                value={newWeight}
+                onChangeText={setNewWeight}
+                keyboardType="numeric"
+              />
+              <View style={styles.modalFooter}>
+                <Button
+                  style={{ marginRight: 10 }}
+                  onPress={() => setGrowthModalVisible(false)}
+                >
+                  Hủy
+                </Button>
+                <Button
+                  type="primary"
+                  onPress={handleAddGrowth}
+                  disabled={!newSize.trim() || !newWeight.trim()}
+                >
+                  Lưu
+                </Button>
+              </View>
+            </View>
+          </View>
+        </Modal>
       </ImageBackground>
     </Provider>
   );

@@ -201,6 +201,19 @@ const PondDetail = ({ navigation, route }) => {
             <Card style={styles.card}>
               <View style={styles.cardContent}>
                 <Image source={{ uri: pond.image }} style={styles.pondImage} />
+                <View
+                  style={[
+                    styles.statusCircle,
+                    {
+                      backgroundColor:
+                        pond.status === "Danger"
+                          ? "#ff0000"
+                          : pond.status === "Warning"
+                          ? "#ffff00"
+                          : "transparent",
+                    },
+                  ]}
+                />
                 <View style={styles.pondInfo}>
                   <View style={styles.infoRow}>
                     <Text style={styles.pondText}>
@@ -217,17 +230,13 @@ const PondDetail = ({ navigation, route }) => {
                   </Text>
                   <TouchableOpacity
                     style={[styles.editButton, styles.addFishButton]}
-                    onPress={() => 
-                      navigation.navigate('AddFish', { 
-                        pondID: pond.pondID 
+                    onPress={() =>
+                      navigation.navigate("AddFish", {
+                        pondID: pond.pondID,
                       })
                     }
                   >
-                    <FontAwesome
-                      name="plus"
-                      size={24}
-                      color="white"
-                    />
+                    <FontAwesome name="plus" size={24} color="white" />
                   </TouchableOpacity>
                   <TouchableOpacity
                     style={styles.editButton}
@@ -393,7 +402,9 @@ const PondDetail = ({ navigation, route }) => {
                       type="primary"
                       style={styles.modalSaveButton}
                       onPress={() => form.submit()}
-                      disabled={isImageChanged && (!uploadResponse || isImageUploading)} // Disable only if image changed and upload incomplete
+                      disabled={
+                        isImageChanged && (!uploadResponse || isImageUploading)
+                      } // Disable only if image changed and upload incomplete
                       loading={isImageUploading} // Show loading state during upload
                     >
                       Lưu

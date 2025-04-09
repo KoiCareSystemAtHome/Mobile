@@ -57,30 +57,45 @@ const PondStatistic = ({ navigation }) => {
 
   const dispatch = useDispatch();
 console.log(pondData)
-  const renderPondCard = ({ item }) => (
-    <TouchableOpacity
-      onPress={() => navigation.navigate("PondDetail", { pond: item })}
-    >
-      <Card style={styles.card}>
-        <View style={styles.cardContent}>
-          <Image source={item.image ? { uri: item.image } : require('../../assets/defaultpond.jpg')} style={styles.pondImage} />
-          <View style={styles.pondInfo}>
-            <View style={styles.infoRow}>
-              <Text style={styles.pondText}>
-                <Text style={styles.label}>Tên: </Text>
-                {item.name}{" "}
+const renderPondCard = ({ item }) => (
+  <TouchableOpacity
+    onPress={() => navigation.navigate("PondDetail", { pond: item })}
+  >
+    <Card style={styles.card}>
+      <View style={styles.cardContent}>
+        <Image 
+          source={item.image ? { uri: item.image } : require('../../assets/defaultpond.jpg')} 
+          style={styles.pondImage} 
+        />
+        <View style={styles.pondInfo}>
+          <View style={styles.infoRow}>
+            <Text style={styles.pondText}>
+              <Text style={styles.label}>Tên: </Text>
+              {item.name}{" "}
+            </Text>
+            <Text style={styles.pondText}>
+              <Text style={styles.label}>
+                {item?.fishAmount} <FontAwesome5 name="fish" size={25} />
               </Text>
-              <Text style={styles.pondText}>
-                <Text style={styles.label}>
-                  {item?.fish?.length} <FontAwesome5 name="fish" size={25} />
-                </Text>
-              </Text>
-            </View>
+            </Text>
           </View>
         </View>
-      </Card>
-    </TouchableOpacity>
-  );
+        {/* Status Circle */}
+        <View
+          style={[
+            styles.statusCircle,
+            {
+              backgroundColor: 
+                item.status === 'Danger' ? '#ff0000' : 
+                item.status === 'Warning' ? '#ffff00' : 
+                'transparent'
+            }
+          ]}
+        />
+      </View>
+    </Card>
+  </TouchableOpacity>
+);
 
   const onFinish = (values) => {
     const createDate = dayjs().utc().format("YYYY-MM-DDTHH:mm:ss.SSS[Z]");

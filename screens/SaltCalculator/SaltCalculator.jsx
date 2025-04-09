@@ -5,6 +5,7 @@ import {
   Text,
   ImageBackground,
   TouchableOpacity,
+  Modal,
 } from "react-native";
 import { styles } from "./styles";
 import Slider from "@react-native-community/slider";
@@ -42,10 +43,11 @@ const SaltCalculator = ({ navigation }) => {
   const [previewValue, setPreviewValue] = useState(0.2);
   const [pondVolume, setPondVolume] = useState(80);
   const [growth, setGrowth] = useState("Medium");
-  const [cycleHours, setCycleHours] = useState(12); // New state for cycleHours
+  const [cycleHours, setCycleHours] = useState(12);
+  const [isReminderModalVisible, setReminderModalVisible] = useState(false);
 
   const growthOptions = ["Low", "Medium", "High"];
-  const cycleOptions = [12, 24]; // Options for cycleHours toggle
+  const cycleOptions = [12, 24];
 
   useEffect(() => {
     const getData = async () => {
@@ -85,32 +87,31 @@ const SaltCalculator = ({ navigation }) => {
         .unwrap()
         .then(() => {
           dispatch(additionProccess(pondId));
+          // Only generate reminder after calculateSalt is complete
+          dispatch(generateReminder({ pondId: homePond?.pondID, cycleHours }))
+            .unwrap()
+            .then(() => {
+              setReminderModalVisible(true); // Show modal after reminders are generated
+            });
         });
     }
-  }, [homePond, growth, waterChange, dispatch]);
+  }, [homePond, growth, waterChange, cycleHours, dispatch]);
 
   const handleSaveReminder = () => {
     const pondId = homePond?.pondID;
-    const reminders = reminderData?.reminders
-    const values = {pondId, reminders}
-    console.log(values)
+    const reminders = reminderData?.reminders;
+    const values = { pondId, reminders };
+    console.log(values);
     dispatch(saveReminder(values))
       .unwrap()
       .then((res) => {
         console.log("Reminders saved successfully!", res);
+        setReminderModalVisible(false); // Close modal on save
       })
       .catch((error) => {
         console.error("Failed to save reminders:", error);
       });
   };
-
-  useEffect(() => {
-    if (homePond) {
-      dispatch(generateReminder({ pondId: homePond?.pondID, cycleHours }));
-    }
-  }, [homePond, cycleHours]);
-
-  console.log(reminderData)
 
   return (
     <ImageBackground
@@ -149,63 +150,63 @@ const SaltCalculator = ({ navigation }) => {
             ))}
           </View>
         )}
-
-        <View style={styles.card}>
-          <Text style={styles.label}>
-            Thể tích hồ: <Text style={styles.value}>{pondVolume}L</Text>
-          </Text>
-        </View>
-
-        {/* Desired Concentration */}
-        <View style={styles.card}>
-          <Text style={styles.label}>Nồng độ mong muốn: </Text>
-          <View style={styles.toggleContainer}>
-            {growthOptions.map((option) => (
-              <TouchableOpacity
-                key={option}
-                style={[
-                  styles.toggleButton,
-                  growth === option && styles.activeToggle,
-                ]}
-                onPress={() => setGrowth(option)}
-              >
-                <Text
-                  style={[
-                    styles.toggleText,
-                    growth === option && styles.activeText,
-                  ]}
-                >
-                  {option}
-                </Text>
-              </TouchableOpacity>
-            ))}
-          </View>
-        </View>
-
-        <View style={styles.card}>
-          <Text style={styles.label}>
-            Lượng nước sẽ thay:{" "}
-            <Text style={styles.value}>
-              {previewValue}L ({((previewValue / pondVolume) * 100).toFixed(0)}
-              %)
-            </Text>
-          </Text>
-          <Slider
-            style={styles.slider}
-            minimumValue={0}
-            maximumValue={pondVolume}
-            step={1}
-            value={waterChange}
-            onValueChange={(value) => setPreviewValue(value)}
-            onSlidingComplete={(value) => setWaterChange(value)}
-            minimumTrackTintColor="#007AFF"
-            maximumTrackTintColor="#ccc"
-            thumbTintColor="#007AFF"
-          />
-        </View>
-
         {homePond ? (
           <>
+            <View style={styles.card}>
+              <Text style={styles.label}>
+                Thể tích hồ: <Text style={styles.value}>{pondVolume}L</Text>
+              </Text>
+            </View>
+
+            {/* Desired Concentration */}
+            <View style={styles.card}>
+              <Text style={styles.label}>Nồng độ mong muốn: </Text>
+              <View style={styles.toggleContainer}>
+                {growthOptions.map((option) => (
+                  <TouchableOpacity
+                    key={option}
+                    style={[
+                      styles.toggleButton,
+                      growth === option && styles.activeToggle,
+                    ]}
+                    onPress={() => setGrowth(option)}
+                  >
+                    <Text
+                      style={[
+                        styles.toggleText,
+                        growth === option && styles.activeText,
+                      ]}
+                    >
+                      {option}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            </View>
+
+            <View style={styles.card}>
+              <Text style={styles.label}>
+                Lượng nước sẽ thay:{" "}
+                <Text style={styles.value}>
+                  {previewValue}L (
+                  {((previewValue / pondVolume) * 100).toFixed(0)}
+                  %)
+                </Text>
+              </Text>
+              <Slider
+                style={styles.slider}
+                minimumValue={0}
+                maximumValue={pondVolume}
+                step={1}
+                value={waterChange}
+                onValueChange={(value) => setPreviewValue(value)}
+                onSlidingComplete={(value) => setWaterChange(value)}
+                minimumTrackTintColor="#007AFF"
+                maximumTrackTintColor="#ccc"
+                thumbTintColor="#007AFF"
+              />
+            </View>
+
             <View style={styles.saltBox}>
               <Text style={styles.saltText}>
                 Lượng muối hiện tại: {saltData?.currentSalt || 0}kg
@@ -235,64 +236,6 @@ const SaltCalculator = ({ navigation }) => {
                 ))}
               </View>
             )}
-
-            {/* Reminder Display */}
-
-            {/* Cycle Hours Selection */}
-            {homePond && (
-              <View style={styles.saltBox}>
-                <Text style={styles.instructionLabel}>
-                  Chu kỳ nhắc nhở (giờ):
-                </Text>
-                <View style={styles.toggleContainer}>
-                  {cycleOptions.map((option) => (
-                    <TouchableOpacity
-                      key={option}
-                      style={[
-                        styles.toggleButton,
-                        cycleHours === option && styles.activeToggle,
-                      ]}
-                      onPress={() => setCycleHours(option)}
-                    >
-                      <Text
-                        style={[
-                          styles.toggleText,
-                          cycleHours === option && styles.activeText,
-                        ]}
-                      >
-                        {option}
-                      </Text>
-                    </TouchableOpacity>
-                  ))}
-                </View>
-                {reminderData?.reminders?.length > 0 && (
-                  <View style={styles.saltBox}>
-                    <Text style={styles.instructionLabel}>
-                      Nhắc nhở thêm muối:
-                    </Text>
-                    {reminderData.reminders.map((reminder, index) => (
-                      <View key={index} style={styles.reminderItem}>
-                        <Text style={styles.reminderText}>
-                          {reminder.title}: {reminder.description}
-                        </Text>
-                        <Text style={styles.reminderDate}>
-                          Thời gian:{" "}
-                          {new Date(reminder.maintainDate).toLocaleString()}
-                        </Text>
-                      </View>
-                    ))}
-                  </View>
-                )}
-                <Button
-                  mode="contained"
-                  onPress={handleSaveReminder}
-                  style={styles.saveReminderButton}
-                  labelStyle={styles.saveReminderText}
-                >
-                  Lưu Nhắc Nhở
-                </Button>
-              </View>
-            )}
           </>
         ) : (
           <></>
@@ -300,6 +243,80 @@ const SaltCalculator = ({ navigation }) => {
 
         <View style={{ height: 100 }} />
       </ScrollView>
+
+      {/* Reminder Modal */}
+      {homePond && reminderData && reminderData.reminders?.length > 0 && (
+        <Modal
+          visible={isReminderModalVisible}
+          transparent={true}
+          animationType="fade"
+          onRequestClose={() => setReminderModalVisible(false)}
+        >
+          <View style={[styles.saltBox]}>
+            <View style={styles.modalContainer}>
+              <Text style={styles.instructionLabel}>
+                Chu kỳ nhắc nhở (giờ):
+              </Text>
+              <View style={styles.toggleContainer}>
+                {cycleOptions.map((option) => (
+                  <TouchableOpacity
+                    key={option}
+                    style={[
+                      styles.toggleButton,
+                      cycleHours === option && styles.activeToggle,
+                    ]}
+                    onPress={() => setCycleHours(option)}
+                  >
+                    <Text
+                      style={[
+                        styles.toggleText,
+                        cycleHours === option && styles.activeText,
+                      ]}
+                    >
+                      {option}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+              <Text style={styles.instructionLabel}>Nhắc nhở thêm muối:</Text>
+              {reminderData.reminders.map((reminder, index) => (
+                <View key={index} style={styles.reminderItem}>
+                  <Text style={styles.reminderText}>
+                    {reminder.title}: {reminder.description}
+                  </Text>
+                  <Text style={styles.reminderDate}>
+                    Thời gian:{" "}
+                    {new Date(reminder.maintainDate).toLocaleString()}
+                  </Text>
+                </View>
+              ))}
+              <View
+                style={{
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                  marginTop: 20,
+                }}
+              >
+                <Button
+                  mode="outlined"
+                  onPress={() => setReminderModalVisible(false)}
+                  style={{ flex: 1, marginRight: 10 }}
+                >
+                  Hủy
+                </Button>
+                <Button
+                  mode="contained"
+                  onPress={handleSaveReminder}
+                  style={{ flex: 1 }}
+                  labelStyle={styles.saveReminderText}
+                >
+                  Lưu Nhắc Nhở
+                </Button>
+              </View>
+            </View>
+          </View>
+        </Modal>
+      )}
 
       {/* Next Button */}
       <TouchableOpacity

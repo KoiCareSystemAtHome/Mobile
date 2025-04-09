@@ -3,10 +3,19 @@ import { styles } from "./style";
 import { useDispatch, useSelector } from "react-redux";
 import { get } from "react-native/Libraries/TurboModule/TurboModuleRegistry";
 import { getExamination, getPrediction } from "../../redux/slices/symptomSlice";
-import { symptomExaminationSelector, symptomPredictionSelector } from "../../redux/selector";
-import { FlatList, ImageBackground, Text, View, TouchableOpacity } from "react-native";
+import {
+  symptomExaminationSelector,
+  symptomPredictionSelector,
+} from "../../redux/selector";
+import {
+  FlatList,
+  ImageBackground,
+  Text,
+  View,
+  TouchableOpacity,
+} from "react-native";
 import DropDownPicker from "react-native-dropdown-picker";
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation } from "@react-navigation/native";
 import AntDesign from "react-native-vector-icons/AntDesign";
 
 const PredictSymptom = ({ route }) => {
@@ -18,7 +27,7 @@ const PredictSymptom = ({ route }) => {
   const symptomPrediction = useSelector(symptomPredictionSelector);
   const diseaseDiagnosis = useSelector(symptomExaminationSelector);
   const { selectedSymptomIds } = route.params;
-  
+
   useEffect(() => {
     if (symptomPrediction) {
       const dropdownItems = symptomPrediction?.symptomPredicts?.map(
@@ -30,13 +39,13 @@ const PredictSymptom = ({ route }) => {
       setItems(dropdownItems);
     }
   }, [symptomPrediction, dispatch]);
-  
+
   useEffect(() => {
     dispatch(getPrediction(selectedSymptomIds));
   }, [selectedSymptomIds]);
 
   useEffect(() => {
-    if(selectedValues?.length > 0) {
+    if (selectedValues?.length > 0) {
       const selectedSymptom = selectedValues.map((id) => ({
         symtompId: id,
         value: "True",
@@ -48,24 +57,24 @@ const PredictSymptom = ({ route }) => {
   const selectedSymptoms = symptomPrediction?.symptomPredicts
     ?.filter((symptom) => selectedValues?.includes(symptom.symtompId))
     .map((symptom) => symptom.name);
-  
+
   const renderSymptomItem = ({ item }) => (
     <View style={styles.symptomItem}>
       <Text style={styles.symptomText}>{item}</Text>
     </View>
   );
-  
-  console.log(diseaseDiagnosis);
-  
+
+  console.log(symptomPrediction);
+
   const handleCreateProfile = () => {
-    const symptomsData = selectedValues.map(symptomId => ({
+    const symptomsData = selectedValues.map((symptomId) => ({
       symptomID: symptomId,
-      value: "True"
+      value: "True",
     }));
 
-    navigation.navigate('CreateKoiProfile', {
+    navigation.navigate("CreateKoiProfile", {
       diseaseId: diseaseDiagnosis?.diseaseId,
-      symptoms: symptomsData
+      symptoms: symptomsData,
     });
   };
   return (
@@ -90,6 +99,13 @@ const PredictSymptom = ({ route }) => {
           dropDownContainerStyle={{ zIndex: 100 }}
         />
 
+        {symptomPrediction?.causeGroupType === "Cá ăn quá no"  && (
+          <View style={styles.symptomCard}>
+            <Text style={styles.cardTitle}>
+              Triệu chứng: {symptomPrediction?.causeGroupType}
+            </Text>
+          </View>
+        )}
         {selectedSymptoms?.length > 0 && (
           <View style={styles.symptomCard}>
             <FlatList
@@ -107,9 +123,9 @@ const PredictSymptom = ({ route }) => {
             </Text>
           </View>
         )}
-        
+
         {selectedValues?.length > 0 && (
-          <TouchableOpacity 
+          <TouchableOpacity
             style={styles.createButton}
             onPress={handleCreateProfile}
           >

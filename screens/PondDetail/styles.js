@@ -269,4 +269,13 @@ export const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: "bold",
   },
+  statusCircle: {
+    position: 'absolute',
+    top: 10,
+    right: 10,
+    width: 50,
+    height: 50,
+    borderRadius: 50,
+
+  },
 });

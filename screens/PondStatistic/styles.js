@@ -211,4 +211,13 @@ export const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "500",
   },
+  statusCircle: {
+    position: 'absolute',
+    top: 10,
+    right: 10,
+    width: 50,
+    height: 50,
+    borderRadius: 50,
+
+  },
 });
