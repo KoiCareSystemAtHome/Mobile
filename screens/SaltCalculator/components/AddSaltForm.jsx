@@ -17,8 +17,8 @@ const AddSaltForm = () => {
   const route = useRoute();
   const navigation = useNavigation();
   const dispatch = useDispatch();
-  const pondId = route.params?.pondID;
-console.log(pondId)
+  const pondId = route.params?.pondID || route.params.pondId
+  console.log(pondId);
   const [addedSaltKg, setAddedSaltKg] = useState("");
 
   // Handle form submission
@@ -26,7 +26,10 @@ console.log(pondId)
     const saltValue = parseFloat(addedSaltKg);
 
     if (isNaN(saltValue) || saltValue <= 0) {
-      Alert.alert("Error", "Please enter a valid amount of salt (greater than 0 kg).");
+      Alert.alert(
+        "Error",
+        "Please enter a valid amount of salt (greater than 0 kg)."
+      );
       return;
     }
 
@@ -34,7 +37,7 @@ console.log(pondId)
     dispatch(updateSalt({ pondId, addedSaltKg: saltValue }))
       .unwrap()
       .then((res) => {
-        console.log("a",res)
+        console.log("a", res);
         Alert.alert("Success", "Salt added successfully!");
         navigation.goBack(); // Return to the previous screen
       })
@@ -67,10 +70,7 @@ console.log(pondId)
             placeholder="Enter salt amount (e.g., 1.5)"
             placeholderTextColor="#999"
           />
-          <TouchableOpacity
-            style={styles.saveButton}
-            onPress={handleSave}
-          >
+          <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
             <Text style={styles.saveButtonText}>Save</Text>
           </TouchableOpacity>
         </View>

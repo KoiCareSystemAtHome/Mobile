@@ -26,7 +26,7 @@ const ResetPasswordForm = ({ navigation }) => {
           Toast.success("Mật khẩu được đặt lại thành công");
           setTimeout(() => {
             navigation.navigate("Login");
-          }, 2000);
+          }, 1000);
         } else {
           Toast.fail("Yêu cầu thất bại");
         }

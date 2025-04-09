@@ -36,7 +36,7 @@ const BlogScreen = ({ navigation }) => {
             fontSize: 12,
             fontWeight: "bold",
             fontFamily: "serif",
-            width: 300,
+            width:250
           }}
         >
           {item.title.toUpperCase()}
@@ -78,7 +78,7 @@ const BlogScreen = ({ navigation }) => {
             <FontAwesome name="arrow-left" size={24} color="#fff" />
           </TouchableOpacity>
           <Text style={styles.title}>Blog</Text>
-          <View style={{ width: 24 }} /> {/* Spacer for alignment */}
+          <View style={{ width: 24 }} /> 
         </View>
 
         <FlatList

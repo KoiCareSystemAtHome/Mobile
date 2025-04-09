@@ -61,16 +61,23 @@ const RegisterScreen = ({ navigation }) => {
 
     dispatch(register(values))
       .unwrap()
-      .then(async(response) => {
-        console.log(response)
-        Toast.success("Đăng ký thành công");
-        setTimeout(() => {
-          navigation.navigate("OTP", { email: values.Email });
-        }, 2000);
+      .then(async (response) => {
+        console.log(response);
+        if (response?.status === "200") {
+          Toast.success("Đăng ký thành công");
+          setTimeout(() => {
+            navigation.navigate("OTP", { email: values.Email });
+          }, 1000);
+        }else{
+          Toast.fail(response.message || "Đăng Ký Thất Bại")
+        }
       })
       .catch((error) => {
         console.error("Registration Failed:", error);
-        Alert.alert("Registration Error", "An error occurred. Please try again.");
+        Alert.alert(
+          "Registration Error",
+          "An error occurred. Please try again."
+        );
       });
   };
 

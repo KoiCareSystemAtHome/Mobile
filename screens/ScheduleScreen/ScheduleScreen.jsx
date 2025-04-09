@@ -143,8 +143,8 @@ const ScheduleScreen = ({ navigation }) => {
         </View>
       )}
 
-      {/* Toggle Switch */}
-      <View style={{ flexDirection: "row", backgroundColor: "#E0E0E0", borderRadius: 20, margin: 10, width: 220, alignSelf: "center" }}>
+      {/* Toggle Switch - Updated with Pond/Salt option */}
+      <View style={{ flexDirection: "row", backgroundColor: "#E0E0E0", borderRadius: 20, margin: 10, width: 330, alignSelf: "center" }}>
         <TouchableOpacity
           style={{ flex: 1, padding: 10, borderRadius: 20, backgroundColor: filterType === "RecurringMaintenance" ? "#6A5ACD" : "transparent", alignItems: "center" }}
           onPress={() => setFilterType("RecurringMaintenance")}
@@ -156,6 +156,12 @@ const ScheduleScreen = ({ navigation }) => {
           onPress={() => setFilterType("Maintenance")}
         >
           <Text style={{ color: filterType === "Maintenance" ? "#FFF" : "#000", fontWeight: "bold", fontSize: 12 }}>Bảo trì</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={{ flex: 1, padding: 10, borderRadius: 20, backgroundColor: filterType === "Pond" ? "#6A5ACD" : "transparent", alignItems: "center" }}
+          onPress={() => setFilterType("Pond")}
+        >
+          <Text style={{ color: filterType === "Pond" ? "#FFF" : "#000", fontWeight: "bold", fontSize: 12 }}>Salt</Text>
         </TouchableOpacity>
       </View>
 
@@ -219,6 +225,8 @@ const ScheduleScreen = ({ navigation }) => {
                     ? "#E6F4EA"
                     : event.reminder.title.toLowerCase().includes("maintenance")
                     ? "#FFF3E0"
+                    : event.reminder.reminderType === "Pond"
+                    ? "#E0F7FA" // Light cyan for Pond/Salt reminders
                     : "#E0E0E0",
                 }]}
                 onPress={() => {

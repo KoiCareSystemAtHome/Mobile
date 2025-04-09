@@ -160,7 +160,7 @@ const CartScreen = ({ navigation }) => {
                   AsyncStorage.removeItem("cart");
                   setTimeout(() => {
                     navigation.navigate("Shopping");
-                  }, 2000);
+                  }, 100);
                 }
               });
           })
@@ -178,7 +178,7 @@ const CartScreen = ({ navigation }) => {
               await AsyncStorage.removeItem("cart");
               setTimeout(() => {
                 navigation.navigate("Shopping");
-              }, 2000);
+              }, 1000);
             } else {
             }
           })
@@ -247,9 +247,7 @@ const CartScreen = ({ navigation }) => {
               <View>
                 <View style={styles.productDetails}>
                   <Text style={styles.productName}>{item.productName}</Text>
-                  <Text style={styles.productPrice}>{`${item.price.toFixed(
-                    0
-                  )} VND`}</Text>
+                  <Text style={styles.productPrice}>{`${(item.price).toLocaleString("vi-VN")} VND`}</Text>
                 </View>
                 <View style={styles.quantityContainer}>
                   <TouchableOpacity

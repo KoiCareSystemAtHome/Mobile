@@ -6,6 +6,7 @@ import {
   ScrollView,
   TouchableOpacity,
   ImageBackground,
+  RefreshControl,
 } from "react-native";
 import { Provider } from "@ant-design/react-native";
 import { styles } from "./styles";
@@ -22,7 +23,8 @@ const OrderHistory = ({ navigation }) => {
   const productData = useSelector(productSelector);
   const orderData = useSelector(orderbyAccountSelector);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-
+  const [refreshing, setRefreshing] = useState(false);
+  
   // Pagination states
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
@@ -33,7 +35,7 @@ const OrderHistory = ({ navigation }) => {
   );
 
   useEffect(() => {
-    const getData = async (key) => {
+    const getData = async () => {
       try {
         const userInfo = await AsyncStorage.getItem("user");
         setIsLoggedIn(userInfo ? JSON.parse(userInfo) : null);
@@ -46,9 +48,32 @@ const OrderHistory = ({ navigation }) => {
   }, []);
 
   useEffect(() => {
-    dispatch(getProduct());
-    dispatch(getOrderByAccount(isLoggedIn?.id));
+    if (isLoggedIn?.id) {
+      dispatch(getProduct());
+      dispatch(getOrderByAccount(isLoggedIn?.id));
+    }
   }, [dispatch, isLoggedIn]);
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    try {
+      const userInfo = await AsyncStorage.getItem("user");
+      const user = userInfo ? JSON.parse(userInfo) : null;
+      setIsLoggedIn(user);
+      
+      if (user?.id) {
+        await Promise.all([
+          dispatch(getProduct()).unwrap(),
+          dispatch(getOrderByAccount(user.id)).unwrap()
+        ]);
+      }
+    } catch (error) {
+      console.error("Refresh failed:", error);
+    } finally {
+      setRefreshing(false);
+      setCurrentPage(1); // Reset to first page after refresh
+    }
+  };
 
   const handlePreviousPage = () => {
     if (currentPage > 1) {
@@ -80,7 +105,6 @@ const OrderHistory = ({ navigation }) => {
       >
         <View style={styles.overlay} />
 
-        {/* Back Button */}
         <TouchableOpacity
           style={{
             position: "absolute",
@@ -99,7 +123,17 @@ const OrderHistory = ({ navigation }) => {
 
         <View style={styles.container}>
           <Text style={styles.title}>Order History</Text>
-          <ScrollView contentContainerStyle={styles.listContent}>
+          <ScrollView 
+            contentContainerStyle={styles.listContent}
+            refreshControl={
+              <RefreshControl
+                refreshing={refreshing}
+                onRefresh={onRefresh}
+                colors={["#6497B1"]} // Customize color to match your theme
+                tintColor="#6497B1"
+              />
+            }
+          >
             {paginatedOrderData?.map((order) => (
               <View key={order.orderId} style={styles.orderCard}>
                 <Text style={styles.storeName}>{order.store}</Text>
@@ -143,7 +177,7 @@ const OrderHistory = ({ navigation }) => {
                                 ).toLocaleString("vi-VN")}{" "}
                               </Text>
                             </Text>
-                            {order.status === "Completed" && (
+                            {(order.status === "Completed" || order.status === "Complete") && (
                               <TouchableOpacity
                                 style={styles.productReviewButton}
                                 onPress={() => {
@@ -153,7 +187,7 @@ const OrderHistory = ({ navigation }) => {
                                 }}
                               >
                                 <Text style={styles.productReviewText}>
-                                 <AntDesign name="star" size={16} color="gold"></AntDesign> Đánh giá
+                                  <AntDesign name="star" size={16} color="gold"></AntDesign> Đánh giá
                                 </Text>
                               </TouchableOpacity>
                             )}
@@ -164,7 +198,6 @@ const OrderHistory = ({ navigation }) => {
                   );
                 })}
 
-                {/* Order Total */}
                 <View style={styles.orderTotalContainer}>
                   <Text style={styles.orderTotalText}>
                     Tổng đơn hàng:{" "}
@@ -182,7 +215,7 @@ const OrderHistory = ({ navigation }) => {
                   </Text>
                 </View>
                 <View style={styles.buttonRow}>
-                  {order?.status === "Complete" ? (
+                  {order?.status === "Complete" || order?.status === "Completed" ? (
                     <TouchableOpacity
                       style={styles.returnButton}
                       onPress={() => {

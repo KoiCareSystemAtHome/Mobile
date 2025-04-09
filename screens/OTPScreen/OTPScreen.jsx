@@ -1,18 +1,24 @@
-import { Provider } from '@ant-design/react-native';
-import React, { useState, useEffect } from 'react';
+import { Provider } from "@ant-design/react-native";
+import React, { useState, useEffect } from "react";
 import enUS from "@ant-design/react-native/lib/locale-provider/en_US";
-import { ImageBackground, View, Text, TouchableOpacity, Alert } from 'react-native';
-import { styles } from './styles';
-import { OtpInput } from 'react-native-otp-entry';
-import { activateAccount, resendCode, resendOtp } from '../../redux/slices/authSlice'; // Assuming resendOtp exists
-import { useDispatch } from 'react-redux';
+import { ImageBackground, View, Text, TouchableOpacity } from "react-native";
+import { styles } from "./styles";
+import { OtpInput } from "react-native-otp-entry";
+import { activateAccount, resendCode } from "../../redux/slices/authSlice";
+import { useDispatch } from "react-redux";
+import { Toast } from "@ant-design/react-native"; // Added Toast import
 
 const OTPScreen = ({ navigation, route }) => {
   const dispatch = useDispatch();
   const { email } = route.params;
-  const [otp, setOtp] = useState(''); // State to store the OTP value
-  const [resendTimer, setResendTimer] = useState(300); // Timer for resend (60 seconds)
-  const [canResend, setCanResend] = useState(false); // Whether resend is allowed
+  const [otp, setOtp] = useState("");
+  const [resendTimer, setResendTimer] = useState(300);
+  const [canResend, setCanResend] = useState(false);
+
+  // Configure Toast duration globally
+  useEffect(() => {
+    Toast.config({ duration: 2 });
+  }, []);
 
   // Timer logic for resend
   useEffect(() => {
@@ -20,9 +26,9 @@ const OTPScreen = ({ navigation, route }) => {
       const timer = setInterval(() => {
         setResendTimer((prev) => prev - 1);
       }, 1000);
-      return () => clearInterval(timer); // Cleanup on unmount
+      return () => clearInterval(timer);
     } else {
-      setCanResend(true); // Allow resend when timer reaches 0
+      setCanResend(true);
     }
   }, [resendTimer]);
 
@@ -31,34 +37,49 @@ const OTPScreen = ({ navigation, route }) => {
     if (otp.length === 6) {
       const values = { otp, email };
       dispatch(activateAccount(values))
-      .unwrap()
-      .then((res)=>{
-        if(res === "success"){
-          navigation.navigate('Login')
-        }
-      })
+        .unwrap()
+        .then((res) => {
+          if (res === "200") {
+            Toast.success("Account activated successfully");
+            setTimeout(() => {
+              navigation.navigate("Login");
+            }, 1000);
+          }
+        })
+        .catch((error) => {
+          Toast.fail("Failed to activate account. Please try again.");
+          console.error(error);
+        });
     } else {
-      Alert.alert('Error', 'Please enter a valid 6-digit OTP');
+      Toast.fail("Please enter a valid 6-digit OTP");
     }
   };
 
   // Function to handle resend OTP
   const handleResend = () => {
     if (canResend) {
-      dispatch(resendCode({ email })) // Dispatch resend OTP action
+      dispatch(resendCode({ email }))
         .unwrap()
         .then(() => {
-          Alert.alert('Success', 'A new OTP has been sent to your email.');
-          setResendTimer(300); 
-          setCanResend(false); 
+          Toast.success("A new OTP has been sent to your email");
+          setResendTimer(300);
+          setCanResend(false);
         })
         .catch((error) => {
-          Alert.alert('Error', 'Failed to resend OTP. Please try again later.');
+          Toast.fail("Failed to resend OTP. Please try again later");
           console.error(error);
         });
     }
   };
+  useEffect(() => {
+    const loadFontAsync = async () => {
+      await loadAsync({
+        antoutline: require("@ant-design/icons-react-native/fonts/antoutline.ttf"),
+      });
+    };
 
+    loadFontAsync();
+  }, []);
   return (
     <Provider locale={enUS}>
       <ImageBackground
@@ -88,10 +109,12 @@ const OTPScreen = ({ navigation, route }) => {
             <Text
               style={[
                 styles.resendText,
-                !canResend && styles.resendTextDisabled, 
+                !canResend && styles.resendTextDisabled,
               ]}
             >
-              {canResend ? 'Resend Code' : `Resend Code in ${resendTimer} seconds`}
+              {canResend
+                ? "Resend Code"
+                : `Resend Code in ${resendTimer} seconds`}
             </Text>
           </TouchableOpacity>
 

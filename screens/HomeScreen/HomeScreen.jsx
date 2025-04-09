@@ -8,6 +8,8 @@ import {
   Animated,
   ActivityIndicator,
   TouchableWithoutFeedback,
+  ScrollView,
+  RefreshControl,
 } from "react-native";
 import { Card, Button, Badge } from "@ant-design/react-native";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
@@ -17,7 +19,11 @@ import { styles } from "./styles";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Tooltip from "react-native-walkthrough-tooltip";
 import { useDispatch, useSelector } from "react-redux";
-import { tokenSelector, userSelector, walletSelector } from "../../redux/selector";
+import {
+  tokenSelector,
+  userSelector,
+  walletSelector,
+} from "../../redux/selector";
 import { getWallet } from "../../redux/slices/authSlice";
 import { LinearGradient } from "expo-linear-gradient";
 
@@ -29,6 +35,7 @@ const HomeScreen = ({ navigation }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [token, setToken] = useState();
   const [tooltipVisible, setTooltipVisible] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
   const tokenState = useSelector(tokenSelector);
   const userState = useSelector(userSelector);
 
@@ -48,10 +55,28 @@ const HomeScreen = ({ navigation }) => {
     }
   };
 
-  // Close drawer when pressing outside
   const handleOutsidePress = () => {
     if (drawerOpen) {
       toggleDrawer();
+    }
+  };
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    try {
+      const value = await AsyncStorage.getItem("user");
+      setIsLoggedIn(value ? JSON.parse(value) : null);
+      
+      const newToken = await AsyncStorage.getItem("accessToken");
+      setToken(newToken);
+      
+      if (isLoggedIn?.id) {
+        await dispatch(getWallet(isLoggedIn?.id)).unwrap();
+      }
+    } catch (error) {
+      console.error("Refresh failed:", error);
+    } finally {
+      setRefreshing(false);
     }
   };
 
@@ -80,14 +105,16 @@ const HomeScreen = ({ navigation }) => {
     try {
       await AsyncStorage.removeItem("user");
       await AsyncStorage.removeItem("accessToken");
+      await AsyncStorage.removeItem("cart");
       setIsLoggedIn(null);
       setToken(null);
       setTooltipVisible(false);
-      navigation.navigate("Login"); 
+      navigation.navigate("Login");
     } catch (error) {
       console.error("Logout failed:", error);
     }
   };
+
   return (
     <ImageBackground
       source={require("../../assets/koimain3.jpg")}
@@ -96,7 +123,6 @@ const HomeScreen = ({ navigation }) => {
     >
       <View style={styles.overlay} />
 
-      {/* Drawer */}
       <Animated.View style={[styles.drawer, { left: drawerAnimation }]}>
         <View style={styles.drawerHeader}>
           <TouchableOpacity
@@ -113,8 +139,12 @@ const HomeScreen = ({ navigation }) => {
           </TouchableOpacity>
           <View style={styles.drawerProfile}>
             <FontAwesome name="user-circle" size={50} color="#6497B1" />
-            <Text style={styles.drawerUserName}>Hello,</Text>
-            <Text style={styles.drawerUserRole}>{isLoggedIn || userState ? isLoggedIn?.name || userState?.name : "User"}</Text>
+            <Text style={styles.drawerUserName}>Xin chào,</Text>
+            <Text style={styles.drawerUserRole}>
+              {isLoggedIn || userState
+                ? isLoggedIn?.name || userState?.name
+                : "User"}
+            </Text>
           </View>
         </View>
         <View style={styles.divider} />
@@ -192,157 +222,174 @@ const HomeScreen = ({ navigation }) => {
         </View>
       </Animated.View>
 
-      {/* Main Content with Outside Press Detection */}
       <TouchableWithoutFeedback onPress={handleOutsidePress}>
-        <View style={styles.container}>
-          <View style={styles.headerNav}>
-            <TouchableOpacity onPress={toggleDrawer}>
-              <Entypo name="menu" size={40} color="#6497B1" />
-            </TouchableOpacity>
-            <Tooltip
-              isVisible={tooltipVisible}
-              content={
-                token ? (
-                  <View style={styles.tooltipContainer}>
-                    <TouchableOpacity
-                      style={styles.tooltipOption}
-                      onPress={handleLogout}
-                    >
-                      <Text style={styles.tooltipText}>Đăng Xuất</Text>
-                    </TouchableOpacity>
-                  </View>
-                ) : (
-                  <View style={styles.tooltipContainer}>
-                    <TouchableOpacity
-                      style={[
-                        styles.tooltipOption,
-                        { borderBottomWidth: 1, paddingBottom: 5 },
-                      ]}
-                      onPress={() => {
-                        navigation.navigate("Login");
-                        setTooltipVisible(false);
-                      }}
-                    >
-                      <Text style={styles.tooltipText}>Đăng Nhập</Text>
-                    </TouchableOpacity>
-                    <View style={styles.tooltipDivider} />
-                    <TouchableOpacity
-                      style={styles.tooltipOption}
-                      onPress={() => {
-                        navigation.navigate("Register"); // Assuming there's a Register screen
-                        setTooltipVisible(false);
-                      }}
-                    >
-                      <Text style={styles.tooltipText}>Đăng Ký</Text>
-                    </TouchableOpacity>
-                  </View>
-                )
-              }
-              placement="bottom"
-              contentStyle={{
-                width: 100,
-                borderWidth: 1,
-                justifyContent: "center",
-              }}
-              onClose={() => setTooltipVisible(false)}
-            >
-              <TouchableOpacity onPress={() => setTooltipVisible(true)}>
-                <FontAwesome name="user-circle" size={40} color="#6497B1" />
+        <View style={{ flex: 1 }}>
+          <ScrollView
+            style={styles.container}
+            refreshControl={
+              <RefreshControl
+                refreshing={refreshing}
+                onRefresh={onRefresh}
+                colors={["#6497B1"]}
+                tintColor="#6497B1"
+              />
+            }
+          >
+            <View style={styles.headerNav}>
+              <TouchableOpacity onPress={toggleDrawer}>
+                <Entypo name="menu" size={40} color="#6497B1" />
               </TouchableOpacity>
-            </Tooltip>
-          </View>
-
-          <View style={styles.header}>
-            <Text style={styles.userText}>
-              Hi {isLoggedIn || userState ? isLoggedIn?.name || userState?.name : "User"}
-            </Text>
-          </View>
-
-          {token ? (
-            <View style={styles.depositCard}>
-              <LinearGradient
-                colors={["#4da6ff", "#80bfff"]}
-                style={styles.depositGradient}
+              <Tooltip
+                isVisible={tooltipVisible}
+                content={
+                  token ? (
+                    <View style={styles.tooltipContainer}>
+                      <TouchableOpacity
+                        style={styles.tooltipOption}
+                        onPress={handleLogout}
+                      >
+                        <Text style={styles.tooltipText}>Đăng Xuất</Text>
+                      </TouchableOpacity>
+                    </View>
+                  ) : (
+                    <View style={styles.tooltipContainer}>
+                      <TouchableOpacity
+                        Peròstyle={[
+                          styles.tooltipOption,
+                          { borderBottomWidth: 1, paddingBottom: 5 },
+                        ]}
+                        onPress={() => {
+                          navigation.navigate("Login");
+                          setTooltipVisible(false);
+                        }}
+                      >
+                        <Text style={styles.tooltipText}>Đăng Nhập</Text>
+                      </TouchableOpacity>
+                      <View style={styles.tooltipDivider} />
+                      <TouchableOpacity
+                        style={styles.tooltipOption}
+                        onPress={() => {
+                          navigation.navigate("Register");
+                          setTooltipVisible(false);
+                        }}
+                      >
+                        <Text style={styles.tooltipText}>Đăng Ký</Text>
+                      </TouchableOpacity>
+                    </View>
+                  )
+                }
+                placement="bottom"
+                contentStyle={{
+                  width: 100,
+                  borderWidth: 1,
+                  justifyContent: "center",
+                }}
+                onClose={() => setTooltipVisible(false)}
               >
-                <View style={styles.depositHeader}>
-                  <Text style={styles.depositText}>
-                    <Text style={styles.amount}>{walletData?.amount || "0"}</Text>
-                    <Text style={styles.currency}> VND</Text>
-                  </Text>
-                  <TouchableOpacity onPress={() => navigation.navigate("DepositScreen")}>
-                    <Text style={styles.depositLink}>Nạp Tiền</Text>
-                  </TouchableOpacity>
-                </View>
-                <Text style={styles.cardDescription}>
-                  Nạp tiền ngay để mở khóa các dịch vụ cao cấp của hệ thống chăm sóc Koi!
-                </Text>
-              </LinearGradient>
+                <TouchableOpacity onPress={() => setTooltipVisible(true)}>
+                  <FontAwesome name="user-circle" size={40} color="#6497B1" />
+                </TouchableOpacity>
+              </Tooltip>
             </View>
-          ) : (
-            <></>
-          )}
 
-          {/* Section: My Koi */}
-          <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>Koi Của Tôi</Text>
-          </View>
+            <View style={styles.header}>
+              <Text style={styles.userText}>
+                Xin Chào{" "}
+                {isLoggedIn || userState
+                  ? isLoggedIn?.name || userState?.name
+                  : "User"}
+              </Text>
+            </View>
 
-          <View style={styles.buttonGroup}>
-            <Button
-              onPress={() => navigation.navigate("FishStatistic")}
-              style={styles.button}
-            >
-              Thống Kê Cá 
-            </Button>
-            <Button
-              onPress={() => navigation.navigate("Shopping")}
-              style={styles.button}
-            >
-              Mua Sắm
-            </Button>
-          </View>
+            {token ? (
+              <View style={styles.depositCard}>
+                <LinearGradient
+                  colors={["#4da6ff", "#80bfff"]}
+                  style={styles.depositGradient}
+                >
+                  <View style={styles.depositHeader}>
+                    <Text style={styles.depositText}>
+                      <Text style={styles.amount}>
+                        {(walletData?.amount).toLocaleString("vi-VN") || "0"}
+                      </Text>
+                      <Text style={styles.currency}> VND</Text>
+                    </Text>
+                    <TouchableOpacity
+                      onPress={() => navigation.navigate("DepositScreen")}
+                    >
+                      <Text style={styles.depositLink}>Nạp Tiền</Text>
+                    </TouchableOpacity>
+                  </View>
+                  <Text style={styles.cardDescription}>
+                    Nạp tiền ngay để mở khóa các dịch vụ cao cấp của hệ thống chăm
+                    sóc Koi!
+                  </Text>
+                </LinearGradient>
+              </View>
+            ) : (
+              <></>
+            )}
 
-          {/* Section: My Pond */}
-          <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>Hồ Của Tôi</Text>
-          </View>
+            <View style={styles.sectionHeader}>
+              <Text style={styles.sectionTitle}>Koi Của Tôi</Text>
+            </View>
 
-          <View style={styles.buttonGroup}>
-            <Button
-              onPress={() => navigation.navigate("PondStatistic")}
-              type="primary"
-              style={styles.pondButton}
-            >
-              Thống Kê Hồ
-            </Button>
-            <Button
-              type="primary"
-              style={styles.pondButton}
-              onPress={() => {
-                navigation.navigate("WaterParameter");
-              }}
-            >
-              Thông Số Nước
-            </Button>
-            <Button
-              type="primary"
-              style={styles.pondButton}
-              onPress={() => {
-                navigation.navigate("FoodCalculator");
-              }}
-            >
-              Tính Thức Ăn
-            </Button>
-            <Button
-              type="primary"
-              style={styles.pondButton}
-              onPress={() => {
-                navigation.navigate("SaltCalculator");
-              }}
-            >
-              Tính Muối
-            </Button>
-          </View>
+            <View style={styles.buttonGroup}>
+              <Button
+                onPress={() => navigation.navigate("FishStatistic")}
+                style={styles.button}
+              >
+                Thống Kê Cá
+              </Button>
+              <Button
+                onPress={() => navigation.navigate("Shopping")}
+                style={styles.button}
+              >
+                Mua Sắm
+              </Button>
+            </View>
+
+            <View style={styles.sectionHeader}>
+              <Text style={styles.sectionTitle}>Hồ Của Tôi</Text>
+            </View>
+
+            <View style={styles.buttonGroup}>
+              <Button
+                onPress={() => navigation.navigate("PondStatistic")}
+                type="primary"
+                style={styles.pondButton}
+              >
+                Thống Kê Hồ
+              </Button>
+              <Button
+                type="primary"
+                style={styles.pondButton}
+                onPress={() => {
+                  navigation.navigate("WaterParameter");
+                }}
+              >
+                Thông Số Nước
+              </Button>
+              <Button
+                type="primary"
+                style={styles.pondButton}
+                onPress={() => {
+                  navigation.navigate("FoodCalculator");
+                }}
+              >
+                Tính Thức Ăn
+              </Button>
+              <Button
+                type="primary"
+                style={styles.pondButton}
+                onPress={() => {
+                  navigation.navigate("SaltCalculator");
+                }}
+              >
+                Tính Muối
+              </Button>
+            </View>
+          </ScrollView>
         </View>
       </TouchableWithoutFeedback>
     </ImageBackground>

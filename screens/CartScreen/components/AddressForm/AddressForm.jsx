@@ -43,7 +43,7 @@ const AddressForm = ({navigation}) => {
     };
     try {
       await AsyncStorage.setItem('address', JSON.stringify(address));
-      navigation.navigate("ProfileScreen");
+      navigation.navigate("CartScreen");
     } catch (error) {
       console.error('Error saving address to AsyncStorage:', error);
     }

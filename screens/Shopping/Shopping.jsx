@@ -160,7 +160,7 @@ const Shopping = ({ navigation }) => {
             <Image source={{ uri: item.image }} style={styles.productImage} />
             <Text style={styles.productName}>{item.productName}</Text>
             {item?.shop && <Text style={styles.productName}>{item.shop}</Text>}
-            <Text style={styles.productPrice}>{item.price} VND</Text>
+            <Text style={styles.productPrice}>{(item.price).toLocaleString("vi-VN")} VND</Text>
             
           </TouchableOpacity>
         )}

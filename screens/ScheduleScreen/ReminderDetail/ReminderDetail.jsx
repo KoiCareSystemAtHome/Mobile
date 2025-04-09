@@ -3,7 +3,7 @@ import {
   View,
   Text,
   TouchableOpacity,
-  Image, // Added Image import
+  Image,
   TouchableWithoutFeedback,
   Alert,
 } from "react-native";
@@ -26,7 +26,8 @@ const ReminderDetail = ({ navigation, route }) => {
   );
 
   const isComplete = selectedStatus === "Complete";
-
+  console.log(reminder.reminderType);
+  
   const date = new Date(reminder.maintainDate);
   const formattedDate = date.toLocaleDateString("en-US", {
     weekday: "long",
@@ -76,6 +77,11 @@ const ReminderDetail = ({ navigation, route }) => {
     }
   };
 
+  // New function to handle navigation to AddSaltForm
+  const handleAddSalt = () => {
+    navigation.navigate("AddSaltForm", { pondId: reminder.pondId });
+  };
+
   useEffect(() => {
     const getData = async () => {
       try {
@@ -87,6 +93,7 @@ const ReminderDetail = ({ navigation, route }) => {
     };
     getData();
   }, []);
+
   return (
     <SafeAreaView style={styles.container}>
       <TouchableWithoutFeedback onPress={handleOutsidePress}>
@@ -102,14 +109,14 @@ const ReminderDetail = ({ navigation, route }) => {
             </Text>
             <Text style={styles.headerTitle}>CHI TIẾT LỜI NHẮC</Text>
           </View>
-  
+
           <View style={styles.titleContainer}>
             <Text style={styles.title}>{reminder.title}</Text>
             <Text style={styles.dateTime}>
               {formattedDate}, {timeRange}
             </Text>
           </View>
-  
+
           <View style={styles.detailsContainer}>
             <View style={styles.detailRow}>
               <Text style={styles.detailLabel}>{reminder?.pondName}</Text>
@@ -154,15 +161,15 @@ const ReminderDetail = ({ navigation, route }) => {
                 )}
               </View>
             </View>
-  
+
             <View style={styles.description}>
               <Text style={styles.detailLabel}>MÔ TẢ</Text>
               <View style={styles.detailValueContainer}>
                 <Text style={styles.detailValue}>{reminder.description}</Text>
               </View>
             </View>
-  
-            {/* GIF added here */}
+
+            {/* GIF */}
             <View style={{ alignItems: 'center', marginTop: 20 }}>
               <Image
                 source={require('../../../assets/ed281664ff39c5251e5ffc26c325d0fc.gif')}
@@ -170,6 +177,25 @@ const ReminderDetail = ({ navigation, route }) => {
                 resizeMode="contain"
               />
             </View>
+
+            {/* Add Salt Button for Pond reminderType */}
+            {reminder.reminderType === "Pond" && (
+              <TouchableOpacity
+                style={{
+                  backgroundColor: "#6A5ACD",
+                  padding: 15,
+                  borderRadius: 10,
+                  alignItems: "center",
+                  marginTop: 20,
+                  marginHorizontal: 20,
+                }}
+                onPress={handleAddSalt}
+              >
+                <Text style={{ color: "#FFF", fontWeight: "bold", fontSize: 16 }}>
+                  Add Salt
+                </Text>
+              </TouchableOpacity>
+            )}
           </View>
         </View>
       </TouchableWithoutFeedback>

@@ -73,7 +73,7 @@ const OrderTracking = () => {
   useEffect(() => {
     const values = { orderId, status: orderTrack?.status };
     dispatch(updateShipType(values));
-    if (orderTrack?.status === "picked") {
+    if (orderTrack?.status === "picked" || orderTrack?.status === "picking" || orderTrack?.status === "delivering" || orderTrack?.status === "storing") { 
       const payload = { orderId, status: "In Progress" };
       dispatch(updateOrderStatus(payload));
     } else if (orderTrack?.status === "delivery_fail") {

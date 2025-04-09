@@ -3,7 +3,7 @@ import {
   ImageBackground,
   Text,
   View,
-  ScrollView,
+  FlatList,
   TouchableOpacity,
   Image,
 } from "react-native";
@@ -22,7 +22,7 @@ import { getDistrict, getProvince, getWard } from "../../redux/slices/ghnSlice";
 import { getImage, updateProfile } from "../../redux/slices/authSlice";
 
 const EditProfile = () => {
-  const [isLoggedIn, setIsLoggedIn] = useState(null); // Initialize as null to distinguish unset state
+  const [isLoggedIn, setIsLoggedIn] = useState(null);
   const [token, setToken] = useState(null);
   const [form] = Form.useForm();
   const dispatch = useDispatch();
@@ -53,7 +53,6 @@ const EditProfile = () => {
         const token = await AsyncStorage.getItem("accessToken");
         setToken(token);
 
-        // Set initial values if they exist
         if (parsedUser?.image) {
           setImageBlob(parsedUser.image);
           setUploadResponse(parsedUser.image);
@@ -87,7 +86,6 @@ const EditProfile = () => {
     dispatch(getProvince());
   }, [dispatch]);
 
-  // Sync form fields with isLoggedIn when it changes
   useEffect(() => {
     if (isLoggedIn) {
       form.setFieldsValue({
@@ -177,7 +175,7 @@ const EditProfile = () => {
     try {
       const existingUserData = await AsyncStorage.getItem("user");
       const existingUser = existingUserData ? JSON.parse(existingUserData) : {};
-      const updatedProfileForApi= {
+      const updatedProfileForApi = {
         name: values.name !== undefined ? values.name : existingUser.name,
         email: values.email !== undefined ? values.email : existingUser.email,
         gender: values.gender !== undefined ? values.gender : existingUser.gender,
@@ -185,13 +183,14 @@ const EditProfile = () => {
         avatar: uploadResponse || existingUser.image || "",
         userReminder: "2025-04-08T20:40:01.369Z",
         shopDescription: "string",
-        bizLicense: "string"
-      }
-      console.log(updatedProfileForApi)
-      dispatch(updateProfile(updatedProfileForApi)).unwrap()
-      .then((res)=>{
-        console.log("Profile updated successfully:", res);
-      })
+        bizLicense: "string",
+      };
+      console.log(updatedProfileForApi);
+      dispatch(updateProfile(updatedProfileForApi))
+        .unwrap()
+        .then((res) => {
+          console.log("Profile updated successfully:", res);
+        });
       const updatedProfile = {
         ...existingUser,
         name: values.name !== undefined ? values.name : existingUser.name,
@@ -201,7 +200,7 @@ const EditProfile = () => {
         avatar: uploadResponse || existingUser.image || "",
         userReminder: "2025-04-08T20:40:01.369Z",
         shopDescription: "string",
-        bizLicense: "string"
+        bizLicense: "string",
       };
 
       // await AsyncStorage.setItem("user", JSON.stringify(updatedProfile));
@@ -211,6 +210,140 @@ const EditProfile = () => {
     }
   };
 
+  const renderForm = () => (
+    <View style={styles.formWrapper}>
+      <View style={styles.header}>
+        <Text style={styles.title}>Hồ sơ cá nhân</Text>
+      </View>
+
+      {imageBlob ? (
+        <View style={styles.imageContainer}>
+          <TouchableOpacity onPress={handleImagePick}>
+            <Image
+              source={{ uri: uploadResponse || imageBlob }}
+              style={styles.selectedImage}
+            />
+          </TouchableOpacity>
+        </View>
+      ) : (
+        <TouchableOpacity style={styles.imageButton} onPress={handleImagePick}>
+          <Text style={styles.imageButtonText}>Chạm để Chọn Hình Ảnh</Text>
+        </TouchableOpacity>
+      )}
+
+      <Form
+        form={form}
+        name="edit_profile"
+        onFinish={onFinish}
+        style={styles.formContainer}
+      >
+        <Form.Item name="name" noStyle>
+          <Input placeholder="Họ và tên" style={styles.inputField} />
+        </Form.Item>
+
+        <Form.Item
+          name="email"
+          rules={[{ type: "email", message: "Enter a valid email" }]}
+          noStyle
+        >
+          <Input
+            placeholder="Email"
+            keyboardType="email-address"
+            style={styles.inputField}
+          />
+        </Form.Item>
+
+        <Form.Item name="gender" noStyle>
+          <Input placeholder="Giới tính" style={styles.inputField} />
+        </Form.Item>
+
+        <Form.Item style={styles.dropdownContainer}>
+          <DropDownPicker
+            placeholder="Select Province"
+            open={openProvince}
+            value={selectedProvince}
+            items={
+              provinceData?.map((prov) => ({
+                label: prov.ProvinceName,
+                value: JSON.stringify({
+                  provinceId: prov.ProvinceID,
+                  provinceName: prov.ProvinceName,
+                }),
+              })) || []
+            }
+            setOpen={setOpenProvince}
+            setValue={setSelectedProvince}
+            listMode="SCROLLVIEW"
+            style={openProvince ? { marginBottom: 200 } : {}}
+            dropDownStyle={styles.dropdownBox}
+            zIndex={3000} // Ensure proper layering
+            zIndexInverse={1000}
+          />
+        </Form.Item>
+
+        <Form.Item style={styles.dropdownContainer}>
+          <DropDownPicker
+            placeholder={
+              selectedProvince ? "Select District" : "Select Province First"
+            }
+            open={openDistrict}
+            value={selectedDistrict}
+            items={
+              districtData?.map((dist) => ({
+                label: dist.DistrictName,
+                value: JSON.stringify({
+                  districtId: dist.DistrictID,
+                  districtName: dist.DistrictName,
+                }),
+              })) || []
+            }
+            setOpen={setOpenDistrict}
+            setValue={setSelectedDistrict}
+            disabled={!selectedProvince}
+            style={openDistrict ? { marginBottom: 200 } : {}}
+            dropDownStyle={styles.dropdownBox}
+            zIndex={2000}
+            zIndexInverse={2000}
+          />
+        </Form.Item>
+
+        <Form.Item style={styles.dropdownContainer}>
+          <DropDownPicker
+            placeholder={
+              selectedDistrict ? "Select Ward" : "Select District First"
+            }
+            open={openWard}
+            value={selectedWard}
+            items={
+              wardData?.map((w) => ({
+                label: w.WardName,
+                value: JSON.stringify({
+                  wardCode: w.WardCode,
+                  wardName: w.WardName,
+                }),
+              })) || []
+            }
+            setOpen={setOpenWard}
+            setValue={setSelectedWard}
+            disabled={!selectedDistrict}
+            style={openWard ? { marginBottom: 200 } : {}}
+            dropDownStyle={styles.dropdownBox}
+            zIndex={1000}
+            zIndexInverse={3000}
+          />
+        </Form.Item>
+
+        <Button
+          type="primary"
+          style={styles.submitButton}
+          onPress={() => form.submit()}
+        >
+          <Text style={styles.submitButtonText}>Lưu</Text>
+        </Button>
+      </Form>
+    </View>
+  );
+
   return (
     <ImageBackground
       source={require("../../assets/koimain3.jpg")}
@@ -218,131 +351,13 @@ const EditProfile = () => {
       resizeMode="cover"
     >
       <View style={styles.overlay} />
-      <ScrollView contentContainerStyle={styles.scrollContainer}>
-        <View style={styles.header}>
-          <Text style={styles.title}>Hồ sơ cá nhân</Text>
-        </View>
-
-        {imageBlob ? (
-          <View style={styles.imageContainer}>
-            <TouchableOpacity onPress={handleImagePick}>
-              <Image
-                source={{ uri: uploadResponse || imageBlob }}
-                style={styles.selectedImage}
-              />
-            </TouchableOpacity>
-          </View>
-        ) : (
-          <TouchableOpacity style={styles.imageButton} onPress={handleImagePick}>
-            <Text style={styles.imageButtonText}>Chạm để Chọn Hình Ảnh</Text>
-          </TouchableOpacity>
-        )}
-
-        <Form
-          form={form}
-          name="edit_profile"
-          onFinish={onFinish}
-          style={styles.formContainer}
-        >
-          <Form.Item name="name" noStyle>
-            <Input placeholder="Họ và tên" style={styles.inputField} />
-          </Form.Item>
-
-          <Form.Item
-            name="email"
-            rules={[{ type: "email", message: "Enter a valid email" }]}
-            noStyle
-          >
-            <Input
-              placeholder="Email"
-              keyboardType="email-address"
-              style={styles.inputField}
-            />
-          </Form.Item>
-
-          <Form.Item name="gender" noStyle>
-            <Input placeholder="Giới tính" style={styles.inputField} />
-          </Form.Item>
-
-          <Form.Item style={styles.dropdownContainer}>
-            <DropDownPicker
-              placeholder="Select Province"
-              open={openProvince}
-              value={selectedProvince}
-              items={
-                provinceData?.map((prov) => ({
-                  label: prov.ProvinceName,
-                  value: JSON.stringify({
-                    provinceId: prov.ProvinceID,
-                    provinceName: prov.ProvinceName,
-                  }),
-                })) || []
-              }
-              setOpen={setOpenProvince}
-              setValue={setSelectedProvince}
-              listMode="SCROLLVIEW"
-              style={openProvince ? { marginBottom: 200 } : {}}
-              dropDownStyle={styles.dropdownBox}
-            />
-          </Form.Item>
-
-          <Form.Item style={styles.dropdownContainer}>
-            <DropDownPicker
-              placeholder={
-                selectedProvince ? "Select District" : "Select Province First"
-              }
-              open={openDistrict}
-              value={selectedDistrict}
-              items={
-                districtData?.map((dist) => ({
-                  label: dist.DistrictName,
-                  value: JSON.stringify({
-                    districtId: dist.DistrictID,
-                    districtName: dist.DistrictName,
-                  }),
-                })) || []
-              }
-              setOpen={setOpenDistrict}
-              setValue={setSelectedDistrict}
-              disabled={!selectedProvince}
-              style={openDistrict ? { marginBottom: 200 } : {}}
-              dropDownStyle={styles.dropdownBox}
-            />
-          </Form.Item>
-
-          <Form.Item style={styles.dropdownContainer}>
-            <DropDownPicker
-              placeholder={
-                selectedDistrict ? "Select Ward" : "Select District First"
-              }
-              open={openWard}
-              value={selectedWard}
-              items={
-                wardData?.map((w) => ({
-                  label: w.WardName,
-                  value: JSON.stringify({
-                    wardCode: w.WardCode,
-                    wardName: w.WardName,
-                  }),
-                })) || []
-              }
-              setOpen={setOpenWard}
-              setValue={setSelectedWard}
-              disabled={!selectedDistrict}
-              style={openWard ? { marginBottom: 200 } : {}}
-              dropDownStyle={styles.dropdownBox}
-            />
-          </Form.Item>
-
-          <Button
-            type="primary"
-            style={styles.submitButton}
-            onPress={() => form.submit()}
-          >
-            <Text style={styles.submitButtonText}>Lưu</Text>
-          </Button>
-        </Form>
-      </ScrollView>
+      <FlatList
+        data={[1]} // Single item to render the form
+        renderItem={renderForm}
+        keyExtractor={() => "edit-profile"}
+        contentContainerStyle={styles.scrollContainer}
+        showsVerticalScrollIndicator={false}
+      />
     </ImageBackground>
   );
 };

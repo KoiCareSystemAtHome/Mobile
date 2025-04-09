@@ -83,7 +83,7 @@ const CreateKoiProfile = ({ route, navigation }) => {
     .then((res)=>{
       if(res === "Create successfully!"){
         Alert.alert("Success", "Lưu lịch sử bệnh thành công!");
-        navigation.navigate("MainTabs")
+        navigation.navigate("FishStatistic")
       }
     })
   };

@@ -36,7 +36,7 @@ const LoginScreen = ({ navigation }) => {
           await AsyncStorage.setItem("user", JSON.stringify(response?.user));
           setTimeout(() => {
             navigation.navigate("MainTabs");
-          }, 2000);
+          }, 1000);
         } else {
           Toast.fail("Invalid Credentials");
         }

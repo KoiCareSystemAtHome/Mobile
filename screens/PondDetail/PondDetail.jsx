@@ -322,7 +322,7 @@ const PondDetail = ({ navigation, route }) => {
                       style={styles.addToCartButton}
                       onPress={() => {
                         navigation.navigate("ProductDetail", {
-                          product: item.product,
+                          product: item
                         });
                       }}
                     >

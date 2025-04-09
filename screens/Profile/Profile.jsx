@@ -16,6 +16,7 @@ const Profile = ({ navigation }) => {
   const handleLogout = async () => {
     await AsyncStorage.removeItem("accessToken"); 
     await AsyncStorage.removeItem("user");
+    await AsyncStorage.removeItem("cart");
     navigation.navigate("Login");
   };
 

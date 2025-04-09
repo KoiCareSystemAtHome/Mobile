@@ -34,7 +34,6 @@ import {
 } from "../../redux/slices/fishSlice";
 import { getProduct } from "../../redux/slices/productSlice";
 import enUS from "@ant-design/react-native/lib/locale-provider/en_US";
-import { StyleSheet } from "react-native";
 import { styles } from "./styles";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
@@ -42,7 +41,7 @@ const FishDetail = ({ route, navigation }) => {
   const { fish } = route.params;
   const dispatch = useDispatch();
   const fishById = useSelector(fishByIdSelector);
-  const koiProfile = useSelector(profileByFishSelector) || [];
+  const koiProfile = useSelector(profileByFishSelector) || []; // Default to empty array
   const products = useSelector(productSelector) || [];
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isHealthModalVisible, setHealthModalVisible] = useState(false);
@@ -63,7 +62,7 @@ const FishDetail = ({ route, navigation }) => {
   }, [fish, dispatch]);
 
   useEffect(() => {
-    if (koiProfile.length > 0 && !selectedProfile) {
+    if (Array.isArray(koiProfile) && koiProfile.length > 0 && !selectedProfile) {
       setSelectedProfile(koiProfile[0].koiDiseaseProfileId);
     }
   }, [koiProfile, selectedProfile]);
@@ -74,7 +73,7 @@ const FishDetail = ({ route, navigation }) => {
         const value = await AsyncStorage.getItem("user");
         setIsLoggedIn(value ? JSON.parse(value) : null);
       } catch (error) {
-        console.error(error);
+        console.error("Error fetching user data:", error);
       }
     };
     getData();
@@ -129,26 +128,27 @@ const FishDetail = ({ route, navigation }) => {
           setNewNote("");
           setNoteModalVisible(false);
           dispatch(getFishByOwner(isLoggedIn?.id));
+        } else {
+          Toast.fail("Failed to add note");
         }
+      })
+      .catch((error) => {
+        console.error("Error adding note:", error);
+        Toast.fail("Failed to add note");
       });
   };
 
   const handleAddGrowth = () => {
     if (newSize.trim() && newWeight.trim()) {
-      console.log("New Growth Record:", {
-        koiId: fish.koiID,
-        size: Number(newSize),
-        weight: Number(newWeight),
-      });
       const koiID = fish.koiID;
       const name = fish.name;
       const pondID = fish.pond.pondID;
-      const physique = fishById?.physique;
+      const physique = fishById?.physique || fish.physique;
       const sex = fish.sex;
-      const breeder = fishById?.breeder;
+      const breeder = fishById?.breeder || fish.breeder;
       const age = fish.age;
       const varietyName = fish.variety.varietyName;
-      const inPondSince = fishById?.inPondSince + "Z";
+      const inPondSince = (fishById?.inPondSince || fish.inPondSince) + "Z";
       const image = fish.image;
       const price = fish.price;
       const size = Number(newSize);
@@ -168,18 +168,24 @@ const FishDetail = ({ route, navigation }) => {
         size,
         weight,
       };
-      console.log(value);
       dispatch(updateFish(value))
         .unwrap()
         .then((res) => {
           if (res.status === "200") {
             Toast.success("Fish Updated Successfully");
-            navigation.goBack()
+            navigation.goBack();
             dispatch(getFishByOwner(isLoggedIn?.id));
+          } else {
+            Toast.fail("Failed to update fish");
           }
+        })
+        .catch((error) => {
+          console.error("Error updating fish:", error);
+          Toast.fail("Failed to update fish");
         });
     }
   };
+
   const renderNotes = () => {
     if (!notes || notes.length === 0) {
       return (
@@ -283,20 +289,24 @@ const FishDetail = ({ route, navigation }) => {
                     style={{ marginRight: 10 }}
                   />
                 </TouchableOpacity>
-                <Picker
-                  data={koiProfile.map((profile) => ({
-                    value: profile.koiDiseaseProfileId,
-                    label: new Date(profile.createddate).toLocaleDateString(),
-                  }))}
-                  cols={1}
-                  value={selectedProfile}
-                  onChange={(value) => setSelectedProfile(value)}
-                  style={{ width: 120 }}
-                >
-                  <TouchableOpacity>
-                    <FontAwesome name="caret-down" size={18} color="#6497B1" />
-                  </TouchableOpacity>
-                </Picker>
+                {Array.isArray(koiProfile) && koiProfile.length > 0 ? (
+                  <Picker
+                    data={koiProfile.map((profile) => ({
+                      value: profile.koiDiseaseProfileId,
+                      label: new Date(profile.createddate).toLocaleDateString(),
+                    }))}
+                    cols={1}
+                    value={selectedProfile}
+                    onChange={(value) => setSelectedProfile(value)}
+                    style={{ width: 120 }}
+                  >
+                    <TouchableOpacity>
+                      <FontAwesome name="caret-down" size={18} color="#6497B1" />
+                    </TouchableOpacity>
+                  </Picker>
+                ) : (
+                  <Text>Chưa có hồ sơ sức khỏe</Text>
+                )}
               </View>
             </View>
             <HealthStatusForm
@@ -305,7 +315,7 @@ const FishDetail = ({ route, navigation }) => {
               onClose={() => setHealthModalVisible(false)}
               onSubmit={handleHealthRecordSubmit}
             />
-            {koiProfile.length > 0 ? (
+            {Array.isArray(koiProfile) && koiProfile.length > 0 ? (
               renderHealthCard(
                 koiProfile.find(
                   (p) => p.koiDiseaseProfileId === selectedProfile

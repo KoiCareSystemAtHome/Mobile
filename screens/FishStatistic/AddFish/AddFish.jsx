@@ -25,6 +25,7 @@ import { pondByOwnerSelector } from "../../../redux/selector";
 import { getImage } from "../../../redux/slices/authSlice";
 import { createFish, getFishByOwner } from "../../../redux/slices/fishSlice";
 import { styles } from "./styles";
+import { getPondByOwner } from "../../../redux/slices/pondSlice";
 
 const AddFish = ({ navigation, route }) => {
   const [form] = Form.useForm();
@@ -109,10 +110,10 @@ const AddFish = ({ navigation, route }) => {
     const pondIDToUse = selectedPond; // Use selectedPond instead of route param directly
     let image = "string";
     values.age = Number(values?.age);
-    values.length = Number(values?.length);
     values.weight = Number(values?.weight);
     values.price = Number(values?.price);
     values.physique = "string";
+    values.size = Number(values?.size);
     values.inPondSince = inPondSince.toISOString();
     if (uploadResponse) {
       image = uploadResponse;
@@ -124,12 +125,15 @@ const AddFish = ({ navigation, route }) => {
       },
     ];
     values = { ...values, pondID: pondIDToUse, requirementFishParam, image };
+    console.log(values)
+
     dispatch(createFish(values))
       .unwrap()
       .then((response) => {
         if (response?.status === "201") {
           Toast.success("Fish Added Successfully");
-          return dispatch(getFishByOwner(isLoggedIn?.id)).unwrap();
+          dispatch(getFishByOwner(isLoggedIn?.id))
+          dispatch(getPondByOwner(isLoggedIn?.id))
         } else {
           Toast.fail("Failed to add fish");
         }
