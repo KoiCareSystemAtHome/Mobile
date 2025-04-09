@@ -310,7 +310,7 @@ const HomeScreen = ({ navigation }) => {
                   <View style={styles.depositHeader}>
                     <Text style={styles.depositText}>
                       <Text style={styles.amount}>
-                        {(walletData?.amount).toLocaleString("vi-VN") || "0"}
+                        {(walletData?.amount)?.toLocaleString("vi-VN") || "0"}
                       </Text>
                       <Text style={styles.currency}> VND</Text>
                     </Text>

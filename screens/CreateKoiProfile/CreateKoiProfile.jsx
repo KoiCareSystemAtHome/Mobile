@@ -81,10 +81,8 @@ const CreateKoiProfile = ({ route, navigation }) => {
     dispatch(createKoiProfile(values))
     .unwrap()
     .then((res)=>{
-      if(res === "Create successfully!"){
         Alert.alert("Success", "Lưu lịch sử bệnh thành công!");
         navigation.navigate("FishStatistic")
-      }
     })
   };
 

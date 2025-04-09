@@ -52,7 +52,14 @@ const FishDetail = ({ route, navigation }) => {
   const [notes, setNotes] = useState(fish.notes || []);
   const [newSize, setNewSize] = useState("");
   const [newWeight, setNewWeight] = useState("");
-
+  const latestReport =
+    fish.fishReportInfos?.length > 0
+      ? fish.fishReportInfos.reduce((latest, current) =>
+          new Date(current.calculatedDate) > new Date(latest.calculatedDate)
+            ? current
+            : latest
+        )
+      : null;
   useEffect(() => {
     if (fish?.koiID) {
       dispatch(getFishById(fish.koiID));
@@ -62,7 +69,11 @@ const FishDetail = ({ route, navigation }) => {
   }, [fish, dispatch]);
 
   useEffect(() => {
-    if (Array.isArray(koiProfile) && koiProfile.length > 0 && !selectedProfile) {
+    if (
+      Array.isArray(koiProfile) &&
+      koiProfile.length > 0 &&
+      !selectedProfile
+    ) {
       setSelectedProfile(koiProfile[0].koiDiseaseProfileId);
     }
   }, [koiProfile, selectedProfile]);
@@ -242,11 +253,15 @@ const FishDetail = ({ route, navigation }) => {
                 </View>
                 <View style={styles.infoBlock}>
                   <Text style={styles.infoLabel}>C.dài</Text>
-                  <Text style={styles.infoValue}>{fish.length}</Text>
+                  <Text style={styles.infoValue}>
+                    {latestReport ? latestReport.size : "N/A"}cm
+                  </Text>
                 </View>
                 <View style={styles.infoBlock}>
                   <Text style={styles.infoLabel}>C.nặng</Text>
-                  <Text style={styles.infoValue}>4.33 g</Text>
+                  <Text style={styles.infoValue}>
+                    {latestReport ? latestReport.weight : "N/A"}kg
+                  </Text>
                 </View>
               </View>
             </View>
@@ -301,7 +316,11 @@ const FishDetail = ({ route, navigation }) => {
                     style={{ width: 120 }}
                   >
                     <TouchableOpacity>
-                      <FontAwesome name="caret-down" size={18} color="#6497B1" />
+                      <FontAwesome
+                        name="caret-down"
+                        size={18}
+                        color="#6497B1"
+                      />
                     </TouchableOpacity>
                   </Picker>
                 ) : (
@@ -309,12 +328,6 @@ const FishDetail = ({ route, navigation }) => {
                 )}
               </View>
             </View>
-            <HealthStatusForm
-              fishId={fish.koiID}
-              visible={isHealthModalVisible}
-              onClose={() => setHealthModalVisible(false)}
-              onSubmit={handleHealthRecordSubmit}
-            />
             {Array.isArray(koiProfile) && koiProfile.length > 0 ? (
               renderHealthCard(
                 koiProfile.find(

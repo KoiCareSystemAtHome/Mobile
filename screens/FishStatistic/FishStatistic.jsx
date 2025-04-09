@@ -69,7 +69,15 @@ const FishStatistic = ({ navigation }) => {
   }, []);
 
   console.log(fishData);
-  const renderFishCard = ({ item }) => (
+const renderFishCard = ({ item }) => {
+  // Find the most recent fish report based on calculatedDate
+  const latestReport = item.fishReportInfos?.length > 0
+    ? item.fishReportInfos.reduce((latest, current) =>
+        new Date(current.calculatedDate) > new Date(latest.calculatedDate) ? current : latest
+      )
+    : null;
+
+  return (
     <TouchableOpacity
       onPress={() => navigation.navigate("FishDetail", { fish: item })}
     >
@@ -109,7 +117,7 @@ const FishStatistic = ({ navigation }) => {
               </Text>
               <Text style={styles.fishText}>
                 <Text style={styles.label}>Chiều dài: </Text>
-                {item.length}
+                {latestReport ? latestReport.size : "N/A"}cm
               </Text>
             </View>
           </View>
@@ -117,6 +125,7 @@ const FishStatistic = ({ navigation }) => {
       </Card>
     </TouchableOpacity>
   );
+};
 
   const handlePreviousPage = () => {
     if (currentPage > 1) {
