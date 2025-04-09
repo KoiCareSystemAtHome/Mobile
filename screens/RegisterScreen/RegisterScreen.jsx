@@ -58,7 +58,7 @@ const RegisterScreen = ({ navigation }) => {
     values.Gender = selectedGender;
     values.Role = "Member";
     console.log(values);
-
+    
     dispatch(register(values))
       .unwrap()
       .then(async (response) => {

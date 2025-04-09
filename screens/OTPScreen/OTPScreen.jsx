@@ -39,7 +39,7 @@ const OTPScreen = ({ navigation, route }) => {
       dispatch(activateAccount(values))
         .unwrap()
         .then((res) => {
-          if (res === "200") {
+          if (res.status === "200") {
             Toast.success("Account activated successfully");
             setTimeout(() => {
               navigation.navigate("Login");
