@@ -56,7 +56,7 @@ const RegisterScreen = ({ navigation }) => {
       return;
     }
     values.Gender = selectedGender;
-    values.Role = "Customer";
+    values.Role = "Member";
     console.log(values);
 
     dispatch(register(values))
