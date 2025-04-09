@@ -6,6 +6,7 @@ import {
   Image,
   FlatList,
   TouchableOpacity,
+  RefreshControl, // Import RefreshControl
 } from "react-native";
 import { Card, Provider, Toast } from "@ant-design/react-native";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
@@ -26,6 +27,7 @@ const FishStatistic = ({ navigation }) => {
   const fishData = useSelector(fishByOwnerSelector);
   const dispatch = useDispatch();
   const [fontLoaded, setFontLoaded] = useState(false);
+  const [refreshing, setRefreshing] = useState(false); // State for pull-to-refresh
 
   // Pagination states
   const [currentPage, setCurrentPage] = useState(1);
@@ -68,64 +70,87 @@ const FishStatistic = ({ navigation }) => {
     loadFontAsync();
   }, []);
 
-  console.log(fishData);
-const renderFishCard = ({ item }) => {
-  // Find the most recent fish report based on calculatedDate
-  const latestReport = item.fishReportInfos?.length > 0
-    ? item.fishReportInfos.reduce((latest, current) =>
-        new Date(current.calculatedDate) > new Date(latest.calculatedDate) ? current : latest
-      )
-    : null;
+  // Pull-to-refresh handler
+  const onRefresh = async () => {
+    if (isLoggedIn?.id) {
+      setRefreshing(true); // Start refreshing
+      try {
+        await Promise.all([
+          dispatch(getPondByOwner(isLoggedIn.id)).unwrap(),
+          dispatch(getFishByOwner(isLoggedIn.id)).unwrap(),
+        ]);
+        Toast.success("Data refreshed successfully");
+      } catch (error) {
+        console.error("Error refreshing data:", error);
+        Toast.fail("Failed to refresh data");
+      } finally {
+        setRefreshing(false); // Stop refreshing
+      }
+    }
+  };
 
-  return (
-    <TouchableOpacity
-      onPress={() => navigation.navigate("FishDetail", { fish: item })}
-    >
-      <Card style={styles.card}>
-        <View style={styles.cardContent}>
-          <Image
-            source={
-              item.image === null || item.image === "string"
-                ? require("../../assets/defaultkoi.jpg")
-                : { uri: item.image }
-            }
-            style={styles.fishImage}
-          />
-          <View style={{ flexDirection: "row", justifyContent: "flex-end" }}>
-            <FontAwesome
-              name={item.gender === "male" ? "mars" : "venus"}
-              size={20}
-              color="#6497B1"
-              style={{ paddingRight: 20, marginTop: 5 }}
+  console.log(fishData);
+
+  const renderFishCard = ({ item }) => {
+    // Find the most recent fish report based on calculatedDate
+    const latestReport =
+      item.fishReportInfos?.length > 0
+        ? item.fishReportInfos.reduce((latest, current) =>
+            new Date(current.calculatedDate) > new Date(latest.calculatedDate)
+              ? current
+              : latest
+          )
+        : null;
+
+    return (
+      <TouchableOpacity
+        onPress={() => navigation.navigate("FishDetail", { fish: item })}
+      >
+        <Card style={styles.card}>
+          <View style={styles.cardContent}>
+            <Image
+              source={
+                item.image === null || item.image === "string"
+                  ? require("../../assets/defaultkoi.jpg")
+                  : { uri: item.image }
+              }
+              style={styles.fishImage}
             />
-          </View>
-          <View style={styles.fishInfo}>
-            <View style={styles.infoRow}>
-              <Text style={styles.fishText}>
-                <Text style={styles.label}>Tên: </Text>
-                {item.name}
-              </Text>
-              <Text style={styles.fishText}>
-                <Text style={styles.label}>Giống: </Text>
-                {item.variety.varietyName}{" "}
-              </Text>
+            <View style={{ flexDirection: "row", justifyContent: "flex-end" }}>
+              <FontAwesome
+                name={item.gender === "male" ? "mars" : "venus"}
+                size={20}
+                color="#6497B1"
+                style={{ paddingRight: 20, marginTop: 5 }}
+              />
             </View>
-            <View style={styles.infoRow}>
-              <Text style={styles.fishText}>
-                <Text style={styles.label}>Tuổi: </Text>
-                {item.age}
-              </Text>
-              <Text style={styles.fishText}>
-                <Text style={styles.label}>Chiều dài: </Text>
-                {latestReport ? latestReport.size : "N/A"}cm
-              </Text>
+            <View style={styles.fishInfo}>
+              <View style={styles.infoRow}>
+                <Text style={styles.fishText}>
+                  <Text style={styles.label}>Tên: </Text>
+                  {item.name}
+                </Text>
+                <Text style={styles.fishText}>
+                  <Text style={styles.label}>Giống: </Text>
+                  {item.variety.varietyName}{" "}
+                </Text>
+              </View>
+              <View style={styles.infoRow}>
+                <Text style={styles.fishText}>
+                  <Text style={styles.label}>Tuổi: </Text>
+                  {item.age}
+                </Text>
+                <Text style={styles.fishText}>
+                  <Text style={styles.label}>Chiều dài: </Text>
+                  {latestReport ? latestReport.size : "N/A"}cm
+                </Text>
+              </View>
             </View>
           </View>
-        </View>
-      </Card>
-    </TouchableOpacity>
-  );
-};
+        </Card>
+      </TouchableOpacity>
+    );
+  };
 
   const handlePreviousPage = () => {
     if (currentPage > 1) {
@@ -154,6 +179,14 @@ const renderFishCard = ({ item }) => {
             renderItem={renderFishCard}
             keyExtractor={(item) => item?.koiID}
             contentContainerStyle={styles.listContent}
+            refreshControl={
+              <RefreshControl
+                refreshing={refreshing}
+                onRefresh={onRefresh}
+                colors={["#6497B1"]} // Customize the refresh indicator color
+                tintColor="#6497B1" // iOS tint color
+              />
+            }
           />
           {fishData?.length > 0 && (
             <View style={styles.paginationContainer}>

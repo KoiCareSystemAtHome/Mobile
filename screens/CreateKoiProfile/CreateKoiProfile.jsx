@@ -80,7 +80,7 @@ const CreateKoiProfile = ({ route, navigation }) => {
     console.log("Saving profile with values:", values);
     dispatch(createKoiProfile(values))
     .unwrap()
-    .then((res)=>{
+    .then(()=>{
         Alert.alert("Success", "Lưu lịch sử bệnh thành công!");
         navigation.navigate("FishStatistic")
     })

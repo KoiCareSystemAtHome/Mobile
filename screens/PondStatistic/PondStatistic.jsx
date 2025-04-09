@@ -9,6 +9,7 @@ import {
   TouchableOpacity,
   TextInput,
   Modal,
+  RefreshControl,
 } from "react-native";
 import {
   Button,
@@ -44,7 +45,8 @@ const PondStatistic = ({ navigation }) => {
   const [imageBlob, setImageBlob] = useState(null);
   const [uploadResponse, setUploadResponse] = useState(null);
   const [fontLoaded, setFontLoaded] = useState(false);
-  const [isImageUploading, setIsImageUploading] = useState(false); // New state for tracking upload
+  const [isImageUploading, setIsImageUploading] = useState(false);
+  const [refreshing, setRefreshing] = useState(false); // Added for pull-to-refresh
 
   // Pagination states
   const [currentPage, setCurrentPage] = useState(1);
@@ -56,52 +58,66 @@ const PondStatistic = ({ navigation }) => {
   );
 
   const dispatch = useDispatch();
-console.log(pondData)
-const renderPondCard = ({ item }) => (
-  <TouchableOpacity
-    onPress={() => navigation.navigate("PondDetail", { pond: item })}
-  >
-    <Card style={styles.card}>
-      <View style={styles.cardContent}>
-        <Image 
-          source={item.image ? { uri: item.image } : require('../../assets/defaultpond.jpg')} 
-          style={styles.pondImage} 
-        />
-        <View style={styles.pondInfo}>
-          <View style={styles.infoRow}>
-            <Text style={styles.pondText}>
-              <Text style={styles.label}>Tên: </Text>
-              {item.name}{" "}
-            </Text>
-            <Text style={styles.pondText}>
-              <Text style={styles.label}>
-                {item?.fishAmount} <FontAwesome5 name="fish" size={25} />
+  console.log(pondData);
+
+  const renderPondCard = ({ item }) => (
+    <TouchableOpacity
+      onPress={() => navigation.navigate("PondDetail", { pond: item })}
+    >
+      <Card style={styles.card}>
+        <View style={styles.cardContent}>
+          <Image 
+            source={item.image ? { uri: item.image } : require('../../assets/defaultpond.jpg')} 
+            style={styles.pondImage} 
+          />
+          <View style={styles.pondInfo}>
+            <View style={styles.infoRow}>
+              <Text style={styles.pondText}>
+                <Text style={styles.label}>Tên: </Text>
+                {item.name}{" "}
               </Text>
-            </Text>
+              <Text style={styles.pondText}>
+                <Text style={styles.label}>
+                  {item?.fishAmount} <FontAwesome5 name="fish" size={25} />
+                </Text>
+              </Text>
+            </View>
           </View>
+          {/* Status Circle */}
+          <View
+            style={[
+              styles.statusCircle,
+              {
+                backgroundColor: 
+                  item.status === 'Danger' ? '#ff0000' : 
+                  item.status === 'Warning' ? '#ffff00' : 
+                  'transparent'
+              }
+            ]}
+          />
         </View>
-        {/* Status Circle */}
-        <View
-          style={[
-            styles.statusCircle,
-            {
-              backgroundColor: 
-                item.status === 'Danger' ? '#ff0000' : 
-                item.status === 'Warning' ? '#ffff00' : 
-                'transparent'
-            }
-          ]}
-        />
-      </View>
-    </Card>
-  </TouchableOpacity>
-);
+      </Card>
+    </TouchableOpacity>
+  );
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    try {
+      if (isLoggedIn?.id) {
+        await dispatch(getPondByOwner(isLoggedIn.id)).unwrap();
+      }
+    } catch (error) {
+      console.error("Refresh failed:", error);
+    } finally {
+      setRefreshing(false);
+    }
+  };
 
   const onFinish = (values) => {
     const createDate = dayjs().utc().format("YYYY-MM-DDTHH:mm:ss.SSS[Z]");
     let image = "string";
     const ownerId = isLoggedIn?.id;
-    values.maxVolume = Number(values.maxVolume)
+    values.maxVolume = Number(values.maxVolume);
     if (uploadResponse) {
       image = uploadResponse;
     }
@@ -141,7 +157,7 @@ const renderPondCard = ({ item }) => (
     }
 
     let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images, // Fixed typo: ImagePicker.Images -> MediaTypeOptions.Images
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
       quality: 1,
     });
@@ -159,7 +175,7 @@ const renderPondCard = ({ item }) => (
       });
 
       setImageBlob(uri);
-      setIsImageUploading(true); // Start loading state
+      setIsImageUploading(true);
       try {
         const response = await dispatch(getImage(formData)).unwrap();
         if (response) {
@@ -168,7 +184,7 @@ const renderPondCard = ({ item }) => (
       } catch (error) {
         console.error("Failed to upload image:", error);
       } finally {
-        setIsImageUploading(false); // End loading state
+        setIsImageUploading(false);
       }
     }
   };
@@ -234,6 +250,14 @@ const renderPondCard = ({ item }) => (
             renderItem={renderPondCard}
             keyExtractor={(item) => item.pondID}
             contentContainerStyle={styles.listContent}
+            refreshControl={
+              <RefreshControl
+                refreshing={refreshing}
+                onRefresh={onRefresh}
+                colors={["#1890ff"]}
+                tintColor="#1890ff"
+              />
+            }
           />
 
           {pondData?.length > 0 && (
@@ -247,8 +271,8 @@ const renderPondCard = ({ item }) => (
                 disabled={currentPage === 1}
               >
                 <Text style={styles.paginationText}>
-               <AntDesign name="left" size={20} color="black" />
-             </Text>
+                  <AntDesign name="left" size={20} color="black" />
+                </Text>
               </TouchableOpacity>
               <Text style={styles.pageText}>
                 {currentPage}/{totalPages}
@@ -262,8 +286,8 @@ const renderPondCard = ({ item }) => (
                 disabled={currentPage === totalPages}
               >
                 <Text style={styles.paginationText}>
-               <AntDesign name="right" size={20} color="black" />
-             </Text>
+                  <AntDesign name="right" size={20} color="black" />
+                </Text>
               </TouchableOpacity>
             </View>
           )}
@@ -297,7 +321,7 @@ const renderPondCard = ({ item }) => (
                 <View style={styles.imageContainer}>
                   <TouchableOpacity onPress={handleImagePick}>
                     <Image
-                      source={{ uri: uploadResponse || imageBlob }} // Show imageBlob if uploadResponse isn't ready
+                      source={{ uri: uploadResponse || imageBlob }}
                       style={styles.selectedImage}
                     />
                   </TouchableOpacity>
@@ -345,8 +369,8 @@ const renderPondCard = ({ item }) => (
                     type="primary"
                     style={styles.modalSaveButton}
                     onPress={() => form.submit()}
-                    disabled={isImageUploading} // Disable while uploading
-                    loading={isImageUploading} // Show loading state
+                    disabled={isImageUploading}
+                    loading={isImageUploading}
                   >
                     Lưu
                   </Button>

@@ -47,7 +47,7 @@ const FishDetail = ({ route, navigation }) => {
   const [isHealthModalVisible, setHealthModalVisible] = useState(false);
   const [isNoteModalVisible, setNoteModalVisible] = useState(false);
   const [isGrowthModalVisible, setGrowthModalVisible] = useState(false);
-  const [selectedProfile, setSelectedProfile] = useState(null);
+  const [selectedProfile, setSelectedProfile] = useState([]); // Changed to array
   const [newNote, setNewNote] = useState("");
   const [notes, setNotes] = useState(fish.notes || []);
   const [newSize, setNewSize] = useState("");
@@ -60,6 +60,7 @@ const FishDetail = ({ route, navigation }) => {
             : latest
         )
       : null;
+
   useEffect(() => {
     if (fish?.koiID) {
       dispatch(getFishById(fish.koiID));
@@ -72,9 +73,9 @@ const FishDetail = ({ route, navigation }) => {
     if (
       Array.isArray(koiProfile) &&
       koiProfile.length > 0 &&
-      !selectedProfile
+      selectedProfile.length === 0 // Check if array is empty
     ) {
-      setSelectedProfile(koiProfile[0].koiDiseaseProfileId);
+      setSelectedProfile([koiProfile[0].koiDiseaseProfileId]); // Set as array
     }
   }, [koiProfile, selectedProfile]);
 
@@ -213,6 +214,8 @@ const FishDetail = ({ route, navigation }) => {
     ));
   };
 
+  console.log(koiProfile);
+
   return (
     <Provider locale={enUS}>
       <ImageBackground
@@ -308,11 +311,11 @@ const FishDetail = ({ route, navigation }) => {
                   <Picker
                     data={koiProfile.map((profile) => ({
                       value: profile.koiDiseaseProfileId,
-                      label: new Date(profile.createddate).toLocaleDateString(),
+                      label: new Date(profile.endDate).toLocaleDateString(),
                     }))}
                     cols={1}
-                    value={selectedProfile}
-                    onChange={(value) => setSelectedProfile(value)}
+                    value={selectedProfile} // Now an array
+                    onChange={(value) => setSelectedProfile(value)} // Value is an array
                     style={{ width: 120 }}
                   >
                     <TouchableOpacity>
@@ -331,7 +334,7 @@ const FishDetail = ({ route, navigation }) => {
             {Array.isArray(koiProfile) && koiProfile.length > 0 ? (
               renderHealthCard(
                 koiProfile.find(
-                  (p) => p.koiDiseaseProfileId === selectedProfile
+                  (p) => p.koiDiseaseProfileId === selectedProfile[0] // Access first element of array
                 ) || koiProfile[0]
               )
             ) : (
@@ -456,4 +459,4 @@ const FishDetail = ({ route, navigation }) => {
   );
 };
 
-export default FishDetail;
+export default FishDetail;  
