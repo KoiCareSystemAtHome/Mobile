@@ -215,7 +215,7 @@ const SaltCalculator = ({ navigation }) => {
                 Lượng muối cần thiết: {saltData?.saltNeeded || 0}kg
               </Text>
               <Text style={styles.saltText}>
-                Tổng muối: {saltData?.totalSalt || 0}kg
+                Lượng muối tối ưu: {saltData?.totalSalt || 0}kg
               </Text>
               <Text style={styles.saltText}>
                 Lượng nước phải thay: {saltData?.waterNeeded || 0}L
