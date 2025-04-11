@@ -170,7 +170,10 @@ const Shopping = ({ navigation }) => {
       key={`${filterType}-${item}`}
       onPress={() => {
         console.log(`Selected ${filterType}:`, item);
-        setFilters({ ...filters, [filterType]: item });
+        setFilters((prevFilters) => ({
+          ...prevFilters,
+          [filterType]: prevFilters[filterType] === item ? "" : item,
+        }));
       }}
     >
       <Text
@@ -244,7 +247,7 @@ const Shopping = ({ navigation }) => {
               <TouchableOpacity onPress={() => toggleSection("categoryName")}>
                 <AntDesign
                   name={openSections.categoryName ? "minus" : "plus"}
-                  size={16}
+                  size={25}
                   color="black"
                 />
               </TouchableOpacity>
@@ -265,7 +268,7 @@ const Shopping = ({ navigation }) => {
               <TouchableOpacity onPress={() => toggleSection("brand")}>
                 <AntDesign
                   name={openSections.brand ? "minus" : "plus"}
-                  size={16}
+                  size={25}
                   color="black"
                 />
               </TouchableOpacity>
@@ -284,7 +287,7 @@ const Shopping = ({ navigation }) => {
               <TouchableOpacity onPress={() => toggleSection("shopName")}>
                 <AntDesign
                   name={openSections.shopName ? "minus" : "plus"}
-                  size={16}
+                  size={25}
                   color="black"
                 />
               </TouchableOpacity>
@@ -305,7 +308,7 @@ const Shopping = ({ navigation }) => {
               <TouchableOpacity onPress={() => toggleSection("parameterImpacts")}>
                 <AntDesign
                   name={openSections.parameterImpacts ? "minus" : "plus"}
-                  size={16}
+                  size={25}
                   color="black"
                 />
               </TouchableOpacity>
