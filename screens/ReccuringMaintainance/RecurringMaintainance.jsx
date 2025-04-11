@@ -18,6 +18,7 @@ import {
 } from "../../redux/selector";
 import {
   calculateMaintainance,
+  getReminderByOwner,
   reccuringMaintainance,
   saveMaintainance,
 } from "../../redux/slices/reminderSlice";
@@ -79,6 +80,7 @@ const CalculateMaintainance = () => {
           console.log("endDate:", endDate);
           console.log("maintain date:", res );
           console.log("Recurring Maintenance Saved", res);
+          dispatch(getReminderByOwner(isLoggedIn?.id));
           if (Array.isArray(res) && res.length > 0) {
             Alert.alert("Success", "Recurring Maintenance Saved");
           }

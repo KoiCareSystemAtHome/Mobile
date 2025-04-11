@@ -26,6 +26,7 @@ import {
   saveReminder,
 } from "../../redux/slices/calculatorSlice";
 import { Button } from "react-native-paper";
+import { getReminderByOwner } from "../../redux/slices/reminderSlice";
 
 const SaltCalculator = ({ navigation }) => {
   const dispatch = useDispatch();
@@ -87,11 +88,10 @@ const SaltCalculator = ({ navigation }) => {
         .unwrap()
         .then(() => {
           dispatch(additionProccess(pondId));
-          // Only generate reminder after calculateSalt is complete
           dispatch(generateReminder({ pondId: homePond?.pondID, cycleHours }))
             .unwrap()
             .then(() => {
-              setReminderModalVisible(true); // Show modal after reminders are generated
+              setReminderModalVisible(true); 
             });
         });
     }
@@ -106,7 +106,9 @@ const SaltCalculator = ({ navigation }) => {
       .unwrap()
       .then((res) => {
         console.log("Reminders saved successfully!", res);
-        setReminderModalVisible(false); // Close modal on save
+        dispatch(getReminderByOwner(isLoggedIn?.id));
+
+        setReminderModalVisible(false); 
       })
       .catch((error) => {
         console.error("Failed to save reminders:", error);

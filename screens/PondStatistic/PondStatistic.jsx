@@ -353,7 +353,7 @@ const PondStatistic = ({ navigation }) => {
                 >
                   <Input
                     keyboardType="numeric"
-                    placeholder="Lượng Nước Tối Đa"
+                    placeholder="Lượng Nước Tối Đa(ml)"
                     style={styles.input}
                   />
                 </Form.Item>

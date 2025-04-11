@@ -12,6 +12,7 @@ import {
   ScrollView,
   TouchableOpacity,
   View,
+  RefreshControl, // Add this import
 } from "react-native";
 import { styles } from "./styles";
 import { useDispatch, useSelector } from "react-redux";
@@ -33,20 +34,39 @@ const WaterParameter = () => {
   const dispatch = useDispatch();
 
   const pondData = useSelector(pondByOwnerSelector);
-  const   requiredParams = useSelector(requiredParamsSelector);
+  const requiredParams = useSelector(requiredParamsSelector);
   const [homePond, setHomePond] = useState(null);
   const [selectedPond, setSelectedPond] = useState(null);
   const [homePondOpen, setHomePondOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isModalVisible, setModalVisible] = useState(false);
   const [warnings, setWarnings] = useState({});
-
+  const [refreshing, setRefreshing] = useState(false); // Add state for refreshing
 
   const [form] = Form.useForm();
+
+  // Function to handle pull-to-refresh
+  const onRefresh = () => {
+    setRefreshing(true);
+    // Fetch updated data
+    Promise.all([
+      dispatch(getRequiredParams()),
+      isLoggedIn?.id && dispatch(getPondByOwner(isLoggedIn.id)),
+      homePond?.pondID &&
+        dispatch(getPondByID(homePond?.pondID))
+          .unwrap()
+          .then((response) => {
+            setSelectedPond(response);
+          }),
+    ]).finally(() => {
+      setRefreshing(false); // Stop refreshing after data is fetched
+    });
+  };
 
   const handleChangeParameters = () => {
     setModalVisible(true);
   };
+
   const handleParamChange = (text, param) => {
     const value = parseFloat(text);
     let message = "";
@@ -66,15 +86,14 @@ const WaterParameter = () => {
       ) {
         message = `Cảnh báo! (${value}) ngoài vùng ${warningLower} - ${warningUpper}`;
         type = "warning";
-      }      
+      }
     }
-  
+
     setWarnings((prev) => ({
       ...prev,
       [param.parameterId]: { message, type },
     }));
   };
-  
 
   const handleSubmit = (values) => {
     const pondID = selectedPond?.pondID;
@@ -98,7 +117,7 @@ const WaterParameter = () => {
       .unwrap()
       .then(() => {
         dispatch(getRequiredParams());
-        dispatch(getPondByOwner(isLoggedIn.id))
+        dispatch(getPondByOwner(isLoggedIn.id));
         dispatch(getPondByID(homePond?.pondID))
           .unwrap()
           .then((response) => {
@@ -111,16 +130,14 @@ const WaterParameter = () => {
   const renderPondCards = (parameters) => {
     if (!parameters || parameters.length === 0) return null;
 
-    // Step 1: Collect all unique caculateDay values and their parameters
     const dayMap = new Map();
 
     parameters.forEach((param) => {
       param.valueInfors.forEach((valueInfo) => {
-        const day = new Date(valueInfo.caculateDay).toLocaleDateString(); // Group by date only (ignore time)
+        const day = new Date(valueInfo.caculateDay).toLocaleDateString();
         if (!dayMap.has(day)) {
           dayMap.set(day, new Map());
         }
-        // Store only the latest value for each parameter per day
         const paramMap = dayMap.get(day);
         if (
           !paramMap.has(param.parameterName) ||
@@ -137,14 +154,12 @@ const WaterParameter = () => {
       });
     });
 
-    // Step 2: Sort days in descending order (most recent first)
     const sortedDays = Array.from(dayMap.entries()).sort(
       (a, b) =>
         new Date(b[1].values().next().value.caculateDay) -
         new Date(a[1].values().next().value.caculateDay)
     );
 
-    // Step 3: Render a card for each day with ScrollView and 2 parameters per row
     return sortedDays.map(([day, paramMap], index) => {
       const params = Array.from(paramMap.values());
       const rows = [];
@@ -155,9 +170,7 @@ const WaterParameter = () => {
       return (
         <View key={index} style={styles.card}>
           <Text style={styles.cardTitle}>{homePond?.name}</Text>
-          <Text style={styles.cardDate}>
-            {day} {/* Display only the date */}
-          </Text>
+          <Text style={styles.cardDate}>{day}</Text>
           <ScrollView nestedScrollEnabled={true} style={styles.scrollView}>
             {rows.map((row, rowIndex) => (
               <View key={rowIndex} style={styles.parameterRow}>
@@ -215,7 +228,12 @@ const WaterParameter = () => {
         resizeMode="cover"
       >
         <View style={styles.overlay} />
-        <ScrollView contentContainerStyle={styles.container}>
+        <ScrollView
+          contentContainerStyle={styles.container}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }
+        >
           <Text style={styles.title}>Water Parameter</Text>
           <View style={{ justifyContent: "center", flexDirection: "row" }}>
             <TouchableOpacity
@@ -263,28 +281,26 @@ const WaterParameter = () => {
                 </View>
 
                 <Form form={form} onFinish={handleSubmit}>
-                {requiredParams?.map((param) => (
+                  {requiredParams?.map((param) => (
                     <View key={param.parameterId} style={styles.paramContainer}>
                       <Text style={styles.paramName}>
                         {param.parameterName} ({param.unitName})
                       </Text>
-                      <Text style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
-                      <Text style={styles.dangerText}>
-                      ← {param.dangerLower ?? 0} 
+                      <Text style={{ flexDirection: "row", flexWrap: "wrap" }}>
+                        <Text style={styles.dangerText}>
+                          ← {param.dangerLower ?? 0}
+                        </Text>
+                        <Text style={styles.warningText}>
+                          --{param.warningLower ?? param.dangerLower ?? 0}
+                        </Text>
+                        <Text style={styles.greenText}>-- an toàn --</Text>
+                        <Text style={styles.warningText}>
+                          {param.warningUpper ?? param.dangerUpper ?? 100}--
+                        </Text>
+                        <Text style={styles.dangerText}>
+                          {param.dangerUpper ?? 100}→
+                        </Text>
                       </Text>
-                      <Text style={styles.warningText}>
-                        --{param.warningLower ?? param.dangerLower ??0}
-                      </Text>
-                      <Text style={styles.greenText}>
-                      -- an toàn --
-                    </Text>
-                      <Text style={styles.warningText}>
-                        {param.warningUpper ??param.dangerUpper ?? 100}-- 
-                      </Text>
-                      <Text style={styles.dangerText}>
-                        {param.dangerUpper ?? 100}→
-                      </Text>
-                    </Text>
                       <Form.Item name={param.parameterId}>
                         <Input
                           placeholder={`Nhập giá trị`}
@@ -294,17 +310,17 @@ const WaterParameter = () => {
                         />
                       </Form.Item>
                       {warnings[param.parameterId]?.message ? (
-                      <Text
-                        style={
-                          warnings[param.parameterId].type === "danger"
-                            ? styles.dangerText
-                            : styles.warningText
-                        }
-                      >
-                        {warnings[param.parameterId].message}
-                      </Text>
-                    ) : null}
-                                        </View>
+                        <Text
+                          style={
+                            warnings[param.parameterId].type === "danger"
+                              ? styles.dangerText
+                              : styles.warningText
+                          }
+                        >
+                          {warnings[param.parameterId].message}
+                        </Text>
+                      ) : null}
+                    </View>
                   ))}
 
                   <Button type="primary" onPress={() => form.submit()}>

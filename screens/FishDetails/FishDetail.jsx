@@ -116,7 +116,7 @@ const FishDetail = ({ route, navigation }) => {
         </View>
         <View style={styles.cardContent}>
           <Text style={styles.cardDate}>
-            {new Date(profile.createddate).toLocaleDateString()}
+            {new Date(profile.endDate).toLocaleDateString()}
           </Text>
           <Text style={{ marginBottom: 5 }}>
             Tình trạng tổng quát: {statusText}
@@ -248,7 +248,7 @@ const FishDetail = ({ route, navigation }) => {
                 </TouchableOpacity>
               </View>
               <Text style={styles.variety}>{fish.variety.varietyName}</Text>
-              <Text style={styles.price}>100 USD</Text>
+              <Text style={styles.price}>{(fish?.price)?.toLocaleString("vi-VN")} VND</Text>
               <View style={styles.infoRow}>
                 <View style={styles.infoBlock}>
                   <Text style={styles.infoLabel}>Tuổi</Text>
@@ -327,7 +327,7 @@ const FishDetail = ({ route, navigation }) => {
                     </TouchableOpacity>
                   </Picker>
                 ) : (
-                  <Text>Chưa có hồ sơ sức khỏe</Text>
+                  <></>
                 )}
               </View>
             </View>

@@ -5,6 +5,7 @@ import {
   TouchableOpacity, 
   View,
   TextInput,
+  Alert,
 } from "react-native";
 import AntDesign from "react-native-vector-icons/AntDesign";
 import { styles } from "./styles";
@@ -81,13 +82,13 @@ const CreateKoiProfile = ({ route, navigation }) => {
     dispatch(createKoiProfile(values))
     .unwrap()
     .then(()=>{
-        Alert.alert("Success", "Lưu lịch sử bệnh thành công!");
+        Alertp.alert("Success", "Lưu lịch sử bệnh thành công!");
         navigation.navigate("FishStatistic")
     })
   };
 
   const fishData = [
-    { value: "", label: "Chọn con cá đang gặp vấn đề" },
+    // { value: "", label: "Chọn con cá đang gặp vấn đề" },
     ...(fishByOwner?.map(fish => ({
       value: fish.koiID,
       label: fish.name
@@ -107,7 +108,7 @@ const CreateKoiProfile = ({ route, navigation }) => {
         {/* Header */}
         <View style={styles.header}>
           <TouchableOpacity onPress={() => navigation.goBack()}>
-            <AntDesign name="left" size={24} color="black" />
+            <AntDesign style={{marginTop:20, marginLeft:20}} name="left" size={24} color="black" />
           </TouchableOpacity>
           <Text style={styles.title}>Lịch sử bệnh cá</Text>
           <View style={{ width: 24 }} />

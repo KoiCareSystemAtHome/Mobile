@@ -41,8 +41,10 @@ const PondDetail = ({ navigation, route }) => {
   const [uploadResponse, setUploadResponse] = useState(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [form] = Form.useForm();
-  const [isImageUploading, setIsImageUploading] = useState(false); // Tracks upload in progress
-  const [isImageChanged, setIsImageChanged] = useState(false); // Tracks if user decided to change image
+  const [isImageUploading, setIsImageUploading] = useState(false);
+  const [isImageChanged, setIsImageChanged] = useState(false);
+
+  console.log(pondById?.pondID);
 
   const transformPondParameters = (pondParameters) => {
     if (!pondParameters || !Array.isArray(pondParameters)) return [];
@@ -222,7 +224,7 @@ const PondDetail = ({ navigation, route }) => {
                     </Text>
                   </View>
                   <Text style={styles.pondText}>
-                    <Text style={styles.label}>Số Cá: </Text>5
+                    <Text style={styles.label}>Số Cá: {pond?.fishAmount}</Text>
                   </Text>
                   <Text style={styles.pondText}>
                     <Text style={styles.label}>Dung Tích: </Text>
@@ -291,10 +293,11 @@ const PondDetail = ({ navigation, route }) => {
               <WaterParametersChart
                 selectedParameters={selectedParameters}
                 waterParameterData={waterParameterData}
+                pondParameters={pondById?.pondParameters || []}
               />
             </View>
           </View>
-
+          <Text>Selected: {JSON.stringify(selectedParameters)}</Text>
           <View style={styles.suggestedContainer}>
             <Text style={styles.sectionTitle}>Sản Phẩm Đề Xuất</Text>
             <ScrollView
@@ -322,7 +325,7 @@ const PondDetail = ({ navigation, route }) => {
                       style={styles.addToCartButton}
                       onPress={() => {
                         navigation.navigate("ProductDetail", {
-                          product: item
+                          product: item,
                         });
                       }}
                     >

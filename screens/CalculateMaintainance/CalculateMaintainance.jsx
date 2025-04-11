@@ -18,6 +18,7 @@ import {
 } from "../../redux/selector";
 import {
   calculateMaintainance,
+  getReminderByOwner,
   saveMaintainance,
 } from "../../redux/slices/reminderSlice";
 import { DatePicker, Provider, Picker } from "@ant-design/react-native";
@@ -83,6 +84,8 @@ const CalculateMaintainance = () => {
         .then((res) => {
           if (res.message) {
             Alert.alert(res.message);
+                      dispatch(getReminderByOwner(isLoggedIn?.id));
+            
           }
         })
         .catch((error) => {

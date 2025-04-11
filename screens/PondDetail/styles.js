@@ -112,7 +112,8 @@ export const styles = StyleSheet.create({
   },
   statisticCard: {
     backgroundColor: "white",
-    height: 300,
+    padding: 10,
+  // borderRadius: 10,
   },
   statisticsLabel: {
     fontSize: 16,

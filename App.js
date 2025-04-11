@@ -198,7 +198,6 @@ const AppContent = () => {
     const subscription = Notifications.addNotificationResponseReceivedListener((response) => {
       const reminderId = response.notification.request.content.data.reminderId;
       if (reminderId && navigationRef.isReady()) {
-        // Find the full reminder object from reminderByOwner
         const selectedReminder = reminderByOwner.find(
           (reminder) => reminder.pondReminderId === reminderId
         );

@@ -13,12 +13,14 @@ export const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingTop: 60,
   },
+  header:{
+    marginTop: 20,
+  },
   title: {
     fontSize: 24,
     fontWeight: "bold",
     color: "#333",
     textAlign: "center",
-    marginVertical: 20,
   },
 formContainer: {
     padding: 20,
