@@ -176,8 +176,8 @@ export const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: "bold",
   },
-  modal:{
-    width:350
+  modal: {
+    width: 350,
   },
   modalOverlay: {
     justifyContent: "center",
@@ -254,7 +254,7 @@ export const styles = StyleSheet.create({
   modalFooter: {
     flexDirection: "row",
     justifyContent: "space-between",
-    backgroundColor:"white"
+    backgroundColor: "white",
   },
   imageContainer: {
     alignItems: "center",
@@ -271,12 +271,11 @@ export const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   statusCircle: {
-    position: 'absolute',
+    position: "absolute",
     top: 10,
     right: 10,
     width: 50,
     height: 50,
     borderRadius: 50,
-
   },
 });

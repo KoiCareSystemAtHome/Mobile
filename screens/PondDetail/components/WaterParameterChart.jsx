@@ -10,17 +10,17 @@ const PADDING = 40;
 const parameterColors = {
   "pH Level": "#1E90FF",
   "Nitrates (NO3-)": "#FF4500",
-  "Clo": "#4682B4",
-  "Salt": "#32CD32",
-  "PH": "#FF69B4",
-  "Hardness": "#9400D3",
+  Clo: "#4682B4",
+  Salt: "#32CD32",
+  PH: "#FF69B4",
+  Hardness: "#9400D3",
   "Amonium (NH4+)": "#FFD700",
   "Mật độ cá nhỏ": "#8A2BE2",
   "Mật độ cá lớn": "#FFA500",
   "Photphat (Po4)": "#ADFF2F",
-  "Nitrites": "#FF8C00",
+  Nitrites: "#FF8C00",
   "Độ cứng KH": "#FF0000",
-  "CO2": "#00CED1",
+  CO2: "#00CED1",
   "Amoniac (NH3)": "#FFD700",
 };
 

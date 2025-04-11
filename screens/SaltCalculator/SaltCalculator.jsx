@@ -188,7 +188,7 @@ const SaltCalculator = ({ navigation }) => {
 
             <View style={styles.card}>
               <Text style={styles.label}>
-                Lượng nước sẽ thay:{" "}
+                Lượng nước trong hồ:{" "}
                 <Text style={styles.value}>
                   {previewValue}L (
                   {((previewValue / pondVolume) * 100).toFixed(0)}
@@ -217,10 +217,10 @@ const SaltCalculator = ({ navigation }) => {
                 Lượng muối cần thiết: {saltData?.saltNeeded || 0}kg
               </Text>
               <Text style={styles.saltText}>
-                Tổng muối: {saltData?.totalSalt || 0}kg
+                Lượng muối tối ưu: {saltData?.totalSalt || 0}kg
               </Text>
               <Text style={styles.saltText}>
-                Lượng nước cần thiết: {saltData?.waterNeeded || 0}L
+                Lượng nước phải thay: {saltData?.waterNeeded || 0}L
               </Text>
             </View>
 
