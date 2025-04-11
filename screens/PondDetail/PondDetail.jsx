@@ -297,7 +297,6 @@ const PondDetail = ({ navigation, route }) => {
               />
             </View>
           </View>
-          <Text>Selected: {JSON.stringify(selectedParameters)}</Text>
           <View style={styles.suggestedContainer}>
             <Text style={styles.sectionTitle}>Sản Phẩm Đề Xuất</Text>
             <ScrollView

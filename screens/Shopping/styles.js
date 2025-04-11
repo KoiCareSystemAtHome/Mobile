@@ -33,18 +33,84 @@ export const styles = StyleSheet.create({
     flex: 1,
     fontSize: 16,
     color: "#333",
-
   },
   searchIcon: {
     paddingHorizontal: 10,
+  },
+  filterButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    padding: 10,
+    backgroundColor: "#fff",
+    borderRadius: 10,
+  },
+  filterText: {
+    marginLeft: 5,
+    fontSize: 16,
+  },
+  filterDrawer: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    width: 300,
+    height: "100%",
+    backgroundColor: "#fff",
+    padding: 15,
+    zIndex: 1001, // Ensure drawer is above the overlay
+  },
+  drawerOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: "rgba(0, 0, 0, 0.3)", // Semi-transparent black overlay
+    zIndex: 1000, // Below the drawer but above other content
+  },
+  filterHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 20,
+  },
+  filterTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+  },
+  filterScrollContainer: {
+    flexGrow: 1,
+  },
+  filterSection: {
+    marginBottom: 15,
+  },
+  filterSectionHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingVertical: 5,
+  },
+  filterLabel: {
+    fontSize: 16,
+    fontWeight: "bold",
+  },
+  filterOptions: {
+    maxHeight: 150,
+  },
+  filterOption: {
+    fontSize: 14,
+    paddingVertical: 8,
+    paddingHorizontal: 10,
+    borderRadius: 5,
+    backgroundColor: "#f0f0f0",
+    marginBottom: 5,
+  },
+  selectedOption: {
+    backgroundColor: "#ddd",
+    fontWeight: "bold",
   },
   categoryContainer: {
     flexDirection: "row",
     marginHorizontal: 20,
     marginBottom: 30,
-    alignItems:"center",
-    justifyContent:"center",
-    height:50
+    alignItems: "center",
+    justifyContent: "center",
+    height: 50,
   },
   categoryButton: {
     paddingHorizontal: 10,
@@ -52,27 +118,15 @@ export const styles = StyleSheet.create({
     borderRadius: 5,
     marginRight: 10,
     backgroundColor: "white",
-        // Box Shadow for iOS
-        shadowColor: "#000",
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.2,
-        shadowRadius: 4,
-    
-        // Elevation for Android
-        elevation: 5,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 5,
   },
   activeCategory: {
     backgroundColor: "#20A920",
   },
-  priceAndButtonContainer: {
-    flexDirection: "row", // Sắp xếp ngang hàng
-    alignItems: "center", // Căn giữa theo chiều dọc
-    justifyContent: "space-between", // Đẩy 2 bên ra xa
-    width: "100%", // Đảm bảo chiếm full chiều rộng
-    paddingHorizontal: 10, // Khoảng cách hai bên
-    marginTop: 8,
-  },
-  
   categoryText: {
     fontSize: 16,
     color: "#333",
@@ -81,7 +135,7 @@ export const styles = StyleSheet.create({
     color: "white",
     fontWeight: "bold",
   },
-  productList: {
+ productList: {
     paddingHorizontal: 20,
     paddingBottom: 100,
   },
@@ -92,74 +146,52 @@ export const styles = StyleSheet.create({
     padding: 10,
     margin: 8,
     alignItems: "center",
-    justifyContent: "center",
-  
-    // Auto height nhưng không quá 300
-    minHeight: 100, 
-    maxHeight: 300, 
-    alignSelf: "stretch", // Chiều rộng tự động mở rộng
-  
-    // Box Shadow for iOS
+    justifyContent: "space-between", // Distribute content evenly
+    height: 280, // Fixed height for uniformity
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 4 },
-  
-    // Elevation for Android
     elevation: 5,
   },
-  
-
   productImage: {
-    // marginTop: 50,
     width: "100%",
-    height: "50%",
-    resizeMode: "cover"
+    height: 120, // Fixed image height to prevent stretching
+    resizeMode: "cover",
+    borderRadius: 5, // Optional: rounded corners for image
   },
   productName: {
-    marginTop:8,
+    marginTop: 8,
     fontSize: 14,
-    textAlign:"bottom",
+    textAlign: "center",
+    flexWrap: "wrap", // Allow text to wrap to avoid overflow
+    maxHeight: 40, // Limit text height to prevent overlap
   },
   productPrice: {
     fontSize: 16,
     fontWeight: "bold",
-    marginBottom:0
+    marginBottom: 0,
   },
-  priceContainer: {
-    flexDirection: "row", // Căn ngang hàng
-    alignItems: "center", // Căn giữa theo chiều dọc
-    justifyContent: "space-between", // Đẩy các phần tử ra xa
-    width: "100%", // Full chiều rộng
+  priceAndButtonContainer: {
+    alignItems: "center",
+    justifyContent: "space-between",
+    width: "100%",
+    paddingHorizontal: 10,
     marginTop: 8,
   },
-  
-  priceText: {
-    flex: 0.7, // 70% width
-    fontSize: 16,
-    fontWeight: "bold",
-    color: "#333",
-  },
-  
-  iconContainer: {
-    flex: 0.3, // 30% width
-    alignItems: "flex-end", // Căn phải icon
-  },  
   addToCartButton: {
-  bottom:0,
-  backgroundColor: "#20A920", // Green color
-  borderRadius: 20, // Fully rounded button
-  paddingVertical: 10,
-  paddingHorizontal: 20,
-  marginTop: 10,
-  alignItems: "center",
-  justifyContent: "center",
-  marginBottom:10
-},
-addToCartText: {
-  color: "white",
-  fontSize: 12,
-  fontWeight: "bold",
-},
-paginationContainer: {
+    backgroundColor: "#20A920",
+    borderRadius: 10,
+    paddingVertical: 8,
+    paddingHorizontal: 10,
+    alignItems: "center",
+    justifyContent: "center",
+    width: "100%", // Full width for consistency
+  },
+  addToCartText: {
+    color: "white",
+    fontSize: 12,
+    fontWeight: "bold",
+  },
+  paginationContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
@@ -168,11 +200,10 @@ paginationContainer: {
     paddingBottom: 20,
   },
   paginationButton: {
-    backgroundColor: "#transparent", // Match your theme color
+    backgroundColor: "transparent",
     borderRadius: 8,
     paddingVertical: 10,
     width: 70,
-    fontWeight: "bold",
   },
   paginationText: {
     color: "#fff",
