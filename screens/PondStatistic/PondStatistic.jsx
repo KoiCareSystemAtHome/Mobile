@@ -66,9 +66,13 @@ const PondStatistic = ({ navigation }) => {
     >
       <Card style={styles.card}>
         <View style={styles.cardContent}>
-          <Image 
-            source={item.image ? { uri: item.image } : require('../../assets/defaultpond.jpg')} 
-            style={styles.pondImage} 
+          <Image
+            source={
+              item.image
+                ? { uri: item.image }
+                : require("../../assets/defaultpond.jpg")
+            }
+            style={styles.pondImage}
           />
           <View style={styles.pondInfo}>
             <View style={styles.infoRow}>
@@ -88,11 +92,13 @@ const PondStatistic = ({ navigation }) => {
             style={[
               styles.statusCircle,
               {
-                backgroundColor: 
-                  item.status === 'Danger' ? '#ff0000' : 
-                  item.status === 'Warning' ? '#ffff00' : 
-                  'transparent'
-              }
+                backgroundColor:
+                  item.status === "Danger"
+                    ? "#ff0000"
+                    : item.status === "Warning"
+                    ? "#ffff00"
+                    : "transparent",
+              },
             ]}
           />
         </View>

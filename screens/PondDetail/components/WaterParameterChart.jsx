@@ -10,32 +10,42 @@ const PADDING = 40;
 const parameterColors = {
   "pH Level": "#1E90FF",
   "Nitrates (NO3-)": "#FF4500",
-  "Clo": "#4682B4",
-  "Salt": "#32CD32",
-  "PH": "#FF69B4",
-  "Hardness": "#9400D3",
+  Clo: "#4682B4",
+  Salt: "#32CD32",
+  PH: "#FF69B4",
+  Hardness: "#9400D3",
   "Amonium (NH4+)": "#FFD700",
   "Mật độ cá nhỏ": "#8A2BE2",
   "Mật độ cá lớn": "#FFA500",
   "Photphat (Po4)": "#ADFF2F",
-  "Nitrites": "#FF8C00",
+  Nitrites: "#FF8C00",
   "Độ cứng KH": "#FF0000",
-  "CO2": "#00CED1",
+  CO2: "#00CED1",
   "Amoniac (NH3)": "#FFD700",
 };
 
-const WaterParametersChart = ({ selectedParameters = [], waterParameterData }) => {
-  const data = Array.isArray(waterParameterData) && waterParameterData.length > 0
-    ? waterParameterData
-    : [];
+const WaterParametersChart = ({
+  selectedParameters = [],
+  waterParameterData,
+}) => {
+  const data =
+    Array.isArray(waterParameterData) && waterParameterData.length > 0
+      ? waterParameterData
+      : [];
 
   const threeMonthsAgo = new Date();
   threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
-  const filteredData = data.filter(item => new Date(item.calculatedDate) >= threeMonthsAgo);
+  const filteredData = data.filter(
+    (item) => new Date(item.calculatedDate) >= threeMonthsAgo
+  );
 
-  filteredData.sort((a, b) => new Date(a.calculatedDate) - new Date(b.calculatedDate));
+  filteredData.sort(
+    (a, b) => new Date(a.calculatedDate) - new Date(b.calculatedDate)
+  );
 
-  const dates = filteredData.map(item => new Date(item.calculatedDate).getTime());
+  const dates = filteredData.map((item) =>
+    new Date(item.calculatedDate).getTime()
+  );
   const minDate = Math.min(...dates);
   const maxDate = Math.max(...dates);
   const dateRange = maxDate - minDate || 1;
@@ -46,15 +56,19 @@ const WaterParametersChart = ({ selectedParameters = [], waterParameterData }) =
   // Updated normalizeData to only include entries with the specified property
   const normalizeData = (data, property) => {
     // Filter data to only include entries that have the property
-    const validData = data.filter(d => d.hasOwnProperty(property) && d[property] != null);
-    
+    const validData = data.filter(
+      (d) => d.hasOwnProperty(property) && d[property] != null
+    );
+
     return validData.map((d) => {
       const dateValue = new Date(d.calculatedDate).getTime();
       const value = d[property];
       return {
-        x: (dateRange > 0)
-          ? PADDING + ((dateValue - minDate) / dateRange) * (CHART_WIDTH - PADDING * 2)
-          : CHART_WIDTH / 2,
+        x:
+          dateRange > 0
+            ? PADDING +
+              ((dateValue - minDate) / dateRange) * (CHART_WIDTH - PADDING * 2)
+            : CHART_WIDTH / 2,
         y: (1 - value / MAX_Y_VALUE) * (CHART_HEIGHT - PADDING * 2) + PADDING,
       };
     });
@@ -67,7 +81,8 @@ const WaterParametersChart = ({ selectedParameters = [], waterParameterData }) =
 
   const yAxisLabels = [];
   for (let i = 0; i <= MAX_Y_VALUE; i += yAxisInterval) {
-    const yPosition = (1 - i / MAX_Y_VALUE) * (CHART_HEIGHT - PADDING * 2) + PADDING;
+    const yPosition =
+      (1 - i / MAX_Y_VALUE) * (CHART_HEIGHT - PADDING * 2) + PADDING;
     yAxisLabels.push({ value: i, y: yPosition });
   }
 
@@ -87,7 +102,11 @@ const WaterParametersChart = ({ selectedParameters = [], waterParameterData }) =
         <Text style={styles.noDataText}>Select parameters to display</Text>
       ) : (
         <>
-          <Svg width={CHART_WIDTH} height={CHART_HEIGHT + 20} style={styles.chart}>
+          <Svg
+            width={CHART_WIDTH}
+            height={CHART_HEIGHT + 20}
+            style={styles.chart}
+          >
             {yAxisLabels.map((label, index) => (
               <SvgText
                 key={`y-label-${index}`}
@@ -161,7 +180,12 @@ const WaterParametersChart = ({ selectedParameters = [], waterParameterData }) =
           <View style={styles.legend}>
             {selectedParameters.map((param) => (
               <View key={param} style={styles.legendItem}>
-                <View style={[styles.legendColor, { backgroundColor: parameterColors[param] }]} />
+                <View
+                  style={[
+                    styles.legendColor,
+                    { backgroundColor: parameterColors[param] },
+                  ]}
+                />
                 <Text>{param}</Text>
               </View>
             ))}

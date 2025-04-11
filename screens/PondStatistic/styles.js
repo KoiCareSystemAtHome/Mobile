@@ -44,8 +44,8 @@ export const styles = StyleSheet.create({
     marginTop: 16,
     fontSize: 16,
     alignContent: "center",
-    textAlign:"center",
-    marginRight: 8
+    textAlign: "center",
+    marginRight: 8,
     // marginBottom: 15,
   },
   label: {
@@ -177,8 +177,6 @@ export const styles = StyleSheet.create({
     marginBottom: 10,
   },
 
-
-
   changeImageText: {
     color: "white",
     fontSize: 14,
@@ -195,7 +193,7 @@ export const styles = StyleSheet.create({
     backgroundColor: "#6497B1",
     borderRadius: 8,
     paddingVertical: 10,
-    width:70,
+    width: 70,
   },
   paginationText: {
     color: "#fff",
@@ -212,12 +210,11 @@ export const styles = StyleSheet.create({
     fontWeight: "500",
   },
   statusCircle: {
-    position: 'absolute',
+    position: "absolute",
     top: 10,
     right: 10,
     width: 50,
     height: 50,
     borderRadius: 50,
-
   },
 });
