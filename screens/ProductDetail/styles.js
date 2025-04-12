@@ -1,9 +1,17 @@
 import { StyleSheet } from "react-native";
 
 export const styles = StyleSheet.create({
+  background: {
+    flex: 1,
+    backgroundColor: "white",
+  },
+  overlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: "rgba(255, 255, 255, 0.5)",
+  },
   container: {
     flex: 1,
-    backgroundColor: "#F5F5F5",
+    // backgroundColor: "#F5F5F5",
     padding: 40,
     borderRadius: 20,
   },
@@ -25,6 +33,10 @@ export const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: "bold",
     marginTop: 20,
+  },
+  shopName: {
+    fontSize: 16,
+    fontWeight: "bold",
   },
   productDescription: {
     fontSize: 14,
@@ -114,7 +126,7 @@ export const styles = StyleSheet.create({
     borderRadius: 20,
     marginRight: 10,
   },
-feedbackSection: {
+  feedbackSection: {
     marginTop: 20,
     paddingHorizontal: 10,
   },
@@ -138,7 +150,6 @@ feedbackSection: {
     elevation: 2,
   },
   feedbackHeader: {
-
     marginBottom: 5,
   },
   feedbackRating: {
@@ -183,5 +194,17 @@ feedbackSection: {
   pageInfo: {
     fontSize: 16,
     color: "#333",
+  },
+  stockQuantity: {
+    fontSize: 14,
+    color: "#20A920",
+    marginTop: 8,
+    fontWeight: "600",
+  },
+  averageRating: {
+    fontSize: 14,
+    color: "#FFD700",
+    marginLeft: 5,
+    fontWeight: "600",
   },
 });

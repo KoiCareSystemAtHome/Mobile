@@ -1,5 +1,13 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, Image, TouchableOpacity, Alert, FlatList } from "react-native";
+import {
+  View,
+  Text,
+  Image,
+  TouchableOpacity,
+  Alert,
+  FlatList,
+  ImageBackground,
+} from "react-native";
 import { Button } from "@ant-design/react-native";
 import AntDesign from "react-native-vector-icons/AntDesign";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -19,6 +27,15 @@ const ProductDetail = ({ navigation }) => {
   const [quantity, setQuantity] = useState(1);
   const [currentPage, setCurrentPage] = useState(1);
   const feedbacks = productById?.feedbacks || [];
+
+  // Calculate average rating
+  const averageRating =
+    feedbacks.length > 0
+      ? (
+          feedbacks.reduce((sum, feedback) => sum + feedback.rate, 0) /
+          feedbacks.length
+        ).toFixed(1)
+      : "N/A";
 
   const handleIncrement = () => setQuantity(quantity + 1);
   const handleDecrement = () => quantity > 1 && setQuantity(quantity - 1);
@@ -100,8 +117,17 @@ const ProductDetail = ({ navigation }) => {
 
       {/* Product Info */}
       <Text style={styles.productTitle}>{product.productName}</Text>
+      <Text style={styles.shopName}>{product.shopName}</Text>
       <Text style={styles.productDescription}>{product.description}</Text>
-      <Text style={styles.productDescription}>{product.shop}</Text>
+      <Text style={styles.stockQuantity}>
+        Còn: {product.stockQuantity} sản phẩm
+      </Text>
+      <View style={styles.ratingContainer}>
+        <AntDesign name="star" size={16} color="#FFD700" />
+        <Text style={styles.averageRating}>
+          {averageRating} ({feedbacks.length} đánh giá)
+        </Text>
+      </View>
 
       {/* Quantity Selector and Price */}
       <View style={styles.row}>
@@ -125,9 +151,7 @@ const ProductDetail = ({ navigation }) => {
 
       {/* Buttons */}
       <View style={styles.buttonContainer}>
-        <TouchableOpacity style={styles.heartButton}>
-          <AntDesign name="staro" size={24} color="#ddd" />
-        </TouchableOpacity>
+
         <Button
           type="primary"
           style={styles.addToCartButton}
@@ -150,7 +174,10 @@ const ProductDetail = ({ navigation }) => {
   const renderFooter = () => (
     <View style={styles.paginationContainer}>
       <TouchableOpacity
-        style={[styles.paginationButton, currentPage === 1 && styles.disabledButton]}
+        style={[
+          styles.paginationButton,
+          currentPage === 1 && styles.disabledButton,
+        ]}
         onPress={handlePrevPage}
         disabled={currentPage === 1}
       >
@@ -160,7 +187,10 @@ const ProductDetail = ({ navigation }) => {
         {currentPage}/{totalPages}
       </Text>
       <TouchableOpacity
-        style={[styles.paginationButton, currentPage === totalPages && styles.disabledButton]}
+        style={[
+          styles.paginationButton,
+          currentPage === totalPages && styles.disabledButton,
+        ]}
         onPress={handleNextPage}
         disabled={currentPage === totalPages}
       >
@@ -170,18 +200,25 @@ const ProductDetail = ({ navigation }) => {
   );
 
   return (
-    <View style={styles.container}>
-      <FlatList
-        data={paginatedFeedbacks}
-        renderItem={renderFeedback}
-        keyExtractor={(item) => item.feedbackId}
-        ListHeaderComponent={renderHeader}
-        ListFooterComponent={renderFooter}
-        ListEmptyComponent={
-          <Text style={styles.noFeedbackText}>Chưa có đánh giá</Text>
-        }
-      />
-    </View>
+    <ImageBackground
+      source={require("../../assets/koiimg.jpg")}
+      style={styles.background}
+      resizeMode="cover"
+    >
+      <View style={styles.overlay} />
+      <View style={styles.container}>
+        <FlatList
+          data={paginatedFeedbacks}
+          renderItem={renderFeedback}
+          keyExtractor={(item) => item.feedbackId}
+          ListHeaderComponent={renderHeader}
+          ListFooterComponent={renderFooter}
+          ListEmptyComponent={
+            <Text style={styles.noFeedbackText}>Chưa có đánh giá</Text>
+          }
+        />
+      </View>
+    </ImageBackground>
   );
 };
 

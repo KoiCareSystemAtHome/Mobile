@@ -1,6 +1,13 @@
 import { Provider } from "@ant-design/react-native";
 import React, { useEffect, useState } from "react";
-import { ImageBackground, ScrollView, Text, View } from "react-native";
+import {
+  Image,
+  ImageBackground,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { styles } from "./styles";
 import { useRoute } from "@react-navigation/native";
 import {
@@ -13,34 +20,18 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   orderDetailSelector,
   orderTrackingSelector,
+  productSelector,
 } from "../../redux/selector";
 import AntDesign from "react-native-vector-icons/AntDesign";
-const timelineData = [
-  { time: "15 Th03 16:54", status: "Giao hàng thành công", active: true },
-  {
-    time: "15 Th03 16:27",
-    status: "Đơn hàng sẽ sớm được giao, vui lòng chú ý điện thoại",
-    active: false,
-  },
-  {
-    time: "15 Th03 15:55",
-    status: "Đơn hàng chuẩn bị bàn giao cho đơn vị vận chuyển",
-    active: false,
-  },
-  {
-    time: "15 Th03 15:52",
-    status: "Người gửi đang chuẩn bị hàng",
-    active: false,
-  },
-  { time: "15 Th03 14:17", status: "Đơn hàng đã được đặt", active: false },
-];
 
-const OrderTracking = () => {
+const OrderTracking = ({ navigation }) => {
   const dispatch = useDispatch();
   const route = useRoute();
   const orderDetail = useSelector(orderDetailSelector);
   const orderTrack = useSelector(orderTrackingSelector);
-  const orderId = route.params.orderId;
+  const productData = useSelector(productSelector);
+  const orderId = route.params?.order?.orderId;
+  const order = route.params?.order;
   const [progress, setProgress] = useState(2);
 
   useEffect(() => {
@@ -68,12 +59,15 @@ const OrderTracking = () => {
     }
   }, [dispatch, orderDetail]);
 
-  console.log(orderTrack?.status);
-
   useEffect(() => {
     const values = { orderId, status: orderTrack?.status };
     dispatch(updateShipType(values));
-    if (orderTrack?.status === "picked" || orderTrack?.status === "picking" || orderTrack?.status === "delivering" || orderTrack?.status === "storing") { 
+    if (
+      orderTrack?.status === "picked" ||
+      orderTrack?.status === "picking" ||
+      orderTrack?.status === "delivering" ||
+      orderTrack?.status === "storing"
+    ) {
       const payload = { orderId, status: "In Progress" };
       dispatch(updateOrderStatus(payload));
     } else if (orderTrack?.status === "delivery_fail") {
@@ -85,6 +79,23 @@ const OrderTracking = () => {
     }
   }, [orderId, dispatch, orderTrack?.status]);
 
+  const handleCancelOrder = () => {
+    const payload = { orderId, status: "Cancelled" };
+    dispatch(updateOrderStatus(payload));
+    navigation.goBack();
+  };
+
+  // Format the payment date
+  const formatPaymentDate = (dateString) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString("en-GB", {
+      weekday: "short",
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    });
+  };
+
   return (
     <Provider>
       <ImageBackground
@@ -94,12 +105,81 @@ const OrderTracking = () => {
       >
         <View style={styles.overlay} />
         <ScrollView contentContainerStyle={styles.container}>
-          <View style={styles.progressContainer}>
-            <Text style={styles.progressText}>Giao vào 15 Th03</Text>
+          {/* Back Button */}
+          <TouchableOpacity
+            style={styles.backButton}
+            onPress={() => navigation.goBack()}
+          >
+            <AntDesign name="arrowleft" size={24} color="black" />
+          </TouchableOpacity>
 
-            {/* Progress Bar */}
+          {/* Product Details */}
+          <View style={styles.orderCard}>
+            <Text style={styles.orderTitle}>Chi tiết đơn hàng</Text>
+            {orderDetail?.details?.map((item) => {
+              const matchedProduct = productData?.find(
+                (product) => product.productId === item.productId
+              );
+              return (
+                matchedProduct && (
+                  <View key={item.productId} style={styles.productRow}>
+                    <Image
+                      source={{ uri: matchedProduct.image }}
+                      style={styles.productImage}
+                    />
+                    <View style={styles.productDetails}>
+                      <Text style={styles.productTitle}>
+                        {matchedProduct.productName}
+                      </Text>
+                      <View style={styles.productFooter}>
+                        <Text style={styles.price}>
+                          {matchedProduct.price.toLocaleString("vi-VN")}₫
+                        </Text>
+                        <Text style={styles.quantity}>x{item.quantity}</Text>
+                      </View>
+                      <Text style={styles.totalPrice}>
+                        Tổng số tiền:{" "}
+                        <Text style={styles.highlight}>
+                          {(
+                            item.quantity * matchedProduct.price
+                          ).toLocaleString("vi-VN")}
+                          ₫
+                        </Text>
+                      </Text>
+                    </View>
+                  </View>
+                )
+              );
+            })}
+
+            {/* Payment Details */}
+            {order?.transactionInfo?.payment && (
+              <View style={styles.paymentDetails}>
+                <Text style={styles.paymentTitle}>
+                  {order.transactionInfo.payment.description}
+                </Text>
+                <Text style={styles.paymentAmount}>
+                  Tổng đơn hàng:{" "}
+                  {order.transactionInfo.payment.amount.toLocaleString("vi-VN")}
+                  ₫
+                </Text>
+                <Text style={styles.paymentDueDate}>
+                  Due date:{" "}
+                  {formatPaymentDate(order.transactionInfo.payment.date)}
+                </Text>
+                <Text style={styles.paymentSource}>
+                  {order.shopName} •{" "}
+                  <Text style={styles.paymentStatus}>
+                    {order.transactionInfo.transactionType}
+                  </Text>
+                </Text>
+              </View>
+            )}
+          </View>
+
+          {/* Progress Bar */}
+          <View style={styles.progressContainer}>
             <View style={styles.progressBar}>
-              {/* Line */}
               <View
                 style={[
                   styles.progressLine,
@@ -112,8 +192,6 @@ const OrderTracking = () => {
                   progress >= 2 && styles.progressLineActive,
                 ]}
               />
-
-              {/* Steps */}
               <View style={[styles.step, progress >= 0 && styles.stepActive]} />
               <View style={[styles.step, progress >= 1 && styles.stepActive]} />
               <View
@@ -122,8 +200,6 @@ const OrderTracking = () => {
                 {progress === 2 && <Text style={styles.checkmark}>✔</Text>}
               </View>
             </View>
-
-            {/* Steps Labels */}
             <View style={styles.progressSteps}>
               <Text
                 style={[
@@ -152,6 +228,7 @@ const OrderTracking = () => {
             </View>
           </View>
 
+          {/* Tracking Log */}
           <View style={styles.progressContainer}>
             {orderTrack?.log?.map((item, index) => {
               const latestDate = Math.max(
@@ -166,18 +243,18 @@ const OrderTracking = () => {
                   year: "numeric",
                   hour: "2-digit",
                   minute: "2-digit",
-                  hour12: false, // 24-hour format
+                  hour12: false,
                 })
                 .replace(",", "")
                 .replace(" ", "-")
                 .replace(" ", "-");
               const statusMapping = {
-                delivered: "Đã được giao hàng",
-                delivering: "Đang được giao hàng, xin hãy chú ý điện thoại",
-                storing: "Đang đóng hàng",
-                picked: "Đã nhận hàng",
-                picking: "Đang nhận hàng",
-                delivery_fail:"Nổ lực giao hàng không thành công"
+                delivered: "Đã được giao hàng",
+                delivering: "Đang được giao hàng, xin hãy chú ý điện thoại",
+                storing: "Đang đóng hàng",
+                picked: "Đã nhận hàng",
+                picking: "Đang nhận hàng",
+                delivery_fail: "Nỗ lực giao hàng không thành công",
               };
               return (
                 <View key={index} style={styles.item}>
@@ -211,6 +288,55 @@ const OrderTracking = () => {
                 </View>
               );
             })}
+          </View>
+
+          {/* Action Buttons */}
+          <View style={styles.buttonContainer}>
+            {(orderTrack?.status === "delivered" ||
+              orderDetail?.status === "Complete" ||
+              orderDetail?.status === "Completed") && (
+              <>
+                <TouchableOpacity
+                  style={styles.reportButton}
+                  onPress={() => {
+                    navigation.navigate("Report", { orderId });
+                  }}
+                >
+                  <Text style={styles.buttonText}>Báo cáo</Text>
+                </TouchableOpacity>
+                {orderDetail?.details?.map((item) => {
+                  const matchedProduct = productData?.find(
+                    (product) => product.productId === item.productId
+                  );
+                  return (
+                    matchedProduct && (
+                      <TouchableOpacity
+                        key={item.productId}
+                        style={styles.reviewButton}
+                        onPress={() => {
+                          navigation.navigate("ReviewScreen", {
+                            product: matchedProduct,
+                          });
+                        }}
+                      >
+                        <Text style={styles.buttonText}>
+                          <AntDesign name="star" size={16} color="gold" /> Đánh
+                          giá
+                        </Text>
+                      </TouchableOpacity>
+                    )
+                  );
+                })}
+              </>
+            )}
+            {orderDetail?.status === "Pending" && (
+              <TouchableOpacity
+                style={styles.cancelButton}
+                onPress={handleCancelOrder}
+              >
+                <Text style={styles.buttonText}>Hủy đơn hàng</Text>
+              </TouchableOpacity>
+            )}
           </View>
         </ScrollView>
       </ImageBackground>

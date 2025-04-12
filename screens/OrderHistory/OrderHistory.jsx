@@ -17,6 +17,7 @@ import { getOrderByAccount } from "../../redux/slices/ghnSlice";
 import { orderbyAccountSelector, productSelector } from "../../redux/selector";
 import { getProduct } from "../../redux/slices/productSlice";
 import AntDesign from "react-native-vector-icons/AntDesign";
+import { getOrderTransaction } from "../../redux/slices/transactionSlice";
 
 const OrderHistory = ({ navigation }) => {
   const dispatch = useDispatch();
@@ -24,7 +25,7 @@ const OrderHistory = ({ navigation }) => {
   const orderData = useSelector(orderbyAccountSelector);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
-  
+
   // Pagination states
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
@@ -54,17 +55,18 @@ const OrderHistory = ({ navigation }) => {
     }
   }, [dispatch, isLoggedIn]);
 
+
   const onRefresh = async () => {
     setRefreshing(true);
     try {
       const userInfo = await AsyncStorage.getItem("user");
       const user = userInfo ? JSON.parse(userInfo) : null;
       setIsLoggedIn(user);
-      
+
       if (user?.id) {
         await Promise.all([
           dispatch(getProduct()).unwrap(),
-          dispatch(getOrderByAccount(user.id)).unwrap()
+          dispatch(getOrderByAccount(user.id)).unwrap(),
         ]);
       }
     } catch (error) {
@@ -96,6 +98,7 @@ const OrderHistory = ({ navigation }) => {
     }, 0);
   };
 
+
   return (
     <Provider>
       <ImageBackground
@@ -123,19 +126,28 @@ const OrderHistory = ({ navigation }) => {
 
         <View style={styles.container}>
           <Text style={styles.title}>Order History</Text>
-          <ScrollView 
+          <ScrollView
             contentContainerStyle={styles.listContent}
             refreshControl={
               <RefreshControl
                 refreshing={refreshing}
                 onRefresh={onRefresh}
-                colors={["#6497B1"]} // Customize color to match your theme
+                colors={["#6497B1"]}
                 tintColor="#6497B1"
               />
             }
           >
             {paginatedOrderData?.map((order) => (
-              <View key={order.orderId} style={styles.orderCard}>
+              <TouchableOpacity
+                key={order.orderId}
+                style={styles.orderCard}
+                onPress={() => {
+                  navigation.navigate("OrderTracking", {
+                    order: order,
+                  });
+                }}
+                activeOpacity={0.8}
+              >
                 <Text style={styles.storeName}>{order.store}</Text>
                 <Text style={styles.status}>{order.status}</Text>
 
@@ -156,12 +168,7 @@ const OrderHistory = ({ navigation }) => {
                               {matchedProduct.productName}
                             </Text>
                             <Text style={styles.price}>
-                              <Text style={styles.originalPrice}>
-                                ₫{matchedProduct.price.toLocaleString("vi-VN")}{" "}
-                              </Text>{" "}
-                              <Text style={styles.discountedPrice}>
-                                {/* ₫{matchedProduct.discountedPrice.toLocaleString()} */}
-                              </Text>
+                              ₫{matchedProduct.price.toLocaleString("vi-VN")}
                             </Text>
                             <Text style={styles.quantity}>
                               x{item.quantity}
@@ -174,23 +181,9 @@ const OrderHistory = ({ navigation }) => {
                                 ₫
                                 {(
                                   item.quantity * matchedProduct.price
-                                ).toLocaleString("vi-VN")}{" "}
+                                ).toLocaleString("vi-VN")}
                               </Text>
                             </Text>
-                            {(order.status === "Completed" || order.status === "Complete") && (
-                              <TouchableOpacity
-                                style={styles.productReviewButton}
-                                onPress={() => {
-                                  navigation.navigate("ReviewScreen", {
-                                    product: matchedProduct,
-                                  });
-                                }}
-                              >
-                                <Text style={styles.productReviewText}>
-                                  <AntDesign name="star" size={16} color="gold"></AntDesign> Đánh giá
-                                </Text>
-                              </TouchableOpacity>
-                            )}
                           </View>
                         </>
                       )}
@@ -214,38 +207,7 @@ const OrderHistory = ({ navigation }) => {
                     {order.coins} Xu
                   </Text>
                 </View>
-                <View style={styles.buttonRow}>
-                  {order?.status === "Complete" || order?.status === "Completed" ? (
-                    <TouchableOpacity
-                      style={styles.returnButton}
-                      onPress={() => {
-                        navigation.navigate("Report", {
-                          orderId: order.orderId,
-                        });
-                      }}
-                    >
-                      <Text style={styles.returnText}>Báo cáo</Text>
-                    </TouchableOpacity>
-                  ) : (
-                    <></>
-                  )}
-
-                  {order?.status === "Pending" ? (
-                    <></>
-                  ) : (
-                    <TouchableOpacity
-                      style={styles.reviewButton}
-                      onPress={() => {
-                        navigation.navigate("OrderTracking", {
-                          orderId: order.orderId,
-                        });
-                      }}
-                    >
-                      <Text style={styles.reviewText}>Theo dõi đơn hàng</Text>
-                    </TouchableOpacity>
-                  )}
-                </View>
-              </View>
+              </TouchableOpacity>
             ))}
           </ScrollView>
 
