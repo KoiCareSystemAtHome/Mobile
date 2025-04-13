@@ -96,10 +96,7 @@ const Shopping = ({ navigation }) => {
     ...new Set(
       products?.flatMap((p) => {
         if (p.parameterImpacts && typeof p.parameterImpacts === "object") {
-          return Object.entries(p.parameterImpacts).flatMap(([key, value]) => [
-            key,
-            value,
-          ]);
+          return Object.keys(p.parameterImpacts); // Only get parameter names
         }
         return [];
       })
@@ -127,10 +124,7 @@ const Shopping = ({ navigation }) => {
         : true;
       const matchesParameterImpacts = filters.parameterImpacts
         ? product.parameterImpacts &&
-          Object.entries(product.parameterImpacts).some(
-            ([key, value]) =>
-              key === filters.parameterImpacts || value === filters.parameterImpacts
-          )
+          filters.parameterImpacts in product.parameterImpacts // Check if parameter exists
         : true;
 
       return (
@@ -315,7 +309,7 @@ const Shopping = ({ navigation }) => {
             </View>
             {openSections.parameterImpacts && (
               <View>
-                {uniqueParameterImpacts.map((item, index) =>
+                {uniqueParameterImpacts.map((item) =>
                   renderFilterOption(item, "parameterImpacts")
                 )}
               </View>
@@ -339,7 +333,7 @@ const Shopping = ({ navigation }) => {
           >
             <Image source={{ uri: item.image }} style={styles.productImage} />
             <Text style={styles.productName}>{item.productName}</Text>
-           <Text style={styles.shopName}>{item.shopName}</Text>
+            <Text style={styles.shopName}>{item.shopName}</Text>
             <View style={styles.priceAndButtonContainer}>
               <Text style={styles.productPrice}>
                 {item.price.toLocaleString("vi-VN")} VND
