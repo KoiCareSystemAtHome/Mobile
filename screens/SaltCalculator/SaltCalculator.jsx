@@ -26,7 +26,7 @@ import {
   saveReminder,
 } from "../../redux/slices/calculatorSlice";
 import { Button } from "react-native-paper";
-import { getReminderByOwner } from "../../redux/slices/reminderSlice";
+import Icon1 from "react-native-vector-icons/MaterialIcons"; // Add MaterialIcons for better icons
 
 const SaltCalculator = ({ navigation }) => {
   const dispatch = useDispatch();
@@ -46,7 +46,11 @@ const SaltCalculator = ({ navigation }) => {
   const [growth, setGrowth] = useState("Medium");
   const [cycleHours, setCycleHours] = useState(12);
   const [isReminderModalVisible, setReminderModalVisible] = useState(false);
-
+  const growthLabels = {
+    Low: "Thấp",
+    Medium: "Trung bình",
+    High: "Cao",
+  };
   const growthOptions = ["Low", "Medium", "High"];
   const cycleOptions = [12, 24];
 
@@ -123,7 +127,7 @@ const SaltCalculator = ({ navigation }) => {
     >
       <View style={styles.overlay} />
       <ScrollView contentContainerStyle={styles.scrollContainer}>
-        <Text style={styles.title}>Ước tính lượng muối</Text>
+        <Text style={styles.title}>Ước Tính Lượng Muối</Text>
 
         <View style={styles.selectorContainer}>
           <TouchableOpacity
@@ -162,7 +166,7 @@ const SaltCalculator = ({ navigation }) => {
 
             {/* Desired Concentration */}
             <View style={styles.card}>
-              <Text style={styles.label}>Nồng độ mong muốn: </Text>
+              <Text style={styles.label}>Nồng độ mong muốn:</Text>
               <View style={styles.toggleContainer}>
                 {growthOptions.map((option) => (
                   <TouchableOpacity
@@ -179,7 +183,7 @@ const SaltCalculator = ({ navigation }) => {
                         growth === option && styles.activeText,
                       ]}
                     >
-                      {option}
+                      {growthLabels[option]} {/* Display Vietnamese label */}
                     </Text>
                   </TouchableOpacity>
                 ))}
@@ -190,9 +194,8 @@ const SaltCalculator = ({ navigation }) => {
               <Text style={styles.label}>
                 Lượng nước trong hồ:{" "}
                 <Text style={styles.value}>
-                  {previewValue}L (
-                  {((previewValue / pondVolume) * 100).toFixed(0)}
-                  %)
+                  {previewValue} L (
+                  {((previewValue / pondVolume) * 100).toFixed(0)}%)
                 </Text>
               </Text>
               <Slider
@@ -209,33 +212,137 @@ const SaltCalculator = ({ navigation }) => {
               />
             </View>
 
+            {/* <View style={styles.saltBox}>
+              <Text style={styles.saltText}>
+                Lượng muối hiện tại: {saltData?.currentSalt || 0} Kg
+              </Text>
+              <Text style={styles.saltText}>
+                Lượng muối cần thiết: {saltData?.saltNeeded || 0} Kg
+              </Text>
+              <Text style={styles.saltText}>
+                Lượng muối tối ưu: {saltData?.totalSalt || 0} Kg
+              </Text>
+              <Text style={styles.saltText}>
+                Lượng nước phải thay: {saltData?.waterNeeded || 0} L
+              </Text>
+              <Text style={styles.saltText}>
+                Lượng muối dư thừa: {saltData?.excessSalt || 0} Kg
+              </Text>
+              <Text style={styles.saltText}>
+                Lượng muối tối ưu từ: {saltData?.optimalSaltFrom || 0} Kg đến{" "}
+                {saltData?.optimalSaltTo || 0} Kg
+              </Text>
+            </View> */}
+
             <View style={styles.saltBox}>
-              <Text style={styles.saltText}>
-                Lượng muối hiện tại: {saltData?.currentSalt || 0}kg
-              </Text>
-              <Text style={styles.saltText}>
-                Lượng muối cần thiết: {saltData?.saltNeeded || 0}kg
-              </Text>
-              <Text style={styles.saltText}>
-                Lượng muối tối ưu: {saltData?.totalSalt || 0}kg
-              </Text>
-              <Text style={styles.saltText}>
-                Lượng nước phải thay: {saltData?.waterNeeded || 0}L
-              </Text>
+              <Text style={styles.sectionTitle}>Thông Tin Lượng Muối</Text>
+              <View style={styles.saltItemContainer}>
+                <Icon1
+                  name="water-drop"
+                  size={20}
+                  color="#007AFF"
+                  style={styles.saltIcon}
+                />
+                <Text style={styles.saltText}>
+                  <Text style={styles.saltLabel}>Lượng muối hiện tại: </Text>
+                  <Text style={styles.saltValue}>
+                    {saltData?.currentSalt || 0} Kg
+                  </Text>
+                </Text>
+              </View>
+              <View style={styles.saltItemContainer}>
+                <Icon1
+                  name="add-circle"
+                  size={20}
+                  color="#007AFF"
+                  style={styles.saltIcon}
+                />
+                <Text style={styles.saltText}>
+                  <Text style={styles.saltLabel}>Lượng muối cần thiết: </Text>
+                  <Text style={styles.saltValue}>
+                    {saltData?.saltNeeded || 0} Kg
+                  </Text>
+                </Text>
+              </View>
+              <View style={styles.saltItemContainer}>
+                <Icon1
+                  name="check-circle"
+                  size={20}
+                  color="#007AFF"
+                  style={styles.saltIcon}
+                />
+                <Text style={styles.saltText}>
+                  <Text style={styles.saltLabel}>Lượng muối tối ưu: </Text>
+                  <Text style={styles.saltValue}>
+                    {saltData?.totalSalt || 0} Kg
+                  </Text>
+                </Text>
+              </View>
+              <View style={styles.saltItemContainer}>
+                <Icon1
+                  name="sync"
+                  size={20}
+                  color="#007AFF"
+                  style={styles.saltIcon}
+                />
+                <Text style={styles.saltText}>
+                  <Text style={styles.saltLabel}>Lượng nước phải thay: </Text>
+                  <Text style={styles.saltValue}>
+                    {saltData?.waterNeeded || 0} L
+                  </Text>
+                </Text>
+              </View>
+              <View style={styles.saltItemContainer}>
+                <Icon1
+                  name="warning"
+                  size={20}
+                  color="#FF9500"
+                  style={styles.saltIcon}
+                />
+                <Text style={styles.saltText}>
+                  <Text style={styles.saltLabel}>Lượng muối dư thừa: </Text>
+                  <Text style={styles.saltValue}>
+                    {saltData?.excessSalt || 0} Kg
+                  </Text>
+                </Text>
+              </View>
+              <View style={styles.saltItemContainer}>
+                <Icon1
+                  name="trending-up"
+                  size={20}
+                  color="#007AFF"
+                  style={styles.saltIcon}
+                />
+                <Text style={styles.saltText}>
+                  <Text style={styles.saltLabel}>Lượng muối tối ưu từ: </Text>
+                  <Text style={styles.saltValue}>
+                    {saltData?.optimalSaltFrom || 0} Kg đến{" "}
+                    {saltData?.optimalSaltTo || 0} Kg
+                  </Text>
+                </Text>
+              </View>
             </View>
 
             {/* Instruction Display */}
             {instructionData?.instructions && (
+              // <View style={styles.saltBox}>
+              //   <Text style={styles.instructionLabel}>Instructions:</Text>
+              //   {instructionData.instructions.map((instruction, index) => (
+              //     <Text key={index} style={styles.instructionItem}>
+              //       {instructionData.instructions.length > 1
+              //         ? `${index + 1}. `
+              //         : ""}
+              //       {instruction}
+              //     </Text>
+              //   ))}
+              // </View>
               <View style={styles.saltBox}>
-                <Text style={styles.instructionLabel}>Instructions:</Text>
-                {instructionData.instructions.map((instruction, index) => (
-                  <Text key={index} style={styles.instructionItem}>
-                    {instructionData.instructions.length > 1
-                      ? `${index + 1}. `
-                      : ""}
-                    {instruction}
-                  </Text>
-                ))}
+                <Text style={styles.instructionLabel}>Hướng Dẫn Bổ Sung:</Text>
+                <Text style={styles.saltText}>
+                  -{" "}
+                  {saltData?.additionalInstruction?.join("\n - ") ||
+                    "No instructions available"}
+                </Text>
               </View>
             )}
           </>
@@ -312,7 +419,7 @@ const SaltCalculator = ({ navigation }) => {
                   style={{ flex: 1 }}
                   labelStyle={styles.saveReminderText}
                 >
-                  Lưu Nhắc Nhở
+                  Lưu
                 </Button>
               </View>
             </View>

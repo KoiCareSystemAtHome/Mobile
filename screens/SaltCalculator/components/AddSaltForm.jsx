@@ -17,7 +17,7 @@ const AddSaltForm = () => {
   const route = useRoute();
   const navigation = useNavigation();
   const dispatch = useDispatch();
-  const pondId = route.params?.pondID || route.params.pondId
+  const pondId = route.params?.pondID || route.params.pondId;
   console.log(pondId);
   const [addedSaltKg, setAddedSaltKg] = useState("");
 
@@ -26,10 +26,7 @@ const AddSaltForm = () => {
     const saltValue = parseFloat(addedSaltKg);
 
     if (isNaN(saltValue) || saltValue <= 0) {
-      Alert.alert(
-        "Error",
-        "Please enter a valid amount of salt (greater than 0 kg)."
-      );
+      Alert.alert("Error", "Vui lòng nhập lượng muối hợp lệ (lớn hơn 0 Kg).");
       return;
     }
 
@@ -38,11 +35,11 @@ const AddSaltForm = () => {
       .unwrap()
       .then((res) => {
         console.log("a", res);
-        Alert.alert("Success", "Salt added successfully!");
+        Alert.alert("Success", "Muối đã được thêm thành công!");
         navigation.goBack(); // Return to the previous screen
       })
       .catch((error) => {
-        Alert.alert("Error", "Failed to add salt. Please try again.");
+        Alert.alert("Error", "Thêm muối không thành công. Vui lòng thử lại!");
         console.error(error);
       });
 
@@ -57,21 +54,21 @@ const AddSaltForm = () => {
     >
       <View style={styles.overlay} />
       <ScrollView contentContainerStyle={styles.scrollContainer}>
-        <Text style={styles.title}>Add Salt</Text>
+        <Text style={styles.title}>Thêm Muối</Text>
 
         {/* Form Container */}
         <View style={styles.formContainer}>
-          <Text style={styles.label}>Amount of Salt Added (kg):</Text>
+          <Text style={styles.label}>Lượng Muối Thêm Vào (Kg):</Text>
           <TextInput
             style={styles.input}
             value={addedSaltKg}
             onChangeText={setAddedSaltKg}
             keyboardType="numeric" // Restrict to numeric input
-            placeholder="Enter salt amount (e.g., 1.5)"
+            placeholder="Nhập lượng muối (Ví dụ: 1.5)"
             placeholderTextColor="#999"
           />
           <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
-            <Text style={styles.saveButtonText}>Save</Text>
+            <Text style={styles.saveButtonText}>Lưu</Text>
           </TouchableOpacity>
         </View>
       </ScrollView>

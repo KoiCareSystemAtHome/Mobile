@@ -25,11 +25,11 @@ export const styles = StyleSheet.create({
     textAlign: "center",
     marginVertical: 20,
   },
-  selectorContainer:{
+  selectorContainer: {
     flexDirection: "row",
     justifyContent: "space-center",
   },
- selector: {
+  selector: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
@@ -78,16 +78,19 @@ export const styles = StyleSheet.create({
     marginTop: 10,
   },
   saltBox: {
-    backgroundColor: "#222",
+    backgroundColor: "#fff", // Changed from #222 to white for better readability
     padding: 15,
     borderRadius: 10,
-    alignItems: "center",
     marginVertical: 10,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
+    elevation: 3,
   },
   saltText: {
-    color: "#fff",
     fontSize: 16,
-    fontWeight: "bold",
+    color: "#333", // Changed from white to dark gray for contrast on white background
   },
   toggleContainer: {
     flexDirection: "row",
@@ -117,18 +120,18 @@ export const styles = StyleSheet.create({
   },
   instructionLabel: {
     fontSize: 16,
-    color: "white",
+    color: "#333", // Changed from white to dark gray for contrast
+    fontWeight: "bold",
   },
   instructionItem: {
     fontSize: 14,
-    color: "white",
+    color: "#444", // Adjusted for better readability
   },
-  // Styles for the Next button
   nextButton: {
     position: "absolute",
     bottom: 20,
     right: 20,
-    backgroundColor: "#FFA500", // Matches the active toggle color
+    backgroundColor: "#FFA500",
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: 8,
@@ -144,12 +147,12 @@ export const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   nextButtonDisabled: {
-    backgroundColor: "#ccc", // Grayed out when disabled
-    opacity: 0.6, // Slightly transparent to indicate disabled state
+    backgroundColor: "#ccc",
+    opacity: 0.6,
   },
   saveReminderButton: {
     marginTop: 10,
-    backgroundColor: "#007AFF", 
+    backgroundColor: "#007AFF",
   },
   saveReminderText: {
     color: "#fff",
@@ -160,11 +163,45 @@ export const styles = StyleSheet.create({
   },
   reminderText: {
     fontSize: 16,
-    color: "white",
+    color: "#333", // Adjusted for contrast
   },
   reminderDate: {
     fontSize: 14,
     color: "#666",
     marginTop: 2,
+  },
+  // New styles for the updated design
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "#333",
+    marginBottom: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: "#e0e0e0",
+    paddingBottom: 5,
+  },
+  saltItemContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginVertical: 5,
+  },
+  saltIcon: {
+    marginRight: 10,
+  },
+  saltLabel: {
+    fontWeight: "500",
+  },
+  saltValue: {
+    fontWeight: "bold",
+    color: "#007AFF",
+  },
+  instructionContainer: {
+    marginTop: 5,
+  },
+  instructionText: {
+    fontSize: 15,
+    color: "#444",
+    marginVertical: 3,
+    lineHeight: 22,
   },
 });
