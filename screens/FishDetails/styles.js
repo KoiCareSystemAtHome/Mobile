@@ -46,7 +46,7 @@ export const styles = StyleSheet.create({
     elevation: 5,
   },
   fishImage: {
-    width: 200,
+    width: "95%",
     height: 200,
     borderRadius: 10,
     marginBottom: 12,

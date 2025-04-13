@@ -147,16 +147,43 @@ const OrderTracking = ({ navigation }) => {
                         <Text style={styles.productTitle} numberOfLines={2}>
                           {matchedProduct.productName}
                         </Text>
-                        <Text style={styles.price}>
-                          ₫{matchedProduct.price.toLocaleString("vi-VN")}
-                        </Text>
-                        <Text style={styles.quantity}>x{item.quantity}</Text>
+                        <View style={{ flexDirection: "row" }}>
+                          <Text style={styles.price}>
+                            ₫{matchedProduct.price.toLocaleString("vi-VN")}
+                          </Text>
+                          <Text style={styles.quantity}>
+                            {" "}
+                            x {item.quantity}
+                          </Text>
+                        </View>
                         <Text style={styles.itemTotal}>
                           ₫
                           {(
                             item.quantity * matchedProduct.price
                           ).toLocaleString("vi-VN")}
                         </Text>
+                        {/* Đánh Giá Button for Each Product */}
+                        {(orderTrack?.status === "delivered" ||
+                          orderDetail?.status === "Complete" ||
+                          orderDetail?.status === "Completed") && (
+                          <TouchableOpacity
+                            style={[styles.actionButton, styles.reviewButton]}
+                            onPress={() => {
+                              navigation.navigate("ReviewScreen", {
+                                product: matchedProduct,
+                              });
+                            }}
+                          >
+                            <Text style={styles.buttonText}>
+                              <AntDesign
+                                name="star"
+                                size={16}
+                                color="#F59E0B"
+                              />{" "}
+                              Đánh Giá
+                            </Text>
+                          </TouchableOpacity>
+                        )}
                       </View>
                     </View>
                   )
@@ -323,39 +350,14 @@ const OrderTracking = ({ navigation }) => {
               {(orderTrack?.status === "delivered" ||
                 orderDetail?.status === "Complete" ||
                 orderDetail?.status === "Completed") && (
-                <>
-                  <TouchableOpacity
-                    style={styles.actionButton}
-                    onPress={() => {
-                      navigation.navigate("Report", { orderId });
-                    }}
-                  >
-                    <Text style={styles.buttonText}>Báo Cáo</Text>
-                  </TouchableOpacity>
-                  {orderDetail?.details?.map((item) => {
-                    const matchedProduct = productData?.find(
-                      (product) => product.productId === item.productId
-                    );
-                    return (
-                      matchedProduct && (
-                        <TouchableOpacity
-                          key={item.productId}
-                          style={styles.actionButton}
-                          onPress={() => {
-                            navigation.navigate("ReviewScreen", {
-                              product: matchedProduct,
-                            });
-                          }}
-                        >
-                          <Text style={styles.buttonText}>
-                            <AntDesign name="star" size={16} color="#F59E0B" />{" "}
-                            Đánh Giá
-                          </Text>
-                        </TouchableOpacity>
-                      )
-                    );
-                  })}
-                </>
+                <TouchableOpacity
+                  style={styles.actionButton}
+                  onPress={() => {
+                    navigation.navigate("Report", { orderId });
+                  }}
+                >
+                  <Text style={styles.buttonText}>Báo Cáo</Text>
+                </TouchableOpacity>
               )}
               {orderDetail?.status === "Pending" && (
                 <TouchableOpacity
