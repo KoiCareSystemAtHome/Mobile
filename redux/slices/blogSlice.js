@@ -1,11 +1,17 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { deleteRequest, getRequest, getRequestParams, postRequest, putRequest } from "../../services/httpMethods";
+import {
+  deleteRequest,
+  getRequest,
+  getRequestParams,
+  postRequest,
+  putRequest,
+} from "../../services/httpMethods";
 import { Alert } from "react-native";
 
 const initialState = {
   approvedBlogs: null,
-  blogById:null,
-  params:null,
+  blogById: null,
+  params: null,
 };
 
 export const blogSlice = createSlice({
@@ -20,7 +26,9 @@ export const blogSlice = createSlice({
     builder.addCase(getApprovedBlogs.fulfilled, (state, action) => {
       state.approvedBlogs = action.payload;
     })
-
+    .addCase(searchBlogs.fulfilled, (state, action) => {
+      state.approvedBlogs = action.payload;
+    })
   },
 });
 
@@ -35,11 +43,23 @@ export const getApprovedBlogs = createAsyncThunk(
     }
   }
 );
+
+export const searchBlogs = createAsyncThunk(
+  "blogSlice/searchBlogs",
+  async (searchTitle) => {
+    try {
+      const res = await getRequest(`Blog/search?searchTitle=${searchTitle}`);
+      return res.data;
+    } catch (error) {
+      Alert.alert("Error", "Failed to load blog data.");
+    }
+  }
+);
 export const getRequiredParams = createAsyncThunk(
   "blogSlice/getRequiredParams",
   async (ownerId) => {
     try {
-      const res = await getRequest(`Blog/blog-required-param`)
+      const res = await getRequest(`Blog/blog-required-param`);
       return res.data;
     } catch (error) {
       Alert.alert("Error", "Failed to load blog data.");

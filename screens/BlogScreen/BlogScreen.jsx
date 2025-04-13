@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react"; // Added useState
 import {
   ImageBackground,
   Text,
@@ -6,24 +6,35 @@ import {
   FlatList,
   Image,
   TouchableOpacity,
+  TextInput, // Added TextInput
 } from "react-native";
 import { styles } from "./styles";
 import { useDispatch, useSelector } from "react-redux";
-import { getApprovedBlogs } from "../../redux/slices/blogSlice";
+import { getApprovedBlogs, searchBlogs } from "../../redux/slices/blogSlice";
 import { approvedBlogsSelector } from "../../redux/selector";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 
 const BlogScreen = ({ navigation }) => {
   const dispatch = useDispatch();
   const blogData = useSelector(approvedBlogsSelector);
+  const [searchQuery, setSearchQuery] = useState(""); // State for search input
 
   useEffect(() => {
     dispatch(getApprovedBlogs());
   }, [dispatch]);
 
+  // Handle search input change
+  const handleSearch = (text) => {
+    setSearchQuery(text);
+    if (text) {
+      dispatch(searchBlogs(text));
+    } else {
+      dispatch(getApprovedBlogs()); // Reset to all blogs when search is cleared
+    }
+  };
+
   const renderBlogItem = ({ item }) => (
     <View style={styles.blogCard}>
-      {/* Blog Title */}
       <View
         style={{ flexDirection: "row", alignItems: "center", marginBottom: 10 }}
       >
@@ -36,14 +47,13 @@ const BlogScreen = ({ navigation }) => {
             fontSize: 12,
             fontWeight: "bold",
             fontFamily: "serif",
-            width:250
+            width: 250,
           }}
         >
           {item.title.toUpperCase()}
         </Text>
       </View>
 
-      {/* Blog Content */}
       <Text
         style={{
           ...styles.blogContent,
@@ -55,7 +65,6 @@ const BlogScreen = ({ navigation }) => {
         {item.content}
       </Text>
 
-      {/* Blog Image */}
       {item.images && (
         <Image
           source={{ uri: item.images }}
@@ -78,7 +87,22 @@ const BlogScreen = ({ navigation }) => {
             <FontAwesome name="arrow-left" size={24} color="#fff" />
           </TouchableOpacity>
           <Text style={styles.title}>Blog</Text>
-          <View style={{ width: 24 }} /> 
+          <View style={{ width: 24 }} />
+        </View>
+
+        {/* Search Bar */}
+        <View style={styles.searchContainer}>
+          <FontAwesome name="search" size={20} color="#666" />
+          <TextInput
+            style={{
+              flex: 1,
+              padding: 10,
+              fontSize: 16,
+            }}
+            placeholder="Search blog titles..."
+            value={searchQuery}
+            onChangeText={handleSearch}
+          />
         </View>
 
         <FlatList

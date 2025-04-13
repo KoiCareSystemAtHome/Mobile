@@ -80,4 +80,18 @@ export const styles = StyleSheet.create({
     color: "#666",
     marginTop: 5,
   },
+  searchContainer: {
+  marginHorizontal: 16,
+  marginVertical: 10,
+  backgroundColor: "transparent",
+  borderRadius: 8,
+  flexDirection: "row",
+  alignItems: "center",
+  paddingHorizontal: 10,
+},
+searchInput: {
+  flex: 1,
+  padding: 10,
+  fontSize: 16,
+},
 });
