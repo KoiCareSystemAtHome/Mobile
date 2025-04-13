@@ -66,9 +66,13 @@ const PondStatistic = ({ navigation }) => {
     >
       <Card style={styles.card}>
         <View style={styles.cardContent}>
-          <Image 
-            source={item.image ? { uri: item.image } : require('../../assets/defaultpond.jpg')} 
-            style={styles.pondImage} 
+          <Image
+            source={
+              item.image
+                ? { uri: item.image }
+                : require("../../assets/defaultpond.jpg")
+            }
+            style={styles.pondImage}
           />
           <View style={styles.pondInfo}>
             <View style={styles.infoRow}>
@@ -88,11 +92,13 @@ const PondStatistic = ({ navigation }) => {
             style={[
               styles.statusCircle,
               {
-                backgroundColor: 
-                  item.status === 'Danger' ? '#ff0000' : 
-                  item.status === 'Warning' ? '#ffff00' : 
-                  'transparent'
-              }
+                backgroundColor:
+                  item.status === "Danger"
+                    ? "#ff0000"
+                    : item.status === "Warning"
+                    ? "#ffff00"
+                    : "transparent",
+              },
             ]}
           />
         </View>
@@ -133,14 +139,14 @@ const PondStatistic = ({ navigation }) => {
       .then((response) => {
         if (response?.status === "201") {
           console.log(response);
-          Toast.success("Ao Đã Được Thêm Thành Công");
+          Toast.success("Hồ Đã Được Thêm Thành Công");
           dispatch(getPondByOwner(isLoggedIn.id));
           form.resetFields();
           setTimeout(() => {
             setModalVisible(false);
           });
         } else {
-          Toast.fail("Thêm Ao Thất Bại");
+          Toast.fail("Thêm Hồ Thất Bại");
           setModalVisible(false);
         }
       });
@@ -243,7 +249,10 @@ const PondStatistic = ({ navigation }) => {
       >
         <View style={styles.overlay} />
         <View style={styles.container}>
-          <Text style={styles.title}>Thống Kê Ao</Text>
+          <TouchableOpacity onPress={() => navigation.goBack("MainTabs")}>
+            <AntDesign name="left" size={24} color="black" />
+          </TouchableOpacity>
+          <Text style={styles.title}>Thống Kê Hồ</Text>
 
           <FlatList
             data={paginatedPondData}
@@ -294,7 +303,7 @@ const PondStatistic = ({ navigation }) => {
 
           <View style={styles.footer}>
             <View style={styles.badge}>
-              <Text style={styles.badgeText}>{pondData?.length} Ao</Text>
+              <Text style={styles.badgeText}>{pondData?.length} Hồ</Text>
             </View>
             <TouchableOpacity
               style={styles.addButton}
@@ -314,7 +323,7 @@ const PondStatistic = ({ navigation }) => {
           <View style={styles.modalOverlay}>
             <View style={styles.modalContainer}>
               <View style={styles.modalHeader}>
-                <Text style={styles.modalTitle}>Thêm Ao Mới</Text>
+                <Text style={styles.modalTitle}>Thêm Hồ Mới</Text>
               </View>
 
               {imageBlob ? (
@@ -340,9 +349,9 @@ const PondStatistic = ({ navigation }) => {
               <Form form={form} onFinish={onFinish} style={styles.form}>
                 <Form.Item
                   name="name"
-                  rules={[{ required: true, message: "Vui lòng nhập tên ao" }]}
+                  rules={[{ required: true, message: "Vui lòng nhập tên hồ" }]}
                 >
-                  <Input placeholder="Tên Ao" style={styles.input} />
+                  <Input placeholder="Tên Hồ" style={styles.input} />
                 </Form.Item>
 
                 <Form.Item

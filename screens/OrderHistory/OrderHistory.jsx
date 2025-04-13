@@ -24,7 +24,7 @@ const OrderHistory = ({ navigation }) => {
   const orderData = useSelector(orderbyAccountSelector);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
-  
+
   // Pagination states
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
@@ -60,11 +60,11 @@ const OrderHistory = ({ navigation }) => {
       const userInfo = await AsyncStorage.getItem("user");
       const user = userInfo ? JSON.parse(userInfo) : null;
       setIsLoggedIn(user);
-      
+
       if (user?.id) {
         await Promise.all([
           dispatch(getProduct()).unwrap(),
-          dispatch(getOrderByAccount(user.id)).unwrap()
+          dispatch(getOrderByAccount(user.id)).unwrap(),
         ]);
       }
     } catch (error) {
@@ -92,7 +92,9 @@ const OrderHistory = ({ navigation }) => {
       const matchedProduct = productData?.find(
         (product) => product.productId === item.productId
       );
-      return total + (matchedProduct ? item.quantity * matchedProduct.price : 0);
+      return (
+        total + (matchedProduct ? item.quantity * matchedProduct.price : 0)
+      );
     }, 0);
   };
 
@@ -105,7 +107,7 @@ const OrderHistory = ({ navigation }) => {
       >
         <View style={styles.overlay} />
 
-        <TouchableOpacity
+        {/* <TouchableOpacity
           style={{
             position: "absolute",
             top: 40,
@@ -119,11 +121,14 @@ const OrderHistory = ({ navigation }) => {
           activeOpacity={0.7}
         >
           <Icon name="arrowleft" size={24} color="black" />
-        </TouchableOpacity>
+        </TouchableOpacity> */}
 
         <View style={styles.container}>
-          <Text style={styles.title}>Order History</Text>
-          <ScrollView 
+          <TouchableOpacity onPress={() => navigation.goBack("MainTabs")}>
+            <AntDesign name="left" size={24} color="black" />
+          </TouchableOpacity>
+          <Text style={styles.title}>Lịch Sử Đơn Hàng</Text>
+          <ScrollView
             contentContainerStyle={styles.listContent}
             refreshControl={
               <RefreshControl
@@ -177,7 +182,8 @@ const OrderHistory = ({ navigation }) => {
                                 ).toLocaleString("vi-VN")}{" "}
                               </Text>
                             </Text>
-                            {(order.status === "Completed" || order.status === "Complete") && (
+                            {(order.status === "Completed" ||
+                              order.status === "Complete") && (
                               <TouchableOpacity
                                 style={styles.productReviewButton}
                                 onPress={() => {
@@ -187,7 +193,12 @@ const OrderHistory = ({ navigation }) => {
                                 }}
                               >
                                 <Text style={styles.productReviewText}>
-                                  <AntDesign name="star" size={16} color="gold"></AntDesign> Đánh giá
+                                  <AntDesign
+                                    name="star"
+                                    size={16}
+                                    color="gold"
+                                  ></AntDesign>{" "}
+                                  Đánh giá
                                 </Text>
                               </TouchableOpacity>
                             )}
@@ -215,7 +226,8 @@ const OrderHistory = ({ navigation }) => {
                   </Text>
                 </View>
                 <View style={styles.buttonRow}>
-                  {order?.status === "Complete" || order?.status === "Completed" ? (
+                  {order?.status === "Complete" ||
+                  order?.status === "Completed" ? (
                     <TouchableOpacity
                       style={styles.returnButton}
                       onPress={() => {

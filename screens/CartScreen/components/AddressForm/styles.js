@@ -18,8 +18,8 @@ export const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   dropdownContainer: {
-    backgroundColor:"transparent",
-    border:0
+    backgroundColor: "transparent",
+    border: 0,
   },
   dropdown: {
     zIndex: 3000,

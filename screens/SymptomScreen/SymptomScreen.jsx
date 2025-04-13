@@ -19,6 +19,7 @@ import {
 } from "../../redux/selector";
 import DropDownPicker from "react-native-dropdown-picker";
 import { styles } from "./styles";
+import AntDesign from "react-native-vector-icons/AntDesign";
 
 const SymptomScreen = ({ navigation }) => {
   const dispatch = useDispatch();
@@ -59,7 +60,7 @@ const SymptomScreen = ({ navigation }) => {
     ),
   ];
 
-  console.log(selectedTypes)
+  console.log(selectedTypes);
 
   // Render individual symptom item
   const renderSymptomItem = ({ item }) => (
@@ -101,7 +102,10 @@ const SymptomScreen = ({ navigation }) => {
     >
       <View style={styles.overlay} />
       <View style={styles.container}>
-        <Text style={styles.title}>Chẩn Đoán Bệnh</Text>
+        <TouchableOpacity onPress={() => navigation.goBack("MainTabs")}>
+          <AntDesign name="left" size={24} color="black" />
+        </TouchableOpacity>
+        <Text style={styles.title}>Chẩn Đoán Bệnh</Text>
         <Text style={styles.subTitle}>Hãy chọn triệu chứng của cá</Text>
         <DropDownPicker
           open={open}

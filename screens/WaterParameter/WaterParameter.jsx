@@ -28,19 +28,19 @@ import {
 } from "../../redux/slices/pondSlice";
 import Icon from "react-native-vector-icons/AntDesign";
 import { color } from "react-native-elements/dist/helpers";
+import AntDesign from "react-native-vector-icons/AntDesign";
 
-const WaterParameter = () => {
+const WaterParameter = ({ navigation }) => {
   const dispatch = useDispatch();
 
   const pondData = useSelector(pondByOwnerSelector);
-  const   requiredParams = useSelector(requiredParamsSelector);
+  const requiredParams = useSelector(requiredParamsSelector);
   const [homePond, setHomePond] = useState(null);
   const [selectedPond, setSelectedPond] = useState(null);
   const [homePondOpen, setHomePondOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isModalVisible, setModalVisible] = useState(false);
   const [warnings, setWarnings] = useState({});
-
 
   const [form] = Form.useForm();
 
@@ -66,15 +66,14 @@ const WaterParameter = () => {
       ) {
         message = `Cảnh báo! (${value}) ngoài vùng ${warningLower} - ${warningUpper}`;
         type = "warning";
-      }      
+      }
     }
-  
+
     setWarnings((prev) => ({
       ...prev,
       [param.parameterId]: { message, type },
     }));
   };
-  
 
   const handleSubmit = (values) => {
     const pondID = selectedPond?.pondID;
@@ -98,7 +97,7 @@ const WaterParameter = () => {
       .unwrap()
       .then(() => {
         dispatch(getRequiredParams());
-        dispatch(getPondByOwner(isLoggedIn.id))
+        dispatch(getPondByOwner(isLoggedIn.id));
         dispatch(getPondByID(homePond?.pondID))
           .unwrap()
           .then((response) => {
@@ -216,14 +215,17 @@ const WaterParameter = () => {
       >
         <View style={styles.overlay} />
         <ScrollView contentContainerStyle={styles.container}>
-          <Text style={styles.title}>Water Parameter</Text>
+          <TouchableOpacity onPress={() => navigation.goBack("MainTabs")}>
+            <AntDesign name="left" size={24} color="black" />
+          </TouchableOpacity>
+          <Text style={styles.title}>Thông Số Nước</Text>
           <View style={{ justifyContent: "center", flexDirection: "row" }}>
             <TouchableOpacity
               onPress={() => setHomePondOpen(!homePondOpen)}
               style={styles.selector}
             >
               <Text style={styles.selectorText}>
-                {homePond ? homePond?.name : "Select a Pond"}
+                {homePond ? homePond?.name : "Chọn Hồ"}
               </Text>
               <Icon name="down" size={16} color="#000" />
             </TouchableOpacity>
@@ -259,58 +261,58 @@ const WaterParameter = () => {
             <View style={styles.modalOverlay}>
               <View style={styles.modalContainer}>
                 <View style={styles.modalHeader}>
-                  <Text style={styles.modalTitle}>Change Water Parameters</Text>
+                  <Text style={styles.modalTitle}>Thêm Thông Số Nước</Text>
                 </View>
 
                 <Form form={form} onFinish={handleSubmit}>
-                {requiredParams?.map((param) => (
+                  {requiredParams?.map((param) => (
                     <View key={param.parameterId} style={styles.paramContainer}>
                       <Text style={styles.paramName}>
                         {param.parameterName} ({param.unitName})
                       </Text>
-                      <Text style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
-                      <Text style={styles.dangerText}>
-                      ← {param.dangerLower ?? 0} 
+                      <Text style={{ flexDirection: "row", flexWrap: "wrap" }}>
+                        <Text style={styles.dangerText}>
+                          ← {param.dangerLower ?? 0}
+                        </Text>
+                        <Text style={styles.warningText}>
+                          --{param.warningLower ?? param.dangerLower ?? 0}
+                        </Text>
+                        <Text style={styles.greenText}>-- an toàn --</Text>
+                        <Text style={styles.warningText}>
+                          {param.warningUpper ?? param.dangerUpper ?? 100}--
+                        </Text>
+                        <Text style={styles.dangerText}>
+                          {param.dangerUpper ?? 100}→
+                        </Text>
                       </Text>
-                      <Text style={styles.warningText}>
-                        --{param.warningLower ?? param.dangerLower ??0}
-                      </Text>
-                      <Text style={styles.greenText}>
-                      -- an toàn --
-                    </Text>
-                      <Text style={styles.warningText}>
-                        {param.warningUpper ??param.dangerUpper ?? 100}-- 
-                      </Text>
-                      <Text style={styles.dangerText}>
-                        {param.dangerUpper ?? 100}→
-                      </Text>
-                    </Text>
                       <Form.Item name={param.parameterId}>
                         <Input
                           placeholder={`Nhập giá trị`}
                           style={styles.paramInput}
                           keyboardType="numeric"
-                          onChangeText={(text) => handleParamChange(text, param)}
+                          onChangeText={(text) =>
+                            handleParamChange(text, param)
+                          }
                         />
                       </Form.Item>
                       {warnings[param.parameterId]?.message ? (
-                      <Text
-                        style={
-                          warnings[param.parameterId].type === "danger"
-                            ? styles.dangerText
-                            : styles.warningText
-                        }
-                      >
-                        {warnings[param.parameterId].message}
-                      </Text>
-                    ) : null}
-                                        </View>
+                        <Text
+                          style={
+                            warnings[param.parameterId].type === "danger"
+                              ? styles.dangerText
+                              : styles.warningText
+                          }
+                        >
+                          {warnings[param.parameterId].message}
+                        </Text>
+                      ) : null}
+                    </View>
                   ))}
 
                   <Button type="primary" onPress={() => form.submit()}>
-                    Submit
+                    Lưu
                   </Button>
-                  <Button onPress={() => setModalVisible(false)}>Cancel</Button>
+                  <Button onPress={() => setModalVisible(false)}>Hủy Bỏ</Button>
                 </Form>
               </View>
             </View>
@@ -320,7 +322,7 @@ const WaterParameter = () => {
           style={styles.changeButton}
           onPress={handleChangeParameters}
         >
-          <Text style={styles.changeButtonText}>Add Parameters</Text>
+          <Text style={styles.changeButtonText}>Thêm Thông Số</Text>
         </TouchableOpacity>
       </ImageBackground>
     </Provider>

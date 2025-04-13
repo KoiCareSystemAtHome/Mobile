@@ -77,7 +77,7 @@ const CalculateMaintainance = () => {
         .unwrap()
         .then((res) => {
           console.log("endDate:", endDate);
-          console.log("maintain date:", res );
+          console.log("maintain date:", res);
           console.log("Recurring Maintenance Saved", res);
           if (Array.isArray(res) && res.length > 0) {
             Alert.alert("Success", "Recurring Maintenance Saved");
@@ -133,7 +133,7 @@ const CalculateMaintainance = () => {
         <View style={styles.overlay} />
         <ScrollView contentContainerStyle={styles.container}>
           <Text style={styles.title}>Lịch Trình Bảo Trì</Text>
-  
+
           {/* Pond Dropdown */}
           <View style={{ justifyContent: "center", flexDirection: "row" }}>
             <TouchableOpacity
@@ -141,7 +141,7 @@ const CalculateMaintainance = () => {
               style={styles.selector}
             >
               <Text style={styles.selectorText}>
-                {homePond ? homePond?.name : "Chọn một ao"}
+                {homePond ? homePond?.name : "Chọn một Hồ"}
               </Text>
               <Icon name="down" size={16} color="#000" />
             </TouchableOpacity>
@@ -163,7 +163,7 @@ const CalculateMaintainance = () => {
               </View>
             )}
           </View>
-  
+
           <View>
             {/* Date Picker */}
             <Text style={styles.label}>NGÀY KẾT THÚC LỊCH TRÌNH</Text>
@@ -190,7 +190,7 @@ const CalculateMaintainance = () => {
                 <Icon name="calendar" size={20} color="#000" />
               </TouchableOpacity>
             </DatePicker>
-  
+
             {/* Time Picker */}
             <Text style={styles.label}>GIỜ KẾT THÚC LỊCH TRÌNH</Text>
             <Picker
@@ -219,7 +219,7 @@ const CalculateMaintainance = () => {
                 <Icon name="clockcircleo" size={20} color="#000" />
               </TouchableOpacity>
             </Picker>
-  
+
             {/* Cycle Days Toggle */}
             <Text style={styles.label}>NGÀY CHU KỲ</Text>
             <View style={styles.toggleContainer}>
@@ -245,7 +245,7 @@ const CalculateMaintainance = () => {
             </View>
           </View>
         </ScrollView>
-  
+
         <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
           <Text style={styles.saveButtonText}>Lưu</Text>
         </TouchableOpacity>

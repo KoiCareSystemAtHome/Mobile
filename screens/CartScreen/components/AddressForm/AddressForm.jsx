@@ -16,7 +16,7 @@ import { useDispatch, useSelector } from "react-redux";
 import DropDownPicker from "react-native-dropdown-picker";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const AddressForm = ({navigation}) => {
+const AddressForm = ({ navigation }) => {
   const dispatch = useDispatch();
   const [form] = Form.useForm();
 
@@ -42,10 +42,10 @@ const AddressForm = ({navigation}) => {
       wardName: JSON.parse(selectedWard).wardName,
     };
     try {
-      await AsyncStorage.setItem('address', JSON.stringify(address));
+      await AsyncStorage.setItem("address", JSON.stringify(address));
       navigation.navigate("CartScreen");
     } catch (error) {
-      console.error('Error saving address to AsyncStorage:', error);
+      console.error("Error saving address to AsyncStorage:", error);
     }
   };
 
@@ -80,10 +80,15 @@ const AddressForm = ({navigation}) => {
     >
       <View style={styles.overlay} />
       <View style={styles.container}>
-        <Text style={styles.title}>Add an address</Text>
-        <Form form={form} onFinish={onFinish} style={{ backgroundColor: "transparentr" }}>
-          <Form.Item label="Province" style={styles.dropdownContainer}>
+        <Text style={styles.title}>Thêm / Thay đổi Địa Chỉ</Text>
+        <Form
+          form={form}
+          onFinish={onFinish}
+          style={{ backgroundColor: "transparent" }}
+        >
+          <Form.Item label="Thành phố/Tỉnh" style={styles.dropdownContainer}>
             <DropDownPicker
+              placeholder="Chọn Thành phố/tỉnh"
               open={openProvince}
               value={selectedProvince}
               items={
@@ -102,10 +107,12 @@ const AddressForm = ({navigation}) => {
             />
           </Form.Item>
 
-          <Form.Item label="District" style={styles.dropdownContainer}>
+          <Form.Item label="Quận/Huyện" style={styles.dropdownContainer}>
             <DropDownPicker
               placeholder={
-                selectedProvince ? "Select District" : "Select Province First"
+                selectedProvince
+                  ? "Chọn Quận/Huyện"
+                  : "Chọn Thành phố/Tỉnh trước"
               }
               open={openDistrict}
               value={selectedDistrict}
@@ -125,10 +132,10 @@ const AddressForm = ({navigation}) => {
             />
           </Form.Item>
 
-          <Form.Item label="Ward" style={styles.dropdownContainer}>
+          <Form.Item label="Phường/Xã" style={styles.dropdownContainer}>
             <DropDownPicker
               placeholder={
-                selectedDistrict ? "Select Ward" : "Select District First"
+                selectedDistrict ? "Chọn Phường/Xã" : "Chọn Quận/Huyện trước"
               }
               open={openWard}
               value={selectedWard}
@@ -149,7 +156,7 @@ const AddressForm = ({navigation}) => {
           </Form.Item>
 
           <Button type="primary" onPress={() => form.submit()}>
-            Submit
+            Lưu
           </Button>
         </Form>
       </View>

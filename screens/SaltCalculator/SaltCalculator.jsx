@@ -27,6 +27,7 @@ import {
 } from "../../redux/slices/calculatorSlice";
 import { Button } from "react-native-paper";
 import Icon1 from "react-native-vector-icons/MaterialIcons"; // Add MaterialIcons for better icons
+import AntDesign from "react-native-vector-icons/AntDesign";
 
 const SaltCalculator = ({ navigation }) => {
   const dispatch = useDispatch();
@@ -126,6 +127,9 @@ const SaltCalculator = ({ navigation }) => {
     >
       <View style={styles.overlay} />
       <ScrollView contentContainerStyle={styles.scrollContainer}>
+        <TouchableOpacity onPress={() => navigation.goBack("MainTabs")}>
+          <AntDesign name="left" size={24} color="black" />
+        </TouchableOpacity>
         <Text style={styles.title}>Ước Tính Lượng Muối</Text>
 
         <View style={styles.selectorContainer}>
@@ -336,7 +340,7 @@ const SaltCalculator = ({ navigation }) => {
               //   ))}
               // </View>
               <View style={styles.saltBox}>
-                <Text style={styles.instructionLabel}>Hướng Dẫn Bổ Sung:</Text>
+                <Text style={styles.sectionTitle}>Hướng Dẫn Bổ Sung:</Text>
                 <Text style={styles.saltText}>
                   -{" "}
                   {saltData?.additionalInstruction?.join("\n - ") ||

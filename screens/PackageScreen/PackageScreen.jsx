@@ -1,27 +1,27 @@
-import React, { useEffect, useState } from 'react';
-import { 
-  ImageBackground, 
-  Text, 
-  TouchableOpacity, 
-  View, 
+import React, { useEffect, useState } from "react";
+import {
+  ImageBackground,
+  Text,
+  TouchableOpacity,
+  View,
   ScrollView,
-  Alert
-} from 'react-native';
-import AntDesign from 'react-native-vector-icons/AntDesign';
-import { styles } from './styles';
-import { useDispatch, useSelector } from 'react-redux';
-import { packageSelector, walletSelector } from '../../redux/selector';
-import { getPackage, payPackage } from '../../redux/slices/transactionSlice';
-import dayjs from 'dayjs';
-import { getWallet } from '../../redux/slices/authSlice';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+  Alert,
+} from "react-native";
+import AntDesign from "react-native-vector-icons/AntDesign";
+import { styles } from "./styles";
+import { useDispatch, useSelector } from "react-redux";
+import { packageSelector, walletSelector } from "../../redux/selector";
+import { getPackage, payPackage } from "../../redux/slices/transactionSlice";
+import dayjs from "dayjs";
+import { getWallet } from "../../redux/slices/authSlice";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const PackageScreen = ({ navigation }) => {
   const dispatch = useDispatch();
   const packageData = useSelector(packageSelector);
   const walletData = useSelector(walletSelector);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  
+
   useEffect(() => {
     dispatch(getPackage());
   }, [dispatch]);
@@ -47,29 +47,33 @@ const PackageScreen = ({ navigation }) => {
   const handleChoosePackage = (pkg) => {
     Alert.alert(
       "Confirm Package Selection",
-      `Are you sure you want to choose the ${pkg.packageTitle} package for ${pkg.packagePrice.toLocaleString('vi-VN')} VND?`,
+      `Are you sure you want to choose the ${
+        pkg.packageTitle
+      } package for ${pkg.packagePrice.toLocaleString("vi-VN")} đ?`,
       [
         {
           text: "Cancel",
-          style: "cancel"
+          style: "cancel",
         },
         {
           text: "Confirm",
           onPress: () => {
-            const email = isLoggedIn?.email
-            const packageId = pkg?.packageId
+            const email = isLoggedIn?.email;
+            const packageId = pkg?.packageId;
             dispatch(payPackage({ email, packageId }))
-            .unwrap()
-            .then((res)=>{
-
-              if(res === "Success"){
-                navigation.navigate("MainTabs")
-                Alert.alert("Success", "You have successfully purchased the package");
-                dispatch(getWallet(isLoggedIn?.id))
-              }
-            })
-          }
-        }
+              .unwrap()
+              .then((res) => {
+                if (res === "Success") {
+                  navigation.navigate("MainTabs");
+                  Alert.alert(
+                    "Success",
+                    "You have successfully purchased the package"
+                  );
+                  dispatch(getWallet(isLoggedIn?.id));
+                }
+              });
+          },
+        },
       ],
       { cancelable: false }
     );
@@ -77,7 +81,7 @@ const PackageScreen = ({ navigation }) => {
 
   return (
     <ImageBackground
-      source={require('../../assets/koimain3.jpg')}
+      source={require("../../assets/koimain3.jpg")}
       style={styles.background}
       resizeMode="cover"
     >
@@ -97,7 +101,11 @@ const PackageScreen = ({ navigation }) => {
         {/* Wallet Balance */}
         <View style={styles.balanceContainer}>
           <Text style={styles.balanceText}>
-            Số dư: {walletData?.amount ? walletData.amount.toLocaleString('vi-VN') : '0'} VND
+            Số dư:{" "}
+            {walletData?.amount
+              ? walletData.amount.toLocaleString("vi-VN")
+              : "0"}{" "}
+            đ
           </Text>
         </View>
 
@@ -108,24 +116,26 @@ const PackageScreen = ({ navigation }) => {
         {/* Package Cards */}
         {packageData?.map((pkg, index) => {
           const isDisabled = walletData?.amount < pkg.packagePrice;
-          
+
           return (
             <View key={index} style={styles.packageCard}>
               <View style={styles.cardContent}>
                 <Text style={styles.packageTitle}>{pkg.packageTitle}</Text>
-                <Text style={styles.packageDescription}>{pkg.packageDescription}</Text>
                 <Text style={styles.packageDescription}>
-                  Mở bán từ: {dayjs(pkg.startDate).format('DD/MM/YYYY')} đến{' '}
-                  {dayjs(pkg.endDate).format('DD/MM/YYYY')}
+                  {pkg.packageDescription}
+                </Text>
+                <Text style={styles.packageDescription}>
+                  Mở bán từ: {dayjs(pkg.startDate).format("DD/MM/YYYY")} đến{" "}
+                  {dayjs(pkg.endDate).format("DD/MM/YYYY")}
                 </Text>
                 {/* Price Row */}
                 <Text style={styles.packagePrice}>
-                  Giá: {pkg.packagePrice.toLocaleString('vi-VN')} VND
+                  Giá: {pkg.packagePrice.toLocaleString("vi-VN")} đ
                 </Text>
-                <TouchableOpacity 
+                <TouchableOpacity
                   style={[
                     styles.chooseButton,
-                    isDisabled && styles.disabledButton
+                    isDisabled && styles.disabledButton,
                   ]}
                   onPress={() => !isDisabled && handleChoosePackage(pkg)}
                   disabled={isDisabled}

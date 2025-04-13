@@ -13,8 +13,8 @@ export const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingTop: 60,
   },
-  formContainer: {  
-    backgroundColor:"transparent",
+  formContainer: {
+    backgroundColor: "transparent",
     paddingHorizontal: 20,
     paddingTop: 60,
     paddingBottom: 20,
@@ -109,7 +109,6 @@ export const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     marginBottom: 20,
-    marginTop: 20,
   },
   modalCancelButton: {
     padding: 10,
@@ -124,7 +123,7 @@ export const styles = StyleSheet.create({
   },
   modalSaveButton: {
     padding: 10,
-    borderWidth:0
+    borderWidth: 0,
   },
   modalSaveText: {
     color: "#4caf50",

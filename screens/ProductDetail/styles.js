@@ -114,7 +114,7 @@ export const styles = StyleSheet.create({
     borderRadius: 20,
     marginRight: 10,
   },
-feedbackSection: {
+  feedbackSection: {
     marginTop: 20,
     paddingHorizontal: 10,
   },
@@ -138,7 +138,6 @@ feedbackSection: {
     elevation: 2,
   },
   feedbackHeader: {
-
     marginBottom: 5,
   },
   feedbackRating: {

@@ -66,10 +66,10 @@ const HomeScreen = ({ navigation }) => {
     try {
       const value = await AsyncStorage.getItem("user");
       setIsLoggedIn(value ? JSON.parse(value) : null);
-      
+
       const newToken = await AsyncStorage.getItem("accessToken");
       setToken(newToken);
-      
+
       if (isLoggedIn?.id) {
         await dispatch(getWallet(isLoggedIn?.id)).unwrap();
       }
@@ -310,9 +310,9 @@ const HomeScreen = ({ navigation }) => {
                   <View style={styles.depositHeader}>
                     <Text style={styles.depositText}>
                       <Text style={styles.amount}>
-                        {(walletData?.amount)?.toLocaleString("vi-VN") || "0"}
+                        {walletData?.amount?.toLocaleString("vi-VN") || "0"}
                       </Text>
-                      <Text style={styles.currency}> VND</Text>
+                      <Text style={styles.currency}> đ</Text>
                     </Text>
                     <TouchableOpacity
                       onPress={() => navigation.navigate("DepositScreen")}
@@ -321,8 +321,8 @@ const HomeScreen = ({ navigation }) => {
                     </TouchableOpacity>
                   </View>
                   <Text style={styles.cardDescription}>
-                    Nạp tiền ngay để mở khóa các dịch vụ cao cấp của hệ thống chăm
-                    sóc Koi!
+                    Nạp tiền ngay để mở khóa các dịch vụ cao cấp của hệ thống
+                    chăm sóc Koi!
                   </Text>
                 </LinearGradient>
               </View>

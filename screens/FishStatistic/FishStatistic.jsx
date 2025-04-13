@@ -79,7 +79,7 @@ const FishStatistic = ({ navigation }) => {
           dispatch(getPondByOwner(isLoggedIn.id)).unwrap(),
           dispatch(getFishByOwner(isLoggedIn.id)).unwrap(),
         ]);
-        Toast.success("Data refreshed successfully");
+        Toast.success("Dữ liệu đã được làm mới thành công!");
       } catch (error) {
         console.error("Error refreshing data:", error);
         Toast.fail("Failed to refresh data");
@@ -173,6 +173,9 @@ const FishStatistic = ({ navigation }) => {
       >
         <View style={styles.overlay} />
         <View style={styles.container}>
+          <TouchableOpacity onPress={() => navigation.goBack("MainTabs")}>
+            <AntDesign name="left" size={24} color="black" />
+          </TouchableOpacity>
           <Text style={styles.title}>Thống Kê Cá</Text>
           <FlatList
             data={paginatedFishData}

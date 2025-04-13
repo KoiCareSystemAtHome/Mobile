@@ -10,6 +10,7 @@ export const styles = StyleSheet.create({
     backgroundColor: "rgba(255, 255, 255, 0.5)",
   },
   header: {
+    marginTop: 20,
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
@@ -23,17 +24,17 @@ export const styles = StyleSheet.create({
   searchContainer: {
     flexDirection: "row",
     backgroundColor: "rgba(153, 204, 153, 0.6)",
-    borderRadius: 10,
+    borderRadius: 5,
     marginHorizontal: 20,
     marginBottom: 15,
     paddingLeft: 10,
     alignItems: "center",
+    height: 40,
   },
   searchInput: {
     flex: 1,
     fontSize: 16,
     color: "#333",
-
   },
   searchIcon: {
     paddingHorizontal: 10,
@@ -42,9 +43,9 @@ export const styles = StyleSheet.create({
     flexDirection: "row",
     marginHorizontal: 20,
     marginBottom: 30,
-    alignItems:"center",
-    justifyContent:"center",
-    height:50
+    alignItems: "center",
+    justifyContent: "center",
+    height: 50,
   },
   categoryButton: {
     paddingHorizontal: 10,
@@ -52,14 +53,14 @@ export const styles = StyleSheet.create({
     borderRadius: 5,
     marginRight: 10,
     backgroundColor: "white",
-        // Box Shadow for iOS
-        shadowColor: "#000",
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.2,
-        shadowRadius: 4,
-    
-        // Elevation for Android
-        elevation: 5,
+    // Box Shadow for iOS
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+
+    // Elevation for Android
+    elevation: 5,
   },
   activeCategory: {
     backgroundColor: "#20A920",
@@ -72,7 +73,7 @@ export const styles = StyleSheet.create({
     paddingHorizontal: 10, // Khoảng cách hai bên
     marginTop: 8,
   },
-  
+
   categoryText: {
     fontSize: 16,
     color: "#333",
@@ -93,36 +94,35 @@ export const styles = StyleSheet.create({
     margin: 8,
     alignItems: "center",
     justifyContent: "center",
-  
+
     // Auto height nhưng không quá 300
-    minHeight: 100, 
-    maxHeight: 300, 
+    minHeight: 100,
+    maxHeight: 300,
     alignSelf: "stretch", // Chiều rộng tự động mở rộng
-  
+
     // Box Shadow for iOS
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 4 },
-  
+
     // Elevation for Android
     elevation: 5,
   },
-  
 
   productImage: {
     // marginTop: 50,
     width: "100%",
     height: "50%",
-    resizeMode: "cover"
+    resizeMode: "cover",
   },
   productName: {
-    marginTop:8,
+    marginTop: 8,
     fontSize: 14,
-    textAlign:"bottom",
+    textAlign: "bottom",
   },
   productPrice: {
     fontSize: 16,
     fontWeight: "bold",
-    marginBottom:0
+    marginBottom: 0,
   },
   priceContainer: {
     flexDirection: "row", // Căn ngang hàng
@@ -131,35 +131,35 @@ export const styles = StyleSheet.create({
     width: "100%", // Full chiều rộng
     marginTop: 8,
   },
-  
+
   priceText: {
     flex: 0.7, // 70% width
     fontSize: 16,
     fontWeight: "bold",
     color: "#333",
   },
-  
+
   iconContainer: {
     flex: 0.3, // 30% width
     alignItems: "flex-end", // Căn phải icon
-  },  
+  },
   addToCartButton: {
-  bottom:0,
-  backgroundColor: "#20A920", // Green color
-  borderRadius: 20, // Fully rounded button
-  paddingVertical: 10,
-  paddingHorizontal: 20,
-  marginTop: 10,
-  alignItems: "center",
-  justifyContent: "center",
-  marginBottom:10
-},
-addToCartText: {
-  color: "white",
-  fontSize: 12,
-  fontWeight: "bold",
-},
-paginationContainer: {
+    bottom: 0,
+    backgroundColor: "#20A920", // Green color
+    borderRadius: 20, // Fully rounded button
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    marginTop: 10,
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 10,
+  },
+  addToCartText: {
+    color: "white",
+    fontSize: 12,
+    fontWeight: "bold",
+  },
+  paginationContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",

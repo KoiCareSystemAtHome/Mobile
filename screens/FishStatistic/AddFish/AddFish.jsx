@@ -26,6 +26,7 @@ import { getImage } from "../../../redux/slices/authSlice";
 import { createFish, getFishByOwner } from "../../../redux/slices/fishSlice";
 import { styles } from "./styles";
 import { getPondByOwner } from "../../../redux/slices/pondSlice";
+import AntDesign from "react-native-vector-icons/AntDesign";
 
 const AddFish = ({ navigation, route }) => {
   const [form] = Form.useForm();
@@ -61,9 +62,9 @@ const AddFish = ({ navigation, route }) => {
         value: pond.pondID,
       }));
       setPondItems(items);
-      
+
       // If pondID exists and matches an item, set it as selected
-      if (pondID && items.some(item => item.value === pondID)) {
+      if (pondID && items.some((item) => item.value === pondID)) {
         setSelectedPond(pondID);
       }
     }
@@ -125,15 +126,15 @@ const AddFish = ({ navigation, route }) => {
       },
     ];
     values = { ...values, pondID: pondIDToUse, requirementFishParam, image };
-    console.log(values)
+    console.log(values);
 
     dispatch(createFish(values))
       .unwrap()
       .then((response) => {
         if (response?.status === "201") {
           Toast.success("Fish Added Successfully");
-          dispatch(getFishByOwner(isLoggedIn?.id))
-          dispatch(getPondByOwner(isLoggedIn?.id))
+          dispatch(getFishByOwner(isLoggedIn?.id));
+          dispatch(getPondByOwner(isLoggedIn?.id));
         } else {
           Toast.fail("Failed to add fish");
         }
@@ -163,6 +164,9 @@ const AddFish = ({ navigation, route }) => {
             onFinish={onFinish}
             style={{ backgroundColor: "transparent", borderWidth: 0 }}
           >
+            <TouchableOpacity onPress={() => navigation.goBack()}>
+              <AntDesign name="left" size={24} color="black" />
+            </TouchableOpacity>
             <View style={styles.modalHeader}>
               <Text style={styles.modalTitle}>Thêm Cá Koi Mới</Text>
             </View>
@@ -180,30 +184,32 @@ const AddFish = ({ navigation, route }) => {
                 style={styles.imageButton}
                 onPress={handleImagePick}
               >
-                <Text style={styles.imageButtonText}>Chạm để Chọn Hình Ảnh</Text>
+                <Text style={styles.imageButtonText}>
+                  Chạm để Chọn Hình Ảnh
+                </Text>
               </TouchableOpacity>
             )}
-  
+
             <View style={styles.modalFields}>
               <View style={styles.row}>
                 <View style={styles.inputRow}>
                   <Text style={styles.inputLabel}>Tên:</Text>
-                  <Form.Item 
-                    name="name" 
+                  <Form.Item
+                    name="name"
                     style={styles.input}
-                    rules={[{ required: true, message: 'Vui lòng nhập tên!' }]}
+                    rules={[{ required: true, message: "Vui lòng nhập tên!" }]}
                   >
                     <Input placeholder="Tên" />
                   </Form.Item>
                 </View>
                 <View style={styles.inputRow}>
                   <Text style={styles.inputLabel}>Tuổi:</Text>
-                  <Form.Item 
-                    name="age" 
+                  <Form.Item
+                    name="age"
                     style={styles.input}
                     rules={[
-                      { required: true, message: 'Vui lòng nhập tuổi!' },
-                      { pattern: /^[0-9]+$/, message: 'Chỉ được nhập số!' }
+                      { required: true, message: "Vui lòng nhập tuổi!" },
+                      { pattern: /^[0-9]+$/, message: "Chỉ được nhập số!" },
                     ]}
                   >
                     <Input placeholder="Tuổi" keyboardType="numeric" />
@@ -213,13 +219,13 @@ const AddFish = ({ navigation, route }) => {
               <View style={styles.row}>
                 <View style={styles.inputRow}>
                   <Text style={styles.inputLabel}>Chiều dài:</Text>
-                  <Form.Item 
-                    name="size" 
-                    style={styles.input} 
+                  <Form.Item
+                    name="size"
+                    style={styles.input}
                     extra="cm"
                     rules={[
-                      { required: true, message: 'Vui lòng nhập chiều dài!' },
-                      { pattern: /^[0-9]+$/, message: 'Chỉ được nhập số!' }
+                      { required: true, message: "Vui lòng nhập chiều dài!" },
+                      { pattern: /^[0-9]+$/, message: "Chỉ được nhập số!" },
                     ]}
                   >
                     <Input placeholder="Chiều dài" keyboardType="numeric" />
@@ -227,13 +233,13 @@ const AddFish = ({ navigation, route }) => {
                 </View>
                 <View style={styles.inputRow}>
                   <Text style={styles.inputLabel}>Cân nặng:</Text>
-                  <Form.Item 
-                    name="weight" 
-                    style={styles.input} 
+                  <Form.Item
+                    name="weight"
+                    style={styles.input}
                     extra="kg"
                     rules={[
-                      { required: true, message: 'Vui lòng nhập cân nặng!' },
-                      { pattern: /^[0-9]+$/, message: 'Chỉ được nhập số!' }
+                      { required: true, message: "Vui lòng nhập cân nặng!" },
+                      { pattern: /^[0-9]+$/, message: "Chỉ được nhập số!" },
                     ]}
                   >
                     <Input placeholder="Cân nặng" keyboardType="numeric" />
@@ -243,20 +249,24 @@ const AddFish = ({ navigation, route }) => {
               <View style={styles.row}>
                 <View style={styles.inputRow}>
                   <Text style={styles.inputLabel}>Giới tính:</Text>
-                  <Form.Item 
-                    name="sex" 
+                  <Form.Item
+                    name="sex"
                     style={styles.input}
-                    rules={[{ required: true, message: 'Vui lòng nhập giới tính!' }]}
+                    rules={[
+                      { required: true, message: "Vui lòng nhập giới tính!" },
+                    ]}
                   >
                     <Input placeholder="Giới tính" />
                   </Form.Item>
                 </View>
                 <View style={styles.inputRow}>
                   <Text style={styles.inputLabel}>Giống:</Text>
-                  <Form.Item 
-                    name="varietyName" 
+                  <Form.Item
+                    name="varietyName"
                     style={styles.input}
-                    rules={[{ required: true, message: 'Vui lòng nhập giống!' }]}
+                    rules={[
+                      { required: true, message: "Vui lòng nhập giống!" },
+                    ]}
                   >
                     <Input placeholder="Giống" />
                   </Form.Item>
@@ -265,16 +275,18 @@ const AddFish = ({ navigation, route }) => {
               <View style={styles.row}>
                 <View style={styles.inputRow}>
                   <Text style={styles.inputLabel}>Tình trạng:</Text>
-                  <Form.Item 
-                    name="condition" 
+                  <Form.Item
+                    name="condition"
                     style={styles.input}
-                    rules={[{ required: true, message: 'Vui lòng nhập tình trạng!' }]}
+                    rules={[
+                      { required: true, message: "Vui lòng nhập tình trạng!" },
+                    ]}
                   >
                     <Input placeholder="Tình trạng" />
                   </Form.Item>
                 </View>
                 <View style={styles.inputRow}>
-                  <Text style={styles.inputLabel}>Trong ao từ:</Text>
+                  <Text style={styles.inputLabel}>Trong hồ từ:</Text>
                   <View style={{ backgroundColor: "white", borderRadius: 5 }}>
                     <DatePicker
                       value={inPondSince}
@@ -304,29 +316,31 @@ const AddFish = ({ navigation, route }) => {
               <View style={styles.row}>
                 <View style={styles.inputRow}>
                   <Text style={styles.inputLabel}>Nhà lai tạo:</Text>
-                  <Form.Item 
-                    name="breeder" 
+                  <Form.Item
+                    name="breeder"
                     style={styles.input}
-                    rules={[{ required: true, message: 'Vui lòng nhập nhà lai tạo!' }]}
+                    rules={[
+                      { required: true, message: "Vui lòng nhập nhà lai tạo!" },
+                    ]}
                   >
                     <Input placeholder="Nhà lai tạo" />
                   </Form.Item>
                 </View>
                 <View style={styles.inputRow}>
                   <Text style={styles.inputLabel}>Giá mua:</Text>
-                  <Form.Item 
-                    name="price" 
-                    style={styles.input} 
-                    extra="VND"
+                  <Form.Item
+                    name="price"
+                    style={styles.input}
+                    extra="đ"
                     rules={[
-                      { required: true, message: 'Vui lòng nhập giá mua!' },
-                      { pattern: /^[0-9]+$/, message: 'Chỉ được nhập số!' },
-                      { 
-                        validator: (_, value) => 
-                          value && Number(value) <= 1000 
-                            ? Promise.reject('Giá phải lớn hơn 1000 VND!') 
-                            : Promise.resolve()
-                      }
+                      { required: true, message: "Vui lòng nhập giá mua!" },
+                      { pattern: /^[0-9]+$/, message: "Chỉ được nhập số!" },
+                      {
+                        validator: (_, value) =>
+                          value && Number(value) <= 1000
+                            ? Promise.reject("Giá phải lớn hơn 1000 đ!")
+                            : Promise.resolve(),
+                      },
                     ]}
                   >
                     <Input placeholder="Giá mua" keyboardType="numeric" />
@@ -335,7 +349,7 @@ const AddFish = ({ navigation, route }) => {
               </View>
               <View style={styles.row}>
                 <View style={styles.inputRow}>
-                  <Text style={styles.inputLabel}>Ao:</Text>
+                  <Text style={styles.inputLabel}>Hồ:</Text>
                   <DropDownPicker
                     open={open}
                     value={selectedPond}
@@ -346,7 +360,7 @@ const AddFish = ({ navigation, route }) => {
                     containerStyle={styles.dropdownContainer}
                     style={styles.dropdown}
                     dropDownStyle={styles.dropdownBox}
-                    placeholder="Chọn một ao"
+                    placeholder="Chọn một hồ"
                     listMode="SCROLLVIEW"
                   />
                 </View>
@@ -364,7 +378,15 @@ const AddFish = ({ navigation, route }) => {
                   onPress={() => form.submit()}
                   disabled={!selectedPond || !imageBlob}
                 >
-                  <Text style={selectedPond ? styles.modalSaveText : styles.modalSaveTextDisabled}>Lưu</Text>
+                  <Text
+                    style={
+                      selectedPond
+                        ? styles.modalSaveText
+                        : styles.modalSaveTextDisabled
+                    }
+                  >
+                    Lưu
+                  </Text>
                 </Button>
               </View>
             </View>

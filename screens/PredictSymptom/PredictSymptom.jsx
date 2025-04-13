@@ -85,7 +85,10 @@ const PredictSymptom = ({ route }) => {
     >
       <View style={styles.overlay} />
       <View style={styles.container}>
-        <Text style={styles.title}>Chẩn Đoán Bệnh</Text>
+        <TouchableOpacity onPress={() => navigation.goBack()}>
+          <AntDesign name="left" size={24} color="black" />
+        </TouchableOpacity>
+        <Text style={styles.title}>Chẩn Đoán Bệnh</Text>
         <DropDownPicker
           open={open}
           value={selectedValues}
@@ -99,7 +102,7 @@ const PredictSymptom = ({ route }) => {
           dropDownContainerStyle={{ zIndex: 100 }}
         />
 
-        {symptomPrediction?.causeGroupType === "Cá ăn quá no"  && (
+        {symptomPrediction?.causeGroupType === "Cá ăn quá no" && (
           <View style={styles.symptomCard}>
             <Text style={styles.cardTitle}>
               Triệu chứng: {symptomPrediction?.causeGroupType}

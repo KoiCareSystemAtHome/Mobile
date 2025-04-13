@@ -7,6 +7,7 @@ import { styles } from "./styles";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useSelector } from "react-redux";
 import { reminderByOwnerSelector } from "../../redux/selector";
+import AntDesign from "react-native-vector-icons/AntDesign";
 
 const leftArrowIcon = "←";
 const rightArrowIcon = "→";
@@ -59,8 +60,8 @@ const ScheduleScreen = ({ navigation }) => {
       }
 
       // Filter and mark dates
-      const filteredReminders = reminderByOwner.filter((reminder) =>
-        reminder.reminderType === filterType
+      const filteredReminders = reminderByOwner.filter(
+        (reminder) => reminder.reminderType === filterType
       );
 
       filteredReminders.forEach((reminder) => {
@@ -88,7 +89,11 @@ const ScheduleScreen = ({ navigation }) => {
     if (markedDates[dateString] && markedDates[dateString].dots) {
       const date = new Date(dateString);
       const formattedDate = date
-        .toLocaleDateString("en-US", { weekday: "long", day: "numeric", month: "short" })
+        .toLocaleDateString("en-US", {
+          weekday: "long",
+          day: "numeric",
+          month: "short",
+        })
         .toUpperCase();
 
       setSelectedDate(formattedDate);
@@ -111,7 +116,11 @@ const ScheduleScreen = ({ navigation }) => {
   const formatNextReminderDate = (maintainDate) => {
     const date = new Date(maintainDate);
     return date
-      .toLocaleDateString("en-US", { weekday: "long", day: "numeric", month: "short" })
+      .toLocaleDateString("en-US", {
+        weekday: "long",
+        day: "numeric",
+        month: "short",
+      })
       .toUpperCase();
   };
 
@@ -119,13 +128,20 @@ const ScheduleScreen = ({ navigation }) => {
     <SafeAreaView style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Text style={styles.headerIcon}>{leftArrowIcon}</Text>
+        {/* <TouchableOpacity onPress={() => navigation.goBack("MainTabs")}>
+          <AntDesign name="left" size={24} color="black" />
+        </TouchableOpacity> */}
+        <TouchableOpacity onPress={() => navigation.goBack("MainTabs")}>
+          <AntDesign name="left" size={24} color="black" />
         </TouchableOpacity>
         <Text style={styles.headerIcon}>Lịch trình</Text>
         <View style={styles.headerIcons}>
-          <TouchableOpacity><Text style={styles.headerIcon}></Text></TouchableOpacity>
-          <TouchableOpacity><Text style={styles.headerIcon}></Text></TouchableOpacity>
+          <TouchableOpacity>
+            <Text style={styles.headerIcon}></Text>
+          </TouchableOpacity>
+          <TouchableOpacity>
+            <Text style={styles.headerIcon}></Text>
+          </TouchableOpacity>
         </View>
       </View>
 
@@ -138,30 +154,85 @@ const ScheduleScreen = ({ navigation }) => {
               {getTimeRange(nextReminder.maintainDate).split("-")[0]}
             </Text>
             <Text style={styles.nextReminderText}>{nextReminder.title}</Text>
-            <Text style={styles.nextReminderDescription}>{nextReminder.description}</Text>
+            <Text style={styles.nextReminderDescription}>
+              {nextReminder.description}
+            </Text>
           </View>
         </View>
       )}
 
       {/* Toggle Switch - Updated with Pond/Salt option */}
-      <View style={{ flexDirection: "row", backgroundColor: "#E0E0E0", borderRadius: 20, margin: 10, width: 330, alignSelf: "center" }}>
+      <View
+        style={{
+          flexDirection: "row",
+          backgroundColor: "#E0E0E0",
+          borderRadius: 20,
+          margin: 10,
+          width: 330,
+          alignSelf: "center",
+        }}
+      >
         <TouchableOpacity
-          style={{ flex: 1, padding: 10, borderRadius: 20, backgroundColor: filterType === "RecurringMaintenance" ? "#6A5ACD" : "transparent", alignItems: "center" }}
+          style={{
+            flex: 1,
+            padding: 10,
+            borderRadius: 20,
+            backgroundColor:
+              filterType === "RecurringMaintenance" ? "#6A5ACD" : "transparent",
+            alignItems: "center",
+          }}
           onPress={() => setFilterType("RecurringMaintenance")}
         >
-          <Text style={{ color: filterType === "RecurringMaintenance" ? "#FFF" : "#000", fontWeight: "bold", fontSize: 12 }}>Định kỳ</Text>
+          <Text
+            style={{
+              color: filterType === "RecurringMaintenance" ? "#FFF" : "#000",
+              fontWeight: "bold",
+              fontSize: 12,
+            }}
+          >
+            Định kỳ
+          </Text>
         </TouchableOpacity>
         <TouchableOpacity
-          style={{ flex: 1, padding: 10, borderRadius: 20, backgroundColor: filterType === "Maintenance" ? "#6A5ACD" : "transparent", alignItems: "center" }}
+          style={{
+            flex: 1,
+            padding: 10,
+            borderRadius: 20,
+            backgroundColor:
+              filterType === "Maintenance" ? "#6A5ACD" : "transparent",
+            alignItems: "center",
+          }}
           onPress={() => setFilterType("Maintenance")}
         >
-          <Text style={{ color: filterType === "Maintenance" ? "#FFF" : "#000", fontWeight: "bold", fontSize: 12 }}>Bảo trì</Text>
+          <Text
+            style={{
+              color: filterType === "Maintenance" ? "#FFF" : "#000",
+              fontWeight: "bold",
+              fontSize: 12,
+            }}
+          >
+            Bảo trì
+          </Text>
         </TouchableOpacity>
         <TouchableOpacity
-          style={{ flex: 1, padding: 10, borderRadius: 20, backgroundColor: filterType === "Pond" ? "#6A5ACD" : "transparent", alignItems: "center" }}
+          style={{
+            flex: 1,
+            padding: 10,
+            borderRadius: 20,
+            backgroundColor: filterType === "Pond" ? "#6A5ACD" : "transparent",
+            alignItems: "center",
+          }}
           onPress={() => setFilterType("Pond")}
         >
-          <Text style={{ color: filterType === "Pond" ? "#FFF" : "#000", fontWeight: "bold", fontSize: 12 }}>Salt</Text>
+          <Text
+            style={{
+              color: filterType === "Pond" ? "#FFF" : "#000",
+              fontWeight: "bold",
+              fontSize: 12,
+            }}
+          >
+            Muối
+          </Text>
         </TouchableOpacity>
       </View>
 
@@ -185,7 +256,11 @@ const ScheduleScreen = ({ navigation }) => {
           selectedDayBackgroundColor: "#6A5ACD",
         }}
         onDayPress={handleDayPress}
-        renderArrow={(direction) => <Text style={styles.arrow}>{direction === "left" ? leftArrowIcon : rightArrowIcon}</Text>}
+        renderArrow={(direction) => (
+          <Text style={styles.arrow}>
+            {direction === "left" ? leftArrowIcon : rightArrowIcon}
+          </Text>
+        )}
         style={styles.calendar}
       />
 
@@ -202,12 +277,19 @@ const ScheduleScreen = ({ navigation }) => {
       </View>
 
       {/* Floating Action Button */}
-      <TouchableOpacity style={styles.fab} onPress={() => navigation.navigate("ReminderScreen")}>
+      <TouchableOpacity
+        style={styles.fab}
+        onPress={() => navigation.navigate("ReminderScreen")}
+      >
         <Text style={styles.fabText}>{addIcon}</Text>
       </TouchableOpacity>
 
       {/* Modal for Event Details */}
-      <Modal isVisible={isModalVisible} onBackdropPress={() => setModalVisible(false)} style={styles.modal}>
+      <Modal
+        isVisible={isModalVisible}
+        onBackdropPress={() => setModalVisible(false)}
+        style={styles.modal}
+      >
         <View style={styles.modalContent}>
           <View style={styles.modalHeader}>
             <TouchableOpacity onPress={() => setModalVisible(false)}>
@@ -220,22 +302,35 @@ const ScheduleScreen = ({ navigation }) => {
             {selectedDateEvents.map((event, index) => (
               <TouchableOpacity
                 key={index}
-                style={[styles.modalEvent, {
-                  backgroundColor: event.reminder.title.toLowerCase().includes("feeding")
-                    ? "#E6F4EA"
-                    : event.reminder.title.toLowerCase().includes("maintenance")
-                    ? "#FFF3E0"
-                    : event.reminder.reminderType === "Pond"
-                    ? "#E0F7FA" // Light cyan for Pond/Salt reminders
-                    : "#E0E0E0",
-                }]}
+                style={[
+                  styles.modalEvent,
+                  {
+                    backgroundColor: event.reminder.title
+                      .toLowerCase()
+                      .includes("feeding")
+                      ? "#E6F4EA"
+                      : event.reminder.title
+                          .toLowerCase()
+                          .includes("maintenance")
+                      ? "#FFF3E0"
+                      : event.reminder.reminderType === "Pond"
+                      ? "#E0F7FA" // Light cyan for Pond/Salt reminders
+                      : "#E0E0E0",
+                  },
+                ]}
                 onPress={() => {
                   setModalVisible(false);
-                  navigation.navigate("ReminderDetail", { reminder: event.reminder });
+                  navigation.navigate("ReminderDetail", {
+                    reminder: event.reminder,
+                  });
                 }}
               >
-                <Text style={styles.modalEventTime}>{getTimeRange(event.reminder.maintainDate).split("-")[0]}</Text>
-                <Text style={styles.modalEventText}>{event.reminder.title}</Text>
+                <Text style={styles.modalEventTime}>
+                  {getTimeRange(event.reminder.maintainDate).split("-")[0]}
+                </Text>
+                <Text style={styles.modalEventText}>
+                  {event.reminder.title}
+                </Text>
               </TouchableOpacity>
             ))}
           </View>

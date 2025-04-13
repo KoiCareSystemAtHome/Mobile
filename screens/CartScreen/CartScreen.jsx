@@ -203,7 +203,7 @@ const CartScreen = ({ navigation }) => {
         <View style={styles.overlay} />
         {/* Header */}
         <View style={styles.header}>
-          <TouchableOpacity onPress={() => navigation.navigate("Shopping")}>
+          <TouchableOpacity onPress={() => navigation.goBack("Shopping")}>
             <AntDesign name="left" size={24} color="black" />
           </TouchableOpacity>
           <Text style={styles.title}>Giỏ Hàng</Text>
@@ -215,7 +215,7 @@ const CartScreen = ({ navigation }) => {
         {/* Wallet Amount */}
         <View style={styles.walletContainer}>
           <Text style={styles.walletText}>
-            Số dư ví: {walletData?.amount?.toFixed(2) || "0.00"} VND
+            Số dư ví: {walletData?.amount?.toFixed(2) || "0.00"} đ
           </Text>
         </View>
 
@@ -247,7 +247,9 @@ const CartScreen = ({ navigation }) => {
               <View>
                 <View style={styles.productDetails}>
                   <Text style={styles.productName}>{item.productName}</Text>
-                  <Text style={styles.productPrice}>{`${(item.price).toLocaleString("vi-VN")} VND`}</Text>
+                  <Text
+                    style={styles.productPrice}
+                  >{`${item.price.toLocaleString("vi-VN")} đ`}</Text>
                 </View>
                 <View style={styles.quantityContainer}>
                   <TouchableOpacity
@@ -276,14 +278,12 @@ const CartScreen = ({ navigation }) => {
         {/* Order Summary */}
         <View style={styles.summaryContainer}>
           <Text style={styles.summaryText}>Tổng phụ</Text>
-          <Text style={styles.summaryPrice}>{`${subtotal.toFixed(
-            2
-          )} VND`}</Text>
+          <Text style={styles.summaryPrice}>{`${subtotal.toFixed(2)} đ`}</Text>
         </View>
 
         <View style={styles.summaryContainer}>
           <Text style={styles.totalText}>Tổng cộng</Text>
-          <Text style={styles.totalPrice}>{`${total.toFixed(2)} VND`}</Text>
+          <Text style={styles.totalPrice}>{`${total.toFixed(2)} đ`}</Text>
         </View>
 
         {/* Payment Method Selection */}

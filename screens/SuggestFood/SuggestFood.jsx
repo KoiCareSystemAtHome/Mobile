@@ -18,11 +18,9 @@ const SuggestFood = ({ route, navigation }) => {
   const foodSuggestion = useSelector(foodSuggestionSelector);
   const { pondId } = route.params;
 
-
   useEffect(() => {
-    dispatch(recommendFood(pondId))
+    dispatch(recommendFood(pondId));
   }, [dispatch, pondId]);
-
 
   return (
     <ImageBackground
@@ -50,7 +48,9 @@ const SuggestFood = ({ route, navigation }) => {
         renderItem={({ item }) => (
           <TouchableOpacity style={styles.productCard}>
             <Image
-              source={{ uri: item.product.image || "https://via.placeholder.com/150" }}
+              source={{
+                uri: item.product.image || "https://via.placeholder.com/150",
+              }}
               style={styles.productImage}
             />
             <Text style={styles.productName}>{item.product.productName}</Text>
@@ -59,7 +59,7 @@ const SuggestFood = ({ route, navigation }) => {
               Age: {item.ageFrom} - {item.ageTo} months
             </Text>
             <Text style={styles.productPrice}>
-              {item.product.price.toLocaleString()} VND
+              {item.product.price.toLocaleString()} đ
             </Text>
             <TouchableOpacity
               style={styles.addToCartButton}

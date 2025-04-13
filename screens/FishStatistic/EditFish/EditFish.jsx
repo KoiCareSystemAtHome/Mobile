@@ -24,6 +24,7 @@ import enUS from "@ant-design/react-native/lib/locale-provider/en_US";
 import { getFishByOwner, updateFish } from "../../../redux/slices/fishSlice";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { getPondByOwner } from "../../../redux/slices/pondSlice";
+import AntDesign from "react-native-vector-icons/AntDesign";
 
 const EditFish = ({ route, navigation }) => {
   const { fish } = route.params;
@@ -97,7 +98,7 @@ const EditFish = ({ route, navigation }) => {
     dispatch(updateFish(updatedFish))
       .unwrap()
       .then(() => {
-        Toast.success("Fish Updated Successfully");
+        Toast.success("Cập nhật cá thành công!");
         dispatch(getFishByOwner(isLoggedIn?.id));
       });
     navigation.navigate("FishStatistic");
@@ -152,6 +153,9 @@ const EditFish = ({ route, navigation }) => {
             onFinish={onFinish}
             style={{ backgroundColor: "transparent" }}
           >
+            <TouchableOpacity onPress={() => navigation.goBack()}>
+              <AntDesign name="left" size={24} color="black" />
+            </TouchableOpacity>
             <View style={styles.modalHeader}>
               <Text style={styles.modalTitle}>Chỉnh Sửa Cá Koi</Text>
             </View>
@@ -221,13 +225,13 @@ const EditFish = ({ route, navigation }) => {
               </View>
               <View style={styles.row}>
                 <View style={styles.inputRow}>
-                  <Text style={styles.inputLabel}>Ao:</Text>
+                  <Text style={styles.inputLabel}>Hồ:</Text>
                   <Form.Item name="pond" style={styles.input}>
-                    <Input placeholder="Ao" disabled />
+                    <Input placeholder="Hồ" disabled />
                   </Form.Item>
                 </View>
                 <View style={styles.inputRow}>
-                  <Text style={styles.inputLabel}>Trong ao từ:</Text>
+                  <Text style={styles.inputLabel}>Trong hồ từ:</Text>
                   <DatePicker
                     value={inPondSince}
                     mode="date"
@@ -264,7 +268,7 @@ const EditFish = ({ route, navigation }) => {
                   <Form.Item
                     name="purchasePrice"
                     style={styles.input}
-                    extra="VND"
+                    extra="đ"
                   >
                     <Input placeholder="Giá mua" />
                   </Form.Item>

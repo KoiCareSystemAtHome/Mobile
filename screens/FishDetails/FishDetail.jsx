@@ -36,6 +36,7 @@ import { getProduct } from "../../redux/slices/productSlice";
 import enUS from "@ant-design/react-native/lib/locale-provider/en_US";
 import { styles } from "./styles";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import AntDesign from "react-native-vector-icons/AntDesign";
 
 const FishDetail = ({ route, navigation }) => {
   const { fish } = route.params;
@@ -228,7 +229,39 @@ const FishDetail = ({ route, navigation }) => {
           style={styles.container}
           contentContainerStyle={{ paddingBottom: 20 }}
         >
-          <Text style={styles.title}>Chi Tiết Cá</Text>
+          <View
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "space-between",
+              marginBottom: 10,
+              marginTop: 10,
+            }}
+          >
+            <TouchableOpacity
+              onPress={() => navigation.goBack("FishStatistic")}
+              style={{
+                width: 24,
+                height: 24,
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <AntDesign name="left" size={24} color="black" />
+            </TouchableOpacity>
+            <View
+              style={{
+                flex: 1,
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <Text style={[styles.title, { marginBottom: 0 }]}>
+                Chi Tiết Cá
+              </Text>
+            </View>
+            <View style={{ width: 24 }} />
+          </View>
           <View style={styles.headerContainer}>
             <View style={styles.imageContainer}>
               <Image source={{ uri: fish.image }} style={styles.fishImage} />
@@ -277,15 +310,14 @@ const FishDetail = ({ route, navigation }) => {
           <View style={styles.section}>
             <Text>
               <Text style={{ fontWeight: "bold" }}>{fish.name}</Text> đã bơi
-              trong ao{" "}
+              trong hồ{" "}
               <Text style={{ fontWeight: "bold" }}>"{fish.pond.name}"</Text> từ{" "}
               <Text style={{ fontWeight: "bold" }}>10.10.2018</Text>
             </Text>
             <Text>
               <Text style={{ fontWeight: "bold" }}>{fish.name}</Text> được mua
-              với giá{" "}
-              <Text style={{ fontWeight: "bold" }}>{fish.price} VND</Text> và
-              được lai tạo bởi{" "}
+              với giá <Text style={{ fontWeight: "bold" }}>{fish.price} đ</Text>{" "}
+              và được lai tạo bởi{" "}
               <Text style={{ fontWeight: "bold" }}>
                 {fish.variety.varietyName}
               </Text>
@@ -459,4 +491,4 @@ const FishDetail = ({ route, navigation }) => {
   );
 };
 
-export default FishDetail;  
+export default FishDetail;

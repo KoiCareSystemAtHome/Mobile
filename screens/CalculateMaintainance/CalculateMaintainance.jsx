@@ -77,7 +77,7 @@ const CalculateMaintainance = () => {
         ...maintainanceData,
         maintainDate: endDate.toISOString(),
       };
-      console.log(updatedMaintenanceData)
+      console.log(updatedMaintenanceData);
       dispatch(saveMaintainance(updatedMaintenanceData))
         .unwrap()
         .then((res) => {
@@ -143,7 +143,7 @@ const CalculateMaintainance = () => {
               style={styles.selector}
             >
               <Text style={styles.selectorText}>
-                {homePond ? homePond?.name : "Chọn một ao"}
+                {homePond ? homePond?.name : "Chọn một hồ"}
               </Text>
               <Icon name="down" size={16} color="#000" />
             </TouchableOpacity>

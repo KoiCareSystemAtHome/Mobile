@@ -8,6 +8,7 @@ import {
   ActivityIndicator,
   Alert,
   ImageBackground,
+  TouchableOpacity,
 } from "react-native";
 import axios from "axios";
 import WebView from "react-native-webview";
@@ -16,6 +17,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { createdUrlSelector } from "../../redux/selector";
 import { getWallet } from "../../redux/slices/authSlice";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import AntDesign from "react-native-vector-icons/AntDesign";
 
 const DepositScreen = ({ navigation }) => {
   const dispatch = useDispatch();
@@ -42,9 +44,7 @@ const DepositScreen = ({ navigation }) => {
   };
   const handleWebViewNavigationStateChange = (navState) => {
     const { url } = navState;
-    if (
-      url.includes("https://loco.com.co/api/Vnpay/CallbackWithUserInfo")
-    ) {
+    if (url.includes("https://loco.com.co/api/Vnpay/CallbackWithUserInfo")) {
       setShowWebView(false);
       setPaymentUrl(null);
       const urlParams = new URLSearchParams(url.split("?")[1]);
@@ -54,7 +54,7 @@ const DepositScreen = ({ navigation }) => {
         navigation.navigate("MainTabs");
         dispatch(getWallet(isLoggedIn?.id));
       } else {
-        Alert.alert("Error", "Payment failed. Please try again.");
+        Alert.alert("Error", "Thanh toán không thành công. Vui lòng thử lại!");
       }
     }
   };
@@ -78,14 +78,20 @@ const DepositScreen = ({ navigation }) => {
       style={styles.container}
       // resizeMode="cover"
     >
-    <View style={styles.overlay} />
+      <View style={styles.overlay} />
       {!showWebView ? (
         <>
-          <Text style={styles.title}>Nạp tiền</Text>
+          <TouchableOpacity
+            style={{ paddingTop: 60, paddingLeft: 20 }}
+            onPress={() => navigation.goBack("MainTabs")}
+          >
+            <AntDesign name="left" size={24} color="black" />
+          </TouchableOpacity>
+          <Text style={styles.title}>Nạp Tiền</Text>
 
           <TextInput
             style={styles.input}
-            placeholder="Số tiền (VND)"
+            placeholder="Số tiền (đ)"
             keyboardType="numeric"
             value={money}
             onChangeText={setMoney}
@@ -101,8 +107,8 @@ const DepositScreen = ({ navigation }) => {
           {loading ? (
             <ActivityIndicator size="large" color="#0000ff" />
           ) : (
-            <View style={{marginHorizontal:20}}>
-            <Button title="Tạo giao dịch" onPress={handleCreatePayment} />
+            <View style={{ marginHorizontal: 20 }}>
+              <Button title="Tạo giao dịch" onPress={handleCreatePayment} />
             </View>
           )}
         </>
@@ -127,7 +133,6 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     marginBottom: 20,
     textAlign: "center",
-    marginTop:60
   },
   input: {
     borderWidth: 1,
@@ -136,7 +141,7 @@ const styles = StyleSheet.create({
     marginBottom: 15,
     borderRadius: 5,
     backgroundColor: "#fff",
-    marginHorizontal:20
+    marginHorizontal: 20,
   },
   webview: {
     flex: 1,

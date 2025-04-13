@@ -14,6 +14,7 @@ import { pondByOwnerSelector } from "../../redux/selector";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { getPondByOwner } from "../../redux/slices/pondSlice";
 import { calculateFood } from "../../redux/slices/calculatorSlice";
+import AntDesign from "react-native-vector-icons/AntDesign";
 
 const FoodCalculator = ({ navigation }) => {
   const dispatch = useDispatch();
@@ -84,8 +85,6 @@ const FoodCalculator = ({ navigation }) => {
     }
   }, [homePond, growth, temperature, dispatch]);
 
-  
-
   return (
     <ImageBackground
       source={require("../../assets/koimain3.jpg")}
@@ -93,7 +92,12 @@ const FoodCalculator = ({ navigation }) => {
       resizeMode="cover"
     >
       <View style={styles.overlay} />
-      <ScrollView contentContainerStyle={[styles.container, { paddingBottom: 80 }]}>
+      <ScrollView
+        contentContainerStyle={[styles.container, { paddingBottom: 80 }]}
+      >
+        <TouchableOpacity onPress={() => navigation.goBack("MainTabs")}>
+          <AntDesign name="left" size={24} color="black" />
+        </TouchableOpacity>
         <Text style={styles.title}>Tính Lượng Thức Ăn</Text>
 
         <View style={{ justifyContent: "center", flexDirection: "row" }}>
@@ -102,12 +106,12 @@ const FoodCalculator = ({ navigation }) => {
             style={styles.selector}
           >
             <Text style={styles.selectorText}>
-              {homePond ? homePond?.name : "Chọn Một Ao"}
+              {homePond ? homePond?.name : "Chọn Một Hồ"}
             </Text>
             <Icon name="down" size={16} color="#000" />
           </TouchableOpacity>
         </View>
-        
+
         <View style={{ justifyContent: "center", flexDirection: "row" }}>
           {homePondOpen && (
             <View style={styles.dropdown}>
@@ -173,44 +177,47 @@ const FoodCalculator = ({ navigation }) => {
         </View>
 
         <Text style={styles.infoText}>
-          Lượng thức ăn được khuyến nghị nên được chia đều thành 3 - 5 lần cho ăn mỗi ngày. 
-          Bằng cách này, cá koi sẽ tiêu hóa thức ăn tốt hơn...
+          Lượng thức ăn được khuyến nghị nên được chia đều thành 3 - 5 lần cho
+          ăn mỗi ngày. Bằng cách này, cá koi sẽ tiêu hóa thức ăn tốt hơn...
         </Text>
 
         <View style={styles.recommendationButton}>
           <Text style={styles.recommendationText}>
-            {homePond ? `Lượng Đề Xuất: ${food}g` : "Vui Lòng Chọn Một Ao"}
+            {homePond ? `Lượng Đề Xuất: ${food}g` : "Vui Lòng Chọn Một Hồ"}
           </Text>
         </View>
 
         {homePond && (
-          <TouchableOpacity 
+          <TouchableOpacity
             style={styles.suggestButton}
-            onPress={() => navigation.navigate("SuggestFood", { pondId: homePond?.pondID })}
+            onPress={() =>
+              navigation.navigate("SuggestFood", { pondId: homePond?.pondID })
+            }
           >
             <Text style={styles.recommendationText}>Mới</Text>
           </TouchableOpacity>
         )}
-
       </ScrollView>
 
       <TouchableOpacity
         style={{
-          position: 'absolute',
+          position: "absolute",
           bottom: 20,
           right: 20,
-          backgroundColor: '#007AFF',
+          backgroundColor: "#007AFF",
           paddingVertical: 10,
           paddingHorizontal: 20,
           borderRadius: 25,
         }}
         onPress={() => navigation.navigate("SymptomScreen")}
       >
-        <Text style={{
-          color: '#FFFFFF',
-          fontSize: 16,
-          fontWeight: 'bold',
-        }}>
+        <Text
+          style={{
+            color: "#FFFFFF",
+            fontSize: 16,
+            fontWeight: "bold",
+          }}
+        >
           Tiếp Theo
         </Text>
       </TouchableOpacity>

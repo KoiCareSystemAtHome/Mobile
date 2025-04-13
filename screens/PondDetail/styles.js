@@ -10,6 +10,7 @@ export const styles = StyleSheet.create({
   },
   container: {
     // flex:1,
+    paddingTop: 40,
     paddingHorizontal: 20,
     paddingBottom: 40,
   },
@@ -18,7 +19,7 @@ export const styles = StyleSheet.create({
     fontWeight: "bold",
     color: "#333",
     textAlign: "center",
-    marginVertical: 20,
+    marginBottom: 20,
   },
   cardContainer: {
     marginBottom: 20,
@@ -175,8 +176,8 @@ export const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: "bold",
   },
-  modal:{
-    width:350
+  modal: {
+    width: 350,
   },
   modalOverlay: {
     justifyContent: "center",
@@ -253,7 +254,7 @@ export const styles = StyleSheet.create({
   modalFooter: {
     flexDirection: "row",
     justifyContent: "space-between",
-    backgroundColor:"white"
+    backgroundColor: "white",
   },
   imageContainer: {
     alignItems: "center",
@@ -270,12 +271,11 @@ export const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   statusCircle: {
-    position: 'absolute',
+    position: "absolute",
     top: 10,
     right: 10,
     width: 50,
     height: 50,
     borderRadius: 50,
-
   },
 });

@@ -12,6 +12,7 @@ import { styles } from "./styles";
 import { useRoute, useNavigation } from "@react-navigation/native";
 import { useDispatch } from "react-redux";
 import { updateSalt } from "../../../redux/slices/calculatorSlice";
+import AntDesign from "react-native-vector-icons/AntDesign";
 
 const AddSaltForm = () => {
   const route = useRoute();
@@ -54,6 +55,9 @@ const AddSaltForm = () => {
     >
       <View style={styles.overlay} />
       <ScrollView contentContainerStyle={styles.scrollContainer}>
+        <TouchableOpacity onPress={() => navigation.goBack("MainTabs")}>
+          <AntDesign name="left" size={24} color="black" />
+        </TouchableOpacity>
         <Text style={styles.title}>Thêm Muối</Text>
 
         {/* Form Container */}

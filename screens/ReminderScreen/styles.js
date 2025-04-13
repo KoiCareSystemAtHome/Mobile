@@ -11,7 +11,7 @@ export const styles = StyleSheet.create({
   },
   scrollContainer: {
     paddingHorizontal: 20,
-    paddingTop: 60,
+    paddingTop: 20,
     paddingBottom: 40,
   },
   container: {
@@ -23,7 +23,7 @@ export const styles = StyleSheet.create({
     fontWeight: "bold",
     color: "#333",
     textAlign: "center",
-    marginVertical: 20,
+    marginBottom: 20,
   },
   backButton: {
     position: "absolute",
@@ -62,5 +62,4 @@ export const styles = StyleSheet.create({
     fontSize: 14,
     color: "#666",
   },
-
 });

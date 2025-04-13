@@ -29,6 +29,7 @@ import { styles } from "./styles";
 import * as ImagePicker from "expo-image-picker";
 import { getImage } from "../../redux/slices/authSlice";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import AntDesign from "react-native-vector-icons/AntDesign";
 
 const PondDetail = ({ navigation, route }) => {
   const dispatch = useDispatch();
@@ -196,7 +197,10 @@ const PondDetail = ({ navigation, route }) => {
       >
         <View style={styles.overlay} />
         <ScrollView contentContainerStyle={styles.container}>
-          <Text style={styles.title}>Chi Tiết Ao</Text>
+          <TouchableOpacity onPress={() => navigation.goBack()}>
+            <AntDesign name="left" size={24} color="black" />
+          </TouchableOpacity>
+          <Text style={styles.title}>Chi Tiết Hồ</Text>
           <View style={styles.cardContainer}>
             <Card style={styles.card}>
               <View style={styles.cardContent}>
@@ -280,7 +284,7 @@ const PondDetail = ({ navigation, route }) => {
           <View style={styles.statisticsContainer}>
             <View style={styles.statisticCard}>
               <View style={styles.statisticsRow}>
-                <Text style={styles.sectionTitle}>Thống Kê Ao</Text>
+                <Text style={styles.sectionTitle}>Thống Kê Hồ</Text>
                 <View style={styles.statisticsRow}>
                   <Text style={styles.statisticsLabel}>Tháng Này</Text>
                   <TouchableOpacity>
@@ -316,13 +320,13 @@ const PondDetail = ({ navigation, route }) => {
                     />
                     <Text style={styles.productName}>{item.productName}</Text>
                     <Text style={styles.productPrice}>
-                      {item.price || "N/A"} VND
+                      {item.price || "N/A"} đ
                     </Text>
                     <TouchableOpacity
                       style={styles.addToCartButton}
                       onPress={() => {
                         navigation.navigate("ProductDetail", {
-                          product: item
+                          product: item,
                         });
                       }}
                     >
@@ -343,7 +347,7 @@ const PondDetail = ({ navigation, route }) => {
             <View style={styles.modalOverlay}>
               <View style={styles.modalContainer}>
                 <View style={styles.modalHeader}>
-                  <Text style={styles.modalTitle}>Chỉnh Sửa Ao</Text>
+                  <Text style={styles.modalTitle}>Chỉnh Sửa Hồ</Text>
                 </View>
 
                 {imageBlob ? (
@@ -371,10 +375,10 @@ const PondDetail = ({ navigation, route }) => {
                     name="name"
                     initialValue={pond?.name}
                     rules={[
-                      { required: true, message: "Vui lòng nhập tên ao" },
+                      { required: true, message: "Vui lòng nhập tên hồ" },
                     ]}
                   >
-                    <Input placeholder="Tên Ao" style={styles.input} />
+                    <Input placeholder="Tên Hồ" style={styles.input} />
                   </Form.Item>
 
                   <Form.Item

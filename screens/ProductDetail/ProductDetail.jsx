@@ -1,5 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, Image, TouchableOpacity, Alert, FlatList } from "react-native";
+import {
+  View,
+  Text,
+  Image,
+  TouchableOpacity,
+  Alert,
+  FlatList,
+} from "react-native";
 import { Button } from "@ant-design/react-native";
 import AntDesign from "react-native-vector-icons/AntDesign";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -120,7 +127,7 @@ const ProductDetail = ({ navigation }) => {
             <Text style={styles.quantityText}>+</Text>
           </TouchableOpacity>
         </View>
-        <Text style={styles.productPrice}>{product.price} VND</Text>
+        <Text style={styles.productPrice}>{product.price} đ</Text>
       </View>
 
       {/* Buttons */}
@@ -150,7 +157,10 @@ const ProductDetail = ({ navigation }) => {
   const renderFooter = () => (
     <View style={styles.paginationContainer}>
       <TouchableOpacity
-        style={[styles.paginationButton, currentPage === 1 && styles.disabledButton]}
+        style={[
+          styles.paginationButton,
+          currentPage === 1 && styles.disabledButton,
+        ]}
         onPress={handlePrevPage}
         disabled={currentPage === 1}
       >
@@ -160,7 +170,10 @@ const ProductDetail = ({ navigation }) => {
         {currentPage}/{totalPages}
       </Text>
       <TouchableOpacity
-        style={[styles.paginationButton, currentPage === totalPages && styles.disabledButton]}
+        style={[
+          styles.paginationButton,
+          currentPage === totalPages && styles.disabledButton,
+        ]}
         onPress={handleNextPage}
         disabled={currentPage === totalPages}
       >
