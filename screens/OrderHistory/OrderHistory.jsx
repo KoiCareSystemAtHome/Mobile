@@ -8,16 +8,14 @@ import {
   ImageBackground,
   RefreshControl,
 } from "react-native";
-import { Provider } from "@ant-design/react-native";
+import { Provider, Toast } from "@ant-design/react-native";
 import { styles } from "./styles";
-import Icon from "react-native-vector-icons/AntDesign";
+import AntDesign from "react-native-vector-icons/AntDesign";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useDispatch, useSelector } from "react-redux";
 import { getOrderByAccount } from "../../redux/slices/ghnSlice";
 import { orderbyAccountSelector, productSelector } from "../../redux/selector";
 import { getProduct } from "../../redux/slices/productSlice";
-import AntDesign from "react-native-vector-icons/AntDesign";
-import { getOrderTransaction } from "../../redux/slices/transactionSlice";
 
 const OrderHistory = ({ navigation }) => {
   const dispatch = useDispatch();
@@ -41,10 +39,9 @@ const OrderHistory = ({ navigation }) => {
         const userInfo = await AsyncStorage.getItem("user");
         setIsLoggedIn(userInfo ? JSON.parse(userInfo) : null);
       } catch (error) {
-        console.error(error);
+        console.error("Error fetching user data:", error);
       }
     };
-
     getData();
   }, []);
 
@@ -54,7 +51,6 @@ const OrderHistory = ({ navigation }) => {
       dispatch(getOrderByAccount(isLoggedIn?.id));
     }
   }, [dispatch, isLoggedIn]);
-
 
   const onRefresh = async () => {
     setRefreshing(true);
@@ -68,9 +64,11 @@ const OrderHistory = ({ navigation }) => {
           dispatch(getProduct()).unwrap(),
           dispatch(getOrderByAccount(user.id)).unwrap(),
         ]);
+        Toast.success("Dữ liệu đã được làm mới");
       }
     } catch (error) {
       console.error("Refresh failed:", error);
+      Toast.fail("Làm mới dữ liệu thất bại");
     } finally {
       setRefreshing(false);
       setCurrentPage(1); // Reset to first page after refresh
@@ -94,10 +92,11 @@ const OrderHistory = ({ navigation }) => {
       const matchedProduct = productData?.find(
         (product) => product.productId === item.productId
       );
-      return total + (matchedProduct ? item.quantity * matchedProduct.price : 0);
+      return (
+        total + (matchedProduct ? item.quantity * matchedProduct.price : 0)
+      );
     }, 0);
   };
-
 
   return (
     <Provider>
@@ -107,109 +106,103 @@ const OrderHistory = ({ navigation }) => {
         resizeMode="cover"
       >
         <View style={styles.overlay} />
+        <View style={styles.header}>
+          <TouchableOpacity onPress={() => navigation.goBack()}>
+            <AntDesign name="left" size={24} color="#fff" />
+          </TouchableOpacity>
+          <Text style={styles.title}>Lịch Sử Đơn Hàng</Text>
+          <View style={{ width: 24 }} />
+        </View>
 
-        <TouchableOpacity
-          style={{
-            position: "absolute",
-            top: 40,
-            left: 15,
-            backgroundColor: "rgba(255, 255, 255, 0.2)",
-            borderRadius: 20,
-            padding: 8,
-            zIndex: 1,
-          }}
-          onPress={() => navigation.goBack()}
-          activeOpacity={0.7}
+        <ScrollView
+          contentContainerStyle={styles.container}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={onRefresh}
+              colors={["#0077B6"]}
+              tintColor="#0077B6"
+            />
+          }
         >
-          <Icon name="arrowleft" size={24} color="black" />
-        </TouchableOpacity>
-
-        <View style={styles.container}>
-          <Text style={styles.title}>Order History</Text>
-          <ScrollView
-            contentContainerStyle={styles.listContent}
-            refreshControl={
-              <RefreshControl
-                refreshing={refreshing}
-                onRefresh={onRefresh}
-                colors={["#6497B1"]}
-                tintColor="#6497B1"
-              />
-            }
-          >
-            {paginatedOrderData?.map((order) => (
+          {paginatedOrderData?.length > 0 ? (
+            paginatedOrderData.map((order) => (
               <TouchableOpacity
                 key={order.orderId}
                 style={styles.orderCard}
                 onPress={() => {
-                  navigation.navigate("OrderTracking", {
-                    order: order,
-                  });
+                  navigation.navigate("OrderTracking", { order });
                 }}
                 activeOpacity={0.8}
               >
-                <Text style={styles.storeName}>{order.store}</Text>
-                <Text style={styles.status}>{order.status}</Text>
+                <View style={styles.orderHeader}>
+                  <Text style={styles.storeName}>{order.store}</Text>
+                  <Text
+                    style={[
+                      styles.status,
+                      {
+                        color:
+                          order.status === "Delivered"
+                            ? "#10B981"
+                            : order.status === "Pending"
+                            ? "#FBBF24"
+                            : "#EF4444",
+                      },
+                    ]}
+                  >
+                    {order.status}
+                  </Text>
+                </View>
 
                 {order?.details?.map((item) => {
                   const matchedProduct = productData?.find(
                     (product) => product.productId === item.productId
                   );
                   return (
-                    <View key={item.productId} style={styles.productRow}>
-                      {matchedProduct && (
-                        <>
-                          <Image
-                            source={{ uri: matchedProduct.image }}
-                            style={styles.productImage}
-                          />
-                          <View style={styles.productDetails}>
-                            <Text style={styles.productTitle}>
-                              {matchedProduct.productName}
-                            </Text>
-                            <Text style={styles.price}>
-                              ₫{matchedProduct.price.toLocaleString("vi-VN")}
-                            </Text>
-                            <Text style={styles.quantity}>
-                              x{item.quantity}
-                            </Text>
-                          </View>
-                          <View style={styles.productFooter}>
-                            <Text style={styles.totalPrice}>
-                              Tổng số tiền:{" "}
-                              <Text style={styles.highlight}>
-                                ₫
-                                {(
-                                  item.quantity * matchedProduct.price
-                                ).toLocaleString("vi-VN")}
-                              </Text>
-                            </Text>
-                          </View>
-                        </>
-                      )}
-                    </View>
+                    matchedProduct && (
+                      <View key={item.productId} style={styles.productRow}>
+                        <Image
+                          source={{ uri: matchedProduct?.image }}
+                          style={styles.productImage}
+                        />
+                        <View style={styles.productDetails}>
+                          <Text style={styles.productTitle} numberOfLines={2}>
+                            {matchedProduct.productName}
+                          </Text>
+                          <Text style={styles.price}>
+                            ₫{matchedProduct.price.toLocaleString("vi-VN")}
+                          </Text>
+                          <Text style={styles.quantity}>x{item.quantity}</Text>
+                        </View>
+                        <Text style={styles.itemTotal}>
+                          ₫
+                          {(
+                            item.quantity * matchedProduct.price
+                          ).toLocaleString("vi-VN")}
+                        </Text>
+                      </View>
+                    )
                   );
                 })}
 
-                <View style={styles.orderTotalContainer}>
-                  <Text style={styles.orderTotalText}>
-                    Tổng đơn hàng:{" "}
-                    <Text style={styles.orderTotalAmount}>
-                      ₫{calculateOrderTotal(order).toLocaleString("vi-VN")}
+                <View style={styles.orderFooter}>
+                  <Text style={styles.orderTotal}>
+                    Tổng đơn hàng: ₫
+                    {calculateOrderTotal(order).toLocaleString("vi-VN")}
+                  </Text>
+                  <View style={styles.rewardRow}>
+                    <AntDesign name="gift" size={16} color="#F59E0B" />
+                    <Text style={styles.rewardText}>
+                      Đánh giá trước {order.reviewDeadline} để nhận{" "}
+                      {order.coins} Xu
                     </Text>
-                  </Text>
-                </View>
-
-                <View style={styles.rewardRow}>
-                  <Icon name="gift" size={16} color="gold" />
-                  <Text style={styles.rewardText}>
-                    Đánh giá sản phẩm trước {order.reviewDeadline} để nhận{" "}
-                    {order.coins} Xu
-                  </Text>
+                  </View>
                 </View>
               </TouchableOpacity>
-            ))}
-          </ScrollView>
+            ))
+          ) : (
+            <Text style={styles.noDataText}>Chưa có đơn hàng nào</Text>
+          )}
 
           {orderData?.length > 0 && (
             <View style={styles.paginationContainer}>
@@ -221,12 +214,14 @@ const OrderHistory = ({ navigation }) => {
                 onPress={handlePreviousPage}
                 disabled={currentPage === 1}
               >
-                <Text style={styles.paginationText}>
-                  <AntDesign name="left" size={20} color="black" />
-                </Text>
+                <AntDesign
+                  name="left"
+                  size={20}
+                  color={currentPage === 1 ? "#A0AEC0" : "#1A3C5A"}
+                />
               </TouchableOpacity>
               <Text style={styles.pageText}>
-                {currentPage}/{totalPages}
+                {currentPage} / {totalPages}
               </Text>
               <TouchableOpacity
                 style={[
@@ -236,13 +231,15 @@ const OrderHistory = ({ navigation }) => {
                 onPress={handleNextPage}
                 disabled={currentPage === totalPages}
               >
-                <Text style={styles.paginationText}>
-                  <AntDesign name="right" size={20} color="black" />
-                </Text>
+                <AntDesign
+                  name="right"
+                  size={20}
+                  color={currentPage === totalPages ? "#A0AEC0" : "#1A3C5A"}
+                />
               </TouchableOpacity>
             </View>
           )}
-        </View>
+        </ScrollView>
       </ImageBackground>
     </Provider>
   );

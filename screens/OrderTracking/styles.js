@@ -6,126 +6,157 @@ export const styles = StyleSheet.create({
   },
   overlay: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: "rgba(255, 255, 255, 0.5)",
+    backgroundColor: "rgba(0, 50, 80, 0.4)", // Darker aquatic overlay
+  },
+  header: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingHorizontal: 16,
+    paddingTop: 40,
+    paddingBottom: 16,
+  },
+  title: {
+    fontSize: 28,
+    fontWeight: "700",
+    color: "#fff",
+    textAlign: "center",
+    fontFamily: "Roboto", // Replace with custom font if available
+    textShadowColor: "rgba(0, 0, 0, 0.2)",
+    textShadowOffset: { width: 1, height: 1 },
+    textShadowRadius: 2,
   },
   container: {
-    paddingHorizontal: 20,
-    paddingTop: 60,
-    paddingBottom: 20,
-  },
-  backButton: {
-    position: "absolute",
-    top: 40,
-    left: 15,
-    backgroundColor: "rgba(255, 255, 255, 0.2)",
-    borderRadius: 20,
-    padding: 8,
-    zIndex: 1,
+    paddingHorizontal: 16,
+    paddingTop: 8,
+    paddingBottom: 40,
   },
   orderCard: {
     backgroundColor: "#fff",
-    borderRadius: 10,
-    padding: 15,
-    marginBottom: 20,
+    borderRadius: 12,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 6,
     elevation: 5,
+    padding: 16,
+    marginBottom: 16,
   },
-  orderTitle: {
-    fontSize: 18,
-    fontWeight: "bold",
-    marginBottom: 10,
-    color: "#333",
+  sectionTitle: {
+    fontSize: 20,
+    fontWeight: "600",
+    color: "#1A3C5A",
+    marginBottom: 12,
   },
   productRow: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 10,
+    paddingVertical: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: "#E2E8F0",
   },
   productImage: {
     width: 60,
     height: 60,
-    borderRadius: 5,
-    marginRight: 10,
+    borderRadius: 8,
+    marginRight: 12,
   },
   productDetails: {
     flex: 1,
-    flexDirection: "column", // Stack the title and footer vertically
   },
   productTitle: {
-    fontSize: 16,
-    fontWeight: "bold",
-    color: "#333",
-
+    fontSize: 14,
+    fontWeight: "500",
+    color: "#1A3C5A",
+    marginBottom: 4,
   },
   price: {
     fontSize: 14,
-    color: "#00A76F",
-    marginRight: 10, // Space between price and quantity
+    color: "#4A5568",
+    marginBottom: 2,
   },
   quantity: {
     fontSize: 14,
-    color: "#666",
-    marginRight: 10, // Space between quantity and total price
+    color: "#4A5568",
+    marginBottom: 2,
   },
-  productFooter: {
-    flexDirection: "row", // Align price, quantity, and total price in a row
-    alignItems: "center",
-    marginTop: 5,
-  },
-  totalPrice: {
+  itemTotal: {
     fontSize: 14,
-    color: "#333",
+    fontWeight: "600",
+    color: "#0077B6",
   },
-  highlight: {
-    fontWeight: "bold",
-    color: "#00A76F",
+  paymentDetails: {
+    marginTop: 12,
+    paddingTop: 12,
+    borderTopWidth: 1,
+    borderTopColor: "#E2E8F0",
   },
-  progressContainer: {
-    backgroundColor: "#fff",
-    padding: 20,
-    borderRadius: 10,
-    alignItems: "center",
-    elevation: 5,
-    marginTop: 20,
+  paymentTitle: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#1A3C5A",
+    marginBottom: 4,
   },
-  progressText: {
+  paymentAmount: {
     fontSize: 18,
-    fontWeight: "bold",
-    marginBottom: 10,
+    fontWeight: "600",
+    color: "#0077B6",
+    marginBottom: 4,
+  },
+  paymentDueDate: {
+    fontSize: 14,
+    color: "#4A5568",
+    marginBottom: 4,
+  },
+  paymentSource: {
+    fontSize: 14,
+    color: "#4A5568",
+  },
+  paymentStatus: {
+    fontWeight: "600",
+    color: "#0077B6",
+  },
+  progressCard: {
+    backgroundColor: "#fff",
+    borderRadius: 12,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 6,
+    elevation: 5,
+    padding: 16,
+    marginBottom: 16,
+    alignItems: "center",
   },
   progressBar: {
     flexDirection: "row",
     alignItems: "center",
     width: "90%",
     position: "relative",
-    marginBottom: 10,
+    marginVertical: 12,
   },
   progressLine: {
     flex: 1,
-    height: 3,
-    backgroundColor: "#ddd",
+    height: 4,
+    backgroundColor: "#E2E8F0",
   },
   progressLineActive: {
-    backgroundColor: "#00A76F",
+    backgroundColor: "#10B981",
   },
   step: {
-    width: 14,
-    height: 14,
-    borderRadius: 7,
-    backgroundColor: "#ddd",
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    backgroundColor: "#E2E8F0",
     position: "absolute",
-  },
-  stepActive: {
-    backgroundColor: "#00A76F",
-  },
-  stepCompleted: {
-    backgroundColor: "#00A76F",
     justifyContent: "center",
     alignItems: "center",
   },
-  checkmark: {
-    color: "#fff",
-    fontSize: 10,
-    fontWeight: "bold",
+  stepActive: {
+    backgroundColor: "#10B981",
+  },
+  stepCompleted: {
+    backgroundColor: "#10B981",
   },
   progressSteps: {
     flexDirection: "row",
@@ -133,48 +164,26 @@ export const styles = StyleSheet.create({
     width: "90%",
   },
   stepText: {
-    fontSize: 10,
-    color: "#aaa",
+    fontSize: 12,
+    color: "#A0AEC0",
+    textAlign: "center",
   },
   stepTextActive: {
-    color: "#00A76F",
-    fontWeight: "bold",
+    color: "#1A3C5A",
+    fontWeight: "600",
   },
-  buttonContainer: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    justifyContent: "center",
-    marginTop: 20,
+  trackingCard: {
+    backgroundColor: "#fff",
+    borderRadius: 12,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 6,
+    elevation: 5,
+    padding: 16,
+    marginBottom: 16,
   },
-  reportButton: {
-    backgroundColor: "#FF4D4F",
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 5,
-    margin: 5,
-  },
-  reviewButton: {
-    backgroundColor: "#00A76F",
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 5,
-    margin: 5,
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  cancelButton: {
-    backgroundColor: "#FF9500",
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 5,
-    margin: 5,
-  },
-  buttonText: {
-    color: "#fff",
-    fontWeight: "bold",
-    fontSize: 14,
-  },
-  item: {
+  trackingItem: {
     flexDirection: "row",
     alignItems: "flex-start",
     marginBottom: 16,
@@ -182,50 +191,52 @@ export const styles = StyleSheet.create({
   iconContainer: {
     width: 30,
     alignItems: "center",
-    marginRight: 10,
+    marginRight: 12,
   },
   textContainer: {
     flex: 1,
   },
-  time: {
-    fontSize: 12,
-    color: "gray",
-  },
-  status: {
+  trackingTime: {
     fontSize: 14,
-    color: "gray",
+    color: "#4A5568",
+    marginBottom: 2,
+  },
+  trackingStatus: {
+    fontSize: 14,
+    color: "#4A5568",
   },
   activeText: {
-    color: "green",
-    fontWeight: "bold",
+    color: "#10B981",
+    fontWeight: "600",
   },
-  paymentDetails: {
-    marginTop: 20,
-    borderTopWidth: 1,
-    borderTopColor: "#eee",
-    paddingTop: 10,
+  buttonContainer: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "center",
+    marginTop: 16,
   },
-  paymentTitle: {
-    fontSize: 16,
-    fontWeight: "bold",
+  actionButton: {
+    backgroundColor: "#0077B6",
+    borderRadius: 8,
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    margin: 6,
+    alignItems: "center",
+    flexGrow: 1,
+    minWidth: 120,
   },
-  paymentAmount: {
-    fontSize: 18,
-    color: "#ff4d4f",
-    fontWeight: "bold",
-    marginVertical: 5,
+  cancelButton: {
+    backgroundColor: "#EF4444",
   },
-  paymentDueDate: {
+  buttonText: {
+    color: "#fff",
     fontSize: 14,
-    color: "#888",
+    fontWeight: "600",
   },
-  paymentSource: {
+  noDataText: {
     fontSize: 14,
-    color: "#888",
-    marginTop: 5,
-  },
-  paymentStatus: {
-    color: "#ff4d4f",
-    fontWeight: "bold",
+    color: "#4A5568",
+    textAlign: "center",
+    padding: 12,
   },
 });
