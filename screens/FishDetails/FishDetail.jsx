@@ -36,18 +36,19 @@ import { getProduct } from "../../redux/slices/productSlice";
 import enUS from "@ant-design/react-native/lib/locale-provider/en_US";
 import { styles } from "./styles";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import AntDesign from "react-native-vector-icons/AntDesign";
 
 const FishDetail = ({ route, navigation }) => {
   const { fish } = route.params;
   const dispatch = useDispatch();
   const fishById = useSelector(fishByIdSelector);
-  const koiProfile = useSelector(profileByFishSelector) || []; // Default to empty array
+  const koiProfile = useSelector(profileByFishSelector) || [];
   const products = useSelector(productSelector) || [];
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isHealthModalVisible, setHealthModalVisible] = useState(false);
   const [isNoteModalVisible, setNoteModalVisible] = useState(false);
   const [isGrowthModalVisible, setGrowthModalVisible] = useState(false);
-  const [selectedProfile, setSelectedProfile] = useState([]); // Changed to array
+  const [selectedProfile, setSelectedProfile] = useState([]);
   const [newNote, setNewNote] = useState("");
   const [notes, setNotes] = useState(fish.notes || []);
   const [newSize, setNewSize] = useState("");
@@ -73,9 +74,9 @@ const FishDetail = ({ route, navigation }) => {
     if (
       Array.isArray(koiProfile) &&
       koiProfile.length > 0 &&
-      selectedProfile.length === 0 // Check if array is empty
+      selectedProfile.length === 0
     ) {
-      setSelectedProfile([koiProfile[0].koiDiseaseProfileId]); // Set as array
+      setSelectedProfile([koiProfile[0].koiDiseaseProfileId]);
     }
   }, [koiProfile, selectedProfile]);
 
@@ -101,7 +102,7 @@ const FishDetail = ({ route, navigation }) => {
   };
 
   const renderHealthCard = (profile) => {
-    if (!profile) return <Text>Không có dữ liệu hồ sơ sức khỏe</Text>;
+    if (!profile) return <Text style={styles.noDataText}>Không có dữ liệu hồ sơ sức khỏe</Text>;
 
     const statusText = profile.status === 0 ? "Ốm" : "Khỏe mạnh";
     const treatmentText =
@@ -110,21 +111,31 @@ const FishDetail = ({ route, navigation }) => {
         : "Không cần điều trị";
 
     return (
-      <View style={styles.card}>
-        <View>
-          <Image source={{ uri: fish.image }} style={styles.cardImage} />
-        </View>
+      <Card style={styles.card}>
         <View style={styles.cardContent}>
           <Text style={styles.cardDate}>
-            {new Date(profile.endDate).toLocaleDateString()}
+            {new Date(profile.endDate).toLocaleDateString("vi-VN", {
+              day: "numeric",
+              month: "long",
+              year: "numeric",
+            })}
           </Text>
-          <Text style={{ marginBottom: 5 }}>
-            Tình trạng tổng quát: {statusText}
+          <Text style={styles.cardText}>
+            <Text style={styles.cardLabel}>Tình trạng: </Text>
+            {statusText}
           </Text>
-          <Text>Điều trị: {treatmentText}</Text>
-          {profile.note && <Text>Ghi chú: {profile.note}</Text>}
+          <Text style={styles.cardText}>
+            <Text style={styles.cardLabel}>Điều trị: </Text>
+            {treatmentText}
+          </Text>
+          {profile.note && (
+            <Text style={styles.cardText}>
+              <Text style={styles.cardLabel}>Ghi chú: </Text>
+              {profile.note}
+            </Text>
+          )}
         </View>
-      </View>
+      </Card>
     );
   };
 
@@ -140,13 +151,14 @@ const FishDetail = ({ route, navigation }) => {
           setNewNote("");
           setNoteModalVisible(false);
           dispatch(getFishByOwner(isLoggedIn?.id));
+          Toast.success("Ghi chú đã được thêm");
         } else {
-          Toast.fail("Failed to add note");
+          Toast.fail("Thêm ghi chú thất bại");
         }
       })
       .catch((error) => {
         console.error("Error adding note:", error);
-        Toast.fail("Failed to add note");
+        Toast.fail("Thêm ghi chú thất bại");
       });
   };
 
@@ -184,16 +196,18 @@ const FishDetail = ({ route, navigation }) => {
         .unwrap()
         .then((res) => {
           if (res.status === "200") {
-            Toast.success("Fish Updated Successfully");
-            navigation.goBack();
+            Toast.success("Cập nhật tăng trưởng thành công");
+            setNewSize("");
+            setNewWeight("");
+            setGrowthModalVisible(false);
             dispatch(getFishByOwner(isLoggedIn?.id));
           } else {
-            Toast.fail("Failed to update fish");
+            Toast.fail("Cập nhật tăng trưởng thất bại");
           }
         })
         .catch((error) => {
           console.error("Error updating fish:", error);
-          Toast.fail("Failed to update fish");
+          Toast.fail("Cập nhật tăng trưởng thất bại");
         });
     }
   };
@@ -201,20 +215,17 @@ const FishDetail = ({ route, navigation }) => {
   const renderNotes = () => {
     if (!notes || notes.length === 0) {
       return (
-        <Text style={styles.noteText}>
-          Bạn chưa thêm bất kỳ ghi chú nào. Vui lòng thêm ghi chú mới bằng cách
-          chạm vào biểu tượng dấu cộng ở góc trên bên phải của phần này.
+        <Text style={styles.noDataText}>
+          Chưa có ghi chú nào. Nhấn vào biểu tượng "+" để thêm ghi chú mới.
         </Text>
       );
     }
     return notes.map((note, index) => (
       <Text key={index} style={styles.noteText}>
-        - {note}
+        • {note}
       </Text>
     ));
   };
-
-  console.log(koiProfile);
 
   return (
     <Provider locale={enUS}>
@@ -226,44 +237,50 @@ const FishDetail = ({ route, navigation }) => {
         <View style={styles.overlay} />
         <ScrollView
           style={styles.container}
-          contentContainerStyle={{ paddingBottom: 20 }}
+          contentContainerStyle={styles.contentContainer}
         >
-          <Text style={styles.title}>Chi Tiết Cá</Text>
+          <View style={styles.header}>
+            <TouchableOpacity onPress={() => navigation.goBack()}>
+              <AntDesign name="left" size={24} color="#fff" />
+            </TouchableOpacity>
+            <Text style={styles.title}>Chi Tiết Cá</Text>
+            <TouchableOpacity
+              onPress={() => navigation.navigate("EditFish", { fish })}
+            >
+              <FontAwesome name="edit" size={24} color="#fff" />
+            </TouchableOpacity>
+          </View>
+
           <View style={styles.headerContainer}>
-            <View style={styles.imageContainer}>
-              <Image source={{ uri: fish.image }} style={styles.fishImage} />
-            </View>
+            <Image
+              source={
+                fish.image
+                  ? { uri: fish.image }
+                  : require("../../assets/defaultkoi.jpg")
+              }
+              style={styles.fishImage}
+            />
             <View style={styles.detailsContainer}>
-              <View style={styles.headerTop}>
-                <Text style={[styles.name, { fontWeight: "bold" }]}>
-                  {fish.name}
-                </Text>
-                <TouchableOpacity style={styles.editIcon}>
-                  <FontAwesome
-                    onPress={() => navigation.navigate("EditFish", { fish })}
-                    name="edit"
-                    size={30}
-                    color="#6497B1"
-                  />
-                </TouchableOpacity>
-              </View>
+              <Text style={styles.name}>{fish.name}</Text>
               <Text style={styles.variety}>{fish.variety.varietyName}</Text>
-              <Text style={styles.price}>{(fish?.price)?.toLocaleString("vi-VN")} VND</Text>
+              <Text style={styles.price}>
+                {fish?.price?.toLocaleString("vi-VN")} VND
+              </Text>
               <View style={styles.infoRow}>
                 <View style={styles.infoBlock}>
                   <Text style={styles.infoLabel}>Tuổi</Text>
-                  <Text style={styles.infoValue}>{fish.age}</Text>
+                  <Text style={styles.infoValue}>{fish.age} năm</Text>
                 </View>
                 <View style={styles.infoBlock}>
-                  <Text style={styles.infoLabel}>C.dài</Text>
+                  <Text style={styles.infoLabel}>Chiều dài</Text>
                   <Text style={styles.infoValue}>
-                    {latestReport ? latestReport.size : "N/A"}cm
+                    {latestReport ? latestReport.size : "N/A"} cm
                   </Text>
                 </View>
                 <View style={styles.infoBlock}>
-                  <Text style={styles.infoLabel}>C.nặng</Text>
+                  <Text style={styles.infoLabel}>Cân nặng</Text>
                   <Text style={styles.infoValue}>
-                    {latestReport ? latestReport.weight : "N/A"}kg
+                    {latestReport ? latestReport.weight : "N/A"} kg
                   </Text>
                 </View>
               </View>
@@ -271,97 +288,96 @@ const FishDetail = ({ route, navigation }) => {
           </View>
 
           <View style={styles.section}>
-            <Text style={styles.label}>Tình trạng: Khỏe mạnh</Text>
-          </View>
-
-          <View style={styles.section}>
-            <Text>
-              <Text style={{ fontWeight: "bold" }}>{fish.name}</Text> đã bơi
-              trong ao{" "}
-              <Text style={{ fontWeight: "bold" }}>"{fish.pond.name}"</Text> từ{" "}
-              <Text style={{ fontWeight: "bold" }}>10.10.2018</Text>
-            </Text>
-            <Text>
-              <Text style={{ fontWeight: "bold" }}>{fish.name}</Text> được mua
-              với giá{" "}
-              <Text style={{ fontWeight: "bold" }}>{fish.price} VND</Text> và
-              được lai tạo bởi{" "}
-              <Text style={{ fontWeight: "bold" }}>
-                {fish.variety.varietyName}
+            <Text style={styles.sectionTitle}>Thông Tin Tổng Quan</Text>
+            <Card style={styles.card}>
+              <Text style={styles.sectionText}>
+                <Text style={styles.sectionLabel}>Tình trạng: </Text>
+                Khỏe mạnh
               </Text>
-              .
-            </Text>
+              <Text style={styles.sectionText}>
+                <Text style={styles.sectionLabel}>Trong ao: </Text>
+                {fish.pond.name} từ{" "}
+                {new Date(fish.inPondSince).toLocaleDateString("vi-VN", {
+                  day: "numeric",
+                  month: "long",
+                  year: "numeric",
+                })}
+              </Text>
+              <Text style={styles.sectionText}>
+                <Text style={styles.sectionLabel}>Lai tạo bởi: </Text>
+                {fish.breeder}
+              </Text>
+            </Card>
           </View>
 
           <View style={styles.section}>
             <View style={styles.sectionHeader}>
-              <Text style={styles.label}>Tình Trạng Sức Khỏe</Text>
-              <View style={{ flexDirection: "row", alignItems: "center" }}>
+              <Text style={styles.sectionTitle}>Tình Trạng Sức Khỏe</Text>
+              <View style={styles.sectionActions}>
                 <TouchableOpacity
                   onPress={() => navigation.navigate("SymptomScreen")}
+                  style={styles.actionButton}
                 >
-                  <FontAwesome
-                    name="plus"
-                    size={18}
-                    color="#6497B1"
-                    style={{ marginRight: 10 }}
-                  />
+                  <FontAwesome name="plus" size={18} color="#0077B6" />
                 </TouchableOpacity>
-                {Array.isArray(koiProfile) && koiProfile.length > 0 ? (
+                {Array.isArray(koiProfile) && koiProfile.length > 0 && (
                   <Picker
                     data={koiProfile.map((profile) => ({
                       value: profile.koiDiseaseProfileId,
-                      label: new Date(profile.endDate).toLocaleDateString(),
+                      label: new Date(profile.endDate).toLocaleDateString(
+                        "vi-VN",
+                        { day: "numeric", month: "long", year: "numeric" }
+                      ),
                     }))}
                     cols={1}
-                    value={selectedProfile} // Now an array
-                    onChange={(value) => setSelectedProfile(value)} // Value is an array
-                    style={{ width: 120 }}
+                    value={selectedProfile}
+                    onChange={(value) => setSelectedProfile(value)}
+                    style={styles.picker}
                   >
-                    <TouchableOpacity>
-                      <FontAwesome
-                        name="caret-down"
-                        size={18}
-                        color="#6497B1"
-                      />
+                    <TouchableOpacity style={styles.actionButton}>
+                      <FontAwesome name="caret-down" size={18} color="#0077B6" />
                     </TouchableOpacity>
                   </Picker>
-                ) : (
-                  <></>
                 )}
               </View>
             </View>
             {Array.isArray(koiProfile) && koiProfile.length > 0 ? (
               renderHealthCard(
                 koiProfile.find(
-                  (p) => p.koiDiseaseProfileId === selectedProfile[0] // Access first element of array
+                  (p) => p.koiDiseaseProfileId === selectedProfile[0]
                 ) || koiProfile[0]
               )
             ) : (
-              <Text>Chưa có hồ sơ sức khỏe nào</Text>
+              <Text style={styles.noDataText}>Chưa có hồ sơ sức khỏe nào</Text>
             )}
           </View>
 
           <View style={styles.section}>
             <View style={styles.sectionHeader}>
-              <Text style={styles.label}>Lịch Sử Tăng Trưởng</Text>
-              <TouchableOpacity onPress={() => setGrowthModalVisible(true)}>
-                <FontAwesome name="plus" size={18} color="#6497B1" />
+              <Text style={styles.sectionTitle}>Lịch Sử Tăng Trưởng</Text>
+              <TouchableOpacity
+                onPress={() => setGrowthModalVisible(true)}
+                style={styles.actionButton}
+              >
+                <FontAwesome name="plus" size={18} color="#0077B6" />
               </TouchableOpacity>
             </View>
-            <View style={styles.card}>
+            <Card style={styles.card}>
               <GrowthChart fishReportInfos={fish?.fishReportInfos} />
-            </View>
+            </Card>
           </View>
 
           <View style={styles.section}>
             <View style={styles.sectionHeader}>
-              <Text style={styles.label}>Ghi Chú</Text>
-              <TouchableOpacity onPress={() => setNoteModalVisible(true)}>
-                <FontAwesome name="plus" size={18} color="#6497B1" />
+              <Text style={styles.sectionTitle}>Ghi Chú</Text>
+              <TouchableOpacity
+                onPress={() => setNoteModalVisible(true)}
+                style={styles.actionButton}
+              >
+                <FontAwesome name="plus" size={18} color="#0077B6" />
               </TouchableOpacity>
             </View>
-            {renderNotes()}
+            <Card style={styles.card}>{renderNotes()}</Card>
           </View>
         </ScrollView>
 
@@ -375,28 +391,34 @@ const FishDetail = ({ route, navigation }) => {
           <View style={styles.modalOverlay}>
             <View style={styles.modalContainer}>
               <View style={styles.modalHeader}>
+                <TouchableOpacity
+                  onPress={() => setNoteModalVisible(false)}
+                  style={styles.modalCancelButton}
+                >
+                  <AntDesign name="close" size={24} color="#EF4444" />
+                </TouchableOpacity>
                 <Text style={styles.modalTitle}>Thêm Ghi Chú</Text>
+                <View style={{ width: 24 }} />
               </View>
               <Input
-                style={[
-                  styles.input,
-                  { height: 100, textAlignVertical: "top" },
-                ]}
+                style={styles.input}
                 placeholder="Nhập ghi chú"
+                placeholderTextColor="#A0AEC0"
                 value={newNote}
                 onChangeText={setNewNote}
                 multiline={true}
                 numberOfLines={4}
+                textAlignVertical="top"
               />
               <View style={styles.modalFooter}>
                 <Button
-                  style={{ marginRight: 10 }}
+                  style={styles.modalCancelButton}
                   onPress={() => setNoteModalVisible(false)}
                 >
                   Hủy
                 </Button>
                 <Button
-                  type="primary"
+                  style={styles.modalSaveButton}
                   onPress={handleAddNote}
                   disabled={!newNote.trim()}
                 >
@@ -417,34 +439,40 @@ const FishDetail = ({ route, navigation }) => {
           <View style={styles.modalOverlay}>
             <View style={styles.modalContainer}>
               <View style={styles.modalHeader}>
+                <TouchableOpacity
+                  onPress={() => setGrowthModalVisible(false)}
+                  style={styles.modalCancelButton}
+                >
+                  <AntDesign name="close" size={24} color="#EF4444" />
+                </TouchableOpacity>
                 <Text style={styles.modalTitle}>Thêm Bản Ghi Tăng Trưởng</Text>
+                <View style={{ width: 24 }} />
               </View>
               <Input
-                style={[
-                  styles.input,
-                  { height: 55, textAlignVertical: "top", marginBottom: 10 },
-                ]}
+                style={styles.input}
                 placeholder="Kích thước (cm)"
+                placeholderTextColor="#A0AEC0"
                 value={newSize}
                 onChangeText={setNewSize}
                 keyboardType="numeric"
               />
               <Input
-                style={[styles.input, { height: 55, textAlignVertical: "top" }]}
+                style={styles.input}
                 placeholder="Cân nặng (kg)"
+                placeholderTextColor="#A0AEC0"
                 value={newWeight}
                 onChangeText={setNewWeight}
                 keyboardType="numeric"
               />
               <View style={styles.modalFooter}>
                 <Button
-                  style={{ marginRight: 10 }}
+                  style={styles.modalCancelButton}
                   onPress={() => setGrowthModalVisible(false)}
                 >
                   Hủy
                 </Button>
                 <Button
-                  type="primary"
+                  style={styles.modalSaveButton}
                   onPress={handleAddGrowth}
                   disabled={!newSize.trim() || !newWeight.trim()}
                 >
@@ -459,4 +487,4 @@ const FishDetail = ({ route, navigation }) => {
   );
 };
 
-export default FishDetail;  
+export default FishDetail;

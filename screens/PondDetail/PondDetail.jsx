@@ -16,6 +16,7 @@ import {
   TouchableOpacity,
 } from "react-native";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
+import AntDesign from "react-native-vector-icons/AntDesign";
 import WaterParametersChart from "./components/WaterParameterChart";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -29,6 +30,7 @@ import { styles } from "./styles";
 import * as ImagePicker from "expo-image-picker";
 import { getImage } from "../../redux/slices/authSlice";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Toast } from "@ant-design/react-native";
 
 const PondDetail = ({ navigation, route }) => {
   const dispatch = useDispatch();
@@ -43,7 +45,6 @@ const PondDetail = ({ navigation, route }) => {
   const [form] = Form.useForm();
   const [isImageUploading, setIsImageUploading] = useState(false);
   const [isImageChanged, setIsImageChanged] = useState(false);
-
 
   const transformPondParameters = (pondParameters) => {
     if (!pondParameters || !Array.isArray(pondParameters)) return [];
@@ -92,6 +93,18 @@ const PondDetail = ({ navigation, route }) => {
     dispatch(getProduct());
   }, [dispatch, pond?.pondID]);
 
+  useEffect(() => {
+    const getData = async () => {
+      try {
+        const value = await AsyncStorage.getItem("user");
+        setIsLoggedIn(value ? JSON.parse(value) : null);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    getData();
+  }, []);
+
   const chunkArray = (array, chunkSize) => {
     const result = [];
     for (let i = 0; i < array.length; i += chunkSize) {
@@ -105,9 +118,7 @@ const PondDetail = ({ navigation, route }) => {
   const handleImagePick = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (status !== "granted") {
-      alert(
-        "Xin lỗi, chúng tôi cần quyền truy cập thư viện ảnh để thực hiện điều này!"
-      );
+      Toast.fail("Cần quyền truy cập thư viện ảnh!");
       return;
     }
 
@@ -130,8 +141,8 @@ const PondDetail = ({ navigation, route }) => {
       });
 
       setImageBlob(uri);
-      setIsImageChanged(true); // User has decided to change the image
-      setIsImageUploading(true); // Start loading
+      setIsImageChanged(true);
+      setIsImageUploading(true);
       try {
         const response = await dispatch(getImage(formData)).unwrap();
         if (response) {
@@ -139,8 +150,9 @@ const PondDetail = ({ navigation, route }) => {
         }
       } catch (error) {
         console.error("Failed to upload image:", error);
+        Toast.fail("Tải ảnh thất bại");
       } finally {
-        setIsImageUploading(false); // End loading
+        setIsImageUploading(false);
       }
     }
   };
@@ -148,7 +160,7 @@ const PondDetail = ({ navigation, route }) => {
   const onFinish = (values) => {
     const pondID = pondById?.pondID;
     const name = values.name;
-    const image = uploadResponse || pond.image; // Use existing image if no new upload
+    const image = uploadResponse || pond.image;
     const createDate = pondById?.createDate + "Z";
     const ownerId = pondById?.ownerId;
     const maxVolume = Number(values.maxVolume);
@@ -168,25 +180,15 @@ const PondDetail = ({ navigation, route }) => {
       .then((res) => {
         dispatch(getPondByOwner(isLoggedIn.id));
         setModalVisible(false);
-        navigation.goBack();
+        setImageBlob(updatedPond.image);
+        setIsImageChanged(false);
+        Toast.success("Cập nhật ao thành công");
       })
       .catch((error) => {
         console.error("Failed to update pond:", error);
+        Toast.fail("Cập nhật ao thất bại");
       });
   };
-
-  useEffect(() => {
-    const getData = async () => {
-      try {
-        const value = await AsyncStorage.getItem("user");
-        setIsLoggedIn(value ? JSON.parse(value) : null);
-      } catch (error) {
-        console.error(error);
-      }
-    };
-
-    getData();
-  }, []);
 
   return (
     <Provider>
@@ -197,57 +199,67 @@ const PondDetail = ({ navigation, route }) => {
       >
         <View style={styles.overlay} />
         <ScrollView contentContainerStyle={styles.container}>
-          <Text style={styles.title}>Chi Tiết Ao</Text>
+          <View style={styles.header}>
+            <TouchableOpacity onPress={() => navigation.goBack()}>
+              <AntDesign name="left" size={24} color="#fff" />
+            </TouchableOpacity>
+            <Text style={styles.title}>Chi Tiết Ao</Text>
+            <View style={{ width: 24 }} />
+          </View>
+
           <View style={styles.cardContainer}>
             <Card style={styles.card}>
-              <View style={styles.cardContent}>
-                <Image source={{ uri: pond.image }} style={styles.pondImage} />
-                <View
-                  style={[
-                    styles.statusCircle,
-                    {
-                      backgroundColor:
-                        pond.status === "Danger"
-                          ? "#ff0000"
-                          : pond.status === "Warning"
-                          ? "#ffff00"
-                          : "transparent",
-                    },
-                  ]}
-                />
-                <View style={styles.pondInfo}>
-                  <View style={styles.infoRow}>
-                    <Text style={styles.pondText}>
-                      <Text style={styles.label}>Tên: </Text>
-                      {pond.name}
-                    </Text>
+              <Image
+                source={
+                  pond.image
+                    ? { uri: pond.image }
+                    : require("../../assets/defaultpond.jpg")
+                }
+                style={styles.pondImage}
+              />
+              <View
+                style={[
+                  styles.statusCircle,
+                  {
+                    backgroundColor:
+                      pond.status === "Danger"
+                        ? "#EF4444"
+                        : pond.status === "Warning"
+                        ? "#FBBF24"
+                        : "#10B981",
+                  },
+                ]}
+              />
+              <View style={styles.pondInfo}>
+                <Text style={styles.pondName}>{pond.name}</Text>
+                <View style={styles.infoRow}>
+                  <View style={styles.infoBlock}>
+                    <Text style={styles.infoLabel}>Số Cá</Text>
+                    <Text style={styles.infoValue}>{pond?.fishAmount}</Text>
                   </View>
-                  <Text style={styles.pondText}>
-                    <Text style={styles.label}>Số Cá: {pond?.fishAmount}</Text>
-                  </Text>
-                  <Text style={styles.pondText}>
-                    <Text style={styles.label}>Dung Tích: </Text>
-                    {pond.maxVolume}L
-                  </Text>
+                  <View style={styles.infoBlock}>
+                    <Text style={styles.infoLabel}>Dung Tích</Text>
+                    <Text style={styles.infoValue}>{pond.maxVolume} L</Text>
+                  </View>
+                </View>
+                <View style={styles.buttonRow}>
                   <TouchableOpacity
-                    style={[styles.editButton, styles.addFishButton]}
+                    style={styles.actionButton}
                     onPress={() =>
                       navigation.navigate("AddFish", {
                         pondID: pond.pondID,
                       })
                     }
                   >
-                    <FontAwesome name="plus" size={24} color="white" />
+                    <FontAwesome name="plus" size={18} color="#fff" />
+                    <Text style={styles.actionButtonText}>Thêm Cá</Text>
                   </TouchableOpacity>
                   <TouchableOpacity
-                    style={styles.editButton}
+                    style={styles.actionButton}
                     onPress={() => setModalVisible(true)}
                   >
-                    <FontAwesome
-                      name="pencil-square-o"
-                      size={24}
-                      color="white"
-                    />
+                    <FontAwesome name="pencil" size={18} color="#fff" />
+                    <Text style={styles.actionButtonText}>Chỉnh Sửa</Text>
                   </TouchableOpacity>
                 </View>
               </View>
@@ -264,11 +276,7 @@ const PondDetail = ({ navigation, route }) => {
                     onPress={() => toggleParameter(param)}
                     style={[
                       styles.parameterCard,
-                      {
-                        backgroundColor: selectedParameters.includes(param)
-                          ? "#FFD29D"
-                          : styles.parameterCard.backgroundColor,
-                      },
+                      selectedParameters.includes(param) && styles.parameterCardActive,
                     ]}
                   >
                     <Text style={styles.parameterLabel}>{param}</Text>
@@ -279,14 +287,12 @@ const PondDetail = ({ navigation, route }) => {
           </View>
 
           <View style={styles.statisticsContainer}>
-            <View style={styles.statisticCard}>
+            <Card style={styles.statisticCard}>
               <View style={styles.statisticsRow}>
                 <Text style={styles.sectionTitle}>Thống Kê Ao</Text>
-                <View style={styles.statisticsRow}>
+                <View style={styles.dropdownContainer}>
                   <Text style={styles.statisticsLabel}>Tháng Này</Text>
-                  <TouchableOpacity>
-                    <Text style={styles.statisticsDropdown}>▼</Text>
-                  </TouchableOpacity>
+                  <FontAwesome name="caret-down" size={16} color="#4A5568" />
                 </View>
               </View>
               <WaterParametersChart
@@ -294,20 +300,24 @@ const PondDetail = ({ navigation, route }) => {
                 waterParameterData={waterParameterData}
                 pondParameters={pondById?.pondParameters || []}
               />
-            </View>
+            </Card>
           </View>
+
           <View style={styles.suggestedContainer}>
             <Text style={styles.sectionTitle}>Sản Phẩm Đề Xuất</Text>
-            <ScrollView
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={styles.productList}
-            >
-              {pondById?.recomment?.length > 0 &&
-                recommendedProducts?.map((item) => (
+            {recommendedProducts.length > 0 ? (
+              <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={styles.productList}
+              >
+                {recommendedProducts.map((item) => (
                   <TouchableOpacity
                     key={item.productId}
                     style={styles.productCard}
+                    onPress={() =>
+                      navigation.navigate("ProductDetail", { product: item })
+                    }
                   >
                     <Image
                       source={{
@@ -315,23 +325,21 @@ const PondDetail = ({ navigation, route }) => {
                       }}
                       style={styles.productImage}
                     />
-                    <Text style={styles.productName}>{item.productName}</Text>
-                    <Text style={styles.productPrice}>
-                      {item.price || "N/A"} VND
+                    <Text style={styles.productName} numberOfLines={2}>
+                      {item.productName}
                     </Text>
-                    <TouchableOpacity
-                      style={styles.addToCartButton}
-                      onPress={() => {
-                        navigation.navigate("ProductDetail", {
-                          product: item,
-                        });
-                      }}
-                    >
-                      <Text style={styles.addToCartText}>Thêm Vào Giỏ</Text>
+                    <Text style={styles.productPrice}>
+                      {item.price ? `${item.price.toLocaleString("vi-VN")} VND` : "N/A"}
+                    </Text>
+                    <TouchableOpacity style={styles.addToCartButton}>
+                      <Text style={styles.addToCartText}>Thêm Vào Giỏ</Text>
                     </TouchableOpacity>
                   </TouchableOpacity>
                 ))}
-            </ScrollView>
+              </ScrollView>
+            ) : (
+              <Text style={styles.noDataText}>Chưa có sản phẩm đề xuất</Text>
+            )}
           </View>
 
           <Modal
@@ -351,7 +359,7 @@ const PondDetail = ({ navigation, route }) => {
                   <View style={styles.imageContainer}>
                     <TouchableOpacity onPress={handleImagePick}>
                       <Image
-                        source={{ uri: uploadResponse || pond.image }}
+                        source={{ uri: uploadResponse || imageBlob }}
                         style={styles.selectedImage}
                       />
                     </TouchableOpacity>
@@ -371,9 +379,7 @@ const PondDetail = ({ navigation, route }) => {
                   <Form.Item
                     name="name"
                     initialValue={pond?.name}
-                    rules={[
-                      { required: true, message: "Vui lòng nhập tên ao" },
-                    ]}
+                    rules={[{ required: true, message: "Vui lòng nhập tên ao" }]}
                   >
                     <Input placeholder="Tên Ao" style={styles.input} />
                   </Form.Item>
@@ -382,12 +388,13 @@ const PondDetail = ({ navigation, route }) => {
                     name="maxVolume"
                     initialValue={pond?.maxVolume.toString()}
                     rules={[
-                      { required: true, message: "Vui lòng nhập lượng nước" },
+                      { required: true, message: "Vui lòng nhập dung tích" },
+                      { pattern: /^[0-9]+$/, message: "Chỉ được nhập số!" },
                     ]}
                   >
                     <Input
                       keyboardType="numeric"
-                      placeholder="Lượng Nước Tối Đa"
+                      placeholder="Dung Tích (L)"
                       style={styles.input}
                     />
                   </Form.Item>
@@ -405,8 +412,8 @@ const PondDetail = ({ navigation, route }) => {
                       onPress={() => form.submit()}
                       disabled={
                         isImageChanged && (!uploadResponse || isImageUploading)
-                      } // Disable only if image changed and upload incomplete
-                      loading={isImageUploading} // Show loading state during upload
+                      }
+                      loading={isImageUploading}
                     >
                       Lưu
                     </Button>
