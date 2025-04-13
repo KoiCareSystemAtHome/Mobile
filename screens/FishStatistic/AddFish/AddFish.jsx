@@ -26,21 +26,24 @@ import { getImage } from "../../../redux/slices/authSlice";
 import { createFish, getFishByOwner } from "../../../redux/slices/fishSlice";
 import { styles } from "./styles";
 import { getPondByOwner } from "../../../redux/slices/pondSlice";
+import FontAwesome from "react-native-vector-icons/FontAwesome";
+import AntDesign from "react-native-vector-icons/AntDesign";
 
 const AddFish = ({ navigation, route }) => {
   const [form] = Form.useForm();
   const dispatch = useDispatch();
-  const { pondID } = route.params || {}; // Default to empty object if route.params is undefined
+  const { pondID } = route.params || {};
 
   const pondData = useSelector(pondByOwnerSelector);
   const [open, setOpen] = useState(false);
-  const [selectedPond, setSelectedPond] = useState(pondID || null); // Set initial value to pondID if it exists
+  const [selectedPond, setSelectedPond] = useState(pondID || null);
   const [pondItems, setPondItems] = useState([]);
   const [imageBlob, setImageBlob] = useState(null);
   const [uploadResponse, setUploadResponse] = useState(null);
   const [inPondSince, setInPondSince] = useState(new Date());
   const [isDatePickerVisible, setDatePickerVisible] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isImageUploading, setIsImageUploading] = useState(false);
 
   useEffect(() => {
     const getData = async () => {
@@ -55,15 +58,19 @@ const AddFish = ({ navigation, route }) => {
   }, []);
 
   useEffect(() => {
+    if (isLoggedIn?.id) {
+      dispatch(getPondByOwner(isLoggedIn.id));
+    }
+  }, [isLoggedIn?.id, dispatch]);
+
+  useEffect(() => {
     if (pondData) {
       const items = pondData.map((pond) => ({
         label: pond.name,
         value: pond.pondID,
       }));
       setPondItems(items);
-      
-      // If pondID exists and matches an item, set it as selected
-      if (pondID && items.some(item => item.value === pondID)) {
+      if (pondID && items.some((item) => item.value === pondID)) {
         setSelectedPond(pondID);
       }
     }
@@ -72,12 +79,12 @@ const AddFish = ({ navigation, route }) => {
   const handleImagePick = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (status !== "granted") {
-      alert("Sorry, we need camera roll permissions to make this work!");
+      Toast.fail("Cần quyền truy cập thư viện ảnh!");
       return;
     }
 
     let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.Images,
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
       quality: 1,
     });
@@ -95,6 +102,7 @@ const AddFish = ({ navigation, route }) => {
       });
 
       setImageBlob(uri);
+      setIsImageUploading(true);
       try {
         const response = await dispatch(getImage(formData)).unwrap();
         if (response) {
@@ -102,12 +110,15 @@ const AddFish = ({ navigation, route }) => {
         }
       } catch (error) {
         console.error("Failed to upload image:", error);
+        Toast.fail("Tải ảnh thất bại");
+      } finally {
+        setIsImageUploading(false);
       }
     }
   };
 
   const onFinish = (values) => {
-    const pondIDToUse = selectedPond; // Use selectedPond instead of route param directly
+    const pondIDToUse = selectedPond;
     let image = "string";
     values.age = Number(values?.age);
     values.weight = Number(values?.weight);
@@ -125,22 +136,25 @@ const AddFish = ({ navigation, route }) => {
       },
     ];
     values = { ...values, pondID: pondIDToUse, requirementFishParam, image };
-    console.log(values)
 
     dispatch(createFish(values))
       .unwrap()
       .then((response) => {
         if (response?.status === "201") {
-          Toast.success("Fish Added Successfully");
-          dispatch(getFishByOwner(isLoggedIn?.id))
-          dispatch(getPondByOwner(isLoggedIn?.id))
+          Toast.success("Cá Đã Được Thêm Thành Công");
+          dispatch(getFishByOwner(isLoggedIn?.id));
+          dispatch(getPondByOwner(isLoggedIn?.id));
+          form.resetFields();
+          setImageBlob(null);
+          setUploadResponse(null);
+          navigation.goBack();
         } else {
-          Toast.fail("Failed to add fish");
+          Toast.fail("Thêm Cá Thất Bại");
         }
       })
-      .then(() => {
-        form.resetFields();
-        navigation.goBack();
+      .catch((error) => {
+        console.error("Create fish error:", error);
+        Toast.fail("Thêm Cá Thất Bại");
       });
   };
 
@@ -158,21 +172,26 @@ const AddFish = ({ navigation, route }) => {
       >
         <View style={styles.overlay} />
         <ScrollView contentContainerStyle={styles.formContainer}>
-          <Form
-            form={form}
-            onFinish={onFinish}
-            style={{ backgroundColor: "transparent", borderWidth: 0 }}
-          >
-            <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>Thêm Cá Koi Mới</Text>
-            </View>
+          <View style={styles.header}>
+            <TouchableOpacity onPress={() => navigation.goBack()}>
+              <AntDesign name="left" size={24} color="#fff" />
+            </TouchableOpacity>
+            <Text style={styles.modalTitle}>Thêm Cá Koi Mới</Text>
+            <View style={{ width: 24 }} />
+          </View>
+
+          <Form form={form} onFinish={onFinish} style={styles.form}>
             {imageBlob ? (
               <View style={styles.imageContainer}>
-                <TouchableOpacity onPress={handleImagePick}>
-                  <Image
-                    source={{ uri: uploadResponse }}
-                    style={styles.selectedImage}
-                  />
+                <Image
+                  source={{ uri: uploadResponse || imageBlob }}
+                  style={styles.selectedImage}
+                />
+                <TouchableOpacity
+                  style={styles.changeImageButton}
+                  onPress={handleImagePick}
+                >
+                  <Text style={styles.changeImageText}>Thay Đổi Ảnh</Text>
                 </TouchableOpacity>
               </View>
             ) : (
@@ -180,162 +199,209 @@ const AddFish = ({ navigation, route }) => {
                 style={styles.imageButton}
                 onPress={handleImagePick}
               >
-                <Text style={styles.imageButtonText}>Chạm để Chọn Hình Ảnh</Text>
+                <FontAwesome name="image" size={24} color="#0077B6" />
+                <Text style={styles.imageButtonText}>Chọn Hình Ảnh</Text>
               </TouchableOpacity>
             )}
-  
+
             <View style={styles.modalFields}>
               <View style={styles.row}>
                 <View style={styles.inputRow}>
-                  <Text style={styles.inputLabel}>Tên:</Text>
-                  <Form.Item 
-                    name="name" 
-                    style={styles.input}
-                    rules={[{ required: true, message: 'Vui lòng nhập tên!' }]}
+                  <Text style={styles.inputLabel}>Tên</Text>
+                  <Form.Item
+                    noStyle
+                    name="name"
+                    rules={[{ required: true, message: "Vui lòng nhập tên!" }]}
                   >
-                    <Input placeholder="Tên" />
+                    <Input
+                      style={styles.input}
+                      placeholder="Tên"
+                      placeholderTextColor="#A0AEC0"
+                    />
                   </Form.Item>
                 </View>
                 <View style={styles.inputRow}>
-                  <Text style={styles.inputLabel}>Tuổi:</Text>
-                  <Form.Item 
-                    name="age" 
-                    style={styles.input}
+                  <Text style={styles.inputLabel}>Tuổi</Text>
+                  <Form.Item
+                    noStyle
+                    name="age"
                     rules={[
-                      { required: true, message: 'Vui lòng nhập tuổi!' },
-                      { pattern: /^[0-9]+$/, message: 'Chỉ được nhập số!' }
+                      { required: true, message: "Vui lòng nhập tuổi!" },
+                      { pattern: /^[0-9]+$/, message: "Chỉ được nhập số!" },
                     ]}
                   >
-                    <Input placeholder="Tuổi" keyboardType="numeric" />
+                    <Input
+                      style={styles.input}
+                      placeholder="Tuổi"
+                      keyboardType="numeric"
+                      placeholderTextColor="#A0AEC0"
+                    />
                   </Form.Item>
                 </View>
               </View>
               <View style={styles.row}>
                 <View style={styles.inputRow}>
-                  <Text style={styles.inputLabel}>Chiều dài:</Text>
-                  <Form.Item 
-                    name="size" 
-                    style={styles.input} 
+                  <Text style={styles.inputLabel}>Chiều dài</Text>
+                  <Form.Item
+                    noStyle
+                    name="size"
                     extra="cm"
                     rules={[
-                      { required: true, message: 'Vui lòng nhập chiều dài!' },
-                      { pattern: /^[0-9]+$/, message: 'Chỉ được nhập số!' }
+                      { required: true, message: "Vui lòng nhập chiều dài!" },
+                      { pattern: /^[0-9]+$/, message: "Chỉ được nhập số!" },
                     ]}
                   >
-                    <Input placeholder="Chiều dài" keyboardType="numeric" />
+                    <Input
+                      style={styles.input}
+                      placeholder="Chiều dài"
+                      keyboardType="numeric"
+                      placeholderTextColor="#A0AEC0"
+                    />
                   </Form.Item>
                 </View>
                 <View style={styles.inputRow}>
-                  <Text style={styles.inputLabel}>Cân nặng:</Text>
-                  <Form.Item 
-                    name="weight" 
-                    style={styles.input} 
+                  <Text style={styles.inputLabel}>Cân nặng</Text>
+                  <Form.Item
+                    noStyle
+                    name="weight"
                     extra="kg"
                     rules={[
-                      { required: true, message: 'Vui lòng nhập cân nặng!' },
-                      { pattern: /^[0-9]+$/, message: 'Chỉ được nhập số!' }
+                      { required: true, message: "Vui lòng nhập cân nặng!" },
+                      { pattern: /^[0-9]+$/, message: "Chỉ được nhập số!" },
                     ]}
                   >
-                    <Input placeholder="Cân nặng" keyboardType="numeric" />
+                    <Input
+                      style={styles.input}
+                      placeholder="Cân nặng"
+                      keyboardType="numeric"
+                      placeholderTextColor="#A0AEC0"
+                    />
                   </Form.Item>
                 </View>
               </View>
               <View style={styles.row}>
                 <View style={styles.inputRow}>
-                  <Text style={styles.inputLabel}>Giới tính:</Text>
-                  <Form.Item 
-                    name="sex" 
-                    style={styles.input}
-                    rules={[{ required: true, message: 'Vui lòng nhập giới tính!' }]}
+                  <Text style={styles.inputLabel}>Giới tính</Text>
+                  <Form.Item
+                    noStyle
+                    name="sex"
+                    rules={[
+                      { required: true, message: "Vui lòng nhập giới tính!" },
+                    ]}
                   >
-                    <Input placeholder="Giới tính" />
+                    <Input
+                      style={styles.input}
+                      placeholder="Giới tính"
+                      placeholderTextColor="#A0AEC0"
+                    />
                   </Form.Item>
                 </View>
                 <View style={styles.inputRow}>
-                  <Text style={styles.inputLabel}>Giống:</Text>
-                  <Form.Item 
-                    name="varietyName" 
-                    style={styles.input}
-                    rules={[{ required: true, message: 'Vui lòng nhập giống!' }]}
+                  <Text style={styles.inputLabel}>Giống</Text>
+                  <Form.Item
+                    noStyle
+                    name="varietyName"
+                    rules={[
+                      { required: true, message: "Vui lòng nhập giống!" },
+                    ]}
                   >
-                    <Input placeholder="Giống" />
+                    <Input
+                      style={styles.input}
+                      placeholder="Giống"
+                      placeholderTextColor="#A0AEC0"
+                    />
                   </Form.Item>
                 </View>
               </View>
               <View style={styles.row}>
                 <View style={styles.inputRow}>
-                  <Text style={styles.inputLabel}>Tình trạng:</Text>
-                  <Form.Item 
-                    name="condition" 
-                    style={styles.input}
-                    rules={[{ required: true, message: 'Vui lòng nhập tình trạng!' }]}
+                  <Text style={styles.inputLabel}>Tình trạng</Text>
+                  <Form.Item
+                    noStyle
+                    name="condition"
+                    rules={[
+                      { required: true, message: "Vui lòng nhập tình trạng!" },
+                    ]}
                   >
-                    <Input placeholder="Tình trạng" />
+                    <Input
+                      style={styles.input}
+                      placeholder="Tình trạng"
+                      placeholderTextColor="#A0AEC0"
+                    />
                   </Form.Item>
                 </View>
                 <View style={styles.inputRow}>
-                  <Text style={styles.inputLabel}>Trong ao từ:</Text>
-                  <View style={{ backgroundColor: "white", borderRadius: 5 }}>
-                    <DatePicker
-                      value={inPondSince}
-                      mode="date"
-                      minDate={new Date(2000, 0, 1)}
-                      format="DD MMMM YYYY"
-                      onChange={handleDatePickerChange}
-                      visible={isDatePickerVisible}
-                      onDismiss={() => setDatePickerVisible(false)}
+                  <Text style={styles.inputLabel}>Trong ao từ</Text>
+                  <DatePicker
+                    value={inPondSince}
+                    mode="date"
+                    minDate={new Date(2000, 0, 1)}
+                    format="DD MMMM YYYY"
+                    onChange={handleDatePickerChange}
+                    visible={isDatePickerVisible}
+                    onDismiss={() => setDatePickerVisible(false)}
+                  >
+                    <TouchableOpacity
+                      style={styles.input}
+                      onPress={() => setDatePickerVisible(true)}
                     >
-                      <TouchableOpacity
-                        style={styles.input}
-                        onPress={() => setDatePickerVisible(true)}
-                      >
-                        <Text style={styles.dateText}>
-                          {inPondSince.toLocaleDateString("vi-VN", {
-                            day: "numeric",
-                            month: "long",
-                            year: "numeric",
-                          })}
-                        </Text>
-                      </TouchableOpacity>
-                    </DatePicker>
-                  </View>
+                      <Text style={styles.dateText}>
+                        {inPondSince.toLocaleDateString("vi-VN", {
+                          day: "numeric",
+                          month: "long",
+                          year: "numeric",
+                        })}
+                      </Text>
+                    </TouchableOpacity>
+                  </DatePicker>
                 </View>
               </View>
               <View style={styles.row}>
                 <View style={styles.inputRow}>
-                  <Text style={styles.inputLabel}>Nhà lai tạo:</Text>
-                  <Form.Item 
-                    name="breeder" 
-                    style={styles.input}
-                    rules={[{ required: true, message: 'Vui lòng nhập nhà lai tạo!' }]}
+                  <Text style={styles.inputLabel}>Nhà lai tạo</Text>
+                  <Form.Item
+                    noStyle
+                    name="breeder"
+                    rules={[
+                      { required: true, message: "Vui lòng nhập nhà lai tạo!" },
+                    ]}
                   >
-                    <Input placeholder="Nhà lai tạo" />
+                    <Input
+                      style={styles.input}
+                      placeholder="Nhà lai tạo"
+                      placeholderTextColor="#A0AEC0"
+                    />
                   </Form.Item>
                 </View>
                 <View style={styles.inputRow}>
-                  <Text style={styles.inputLabel}>Giá mua:</Text>
-                  <Form.Item 
-                    name="price" 
-                    style={styles.input} 
+                  <Text style={styles.inputLabel}>Giá mua</Text>
+                  <Form.Item
+                    noStyle
+                    name="price"
                     extra="VND"
                     rules={[
-                      { required: true, message: 'Vui lòng nhập giá mua!' },
-                      { pattern: /^[0-9]+$/, message: 'Chỉ được nhập số!' },
-                      { 
-                        validator: (_, value) => 
-                          value && Number(value) <= 1000 
-                            ? Promise.reject('Giá phải lớn hơn 1000 VND!') 
-                            : Promise.resolve()
-                      }
+                      { required: true, message: "Vui lòng nhập giá mua!" },
+                      { pattern: /^[0-9]+$/, message: "Chỉ được nhập số!" },
+                      {
+                        validator: (_, value) =>
+                          value && Number(value) <= 1000
+                            ? Promise.reject("Giá phải lớn hơn 1000 VND!")
+                            : Promise.resolve(),
+                      },
                     ]}
                   >
-                    <Input placeholder="Giá mua" keyboardType="numeric" />
+                    <Input
+                      style={styles.input}
+                      placeholder="Giá mua"
+                      keyboardType="numeric"
+                      placeholderTextColor="#A0AEC0"
+                    />
                   </Form.Item>
                 </View>
               </View>
               <View style={styles.row}>
                 <View style={styles.inputRow}>
-                  <Text style={styles.inputLabel}>Ao:</Text>
+                  <Text style={styles.inputLabel}>Ao</Text>
                   <DropDownPicker
                     open={open}
                     value={selectedPond}
@@ -343,28 +409,31 @@ const AddFish = ({ navigation, route }) => {
                     setOpen={setOpen}
                     setValue={setSelectedPond}
                     setItems={setPondItems}
-                    containerStyle={styles.dropdownContainer}
-                    style={styles.dropdown}
-                    dropDownStyle={styles.dropdownBox}
                     placeholder="Chọn một ao"
+                    placeholderStyle={styles.dropdownPlaceholder}
+                    style={styles.dropdown}
+                    dropDownContainerStyle={styles.dropdownBox}
+                    textStyle={styles.dropdownText}
                     listMode="SCROLLVIEW"
+                    zIndex={1000}
+                    zIndexInverse={2000}
                   />
                 </View>
               </View>
               <View style={styles.modalFooter}>
-                <TouchableOpacity
+                <Button
                   style={styles.modalCancelButton}
                   onPress={() => navigation.goBack()}
                 >
-                  <Text style={styles.modalCancelText}>Hủy</Text>
-                </TouchableOpacity>
+                  Hủy
+                </Button>
                 <Button
-                  type="ghost"
                   style={styles.modalSaveButton}
                   onPress={() => form.submit()}
-                  disabled={!selectedPond || !imageBlob}
+                  disabled={!selectedPond || isImageUploading}
+                  loading={isImageUploading}
                 >
-                  <Text style={selectedPond ? styles.modalSaveText : styles.modalSaveTextDisabled}>Lưu</Text>
+                  Lưu
                 </Button>
               </View>
             </View>

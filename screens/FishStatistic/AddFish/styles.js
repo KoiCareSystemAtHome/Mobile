@@ -6,232 +6,150 @@ export const styles = StyleSheet.create({
   },
   overlay: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: "rgba(255, 255, 255, 0.5)",
+    backgroundColor: "rgba(0, 50, 80, 0.4)", // Darker aquatic overlay
   },
-  container: {
-    flex: 1,
-    paddingHorizontal: 20,
-    paddingTop: 60,
+  formContainer: {
+    paddingHorizontal: 16,
+    paddingTop: 40,
+    paddingBottom: 40,
   },
-  formContainer: {  
-    backgroundColor:"transparent",
-    paddingHorizontal: 20,
-    paddingTop: 60,
-    paddingBottom: 20,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: "bold",
-    color: "#333",
-    textAlign: "center",
-    marginBottom: 20,
-  },
-  listContent: {
-    paddingBottom: 100,
-  },
-  card: {
-    marginBottom: 20,
-    borderRadius: 10,
-    overflow: "hidden",
-    height: 300,
-  },
-  cardContent: {
-    // padding: 10,
-  },
-  fishImage: {
-    width: "100%",
-    height: 200,
-    borderRadius: 10,
-  },
-  fishInfo: {
-    // marginLeft: 10,
-  },
-  fishText: {
-    marginTop: 16,
-    fontSize: 16,
-    // marginBottom: 15,
-  },
-  label: {
-    fontWeight: "bold",
-  },
-  infoRow: {
+  header: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    paddingInline: 20,
-  },
-  footer: {
-    flexDirection: "row",
-    justifyContent: "flex-end",
-    alignItems: "center",
-    position: "absolute",
-    bottom: 20,
-    left: 20,
-    right: 20,
-  },
-  badge: {
-    backgroundColor: "#FFD29D",
-    width: 50,
-    height: 50,
-    borderRadius: 15,
-    justifyContent: "center",
-    alignItems: "center",
-    textAlign: "center",
-    color: "white",
-  },
-  badgeText: {
-    textAlign: "center",
-    color: "white",
-    fontWeight: "bold",
-  },
-  addButton: {
-    backgroundColor: "#FFD29D",
-    width: 50,
-    height: 50,
-    borderRadius: 15,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  modalContainer: {
-    backgroundColor: "#fff",
-    width: "90%",
-    borderRadius: 10,
-    padding: 10,
-  },
-  modalHeader: {
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
-    marginBottom: 20,
-    marginTop: 20,
-  },
-  modalCancelButton: {
-    padding: 10,
-  },
-  modalCancelText: {
-    color: "#ff4d4f",
-    fontWeight: "bold",
+    marginBottom: 24,
   },
   modalTitle: {
-    fontSize: 20,
-    fontWeight: "bold",
+    fontSize: 28,
+    fontWeight: "700",
+    color: "#fff",
+    textAlign: "center",
+    fontFamily: "Roboto", // Replace with custom font if available
+    textShadowColor: "rgba(0, 0, 0, 0.2)",
+    textShadowOffset: { width: 1, height: 1 },
+    textShadowRadius: 2,
   },
-  modalSaveButton: {
-    padding: 10,
-    borderWidth:0
-  },
-  modalSaveText: {
-    color: "#4caf50",
-    fontWeight: "bold",
-  },
-  modalSaveTextDisabled: {
-    color: "#ddd",
-    fontWeight: "bold",
+  form: {
+    backgroundColor: "transparent",
   },
   imageButton: {
-    borderWidth: 2,
-    borderColor: "#3498db", // Vibrant blue border
-    borderStyle: "dashed", // Dashed border for a modern touch
-    paddingVertical: 15,
-    paddingHorizontal: 20,
-    borderRadius: 12, // Softer rounded corners
-    marginBottom: 20,
+    borderWidth: 1,
+    borderColor: "#E2E8F0",
+    borderStyle: "dashed",
+    padding: 16,
+    borderRadius: 10,
+    marginBottom: 16,
     alignItems: "center",
-    backgroundColor: "rgba(255, 255, 255, 0.9)", // Slightly transparent white background
-    shadowColor: "#000", // Subtle shadow for depth
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2, // Android shadow
+    flexDirection: "row",
+    justifyContent: "center",
+    backgroundColor: "#F8FAFC",
   },
   imageButtonText: {
-    color: "#3498db", // Matching blue text
+    color: "#0077B6",
     fontSize: 16,
-    fontWeight: "600", // Bolder text for emphasis
-    letterSpacing: 0.5, // Slight letter spacing for readability
+    fontWeight: "500",
+    marginLeft: 8,
+  },
+  imageContainer: {
+    alignItems: "center",
+    marginBottom: 16,
+  },
+  selectedImage: {
+    width: 200,
+    height: 200,
+    borderRadius: 10,
+    marginBottom: 8,
+  },
+  changeImageButton: {
+    backgroundColor: "#0077B6",
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderRadius: 8,
+  },
+  changeImageText: {
+    color: "#fff",
+    fontSize: 14,
+    fontWeight: "600",
   },
   modalFields: {
     backgroundColor: "transparent",
     width: "100%",
-    marginVertical: 10,
   },
   row: {
     flexDirection: "row",
     justifyContent: "space-between",
-    marginBottom: 10,
+    marginBottom: 12,
   },
   inputRow: {
     flex: 1,
-    marginHorizontal: 5, // Add spacing between columns
+    marginHorizontal: 6,
   },
   inputLabel: {
     fontSize: 14,
-    fontWeight: "bold",
-    marginBottom: 5,
-    borderRadius: 30,
+    fontWeight: "600",
+    color: "#0077B6",
+    marginBottom: 6,
   },
   input: {
     borderWidth: 1,
-    borderColor: "#ddd",
-    paddingLeft: 5,
-    height: 40,
+    borderColor: "#E2E8F0",
+    height: 48,
     borderRadius: 10,
+    paddingHorizontal: 12,
+    fontSize: 16,
+    color: "#1A3C5A",
+    backgroundColor: "#fff",
+  },
+  dropdown: {
+    borderWidth: 1,
+    borderColor: "#E2E8F0",
+    borderRadius: 10,
+    height: 48,
+    backgroundColor: "#fff",
+  },
+  dropdownBox: {
+    borderWidth: 1,
+    borderColor: "#E2E8F0",
+    borderRadius: 10,
+    backgroundColor: "#fff",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 6,
+    elevation: 5,
+  },
+  dropdownPlaceholder: {
+    color: "#A0AEC0",
+    fontSize: 16,
+  },
+  dropdownText: {
+    fontSize: 16,
+    color: "#1A3C5A",
+  },
+  dateText: {
+    fontSize: 16,
+    color: "#1A3C5A",
+    paddingVertical: 14,
   },
   modalFooter: {
     flexDirection: "row",
     justifyContent: "space-between",
+    marginTop: 16,
   },
-  imageContainer: {
-    alignItems: "center",
-  },
-  selectedImage: {
-    width: 250,
-    height: 250,
-    borderRadius: 10,
-    marginBottom: 10,
-  },
-
-  changeImageText: {
-    color: "white",
-    fontSize: 14,
-    fontWeight: "bold",
-  },
-  paginationContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginVertical: 10,
-    paddingRight: 150,
-  },
-  paginationButton: {
-    backgroundColor: "#6497B1",
+  modalCancelButton: {
+    backgroundColor: "#F1F5F9",
     borderRadius: 8,
-    paddingVertical: 10,
-    width: 70,
+    paddingVertical: 12,
+    flex: 1,
+    marginRight: 8,
+    alignItems: "center",
   },
-  paginationText: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "500",
-    textAlign: "center",
-  },
-  disabledButton: {
-    backgroundColor: "#ccc",
-  },
-  pageText: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "500",
-  },
-  dateText: {
-    fontSize: 16,
-    color: "#333",
-    paddingVertical: 10,
+  modalSaveButton: {
+    backgroundColor: "#0077B6",
+    borderRadius: 8,
+    paddingVertical: 12,
+    flex: 1,
+    marginLeft: 8,
+    alignItems: "center",
   },
 });

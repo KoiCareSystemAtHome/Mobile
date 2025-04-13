@@ -18,7 +18,6 @@ const AddSaltForm = () => {
   const navigation = useNavigation();
   const dispatch = useDispatch();
   const pondId = route.params?.pondID || route.params.pondId;
-  console.log(pondId);
   const [addedSaltKg, setAddedSaltKg] = useState("");
 
   // Handle form submission
@@ -34,7 +33,6 @@ const AddSaltForm = () => {
     dispatch(updateSalt({ pondId, addedSaltKg: saltValue }))
       .unwrap()
       .then((res) => {
-        console.log("a", res);
         Alert.alert("Success", "Muối đã được thêm thành công!");
         navigation.goBack(); // Return to the previous screen
       })

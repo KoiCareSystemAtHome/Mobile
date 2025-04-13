@@ -25,9 +25,7 @@ const parameterColors = {
 };
 
 const WaterParametersChart = ({ selectedParameters = [], waterParameterData, pondParameters }) => {
-  console.log("Selected Parameters:", selectedParameters);
-  console.log("Water Parameter Data:", waterParameterData);
-  console.log("Pond Parameters:", pondParameters);
+
 
   const data = Array.isArray(waterParameterData) && waterParameterData.length > 0
     ? waterParameterData
@@ -38,7 +36,7 @@ const WaterParametersChart = ({ selectedParameters = [], waterParameterData, pon
   const filteredData = data.filter(item => new Date(item.calculatedDate) >= threeMonthsAgo);
   filteredData.sort((a, b) => new Date(a.calculatedDate) - new Date(b.calculatedDate));
 
-  console.log("Filtered Data:", filteredData);
+
 
   const dates = filteredData.map(item => new Date(item.calculatedDate).getTime());
   const minDate = dates.length > 0 ? Math.min(...dates) : Date.now();
@@ -47,7 +45,6 @@ const WaterParametersChart = ({ selectedParameters = [], waterParameterData, pon
 
   const normalizeData = (data, property, maxYValue) => {
     const validData = data.filter(d => d.hasOwnProperty(property) && d[property] != null);
-    console.log(`Normalizing data for ${property}:`, validData);
     return validData.map((d) => {
       const dateValue = new Date(d.calculatedDate).getTime();
       const value = d[property];
@@ -95,7 +92,6 @@ const WaterParametersChart = ({ selectedParameters = [], waterParameterData, pon
           const { maxYValue, yAxisInterval } = getChartConfig(parameter);
           const points = normalizeData(filteredData, parameter, maxYValue);
 
-          console.log(`Points for ${parameter}:`, points);
 
           const yAxisLabels = [];
           for (let i = 0; i <= maxYValue; i += yAxisInterval) {

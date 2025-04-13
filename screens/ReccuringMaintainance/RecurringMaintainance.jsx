@@ -77,9 +77,6 @@ const CalculateMaintainance = () => {
       dispatch(reccuringMaintainance(values))
         .unwrap()
         .then((res) => {
-          console.log("endDate:", endDate);
-          console.log("maintain date:", res );
-          console.log("Recurring Maintenance Saved", res);
           dispatch(getReminderByOwner(isLoggedIn?.id));
           if (Array.isArray(res) && res.length > 0) {
             Alert.alert("Success", "Recurring Maintenance Saved");
@@ -108,7 +105,6 @@ const CalculateMaintainance = () => {
       newDate.setUTCHours(hours, minutes, 0, 0);
       setEndDate(newDate);
       setTimePickerVisible(false);
-      console.log("Selected Time (UTC):", newDate.toISOString());
     }
   };
 

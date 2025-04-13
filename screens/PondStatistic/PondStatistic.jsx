@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
-  StyleSheet,
   ImageBackground,
   Image,
   FlatList,
@@ -14,7 +13,6 @@ import {
 import {
   Button,
   Card,
-  DatePicker,
   Form,
   Input,
   Provider,
@@ -23,8 +21,7 @@ import {
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 import { useDispatch, useSelector } from "react-redux";
-import { getTest } from "../../redux/slices/testSlice";
-import { pondByOwnerSelector, testDataSelector } from "../../redux/selector";
+import { pondByOwnerSelector } from "../../redux/selector";
 import { styles } from "./styles";
 import { createPond, getPondByOwner } from "../../redux/slices/pondSlice";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -46,7 +43,7 @@ const PondStatistic = ({ navigation }) => {
   const [uploadResponse, setUploadResponse] = useState(null);
   const [fontLoaded, setFontLoaded] = useState(false);
   const [isImageUploading, setIsImageUploading] = useState(false);
-  const [refreshing, setRefreshing] = useState(false); // Added for pull-to-refresh
+  const [refreshing, setRefreshing] = useState(false);
 
   // Pagination states
   const [currentPage, setCurrentPage] = useState(1);
@@ -58,7 +55,6 @@ const PondStatistic = ({ navigation }) => {
   );
 
   const dispatch = useDispatch();
-  console.log(pondData);
 
   const renderPondCard = ({ item }) => (
     <TouchableOpacity
@@ -75,29 +71,24 @@ const PondStatistic = ({ navigation }) => {
             style={styles.pondImage}
           />
           <View style={styles.pondInfo}>
+            <Text style={styles.pondName}>{item.name}</Text>
             <View style={styles.infoRow}>
-              <Text style={styles.pondText}>
-                <Text style={styles.label}>Tên: </Text>
-                {item.name}{" "}
-              </Text>
-              <Text style={styles.pondText}>
-                <Text style={styles.label}>
-                  {item?.fishAmount} <FontAwesome5 name="fish" size={25} />
-                </Text>
+              <Text style={styles.pondDetail}>
+                <Text style={styles.label}>Số cá: </Text>
+                {item?.fishAmount} <FontAwesome5 name="fish" size={16} color="#0077B6" />
               </Text>
             </View>
           </View>
-          {/* Status Circle */}
           <View
             style={[
               styles.statusCircle,
               {
                 backgroundColor:
                   item.status === "Danger"
-                    ? "#ff0000"
+                    ? "#EF4444" // Red for Danger
                     : item.status === "Warning"
-                    ? "#ffff00"
-                    : "transparent",
+                    ? "#FBBF24" // Yellow for Warning
+                    : "#10B981", // Green for Normal
               },
             ]}
           />
@@ -111,9 +102,11 @@ const PondStatistic = ({ navigation }) => {
     try {
       if (isLoggedIn?.id) {
         await dispatch(getPondByOwner(isLoggedIn.id)).unwrap();
+        Toast.success("Data refreshed successfully");
       }
     } catch (error) {
       console.error("Refresh failed:", error);
+      Toast.fail("Failed to refresh data");
     } finally {
       setRefreshing(false);
     }
@@ -138,27 +131,26 @@ const PondStatistic = ({ navigation }) => {
       .unwrap()
       .then((response) => {
         if (response?.status === "201") {
-          console.log(response);
           Toast.success("Ao Đã Được Thêm Thành Công");
           dispatch(getPondByOwner(isLoggedIn.id));
           form.resetFields();
-          setTimeout(() => {
-            setModalVisible(false);
-          });
+          setImageBlob(null);
+          setUploadResponse(null);
+          setModalVisible(false);
         } else {
           Toast.fail("Thêm Ao Thất Bại");
-          setModalVisible(false);
         }
+      })
+      .catch((error) => {
+        console.error("Create pond error:", error);
+        Toast.fail("Thêm Ao Thất Bại");
       });
-    setModalVisible(false);
   };
 
   const handleImagePick = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (status !== "granted") {
-      alert(
-        "Xin lỗi, chúng tôi cần quyền truy cập thư viện ảnh để thực hiện điều này!"
-      );
+      Toast.fail("Cần quyền truy cập thư viện ảnh!");
       return;
     }
 
@@ -189,6 +181,7 @@ const PondStatistic = ({ navigation }) => {
         }
       } catch (error) {
         console.error("Failed to upload image:", error);
+        Toast.fail("Tải ảnh thất bại");
       } finally {
         setIsImageUploading(false);
       }
@@ -206,7 +199,6 @@ const PondStatistic = ({ navigation }) => {
         console.error(error);
       }
     };
-
     getData();
   }, []);
 
@@ -224,7 +216,6 @@ const PondStatistic = ({ navigation }) => {
       setFontLoaded(true);
       Toast.config({ duration: 2 });
     };
-
     loadFontAsync();
   }, []);
 
@@ -249,7 +240,13 @@ const PondStatistic = ({ navigation }) => {
       >
         <View style={styles.overlay} />
         <View style={styles.container}>
-          <Text style={styles.title}>Thống Kê Ao</Text>
+          <View style={styles.header}>
+            <TouchableOpacity onPress={() => navigation.goBack()}>
+              <AntDesign name="left" size={24} color="#fff" />
+            </TouchableOpacity>
+            <Text style={styles.title}>Thống Kê Ao</Text>
+            <View style={{ width: 24 }} />
+          </View>
 
           <FlatList
             data={paginatedPondData}
@@ -260,8 +257,8 @@ const PondStatistic = ({ navigation }) => {
               <RefreshControl
                 refreshing={refreshing}
                 onRefresh={onRefresh}
-                colors={["#1890ff"]}
-                tintColor="#1890ff"
+                colors={["#0077B6"]}
+                tintColor="#0077B6"
               />
             }
           />
@@ -276,12 +273,10 @@ const PondStatistic = ({ navigation }) => {
                 onPress={handlePreviousPage}
                 disabled={currentPage === 1}
               >
-                <Text style={styles.paginationText}>
-                  <AntDesign name="left" size={20} color="black" />
-                </Text>
+                <AntDesign name="left" size={20} color="#fff" />
               </TouchableOpacity>
               <Text style={styles.pageText}>
-                {currentPage}/{totalPages}
+                {currentPage} / {totalPages}
               </Text>
               <TouchableOpacity
                 style={[
@@ -291,9 +286,7 @@ const PondStatistic = ({ navigation }) => {
                 onPress={handleNextPage}
                 disabled={currentPage === totalPages}
               >
-                <Text style={styles.paginationText}>
-                  <AntDesign name="right" size={20} color="black" />
-                </Text>
+                <AntDesign name="right" size={20} color="#fff" />
               </TouchableOpacity>
             </View>
           )}
@@ -320,16 +313,27 @@ const PondStatistic = ({ navigation }) => {
           <View style={styles.modalOverlay}>
             <View style={styles.modalContainer}>
               <View style={styles.modalHeader}>
+                <TouchableOpacity
+                  onPress={() => setModalVisible(false)}
+                  style={styles.modalCancelButton}
+                >
+                  <AntDesign name="close" size={24} color="#EF4444" />
+                </TouchableOpacity>
                 <Text style={styles.modalTitle}>Thêm Ao Mới</Text>
+                <View style={{ width: 24 }} />
               </View>
 
               {imageBlob ? (
                 <View style={styles.imageContainer}>
-                  <TouchableOpacity onPress={handleImagePick}>
-                    <Image
-                      source={{ uri: uploadResponse || imageBlob }}
-                      style={styles.selectedImage}
-                    />
+                  <Image
+                    source={{ uri: uploadResponse || imageBlob }}
+                    style={styles.selectedImage}
+                  />
+                  <TouchableOpacity
+                    style={styles.changeImageButton}
+                    onPress={handleImagePick}
+                  >
+                    <Text style={styles.changeImageText}>Thay Đổi Ảnh</Text>
                   </TouchableOpacity>
                 </View>
               ) : (
@@ -337,9 +341,8 @@ const PondStatistic = ({ navigation }) => {
                   style={styles.imageButton}
                   onPress={handleImagePick}
                 >
-                  <Text style={styles.imageButtonText}>
-                    Chạm Để Chọn Hình Ảnh
-                  </Text>
+                  <FontAwesome name="image" size={24} color="#0077B6" />
+                  <Text style={styles.imageButtonText}>Chọn Hình Ảnh</Text>
                 </TouchableOpacity>
               )}
 
@@ -348,19 +351,28 @@ const PondStatistic = ({ navigation }) => {
                   name="name"
                   rules={[{ required: true, message: "Vui lòng nhập tên ao" }]}
                 >
-                  <Input placeholder="Tên Ao" style={styles.input} />
+                  <Input
+                    placeholder="Tên Ao"
+                    style={styles.input}
+                    placeholderTextColor="#A0AEC0"
+                  />
                 </Form.Item>
 
                 <Form.Item
                   name="maxVolume"
                   rules={[
                     { required: true, message: "Vui lòng nhập lượng nước" },
+                    {
+                      pattern: /^[0-9]+$/,
+                      message: "Lượng nước phải là số",
+                    },
                   ]}
                 >
                   <Input
                     keyboardType="numeric"
-                    placeholder="Lượng Nước Tối Đa(ml)"
+                    placeholder="Lượng Nước Tối Đa (ml)"
                     style={styles.input}
+                    placeholderTextColor="#A0AEC0"
                   />
                 </Form.Item>
 

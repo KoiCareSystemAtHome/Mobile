@@ -6,7 +6,7 @@ import {
   Image,
   FlatList,
   TouchableOpacity,
-  RefreshControl, // Import RefreshControl
+  RefreshControl,
 } from "react-native";
 import { Card, Provider, Toast } from "@ant-design/react-native";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
@@ -27,7 +27,7 @@ const FishStatistic = ({ navigation }) => {
   const fishData = useSelector(fishByOwnerSelector);
   const dispatch = useDispatch();
   const [fontLoaded, setFontLoaded] = useState(false);
-  const [refreshing, setRefreshing] = useState(false); // State for pull-to-refresh
+  const [refreshing, setRefreshing] = useState(false);
 
   // Pagination states
   const [currentPage, setCurrentPage] = useState(1);
@@ -70,10 +70,9 @@ const FishStatistic = ({ navigation }) => {
     loadFontAsync();
   }, []);
 
-  // Pull-to-refresh handler
   const onRefresh = async () => {
     if (isLoggedIn?.id) {
-      setRefreshing(true); // Start refreshing
+      setRefreshing(true);
       try {
         await Promise.all([
           dispatch(getPondByOwner(isLoggedIn.id)).unwrap(),
@@ -84,7 +83,7 @@ const FishStatistic = ({ navigation }) => {
         console.error("Error refreshing data:", error);
         Toast.fail("Failed to refresh data");
       } finally {
-        setRefreshing(false); // Stop refreshing
+        setRefreshing(false);
       }
     }
   };
@@ -92,7 +91,6 @@ const FishStatistic = ({ navigation }) => {
   console.log(fishData);
 
   const renderFishCard = ({ item }) => {
-    // Find the most recent fish report based on calculatedDate
     const latestReport =
       item.fishReportInfos?.length > 0
         ? item.fishReportInfos.reduce((latest, current) =>
@@ -116,33 +114,28 @@ const FishStatistic = ({ navigation }) => {
               }
               style={styles.fishImage}
             />
-            <View style={{ flexDirection: "row", justifyContent: "flex-end" }}>
-              <FontAwesome
-                name={item.gender === "male" ? "mars" : "venus"}
-                size={20}
-                color="#6497B1"
-                style={{ paddingRight: 20, marginTop: 5 }}
-              />
-            </View>
             <View style={styles.fishInfo}>
-              <View style={styles.infoRow}>
-                <Text style={styles.fishText}>
-                  <Text style={styles.label}>Tên: </Text>
-                  {item.name}
-                </Text>
-                <Text style={styles.fishText}>
-                  <Text style={styles.label}>Giống: </Text>
-                  {item.variety.varietyName}{" "}
-                </Text>
+              <View style={styles.infoHeader}>
+                <Text style={styles.fishName}>{item.name}</Text>
+                <FontAwesome
+                  name={item.gender === "male" ? "mars" : "venus"}
+                  size={20}
+                  color="#0077B6"
+                  style={styles.genderIcon}
+                />
               </View>
+              <Text style={styles.fishDetail}>
+                <Text style={styles.label}>Giống: </Text>
+                {item.variety.varietyName}
+              </Text>
               <View style={styles.infoRow}>
-                <Text style={styles.fishText}>
+                <Text style={styles.fishDetail}>
                   <Text style={styles.label}>Tuổi: </Text>
-                  {item.age}
+                  {item.age} năm
                 </Text>
-                <Text style={styles.fishText}>
-                  <Text style={styles.label}>Chiều dài: </Text>
-                  {latestReport ? latestReport.size : "N/A"}cm
+                <Text style={styles.fishDetail}>
+                  <Text style={styles.label}>Dài: </Text>
+                  {latestReport ? latestReport.size : "N/A"} cm
                 </Text>
               </View>
             </View>
@@ -173,7 +166,13 @@ const FishStatistic = ({ navigation }) => {
       >
         <View style={styles.overlay} />
         <View style={styles.container}>
-          <Text style={styles.title}>Thống Kê Cá</Text>
+          <View style={styles.header}>
+            <TouchableOpacity onPress={() => navigation.goBack()}>
+              <AntDesign name="left" size={24} color="#fff" />
+            </TouchableOpacity>
+            <Text style={styles.title}>Thống Kê Cá</Text>
+            <View style={{ width: 24 }} />
+          </View>
           <FlatList
             data={paginatedFishData}
             renderItem={renderFishCard}
@@ -183,8 +182,8 @@ const FishStatistic = ({ navigation }) => {
               <RefreshControl
                 refreshing={refreshing}
                 onRefresh={onRefresh}
-                colors={["#6497B1"]} // Customize the refresh indicator color
-                tintColor="#6497B1" // iOS tint color
+                colors={["#0077B6"]}
+                tintColor="#0077B6"
               />
             }
           />
@@ -198,12 +197,10 @@ const FishStatistic = ({ navigation }) => {
                 onPress={handlePreviousPage}
                 disabled={currentPage === 1}
               >
-                <Text style={styles.paginationText}>
-                  <AntDesign name="left" size={20} color="black" />
-                </Text>
+                <AntDesign name="left" size={20} color="#fff" />
               </TouchableOpacity>
               <Text style={styles.pageText}>
-                {currentPage}/{totalPages}
+                {currentPage} / {totalPages}
               </Text>
               <TouchableOpacity
                 style={[
@@ -213,9 +210,7 @@ const FishStatistic = ({ navigation }) => {
                 onPress={handleNextPage}
                 disabled={currentPage === totalPages}
               >
-                <Text style={styles.paginationText}>
-                  <AntDesign name="right" size={20} color="black" />
-                </Text>
+                <AntDesign name="right" size={20} color="#fff" />
               </TouchableOpacity>
             </View>
           )}

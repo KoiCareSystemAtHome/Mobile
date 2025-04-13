@@ -21,7 +21,6 @@ const ResetPasswordForm = ({ navigation }) => {
     dispatch(resetPassword(values))
       .unwrap()
       .then((response) => {
-        console.log(response);
         if (response === "success") {
           Toast.success("Mật khẩu được đặt lại thành công");
           setTimeout(() => {

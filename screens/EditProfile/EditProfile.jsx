@@ -185,11 +185,9 @@ const EditProfile = () => {
         shopDescription: "string",
         bizLicense: "string",
       };
-      console.log(updatedProfileForApi);
       dispatch(updateProfile(updatedProfileForApi))
         .unwrap()
         .then((res) => {
-          console.log("Profile updated successfully:", res);
         });
       const updatedProfile = {
         ...existingUser,

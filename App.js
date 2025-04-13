@@ -77,9 +77,7 @@ const scheduleNotification = async (reminder) => {
         trigger: {
           date: notificationDate,
         },
-      });
-      console.log(`Notification scheduled for ${reminder.title} at ${notificationDate}`);
-    }
+      });    }
   } catch (error) {
     console.error("Error scheduling notification:", error);
   }

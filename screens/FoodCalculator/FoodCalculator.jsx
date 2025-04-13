@@ -78,7 +78,6 @@ const FoodCalculator = ({ navigation }) => {
       dispatch(calculateFood(values))
         .unwrap()
         .then((response) => {
-          console.log(response);
           setFood(response?.foodAmount);
         });
     }

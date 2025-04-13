@@ -103,13 +103,6 @@ const Shopping = ({ navigation }) => {
     ),
   ].filter(Boolean);
 
-  // Log the filter options to debug
-  console.log("Unique Category Names:", uniqueCategoryNames);
-  console.log("Unique Brands:", uniqueBrands);
-  console.log("Unique Shop Names:", uniqueShopNames);
-  console.log("Unique Parameter Impacts:", uniqueParameterImpacts);
-
-  // Filter products with error handling
   const filteredProducts = products?.filter((product) => {
     try {
       const matchesSearch = product.productName
@@ -163,7 +156,6 @@ const Shopping = ({ navigation }) => {
     <TouchableOpacity
       key={`${filterType}-${item}`}
       onPress={() => {
-        console.log(`Selected ${filterType}:`, item);
         setFilters((prevFilters) => ({
           ...prevFilters,
           [filterType]: prevFilters[filterType] === item ? "" : item,

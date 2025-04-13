@@ -93,7 +93,6 @@ const EditFish = ({ route, navigation }) => {
       image,
       pondID: fish.pond?.pondID,
     };
-    console.log(updatedFish);
     dispatch(updateFish(updatedFish))
       .unwrap()
       .then(() => {

@@ -126,7 +126,6 @@ const TransactionScreen = ({ navigation }) => {
     getData();
   }, []);
 
-  console.log(isLoggedIn?.id);
 
   useEffect(() => {
     if (isLoggedIn?.id) {

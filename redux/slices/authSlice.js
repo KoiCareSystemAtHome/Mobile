@@ -102,7 +102,6 @@ export const activateAccount = createAsyncThunk(
   "authSlice/activateAccount",
   async (credentials, { rejectWithValue }) => {
     try {
-      console.log(credentials)
       const response = await putRequest(
         `Account/activate?email=${credentials.email}&code=${credentials.otp}`
       );
@@ -119,7 +118,6 @@ export const resendCode = createAsyncThunk(
   "authSlice/resendCode",
   async (credentials, { rejectWithValue }) => {
     try {
-      console.log(credentials)
       const response = await putRequest(
         `Account/resend-code?email=${credentials.email}`
       );
@@ -136,7 +134,6 @@ export const updateProfile = createAsyncThunk(
   "authSlice/updateProfile",
   async (credentials, { rejectWithValue }) => {
     try {
-      console.log(credentials)
       const response = await postRequest(
         `Account/UpdateProfile`, credentials
       );

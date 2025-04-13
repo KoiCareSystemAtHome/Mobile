@@ -44,7 +44,6 @@ const PondDetail = ({ navigation, route }) => {
   const [isImageUploading, setIsImageUploading] = useState(false);
   const [isImageChanged, setIsImageChanged] = useState(false);
 
-  console.log(pondById?.pondID);
 
   const transformPondParameters = (pondParameters) => {
     if (!pondParameters || !Array.isArray(pondParameters)) return [];

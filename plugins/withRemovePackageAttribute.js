@@ -7,7 +7,6 @@ module.exports = function withRemovePackageAttribute(config) {
 
         // Remove the package attribute from the <manifest> tag
         if (manifest.$ && manifest.$['package']) {
-            console.log(`Removing package attribute: ${manifest.$['package']}`);
             delete manifest.$['package'];
         }
 

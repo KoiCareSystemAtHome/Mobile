@@ -41,7 +41,6 @@ const OrderTracking = ({ navigation }) => {
   useEffect(() => {
     if (orderDetail?.oder_code) {
       const order_code = orderDetail?.oder_code;
-      console.log(order_code)
       dispatch(getOrderTracking({ order_code }))
         .unwrap()
         .then((response) => {
@@ -97,7 +96,6 @@ const OrderTracking = ({ navigation }) => {
     });
   };
 
-  console.log(orderDetail?.details)
 
   return (
     <Provider>

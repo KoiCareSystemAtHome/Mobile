@@ -44,7 +44,6 @@ const PackageScreen = ({ navigation }) => {
     }
   }, [isLoggedIn, dispatch]);
 
-  console.log(isLoggedIn, "isLoggedIn");
 
   const handleChoosePackage = (pkg) => {
     const email = isLoggedIn?.email;
