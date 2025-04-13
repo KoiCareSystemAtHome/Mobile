@@ -102,7 +102,7 @@ export const getOrderDetail = createAsyncThunk(
       const res = await getRequest(`Order/detail?orderId=${values}`);
       return res.data;
     } catch (error) {
-      Alert.alert("Error", "Failed to load  data.");
+      Alert.alert("Error", "Failed to load order detail.");
     }
   }
 );
@@ -111,10 +111,12 @@ export const getOrderTracking = createAsyncThunk(
   "ghnSlice/getOrderTracking",
   async (values) => {
     try {
+      console.log(values)
       const res = await postRequest(`Ghn/tracking-order`, values);
-      return res.data.data;
+      return res.data?.data;
     } catch (error) {
-      Alert.alert("Error", "Failed to load category data.");
+      console.log(error)
+      // Alert.alert("Error", "Failed to load order tracking.");
     }
   }
 );

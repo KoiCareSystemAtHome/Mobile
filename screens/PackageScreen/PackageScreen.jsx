@@ -20,8 +20,8 @@ const PackageScreen = ({ navigation }) => {
   const dispatch = useDispatch();
   const packageData = useSelector(packageSelector);
   const walletData = useSelector(walletSelector);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  
+  const [isLoggedIn, setIsLoggedIn] = useState(null);
+
   useEffect(() => {
     dispatch(getPackage());
   }, [dispatch]);
@@ -44,35 +44,83 @@ const PackageScreen = ({ navigation }) => {
     }
   }, [isLoggedIn, dispatch]);
 
-  const handleChoosePackage = (pkg) => {
-    Alert.alert(
-      "Confirm Package Selection",
-      `Are you sure you want to choose the ${pkg.packageTitle} package for ${pkg.packagePrice.toLocaleString('vi-VN')} VND?`,
-      [
-        {
-          text: "Cancel",
-          style: "cancel"
-        },
-        {
-          text: "Confirm",
-          onPress: () => {
-            const email = isLoggedIn?.email
-            const packageId = pkg?.packageId
-            dispatch(payPackage({ email, packageId }))
-            .unwrap()
-            .then((res)=>{
+  console.log(isLoggedIn, "isLoggedIn");
 
-              if(res === "Success"){
-                navigation.navigate("MainTabs")
-                Alert.alert("Success", "You have successfully purchased the package");
-                dispatch(getWallet(isLoggedIn?.id))
-              }
-            })
-          }
-        }
-      ],
-      { cancelable: false }
-    );
+  const handleChoosePackage = (pkg) => {
+    const email = isLoggedIn?.email;
+    const packageId = pkg?.packageId;
+
+    // Check if the user already has an active package (isLoggedIn.packageID exists)
+    if (isLoggedIn?.packageID) {
+      // Dispatch payPackage with confirmPurchase: false to check the existing package
+      dispatch(payPackage({ email, packageId, confirmPurchase: false }))
+        .unwrap()
+        .then((res) => {
+          // Display the confirmation popup based on the response
+          Alert.alert(
+            "Existing Package Detected",
+            `Your current package is active until ${res.expirationDate} UTC (${res.daysLeft} days left).\nYou can upgrade to the new package for ${res.discountPrice.toLocaleString('vi-VN')} VND, a discount of ${res.discountPercentage}%.\nConfirm to proceed?`,
+            [
+              {
+                text: "Cancel",
+                style: "cancel",
+              },
+              {
+                text: "Confirm",
+                onPress: () => {
+                  // Dispatch payPackage again with confirmPurchase: true
+                  dispatch(payPackage({ email, packageId, confirmPurchase: true }))
+                    .unwrap()
+                    .then((finalRes) => {
+                      if (finalRes === "Success") {
+                        navigation.navigate("MainTabs");
+                        Alert.alert("Success", "You have successfully purchased the package");
+                        dispatch(getWallet(isLoggedIn?.id));
+                      }
+                    })
+                    .catch((err) => {
+                      Alert.alert("Error", "Failed to purchase the package. Please try again.");
+                    });
+                },
+              },
+            ],
+            { cancelable: false }
+          );
+        })
+        .catch((err) => {
+          Alert.alert("Error", "Failed to check your current package. Please try again.");
+        });
+    } else {
+      // No existing package, proceed with confirmPurchase: true directly
+      Alert.alert(
+        "Confirm Package Selection",
+        `Are you sure you want to choose the ${pkg.packageTitle} package for ${pkg.packagePrice.toLocaleString('vi-VN')} VND?`,
+        [
+          {
+            text: "Cancel",
+            style: "cancel",
+          },
+          {
+            text: "Confirm",
+            onPress: () => {
+              dispatch(payPackage({ email, packageId, confirmPurchase: true }))
+                .unwrap()
+                .then((res) => {
+                  if (res === "Success") {
+                    navigation.navigate("MainTabs");
+                    Alert.alert("Success", "You have successfully purchased the package");
+                    dispatch(getWallet(isLoggedIn?.id));
+                  }
+                })
+                .catch((err) => {
+                  Alert.alert("Error", "Failed to purchase the package. Please try again.");
+                });
+            },
+          },
+        ],
+        { cancelable: false }
+      );
+    }
   };
 
   return (
@@ -108,7 +156,7 @@ const PackageScreen = ({ navigation }) => {
         {/* Package Cards */}
         {packageData?.map((pkg, index) => {
           const isDisabled = walletData?.amount < pkg.packagePrice;
-          
+
           return (
             <View key={index} style={styles.packageCard}>
               <View style={styles.cardContent}>

@@ -97,7 +97,7 @@ export const payPackage = createAsyncThunk(
   "transactionSlice/payPackage",
   async (values) => {
     try {
-      const res = await postRequest(`Account/pay-package?email=${values.email}&packageId=${values.packageId}`);
+      const res = await postRequest(`Account/pay-package?email=${values.email}&packageId=${values.packageId}&confirmPurchase=${values.confirmPurchase}`);
       return res.data;
     } catch (error) {
       Alert.alert("Error", "Failed to load data.");

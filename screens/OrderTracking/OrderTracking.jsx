@@ -41,6 +41,7 @@ const OrderTracking = ({ navigation }) => {
   useEffect(() => {
     if (orderDetail?.oder_code) {
       const order_code = orderDetail?.oder_code;
+      console.log(order_code)
       dispatch(getOrderTracking({ order_code }))
         .unwrap()
         .then((response) => {
@@ -79,11 +80,11 @@ const OrderTracking = ({ navigation }) => {
     }
   }, [orderId, dispatch, orderTrack?.status]);
 
-  const handleCancelOrder = () => {
-    const payload = { orderId, status: "Cancelled" };
-    dispatch(updateOrderStatus(payload));
-    navigation.goBack();
-  };
+  // const handleCancelOrder = () => {
+  //   const payload = { orderId, status: "Cancelled" };
+  //   dispatch(updateOrderStatus(payload));
+  //   navigation.goBack();
+  // };
 
   // Format the payment date
   const formatPaymentDate = (dateString) => {
@@ -95,6 +96,8 @@ const OrderTracking = ({ navigation }) => {
       year: "numeric",
     });
   };
+
+  console.log(orderDetail?.details)
 
   return (
     <Provider>

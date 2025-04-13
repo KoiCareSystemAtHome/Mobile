@@ -23,12 +23,12 @@ import {
 } from "../../redux/selector";
 import dayjs from "dayjs";
 
-
 const TransactionScreen = ({ navigation }) => {
   const dispatch = useDispatch();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [activeTab, setActiveTab] = useState("Thanh toán");
-  
+  const [expandedItems, setExpandedItems] = useState({}); // State to track expanded transactions
+
   // Pagination states
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10; // 10 transactions per page
@@ -58,28 +58,61 @@ const TransactionScreen = ({ navigation }) => {
     currentPage * itemsPerPage
   );
 
+  // Toggle expanded state for a transaction
+  const toggleExpand = (transactionId) => {
+    setExpandedItems((prev) => ({
+      ...prev,
+      [transactionId]: !prev[transactionId],
+    }));
+  };
+
   // Render each transaction item
-  const renderDepositData = ({ item }) => (
-    <View style={styles.transactionCard}>
-      <Text style={styles.orderNumber}>
-        {item?.pakageName
-          ? `Gói ${item?.pakageName}`
-          : `Đơn ${item?.vnPayTransactionId}`}
-      </Text>
-      <Text style={styles.orderDetails}>
-        Mua ngày: {dayjs(item.transactionDate).format("ddd, D MMMM YYYY")}
-      </Text>
-      <Text style={styles.orderTotal}>Tổng tiền: {item.amount}</Text>
-      {/* <View style={styles.buttonContainer}>
-        <TouchableOpacity style={styles.reviewButton}>
-          <Text style={styles.buttonText}>Đánh giá</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.buyAgainButton}>
-          <Text style={styles.buttonText}>Mua lại</Text>
-        </TouchableOpacity>
-      </View> */}
-    </View>
-  );
+  const renderDepositData = ({ item }) => {
+    const isExpanded = expandedItems[item.transactionId] || false;
+
+    return (
+      <View style={styles.transactionCard}>
+        <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
+          <View>
+            <Text style={styles.orderNumber}>
+              {item?.pakageName
+                ? `Gói ${item?.pakageName}`
+                : `Đơn ${item?.vnPayTransactionId}`}
+            </Text>
+            <Text style={styles.orderDetails}>
+              Mua ngày: {dayjs(item.transactionDate).format("ddd, D MMMM YYYY")}
+            </Text>
+            <Text style={styles.orderTotal}>Tổng tiền: {item.amount.toLocaleString('vi-VN')} VND</Text>
+          </View>
+          {/* Show down arrow only for "Sản phẩm" tab and if payment details exist */}
+          {activeTab === "Sản phẩm" && item.payment && (
+            <TouchableOpacity onPress={() => toggleExpand(item.transactionId)}>
+              <AntDesign
+                name={isExpanded ? "up" : "down"}
+                size={20}
+                color="black"
+              />
+            </TouchableOpacity>
+          )}
+        </View>
+
+        {/* Payment Details (shown when expanded) */}
+        {activeTab === "Sản phẩm" && isExpanded && item.payment && (
+          <View style={{ marginTop: 10, padding: 10, backgroundColor: "#f0f0f0", borderRadius: 5 }}>
+            <Text style={styles.orderDetails}>
+              Số tiền thanh toán: {item.payment.amount.toLocaleString('vi-VN')} VND
+            </Text>
+            <Text style={styles.orderDetails}>
+              Ngày thanh toán: {dayjs(item.payment.date).format("ddd, D MMMM YYYY, HH:mm:ss")}
+            </Text>
+            <Text style={styles.orderDetails}>
+              Mô tả: {item.payment.description}
+            </Text>
+          </View>
+        )}
+      </View>
+    );
+  };
 
   useEffect(() => {
     const getData = async () => {
@@ -92,6 +125,8 @@ const TransactionScreen = ({ navigation }) => {
     };
     getData();
   }, []);
+
+  console.log(isLoggedIn?.id);
 
   useEffect(() => {
     if (isLoggedIn?.id) {
@@ -117,6 +152,7 @@ const TransactionScreen = ({ navigation }) => {
   // Reset page when tab changes
   useEffect(() => {
     setCurrentPage(1);
+    setExpandedItems({}); // Reset expanded state when tab changes
   }, [activeTab]);
 
   return (
@@ -199,8 +235,8 @@ const TransactionScreen = ({ navigation }) => {
               disabled={currentPage === 1}
             >
               <Text style={styles.paginationText}>
-               <AntDesign name="left" size={20} color="black" />
-             </Text>
+                <AntDesign name="left" size={20} color="black" />
+              </Text>
             </TouchableOpacity>
             <Text style={styles.pageText}>
               {currentPage}/{totalPages}
@@ -214,8 +250,8 @@ const TransactionScreen = ({ navigation }) => {
               disabled={currentPage === totalPages}
             >
               <Text style={styles.paginationText}>
-               <AntDesign name="right" size={20} color="black" />
-             </Text>
+                <AntDesign name="right" size={20} color="black" />
+              </Text>
             </TouchableOpacity>
           </View>
         )}
