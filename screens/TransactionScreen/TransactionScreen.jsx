@@ -27,11 +27,9 @@ const TransactionScreen = ({ navigation }) => {
   const dispatch = useDispatch();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [activeTab, setActiveTab] = useState("Thanh toán");
-  const [expandedItems, setExpandedItems] = useState({}); // State to track expanded transactions
-
-  // Pagination states
+  const [expandedItems, setExpandedItems] = useState({});
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10; // 10 transactions per page
+  const itemsPerPage = 10;
 
   const orderTransactionData = useSelector(orderTransactionSelector);
   const packageTransactionData = useSelector(packageTransactionSelector);
@@ -50,7 +48,6 @@ const TransactionScreen = ({ navigation }) => {
     }
   };
 
-  // Get transactions data and calculate pagination
   const transactions = getDataForTab();
   const totalPages = Math.ceil(transactions?.length / itemsPerPage);
   const paginatedTransactions = transactions?.slice(
@@ -58,7 +55,6 @@ const TransactionScreen = ({ navigation }) => {
     currentPage * itemsPerPage
   );
 
-  // Toggle expanded state for a transaction
   const toggleExpand = (transactionId) => {
     setExpandedItems((prev) => ({
       ...prev,
@@ -66,48 +62,87 @@ const TransactionScreen = ({ navigation }) => {
     }));
   };
 
-  // Render each transaction item
   const renderDepositData = ({ item }) => {
     const isExpanded = expandedItems[item.transactionId] || false;
 
     return (
       <View style={styles.transactionCard}>
-        <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
+        <View
+          style={{
+            flexDirection: "row",
+            justifyContent: "space-between",
+            alignItems: "center",
+          }}
+        >
           <View>
             <Text style={styles.orderNumber}>
               {item?.pakageName
-                ? `Gói ${item?.pakageName}`
+                ? `Gói ${item?.pakageName}`
                 : `Đơn ${item?.vnPayTransactionId}`}
             </Text>
+            {(item.transactionType === "Cancel" || item.refund) && (
+              <Text style={styles.statusText}>Đơn đã được hủy</Text>
+            )}
+            {(item.payment && !item.refund) && (
+              <Text style={[styles.statusText,{color:"green"}]}>Đơn đã được trả</Text>
+            )}
+            {(!item.payment && !item.refund) && (
+              <Text style={[styles.statusText,{color:"yellow"}]}>Chờ thanh toán</Text>
+            )}
             <Text style={styles.orderDetails}>
               Mua ngày: {dayjs(item.transactionDate).format("ddd, D MMMM YYYY")}
             </Text>
-            <Text style={styles.orderTotal}>Tổng tiền: {item.amount.toLocaleString('vi-VN')} VND</Text>
+            <Text style={styles.orderTotal}>
+              Tổng tiền: {item.amount.toLocaleString("vi-VN")} VND
+            </Text>
           </View>
-          {/* Show down arrow only for "Sản phẩm" tab and if payment details exist */}
-          {activeTab === "Sản phẩm" && item.payment && (
+          {(item.payment || item.refund) && (
             <TouchableOpacity onPress={() => toggleExpand(item.transactionId)}>
               <AntDesign
                 name={isExpanded ? "up" : "down"}
                 size={20}
-                color="black"
+                color="#1E3A8A"
               />
             </TouchableOpacity>
           )}
         </View>
 
-        {/* Payment Details (shown when expanded) */}
-        {activeTab === "Sản phẩm" && isExpanded && item.payment && (
-          <View style={{ marginTop: 10, padding: 10, backgroundColor: "#f0f0f0", borderRadius: 5 }}>
-            <Text style={styles.orderDetails}>
-              Số tiền thanh toán: {item.payment.amount.toLocaleString('vi-VN')} VND
-            </Text>
-            <Text style={styles.orderDetails}>
-              Ngày thanh toán: {dayjs(item.payment.date).format("ddd, D MMMM YYYY, HH:mm:ss")}
-            </Text>
-            <Text style={styles.orderDetails}>
-              Mô tả: {item.payment.description}
-            </Text>
+        {isExpanded && (item.payment || item.refund) && (
+          <View style={{ marginTop: 10 }}>
+            {item.payment && (
+              <View style={styles.paymentContainer}>
+                <Text style={styles.detailText}>
+                  Số tiền thanh toán:{" "}
+                  {item.payment.amount.toLocaleString("vi-VN")} VND
+                </Text>
+                <Text style={styles.detailText}>
+                  Ngày thanh toán:{" "}
+                  {dayjs(item.payment.date).format(
+                    "ddd, D MMMM YYYY, HH:mm:ss"
+                  )}
+                </Text>
+                <Text style={styles.detailText}>
+                  Phương thức: {item.payment.paymentMethod || "Không xác định"}
+                </Text>
+                <Text style={styles.detailText}>
+                  Mô tả: {item.payment.description}
+                </Text>
+              </View>
+            )}
+            {item.refund && (
+              <View style={styles.refundContainer}>
+                <Text style={styles.detailText}>
+                  Số tiền hoàn: {item.refund.amount.toLocaleString("vi-VN")} VND
+                </Text>
+                <Text style={styles.detailText}>
+                  Ngày hoàn:{" "}
+                  {dayjs(item.refund.date).format("ddd, D MMMM YYYY, HH:mm:ss")}
+                </Text>
+                <Text style={styles.detailText}>
+                  Mô tả: {item.refund.description}
+                </Text>
+              </View>
+            )}
           </View>
         )}
       </View>
@@ -126,7 +161,6 @@ const TransactionScreen = ({ navigation }) => {
     getData();
   }, []);
 
-
   useEffect(() => {
     if (isLoggedIn?.id) {
       dispatch(getOrderTransaction(isLoggedIn.id));
@@ -135,7 +169,6 @@ const TransactionScreen = ({ navigation }) => {
     }
   }, [isLoggedIn?.id, dispatch]);
 
-  // Pagination controls
   const handlePreviousPage = () => {
     if (currentPage > 1) {
       setCurrentPage(currentPage - 1);
@@ -148,10 +181,9 @@ const TransactionScreen = ({ navigation }) => {
     }
   };
 
-  // Reset page when tab changes
   useEffect(() => {
     setCurrentPage(1);
-    setExpandedItems({}); // Reset expanded state when tab changes
+    setExpandedItems({});
   }, [activeTab]);
 
   return (
@@ -162,16 +194,13 @@ const TransactionScreen = ({ navigation }) => {
     >
       <View style={styles.overlay} />
       <SafeAreaView style={styles.container}>
-        {/* Header */}
         <View style={styles.header}>
           <TouchableOpacity onPress={() => navigation.goBack()}>
-            <AntDesign name="left" size={24} color="black" />
+            <AntDesign name="left" size={24} color="#1E3A8A" />
           </TouchableOpacity>
           <Text style={styles.title}>Lịch Sử Giao Dịch</Text>
           <View style={{ width: 24 }} />
         </View>
-
-        {/* Tabs */}
         <View style={styles.tabContainer}>
           <TouchableOpacity
             style={[styles.tab, activeTab === "Thanh toán" && styles.activeTab]}
@@ -213,16 +242,12 @@ const TransactionScreen = ({ navigation }) => {
             </Text>
           </TouchableOpacity>
         </View>
-
-        {/* Transaction List */}
         <FlatList
           data={paginatedTransactions}
           renderItem={renderDepositData}
           keyExtractor={(item) => item.transactionId}
           contentContainerStyle={styles.listContainer}
         />
-
-        {/* Pagination Controls */}
         {transactions?.length > 0 && (
           <View style={styles.paginationContainer}>
             <TouchableOpacity
@@ -234,7 +259,7 @@ const TransactionScreen = ({ navigation }) => {
               disabled={currentPage === 1}
             >
               <Text style={styles.paginationText}>
-                <AntDesign name="left" size={20} color="black" />
+                <AntDesign name="left" size={20} color="#1E3A8A" />
               </Text>
             </TouchableOpacity>
             <Text style={styles.pageText}>
@@ -249,7 +274,7 @@ const TransactionScreen = ({ navigation }) => {
               disabled={currentPage === totalPages}
             >
               <Text style={styles.paginationText}>
-                <AntDesign name="right" size={20} color="black" />
+                <AntDesign name="right" size={20} color="#1E3A8A" />
               </Text>
             </TouchableOpacity>
           </View>

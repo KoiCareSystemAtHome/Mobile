@@ -31,7 +31,7 @@ const HomeScreen = ({ navigation }) => {
   const dispatch = useDispatch();
   const walletData = useSelector(walletSelector);
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const [drawerAnimation] = useState(new Animated.Value(-250));
+  const [drawerAnimation] = useState(new Animated.Value(-270));
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [token, setToken] = useState();
   const [tooltipVisible, setTooltipVisible] = useState(false);
@@ -42,7 +42,7 @@ const HomeScreen = ({ navigation }) => {
   const toggleDrawer = () => {
     if (drawerOpen) {
       Animated.timing(drawerAnimation, {
-        toValue: -250,
+        toValue: -270, 
         duration: 300,
         useNativeDriver: false,
       }).start(() => setDrawerOpen(false));
@@ -114,6 +114,8 @@ const HomeScreen = ({ navigation }) => {
       console.error("Logout failed:", error);
     }
   };
+  
+  console.log(isLoggedIn?.id)
 
   return (
     <ImageBackground

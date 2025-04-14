@@ -74,8 +74,8 @@ const PondStatistic = ({ navigation }) => {
             <Text style={styles.pondName}>{item.name}</Text>
             <View style={styles.infoRow}>
               <Text style={styles.pondDetail}>
-                <Text style={styles.label}>Số cá: </Text>
-                {item?.fishAmount} <FontAwesome5 name="fish" size={16} color="#0077B6" />
+                {item?.fishAmount}{" "}
+                <FontAwesome5 name="fish" size={16} color="#0077B6" />
               </Text>
             </View>
           </View>

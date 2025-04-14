@@ -225,6 +225,9 @@ export const styles = StyleSheet.create({
     flexGrow: 1,
     minWidth: 120,
   },
+  confirmButton: {
+    backgroundColor: "#10B981", // Green color for confirmation
+  },
   cancelButton: {
     backgroundColor: "#EF4444",
   },

@@ -1,18 +1,21 @@
-import { Provider, Toast } from "@ant-design/react-native";
+import { Provider, Toast, Modal } from "@ant-design/react-native";
 import React, { useEffect, useState } from "react";
 import {
   Image,
   ImageBackground,
   ScrollView,
   Text,
+  TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
 import { styles } from "./styles";
 import { useRoute } from "@react-navigation/native";
 import {
+  getOrderByAccount,
   getOrderDetail,
   getOrderTracking,
+  rejectOrder,
   updateOrderStatus,
   updateShipType,
 } from "../../redux/slices/ghnSlice";
@@ -32,7 +35,10 @@ const OrderTracking = ({ navigation }) => {
   const productData = useSelector(productSelector);
   const orderId = route.params?.order?.orderId;
   const order = route.params?.order;
+  const userId = route.params?.userId;
   const [progress, setProgress] = useState(0);
+  const [cancelModalVisible, setCancelModalVisible] = useState(false);
+  const [cancelReason, setCancelReason] = useState("");
 
   useEffect(() => {
     dispatch(getOrderDetail(orderId));
@@ -69,14 +75,12 @@ const OrderTracking = ({ navigation }) => {
       dispatch(updateShipType(values));
 
       let payload;
-      if (
-        ["picked", "picking", "delivering", "storing"].includes(
-          orderTrack.status
-        )
-      ) {
+      if (["picked", "picking", "storing"].includes(orderTrack.status)) {
         payload = { orderId, status: "In Progress" };
       } else if (orderTrack.status === "delivery_fail") {
         payload = { orderId, status: "Fail" };
+      } else if (orderTrack.status === "delivering") {
+        payload = { orderId, status: "Delivered" };
       } else if (orderTrack.status === "delivered") {
         payload = { orderId, status: "Complete" };
       }
@@ -87,12 +91,27 @@ const OrderTracking = ({ navigation }) => {
   }, [orderId, dispatch, orderTrack?.status]);
 
   const handleCancelOrder = () => {
-    const payload = { orderId, status: "Cancelled" };
-    dispatch(updateOrderStatus(payload))
+    setCancelModalVisible(true);
+  };
+
+  const confirmCancelOrder = () => {
+    if (!cancelReason.trim()) {
+      Toast.fail("Vui lòng nhập lý do hủy đơn hàng");
+      return;
+    }
+    const payload = { orderId, reason: cancelReason };
+    console.log("payload", payload);
+    dispatch(rejectOrder(payload))
       .unwrap()
-      .then(() => {
-        Toast.success("Đơn hàng đã được hủy");
-        navigation.goBack();
+      .then((res) => {
+        console.log("response", res);
+        if (res.status === "success") {
+          Toast.success("Đơn hàng đã được hủy");
+          dispatch(getOrderByAccount(userId));
+          setCancelModalVisible(false);
+          setCancelReason("");
+          navigation.goBack();
+        }
       })
       .catch((error) => {
         console.error("Error cancelling order:", error);
@@ -100,7 +119,6 @@ const OrderTracking = ({ navigation }) => {
       });
   };
 
-  // Format the payment date
   const formatPaymentDate = (dateString) => {
     const date = new Date(dateString);
     return date.toLocaleDateString("vi-VN", {
@@ -128,7 +146,6 @@ const OrderTracking = ({ navigation }) => {
         </View>
 
         <ScrollView contentContainerStyle={styles.container}>
-          {/* Order Details */}
           <View style={styles.orderCard}>
             <Text style={styles.sectionTitle}>Chi Tiết Đơn Hàng</Text>
             {orderDetail?.details?.length > 0 ? (
@@ -162,7 +179,6 @@ const OrderTracking = ({ navigation }) => {
                             item.quantity * matchedProduct.price
                           ).toLocaleString("vi-VN")}
                         </Text>
-                        {/* Đánh Giá Button for Each Product */}
                         {(orderTrack?.status === "delivered" ||
                           orderDetail?.status === "Complete" ||
                           orderDetail?.status === "Completed") && (
@@ -193,7 +209,6 @@ const OrderTracking = ({ navigation }) => {
               <Text style={styles.noDataText}>Không có sản phẩm nào</Text>
             )}
 
-            {/* Payment Details */}
             {order?.transactionInfo?.payment && (
               <View style={styles.paymentDetails}>
                 <Text style={styles.paymentTitle}>
@@ -217,7 +232,6 @@ const OrderTracking = ({ navigation }) => {
             )}
           </View>
 
-          {/* Progress Bar */}
           <View style={styles.progressCard}>
             <Text style={styles.sectionTitle}>Tiến Độ Đơn Hàng</Text>
             <View style={styles.progressBar}>
@@ -271,7 +285,6 @@ const OrderTracking = ({ navigation }) => {
             </View>
           </View>
 
-          {/* Tracking Log */}
           <View style={styles.trackingCard}>
             <Text style={styles.sectionTitle}>Nhật Ký Theo Dõi</Text>
             {orderTrack?.log?.length > 0 ? (
@@ -344,7 +357,6 @@ const OrderTracking = ({ navigation }) => {
             )}
           </View>
 
-          {/* Action Buttons */}
           {(orderTrack?.status || orderDetail?.status) && (
             <View style={styles.buttonContainer}>
               {(orderTrack?.status === "delivered" ||
@@ -359,6 +371,26 @@ const OrderTracking = ({ navigation }) => {
                   <Text style={styles.buttonText}>Báo Cáo</Text>
                 </TouchableOpacity>
               )}
+              {orderTrack?.status === "delivering" && (
+                <TouchableOpacity
+                  style={[styles.actionButton, styles.confirmButton]}
+                  onPress={() => {
+                    const payload = { orderId, status: "Complete" };
+                    dispatch(updateOrderStatus(payload))
+                      .unwrap()
+                      .then(() => {
+                        Toast.success("Xác nhận nhận hàng thành công");
+                        dispatch(getOrderDetail(orderId));
+                      })
+                      .catch((error) => {
+                        console.error("Error confirming order:", error);
+                        Toast.fail("Xác nhận nhận hàng thất bại");
+                      });
+                  }}
+                >
+                  <Text style={styles.buttonText}>Đã Nhận Hàng</Text>
+                </TouchableOpacity>
+              )}
               {orderDetail?.status === "Pending" && (
                 <TouchableOpacity
                   style={[styles.actionButton, styles.cancelButton]}
@@ -370,6 +402,39 @@ const OrderTracking = ({ navigation }) => {
             </View>
           )}
         </ScrollView>
+
+        <Modal
+          title="Hủy Đơn Hàng"
+          transparent
+          visible={cancelModalVisible}
+          onClose={() => {
+            setCancelModalVisible(false);
+            setCancelReason("");
+          }}
+          maskClosable
+          footer={[
+            {
+              text: "Hủy",
+              onPress: () => {
+                setCancelModalVisible(false);
+                setCancelReason("");
+              },
+            },
+            {
+              text: "Xác Nhận",
+              onPress: confirmCancelOrder,
+            },
+          ]}
+        >
+          <View style={{ paddingVertical: 20 }}>
+            <TextInput
+              style={styles.cancelReasonInput}
+              onChangeText={(text) => setCancelReason(text)}
+              placeholder="Nhập lý do hủy đơn hàng"
+              multiline
+            />
+          </View>
+        </Modal>
       </ImageBackground>
     </Provider>
   );

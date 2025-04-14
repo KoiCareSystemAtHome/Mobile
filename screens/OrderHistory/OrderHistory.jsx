@@ -131,7 +131,7 @@ const OrderHistory = ({ navigation }) => {
                 key={order.orderId}
                 style={styles.orderCard}
                 onPress={() => {
-                  navigation.navigate("OrderTracking", { order });
+                  navigation.navigate("OrderTracking", { order, userId: isLoggedIn?.id });
                 }}
                 activeOpacity={0.8}
               >

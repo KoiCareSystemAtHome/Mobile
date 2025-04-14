@@ -156,6 +156,17 @@ export const updateOrderStatus = createAsyncThunk(
     }
   }
 );
+export const rejectOrder = createAsyncThunk(
+  "ghnSlice/rejectOrder",
+  async (values) => {
+    try {
+      const res = await putRequest(`Order/RejectOrder`, values);
+      return res.data;
+    } catch (error) {
+      console.log(error)
+    }
+  }
+);
 
 export const { setData } = ghnSlice.actions;
 export default ghnSlice;
