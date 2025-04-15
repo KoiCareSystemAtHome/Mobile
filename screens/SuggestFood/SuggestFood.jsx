@@ -35,7 +35,7 @@ const SuggestFood = ({ route, navigation }) => {
         <TouchableOpacity onPress={() => navigation.goBack()}>
           <AntDesign name="left" size={28} color="#1E3A8A" />
         </TouchableOpacity>
-        <Text style={styles.title}>Suggested Foods</Text>
+        <Text style={styles.title}>Thức ăn gợi ý</Text>
         <View style={{ width: 28 }} />
       </View>
 
