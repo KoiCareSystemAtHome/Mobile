@@ -109,7 +109,7 @@ const ReportScreen = ({navigation}) => {
       >
         <View style={styles.overlay} />
         <ScrollView contentContainerStyle={styles.container}>
-          <Text style={styles.title}>Report Screen</Text>
+          <Text style={styles.title}>Báo cáo của tôi</Text>
           {imageBlob ? (
             <View style={styles.imageContainer}>
               <Image
@@ -120,7 +120,7 @@ const ReportScreen = ({navigation}) => {
                 style={styles.changeImageButton}
                 onPress={handleImagePick}
               >
-                <Text style={styles.changeImageText}>Change Picture</Text>
+                <Text style={styles.changeImageText}>Thay đổi ảnh</Text>
               </TouchableOpacity>
             </View>
           ) : (
@@ -128,7 +128,7 @@ const ReportScreen = ({navigation}) => {
               style={styles.imageButton}
               onPress={handleImagePick}
             >
-              <Text style={styles.imageButtonText}>Tap To Select Image</Text>
+              <Text style={styles.imageButtonText}>Chọn ảnh</Text>
             </TouchableOpacity>
           )}
           <Form
@@ -149,7 +149,7 @@ const ReportScreen = ({navigation}) => {
               style={styles.submitButton}
               onPress={() => form.submit()}
             >
-              <Text style={styles.modalSaveText}>Submit</Text>
+              <Text style={styles.modalSaveText}>Lưu</Text>
             </Button>
           </Form>
         </ScrollView>

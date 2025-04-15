@@ -62,7 +62,7 @@ const HealthStatusForm = ({ fishId, visible, onClose, onSubmit }) => {
   return (
     <Provider>
       <Modal
-        title={<Text style={styles.modalTitle}>Add Health Record</Text>}
+        title={<Text style={styles.modalTitle}>Lịch sử bệnh cá</Text>}
         visible={visible}
         transparent
         onClose={onClose}
@@ -98,7 +98,7 @@ const HealthStatusForm = ({ fishId, visible, onClose, onSubmit }) => {
             >
               <Form.Item
                 name="diseaseID"
-                label={<Text style={styles.inputLabel}>Disease ID</Text>}
+                label={<Text style={styles.inputLabel}>Bệnh cá</Text>}
                 rules={[{ required: true, message: "Please enter Disease ID" }]}
               >
                 <Input placeholder="Enter Disease ID" style={styles.input} />
@@ -106,7 +106,7 @@ const HealthStatusForm = ({ fishId, visible, onClose, onSubmit }) => {
 
               <Form.Item
                 name="medicineId"
-                label={<Text style={styles.inputLabel}>Medicine ID</Text>}
+                label={<Text style={styles.inputLabel}>Mã đơn thuốc</Text>}
                 rules={[{ required: true, message: "Please enter Medicine ID" }]}
               >
                 <Input placeholder="Enter Medicine ID" style={styles.input} />
@@ -114,7 +114,7 @@ const HealthStatusForm = ({ fishId, visible, onClose, onSubmit }) => {
 
               <Form.Item
                 name="endDate"
-                label={<Text style={styles.inputLabel}>End Date</Text>}
+                label={<Text style={styles.inputLabel}>Ngày kết thúc</Text>}
                 rules={[{ required: true, message: "Please select End Date" }]}
               >
                 <DatePicker
@@ -128,7 +128,7 @@ const HealthStatusForm = ({ fishId, visible, onClose, onSubmit }) => {
 
               <Form.Item
                 name="status"
-                label={<Text style={styles.inputLabel}>Status</Text>}
+                label={<Text style={styles.inputLabel}>Trạng thái</Text>}
                 rules={[{ required: true, message: "Please select Status" }]}
               >
                 <Picker
@@ -140,13 +140,13 @@ const HealthStatusForm = ({ fishId, visible, onClose, onSubmit }) => {
                   cols={1}
                   style={styles.picker}
                 >
-                  <Text style={styles.input}>Select Status</Text>
+                  <Text style={styles.input}>Chọn trạng thái</Text>
                 </Picker>
               </Form.Item>
 
               {/* Symptoms Section */}
               <View style={styles.sectionHeader}>
-                <Text style={styles.label}>Symptoms</Text>
+                <Text style={styles.label}>Triệu chứng</Text>
                 <TouchableOpacity onPress={addSymptom}>
                   <FontAwesome name="plus" size={18} color="#6497B1" />
                 </TouchableOpacity>
@@ -155,7 +155,7 @@ const HealthStatusForm = ({ fishId, visible, onClose, onSubmit }) => {
               {symptoms.map((symptom, index) => (
                 <View key={index} style={styles.symptomRow}>
                   <View style={styles.inputRow}>
-                    <Text style={styles.inputLabel}>Symptom ID:</Text>
+                    <Text style={styles.inputLabel}>Triệu chứng:</Text>
                     <Input
                       placeholder="Symptom ID"
                       value={symptom.symptomID}
@@ -166,7 +166,7 @@ const HealthStatusForm = ({ fishId, visible, onClose, onSubmit }) => {
                     />
                   </View>
                   <View style={styles.inputRow}>
-                    <Text style={styles.inputLabel}>Value:</Text>
+                    <Text style={styles.inputLabel}>Giá trị:</Text>
                     <Input
                       placeholder="Symptom Value"
                       value={symptom.value}
@@ -187,7 +187,7 @@ const HealthStatusForm = ({ fishId, visible, onClose, onSubmit }) => {
 
               <Form.Item
                 name="note"
-                label={<Text style={styles.inputLabel}>Note</Text>}
+                label={<Text style={styles.inputLabel}>Ghi chú</Text>}
               >
                 <Input
                   placeholder="Add a note (optional)"

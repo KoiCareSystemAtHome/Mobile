@@ -45,8 +45,8 @@ const Profile = ({ navigation }) => {
       <View style={styles.overlay} />
       <View style={styles.container}>
         <View style={styles.header}>
-          <Text style={styles.sideHeader} onPress={()=>{navigation.navigate("EditProfile")}}>Edit</Text>
-          <Text style={styles.title}>Profile</Text>
+          <Text style={styles.sideHeader} onPress={()=>{navigation.navigate("EditProfile")}}>Chỉnh sửa</Text>
+          <Text style={styles.title}>Thông tin tài khoản</Text>
           <TouchableOpacity onPress={handleLogout}>
           <Text style={styles.sideHeader} >
             Logout

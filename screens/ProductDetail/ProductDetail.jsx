@@ -96,7 +96,7 @@ const ProductDetail = ({ navigation }) => {
     <View style={styles.feedbackItem}>
       <View style={styles.feedbackHeader}>
         <Text style={styles.feedbackMemberName}>{item.memberName}:</Text>
-        <Text style={styles.feedbackRating}>Rating: {item.rate}/5</Text>
+        <Text style={styles.feedbackRating}>Chất lượng: {item.rate}/5</Text>
       </View>
       <Text style={styles.feedbackContent}>{item.content}</Text>
     </View>
