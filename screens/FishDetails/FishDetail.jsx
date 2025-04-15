@@ -102,7 +102,10 @@ const FishDetail = ({ route, navigation }) => {
   };
 
   const renderHealthCard = (profile) => {
-    if (!profile) return <Text style={styles.noDataText}>Không có dữ liệu hồ sơ sức khỏe</Text>;
+    if (!profile)
+      return (
+        <Text style={styles.noDataText}>Không có dữ liệu hồ sơ sức khỏe</Text>
+      );
 
     const statusText = profile.status === 0 ? "Ốm" : "Khỏe mạnh";
     const treatmentText =
@@ -164,6 +167,24 @@ const FishDetail = ({ route, navigation }) => {
 
   const handleAddGrowth = () => {
     if (newSize.trim() && newWeight.trim()) {
+      const today = new Date().toISOString().split("T")[0]; // Get today's date in YYYY-MM-DD format
+
+      // Check if a growth record exists for today
+      const hasRecordToday = fish.fishReportInfos?.some((report) => {
+        const reportDate = new Date(report.calculatedDate)
+          .toISOString()
+          .split("T")[0];
+        return reportDate === today;
+      });
+
+      if (hasRecordToday) {
+        Toast.fail("Chỉ được thêm một bản ghi tăng trưởng mỗi ngày.");
+        setNewSize("");
+        setNewWeight("");
+        setGrowthModalVisible(false);
+        return;
+      }
+
       const koiID = fish.koiID;
       const name = fish.name;
       const pondID = fish.pond.pondID;
@@ -335,7 +356,11 @@ const FishDetail = ({ route, navigation }) => {
                     style={styles.picker}
                   >
                     <TouchableOpacity style={styles.actionButton}>
-                      <FontAwesome name="caret-down" size={18} color="#0077B6" />
+                      <FontAwesome
+                        name="caret-down"
+                        size={18}
+                        color="#0077B6"
+                      />
                     </TouchableOpacity>
                   </Picker>
                 )}
