@@ -5,7 +5,7 @@ import {
   Image,
   TouchableOpacity,
   TextInput,
-  ScrollView,
+  FlatList,
   ImageBackground,
 } from "react-native";
 import { Button, Provider, Toast } from "@ant-design/react-native";
@@ -29,7 +29,7 @@ const CartScreen = ({ navigation }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [fontLoaded, setFontLoaded] = useState(false);
   const [address, setAddress] = useState(null);
-  const [userInfo, setUserInfo] = useState(null);
+  const [userInfo, setUserInfo] = useState(null); // Updated to store both name and phoneNumber
   const [paymentMethod, setPaymentMethod] = useState("COD");
   const tax = 0.0;
   const total = subtotal;
@@ -70,7 +70,7 @@ const CartScreen = ({ navigation }) => {
         const value = await AsyncStorage.getItem("address");
         setAddress(value ? JSON.parse(value) : null);
         const recipientInfo = await AsyncStorage.getItem("userInfo");
-        setUserInfo(recipientInfo ? JSON.parse(recipientInfo) : null);
+        setUserInfo(recipientInfo ? JSON.parse(recipientInfo) : null); // Store name and phoneNumber
         const userInfo = await AsyncStorage.getItem("user");
         setIsLoggedIn(userInfo ? JSON.parse(userInfo) : null);
       } catch (error) {
@@ -143,11 +143,11 @@ const CartScreen = ({ navigation }) => {
     };
 
     if (address === null) {
-      Toast.fail("Vui lòng chọn địa chỉ");
+      Toast.fail("Please select an address");
     } else {
       if (paymentMethod === "Online Banking") {
         if (walletData?.amount < total) {
-          Toast.fail("Số dư ví không đủ");
+          Toast.fail("Insufficient wallet balance");
           return;
         }
 
@@ -161,10 +161,10 @@ const CartScreen = ({ navigation }) => {
               .unwrap()
               .then((res) => {
                 if (!res) {
-                  Toast.fail("Thanh toán thất bại");
+                  Toast.fail("Failed to pay order");
                 } else {
                   dispatch(getWallet(isLoggedIn?.id));
-                  Toast.success("Thanh toán thành công");
+                  Toast.success("Order Paid Successfully");
                   AsyncStorage.removeItem("cart");
                   setTimeout(() => {
                     navigation.navigate("Shopping");
@@ -173,7 +173,7 @@ const CartScreen = ({ navigation }) => {
               });
           })
           .catch((error) => {
-            Toast.fail("Thanh toán thất bại");
+            Toast.fail("Failed to pay order");
             console.error(error);
           });
       } else {
@@ -181,7 +181,7 @@ const CartScreen = ({ navigation }) => {
           .unwrap()
           .then(async (res) => {
             if (res !== undefined) {
-              Toast.success("Đặt hàng thành công");
+              Toast.success("Order Created Successfully");
               await AsyncStorage.removeItem("cart");
               setTimeout(() => {
                 navigation.navigate("Shopping");
@@ -189,7 +189,7 @@ const CartScreen = ({ navigation }) => {
             }
           })
           .catch((error) => {
-            Toast.fail("Đặt hàng thất bại");
+            Toast.fail("Failed to create order");
             console.error(error);
           });
       }
@@ -207,132 +207,121 @@ const CartScreen = ({ navigation }) => {
         style={styles.background}
       >
         <View style={styles.overlay} />
-        <ScrollView
-          contentContainerStyle={styles.scrollContent}
-          showsVerticalScrollIndicator={false}
-        >
-          {/* Header */}
-          <View style={styles.header}>
-            <TouchableOpacity onPress={() => navigation.navigate("Shopping")}>
-              <AntDesign name="left" size={24} color="#FFF" />
-            </TouchableOpacity>
-            <Text style={styles.title}>Giỏ Hàng</Text>
-            <TouchableOpacity>
-              <FontAwesome name="bell" size={24} color="#FFF" />
+        {/* Header */}
+        <View style={styles.header}>
+          <TouchableOpacity onPress={() => navigation.navigate("Shopping")}>
+            <AntDesign name="left" size={24} color="#FFF" />
+          </TouchableOpacity>
+          <Text style={styles.title}>Giỏ Hàng</Text>
+          <TouchableOpacity>
+            <FontAwesome name="bell" size={24} color="#FFF" />
+          </TouchableOpacity>
+        </View>
+
+        {/* Wallet Amount */}
+        <View style={styles.walletContainer}>
+          <Text style={styles.walletText}>
+            Số dư ví: {walletData?.amount?.toFixed(2) || "0.00"} VND
+          </Text>
+        </View>
+
+        {/* Recipient and Address Info */}
+        {address && userInfo ? (
+          <View style={styles.addressInfo}>
+            <Text style={styles.addressText}>
+              {`${userInfo.name} | ${userInfo.phoneNumber}`}
+            </Text>
+            <Text style={styles.addressText}>
+              {`${address.provinceName}, ${address.districtName}, ${address.wardName}`}
+            </Text>
+            <TouchableOpacity
+              onPress={() => navigation.navigate("AddressForm")}
+              style={styles.changeAddressButton}
+            >
+              <Text style={styles.changeAddressText}>Thay đổi địa chỉ</Text>
             </TouchableOpacity>
           </View>
+        ) : (
+          <TouchableOpacity onPress={() => navigation.navigate("AddressForm")}>
+            <View style={styles.addressBar}>
+              <Text style={styles.addressBarText}>Thêm địa chỉ</Text>
+              <AntDesign name="arrowright" size={20} color="#FFF" />
+            </View>
+          </TouchableOpacity>
+        )}
 
-          {/* Wallet Amount */}
-          <View style={styles.walletContainer}>
-            <Text style={styles.walletText}>
-              Số dư ví: {walletData?.amount?.toFixed(2) || "0.00"} VND
+        {/* Cart Items */}
+        <FlatList
+          data={cart}
+          keyExtractor={(item) => item.productId}
+          renderItem={({ item }) => (
+            <View style={styles.cartItem}>
+              <Image source={{ uri: item.image }} style={styles.productImage} />
+              <View style={styles.productInfo}>
+                <Text style={styles.productName}>{item.productName}</Text>
+                <Text style={styles.productPrice}>
+                  {`${item.price.toLocaleString("vi-VN")} VND`}
+                </Text>
+                <View style={styles.quantityContainer}>
+                  <TouchableOpacity
+                    style={styles.quantityButton}
+                    onPress={() =>
+                      handleQuantityChange(item.productId, "decrease")
+                    }
+                  >
+                    <AntDesign name="minus" size={16} color="#FFF" />
+                  </TouchableOpacity>
+                  <Text style={styles.quantityText}>{item.quantity}</Text>
+                  <TouchableOpacity
+                    style={styles.quantityButton}
+                    onPress={() =>
+                      handleQuantityChange(item.productId, "increase")
+                    }
+                  >
+                    <AntDesign name="plus" size={16} color="#FFF" />
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </View>
+          )}
+          contentContainerStyle={styles.flatListContent}
+        />
+
+        {/* Order Summary */}
+        <View style={styles.summaryContainer}>
+          <View style={styles.summaryRow}>
+            <Text style={styles.summaryText}>Tổng phụ</Text>
+            <Text style={styles.summaryPrice}>
+              {`${subtotal.toFixed(2)} VND`}
             </Text>
           </View>
-
-          {/* Recipient and Address Info */}
-          {address && userInfo ? (
-            <View style={styles.addressInfo}>
-              <Text style={styles.addressText}>
-                {`${userInfo.name} | ${userInfo.phoneNumber}`}
-              </Text>
-              <Text style={styles.addressText}>
-                {`${address.provinceName}, ${address.districtName}, ${address.wardName}`}
-              </Text>
-              <TouchableOpacity
-                onPress={() => navigation.navigate("AddressForm")}
-                style={styles.changeAddressButton}
-              >
-                <Text style={styles.changeAddressText}>Thay đổi địa chỉ</Text>
-              </TouchableOpacity>
-            </View>
-          ) : (
-            <TouchableOpacity onPress={() => navigation.navigate("AddressForm")}>
-              <View style={styles.addressBar}>
-                <Text style={styles.addressBarText}>Thêm địa chỉ</Text>
-                <AntDesign name="arrowright" size={20} color="#FFF" />
-              </View>
-            </TouchableOpacity>
-          )}
-
-          {/* Cart Items */}
-          <View style={styles.cartItemsContainer}>
-            {cart.length > 0 ? (
-              cart.map((item) => (
-                <View key={item.productId} style={styles.cartItem}>
-                  <Image
-                    source={{ uri: item.image }}
-                    style={styles.productImage}
-                  />
-                  <View style={styles.productInfo}>
-                    <Text style={styles.productName}>{item.productName}</Text>
-                    <Text style={styles.productPrice}>
-                      {`${item.price.toLocaleString("vi-VN")} VND`}
-                    </Text>
-                    <View style={styles.quantityContainer}>
-                      <TouchableOpacity
-                        style={styles.quantityButton}
-                        onPress={() =>
-                          handleQuantityChange(item.productId, "decrease")
-                        }
-                      >
-                        <AntDesign name="minus" size={16} color="#FFF" />
-                      </TouchableOpacity>
-                      <Text style={styles.quantityText}>{item.quantity}</Text>
-                      <TouchableOpacity
-                        style={styles.quantityButton}
-                        onPress={() =>
-                          handleQuantityChange(item.productId, "increase")
-                        }
-                      >
-                        <AntDesign name="plus" size={16} color="#FFF" />
-                      </TouchableOpacity>
-                    </View>
-                  </View>
-                </View>
-              ))
-            ) : (
-              <Text style={styles.emptyCartText}>Giỏ hàng trống</Text>
-            )}
+          <View style={styles.summaryRow}>
+            <Text style={styles.totalText}>Tổng cộng</Text>
+            <Text style={styles.totalPrice}>{`${total.toFixed(2)} VND`}</Text>
           </View>
+        </View>
 
-          {/* Order Summary */}
-          <View style={styles.summaryContainer}>
-            <View style={styles.summaryRow}>
-              <Text style={styles.summaryText}>Tổng phụ</Text>
-              <Text style={styles.summaryPrice}>
-                {`${subtotal.toFixed(2)} VND`}
-              </Text>
-            </View>
-            <View style={styles.summaryRow}>
-              <Text style={styles.totalText}>Tổng cộng</Text>
-              <Text style={styles.totalPrice}>
-                {`${total.toFixed(2)} VND`}
-              </Text>
-            </View>
-          </View>
+        {/* Payment Method Selection */}
+        <View style={styles.paymentMethodContainer}>
+          <Text style={styles.paymentMethodLabel}>Phương thức thanh toán</Text>
+          <RadioGroup
+            radioButtons={radioButtons}
+            onPress={setPaymentMethod}
+            selectedId={paymentMethod}
+            layout="column"
+            containerStyle={styles.radioGroup}
+            labelStyle={styles.radioText}
+          />
+        </View>
 
-          {/* Payment Method Selection */}
-          <View style={styles.paymentMethodContainer}>
-            <Text style={styles.paymentMethodLabel}>Phương thức thanh toán</Text>
-            <RadioGroup
-              radioButtons={radioButtons}
-              onPress={setPaymentMethod}
-              selectedId={paymentMethod}
-              layout="column"
-              containerStyle={styles.radioGroup}
-              labelStyle={styles.radioText}
-            />
-          </View>
-
-          {/* Checkout Button */}
-          <Button
-            type="primary"
-            style={styles.checkoutButton}
-            onPress={handleCheckout}
-          >
-            <Text style={styles.checkoutText}>Thanh toán</Text>
-          </Button>
-        </ScrollView>
+        {/* Checkout Button */}
+        <Button
+          type="primary"
+          style={styles.checkoutButton}
+          onPress={handleCheckout}
+        >
+          <Text style={styles.checkoutText}>Thanh toán</Text>
+        </Button>
       </ImageBackground>
     </Provider>
   );

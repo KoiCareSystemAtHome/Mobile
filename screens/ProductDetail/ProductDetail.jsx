@@ -53,20 +53,20 @@ const ProductDetail = ({ navigation }) => {
         cart[existingProductIndex].quantity += quantity;
       } else {
         cart.push({
-          productId: productById.productId,
-          productName: productById.productName,
-          price: productById.price,
+          productId: product.productId,
+          productName: product.productName,
+          price: product.price,
           quantity,
-          image: productById.image,
-          shopId: productById.shopId,
+          image: product.image,
+          shopId: product.shopId,
         });
       }
 
       await AsyncStorage.setItem("cart", JSON.stringify(cart));
       navigation.navigate("Shopping");
-      Alert.alert("Thành công", "Sản phẩm đã được thêm vào giỏ hàng!");
+      Alert.alert("Success", "Product added to cart!");
     } catch (error) {
-      console.error("Lỗi khi thêm vào giỏ hàng:", error);
+      console.error("Error adding to cart:", error);
     }
   };
 
@@ -95,8 +95,8 @@ const ProductDetail = ({ navigation }) => {
   const renderFeedback = ({ item }) => (
     <View style={styles.feedbackItem}>
       <View style={styles.feedbackHeader}>
-        <Text style={styles.feedbackMemberName}>{item.memberName}</Text>
-        <Text style={styles.feedbackRating}>{item.rate}/5</Text>
+        <Text style={styles.feedbackMemberName}>{item.memberName}:</Text>
+        <Text style={styles.feedbackRating}>Chất lượng: {item.rate}/5</Text>
       </View>
       <Text style={styles.feedbackContent}>{item.content}</Text>
     </View>
@@ -109,35 +109,29 @@ const ProductDetail = ({ navigation }) => {
         style={styles.backButton}
         onPress={() => navigation.goBack()}
       >
-        <AntDesign name="left" size={24} color="#FFF" />
+        <AntDesign name="left" size={20} color="#000" />
       </TouchableOpacity>
 
       {/* Product Image */}
-      <Image source={{ uri: productById?.image }} style={styles.productImage} />
+      <Image source={{ uri: product.image }} style={styles.productImage} />
 
       {/* Product Info */}
-      <View style={styles.productInfo}>
-        <Text style={styles.productTitle}>{productById?.productName}</Text>
-        <Text style={styles.shopName}>{productById?.shopName}</Text>
-        <View style={styles.ratingContainer}>
-          <AntDesign name="star" size={16} color="#FFD700" />
-          <Text style={styles.averageRating}>
-            {averageRating} ({feedbacks.length} đánh giá)
-          </Text>
-        </View>
-        <Text style={styles.productPrice}>
-          {productById?.price.toLocaleString("vi-VN")} VND
+      <Text style={styles.productTitle}>{product.productName}</Text>
+      <Text style={styles.shopName}>{product.shopName}</Text>
+      <Text style={styles.productDescription}>{product.description}</Text>
+      <Text style={styles.stockQuantity}>
+        Còn: {product.stockQuantity} sản phẩm
+      </Text>
+      <View style={styles.ratingContainer}>
+        <AntDesign name="star" size={16} color="#FFD700" />
+        <Text style={styles.averageRating}>
+          {averageRating} ({feedbacks.length} đánh giá)
         </Text>
-        <Text style={styles.stockQuantity}>
-          Còn: {productById?.stockQuantity} sản phẩm
-        </Text>
-        <Text style={styles.productDescription}>{productById?.description}</Text>
       </View>
 
-      {/* Quantity Selector */}
-      <View style={styles.quantityContainer}>
-        <Text style={styles.quantityLabel}>Số lượng:</Text>
-        <View style={styles.quantitySelector}>
+      {/* Quantity Selector and Price */}
+      <View style={styles.row}>
+        <View style={styles.quantityContainer}>
           <TouchableOpacity
             style={styles.quantityButton}
             onPress={handleDecrement}
@@ -152,19 +146,23 @@ const ProductDetail = ({ navigation }) => {
             <Text style={styles.quantityText}>+</Text>
           </TouchableOpacity>
         </View>
+        <Text style={styles.productPrice}>{product.price} VND</Text>
       </View>
 
-      {/* Add to Cart Button */}
-      <Button
-        type="primary"
-        style={styles.addToCartButton}
-        onPress={addToCart}
-      >
-        <View style={styles.buttonContent}>
-          <AntDesign name="shoppingcart" size={20} color="#FFF" />
-          <Text style={styles.buttonText}>Thêm vào giỏ</Text>
-        </View>
-      </Button>
+      {/* Buttons */}
+      <View style={styles.buttonContainer}>
+
+        <Button
+          type="primary"
+          style={styles.addToCartButton}
+          onPress={addToCart}
+        >
+          <View style={styles.buttonContent}>
+            <AntDesign name="shoppingcart" size={18} color="#fff" />
+            <Text style={styles.buttonText}> Thêm vào giỏ</Text>
+          </View>
+        </Button>
+      </View>
 
       {/* Feedback Section Title */}
       <View style={styles.feedbackSection}>
@@ -183,7 +181,7 @@ const ProductDetail = ({ navigation }) => {
         onPress={handlePrevPage}
         disabled={currentPage === 1}
       >
-        <Text style={styles.paginationText}>Trang trước</Text>
+        <Text style={styles.paginationText}>Trang Trước</Text>
       </TouchableOpacity>
       <Text style={styles.pageInfo}>
         {currentPage}/{totalPages}
@@ -196,7 +194,7 @@ const ProductDetail = ({ navigation }) => {
         onPress={handleNextPage}
         disabled={currentPage === totalPages}
       >
-        <Text style={styles.paginationText}>Trang sau</Text>
+        <Text style={styles.paginationText}>Trang Sau</Text>
       </TouchableOpacity>
     </View>
   );
@@ -218,7 +216,6 @@ const ProductDetail = ({ navigation }) => {
           ListEmptyComponent={
             <Text style={styles.noFeedbackText}>Chưa có đánh giá</Text>
           }
-          contentContainerStyle={styles.flatListContent}
         />
       </View>
     </ImageBackground>

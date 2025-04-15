@@ -8,16 +8,13 @@ export const styles = StyleSheet.create({
     ...StyleSheet.absoluteFillObject,
     backgroundColor: "rgba(255, 255, 255, 0.7)", // Softer overlay for readability
   },
-  scrollContent: {
-    paddingBottom: 40, // Extra padding for scrollable content
-  },
   header: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
     padding: 20,
     paddingTop: 40,
-    backgroundColor: "rgba(0, 73, 104, 0.8)", // Darker blue for header
+    backgroundColor: "rgba(0, 105, 148, 0.8)", // Deep blue for water theme
     borderBottomLeftRadius: 20,
     borderBottomRightRadius: 20,
   },
@@ -29,9 +26,9 @@ export const styles = StyleSheet.create({
   },
   walletContainer: {
     padding: 12,
-    backgroundColor: "#E6F0FA", // Light blue
+    backgroundColor: "#E6F0FA", // Light blue for water effect
     marginHorizontal: 20,
-    marginVertical: 12,
+    marginVertical: 10,
     borderRadius: 12,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
@@ -41,16 +38,15 @@ export const styles = StyleSheet.create({
   },
   walletText: {
     fontSize: 16,
-    color: "#004D73",
+    color: "#004D73", // Darker blue for contrast
     fontWeight: "600",
   },
   addressBar: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    backgroundColor: "#006994",
-    marginHorizontal: 20,
-    marginVertical: 12,
+    backgroundColor: "#006994", // Water-themed blue
+    margin: 20,
     padding: 14,
     borderRadius: 12,
     shadowColor: "#000",
@@ -65,8 +61,7 @@ export const styles = StyleSheet.create({
   },
   addressInfo: {
     backgroundColor: "#FFFFFF",
-    marginHorizontal: 20,
-    marginVertical: 12,
+    margin: 20,
     padding: 16,
     borderRadius: 12,
     shadowColor: "#000",
@@ -89,12 +84,9 @@ export const styles = StyleSheet.create({
     color: "#007AFF",
     fontWeight: "600",
   },
-  cartItemsContainer: {
-    marginVertical: 12,
-  },
   cartItem: {
     flexDirection: "row",
-    backgroundColor: "#F9F9F9",
+    backgroundColor: "#F9F9F9", // Light background for contrast
     borderRadius: 12,
     padding: 12,
     marginHorizontal: 20,
@@ -146,18 +138,15 @@ export const styles = StyleSheet.create({
     marginHorizontal: 12,
     fontWeight: "500",
   },
-  emptyCartText: {
-    fontSize: 16,
-    color: "#666",
-    textAlign: "center",
-    marginVertical: 20,
+  flatListContent: {
+    paddingBottom: 20,
   },
   summaryContainer: {
     backgroundColor: "#FFFFFF",
     marginHorizontal: 20,
     padding: 16,
     borderRadius: 12,
-    marginVertical: 12,
+    marginVertical: 10,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
@@ -193,8 +182,8 @@ export const styles = StyleSheet.create({
     padding: 16,
     backgroundColor: "#FFFFFF",
     marginHorizontal: 20,
-    marginVertical: 12,
     borderRadius: 12,
+    marginVertical: 10,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
@@ -216,10 +205,11 @@ export const styles = StyleSheet.create({
     fontWeight: "500",
   },
   checkoutButton: {
-    backgroundColor: "#006994",
+    backgroundColor: "#006994", // Water-themed blue
     borderRadius: 12,
     marginHorizontal: 20,
     marginVertical: 20,
+    // padding: 16,
     alignItems: "center",
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },

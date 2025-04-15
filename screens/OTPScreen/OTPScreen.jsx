@@ -120,7 +120,7 @@ const OTPScreen = ({ navigation, route }) => {
 
           {/* Submit Button */}
           <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
-            <Text style={styles.submitButtonText}>Submit</Text>
+            <Text style={styles.submitButtonText}>Tiếp theo</Text>
           </TouchableOpacity>
         </View>
       </ImageBackground>

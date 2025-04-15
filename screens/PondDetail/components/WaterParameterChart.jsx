@@ -86,7 +86,7 @@ const WaterParametersChart = ({ selectedParameters = [], waterParameterData, pon
       showsVerticalScrollIndicator={true}
     >
       {selectedParameters.length === 0 ? (
-        <Text style={styles.noDataText}>Select parameters to display</Text>
+        <Text style={styles.noDataText}>Hãy chọn 1 thông số</Text>
       ) : (
         selectedParameters.map((parameter) => {
           const { maxYValue, yAxisInterval } = getChartConfig(parameter);

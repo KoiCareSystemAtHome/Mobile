@@ -52,7 +52,7 @@ const ForgetPassword = ({ navigation }) => {
   }, []);
 
   if (!fontLoaded) {
-    return <Text>'字体加载中...'</Text>;
+    return <Text>'Đang tải font chữ'</Text>;
   }
 
   return (

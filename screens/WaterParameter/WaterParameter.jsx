@@ -234,7 +234,7 @@ const WaterParameter = () => {
             <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
           }
         >
-          <Text style={styles.title}>Water Parameter</Text>
+          <Text style={styles.title}>Thông số nước</Text>
           <View style={{ justifyContent: "center", flexDirection: "row" }}>
             <TouchableOpacity
               onPress={() => setHomePondOpen(!homePondOpen)}
@@ -277,7 +277,7 @@ const WaterParameter = () => {
             <View style={styles.modalOverlay}>
               <View style={styles.modalContainer}>
                 <View style={styles.modalHeader}>
-                  <Text style={styles.modalTitle}>Change Water Parameters</Text>
+                  <Text style={styles.modalTitle}>Lưu thông số nước</Text>
                 </View>
 
                 <Form form={form} onFinish={handleSubmit}>

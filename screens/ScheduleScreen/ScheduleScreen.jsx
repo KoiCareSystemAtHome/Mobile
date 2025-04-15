@@ -161,7 +161,7 @@ const ScheduleScreen = ({ navigation }) => {
           style={{ flex: 1, padding: 10, borderRadius: 20, backgroundColor: filterType === "Pond" ? "#6A5ACD" : "transparent", alignItems: "center" }}
           onPress={() => setFilterType("Pond")}
         >
-          <Text style={{ color: filterType === "Pond" ? "#FFF" : "#000", fontWeight: "bold", fontSize: 12 }}>Salt</Text>
+          <Text style={{ color: filterType === "Pond" ? "#FFF" : "#000", fontWeight: "bold", fontSize: 12 }}>Muối</Text>
         </TouchableOpacity>
       </View>
 

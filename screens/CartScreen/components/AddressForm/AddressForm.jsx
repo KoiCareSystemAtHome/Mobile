@@ -205,7 +205,7 @@ const AddressForm = ({ navigation }) => {
             onPress={() => form.submit()}
             style={styles.button}
           >
-            <Text style={styles.buttonText}>Submit</Text>
+            <Text style={styles.buttonText}>Lưu</Text>
           </Button>
         </Form>
       </View>
