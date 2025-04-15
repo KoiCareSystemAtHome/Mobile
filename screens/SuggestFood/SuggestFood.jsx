@@ -41,6 +41,17 @@ const SuggestFood = ({ route, navigation }) => {
         <View style={{ width: 24 }} /> {/* Spacer for symmetry */}
       </View>
 
+      <View style={styles.notediv}>
+        <Text style={styles.note}>{foodSuggestion.note}</Text>
+        {foodSuggestion.image ? (
+          <Image 
+            source={{ uri: foodSuggestion.image }} 
+            style={styles.foodImage} 
+            resizeMode="cover" 
+          />
+        ) : null}
+      </View>
+
       {/* Food Suggestions List */}
       <FlatList
         data={foodSuggestion?.foods}

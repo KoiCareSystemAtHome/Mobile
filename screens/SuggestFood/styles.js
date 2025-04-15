@@ -20,6 +20,27 @@ export const styles = StyleSheet.create({
     textAlign: "center",
     marginVertical: 20,
   },
+  note: {
+    fontSize: 14,
+    color: "#333",
+    textAlign: "center",
+    padding: 4,
+    marginBottom: 16
+  },
+  foodImage: {
+    width: '95%',
+    height: 350,
+    alignSelf: 'center',
+    borderRadius: 8,
+    marginBottom: 10
+  },  
+  notediv: {
+    backgroundColor: "rgba(255, 255, 255, 0.5)",
+    marginLeft: 15,
+    marginRight: 15,
+    borderRadius: 10,
+    marginBottom: 20,
+  },
   productCard: {
     flex: 1,
     backgroundColor: "white",
