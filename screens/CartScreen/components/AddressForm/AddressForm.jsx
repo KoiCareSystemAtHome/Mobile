@@ -1,4 +1,4 @@
-import { Button, Form, View } from "@ant-design/react-native";
+import { Button, Form, View, Input } from "@ant-design/react-native";
 import React, { useEffect, useState } from "react";
 import { styles } from "./styles";
 import { ImageBackground, Text } from "react-native";
@@ -16,7 +16,7 @@ import { useDispatch, useSelector } from "react-redux";
 import DropDownPicker from "react-native-dropdown-picker";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const AddressForm = ({navigation}) => {
+const AddressForm = ({ navigation }) => {
   const dispatch = useDispatch();
   const [form] = Form.useForm();
 
@@ -41,11 +41,16 @@ const AddressForm = ({navigation}) => {
       wardId: String(JSON.parse(selectedWard).wardCode),
       wardName: JSON.parse(selectedWard).wardName,
     };
+    const userInfo = {
+      name: values.name,
+      phoneNumber: values.phoneNumber,
+    };
     try {
-      await AsyncStorage.setItem('address', JSON.stringify(address));
+      await AsyncStorage.setItem("address", JSON.stringify(address));
+      await AsyncStorage.setItem("userInfo", JSON.stringify(userInfo));
       navigation.navigate("CartScreen");
     } catch (error) {
-      console.error('Error saving address to AsyncStorage:', error);
+      console.error("Error saving data to AsyncStorage:", error);
     }
   };
 
@@ -80,9 +85,43 @@ const AddressForm = ({navigation}) => {
     >
       <View style={styles.overlay} />
       <View style={styles.container}>
-        <Text style={styles.title}>Add an address</Text>
-        <Form form={form} onFinish={onFinish} style={{ backgroundColor: "transparentr" }}>
-          <Form.Item label="Province" style={styles.dropdownContainer}>
+        <Text style={styles.title}>Thông tin người nhận</Text>
+        <Form
+          form={form}
+          onFinish={onFinish}
+          style={{ backgroundColor: "transparent", width: "100%" }}
+        >
+          <Form.Item
+            label="Name"
+            name="name"
+            rules={[{ required: true, message: "Please enter your name" }]}
+            style={styles.dropdownContainer}
+            noStyle
+          >
+            <Input placeholder="Enter your name" style={styles.input} />
+          </Form.Item>
+
+          <Form.Item
+            noStyle
+            label="Phone Number"
+            name="phoneNumber"
+            rules={[
+              { required: true, message: "Please enter your phone number" },
+              {
+                pattern: /^[0-9]+$/,
+                message: "Please enter a valid phone number",
+              },
+            ]}
+            style={styles.dropdownContainer}
+          >
+            <Input
+              placeholder="Enter your phone number"
+              keyboardType="numeric"
+              style={styles.input}
+            />
+          </Form.Item>
+
+          <Form.Item label="Province" style={styles.dropdownContainer} noStyle>
             <DropDownPicker
               open={openProvince}
               value={selectedProvince}
@@ -98,11 +137,17 @@ const AddressForm = ({navigation}) => {
               setOpen={setOpenProvince}
               setValue={setSelectedProvince}
               listMode="SCROLLVIEW"
-              style={openProvince ? { marginBottom: 200 } : {}}
+              style={[
+                styles.dropdown,
+                openProvince ? { marginBottom: 200 } : {},
+              ]}
+              textStyle={{ fontSize: 16, color: "#333" }}
+              dropDownContainerStyle={styles.dropdown}
+              placeholder="Select Province"
             />
           </Form.Item>
 
-          <Form.Item label="District" style={styles.dropdownContainer}>
+          <Form.Item label="District" style={styles.dropdownContainer} noStyle>
             <DropDownPicker
               placeholder={
                 selectedProvince ? "Select District" : "Select Province First"
@@ -121,11 +166,16 @@ const AddressForm = ({navigation}) => {
               setOpen={setOpenDistrict}
               setValue={setSelectedDistrict}
               disabled={!selectedProvince}
-              style={openDistrict ? { marginBottom: 200 } : {}}
+              style={[
+                styles.dropdown,
+                openDistrict ? { marginBottom: 200 } : {},
+              ]}
+              textStyle={{ fontSize: 16, color: "#333" }}
+              dropDownContainerStyle={styles.dropdown}
             />
           </Form.Item>
 
-          <Form.Item label="Ward" style={styles.dropdownContainer}>
+          <Form.Item label="Ward" style={styles.dropdownContainer} noStyle>
             <DropDownPicker
               placeholder={
                 selectedDistrict ? "Select Ward" : "Select District First"
@@ -144,12 +194,18 @@ const AddressForm = ({navigation}) => {
               setOpen={setOpenWard}
               setValue={setSelectedWard}
               disabled={!selectedDistrict}
-              style={openWard ? { marginBottom: 200 } : {}}
+              style={[styles.dropdown, openWard ? { marginBottom: 200 } : {}]}
+              textStyle={{ fontSize: 16, color: "#333" }}
+              dropDownContainerStyle={styles.dropdown}
             />
           </Form.Item>
 
-          <Button type="primary" onPress={() => form.submit()}>
-            Submit
+          <Button
+            type="primary"
+            onPress={() => form.submit()}
+            style={styles.button}
+          >
+            <Text style={styles.buttonText}>Submit</Text>
           </Button>
         </Form>
       </View>

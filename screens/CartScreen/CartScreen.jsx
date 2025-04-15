@@ -29,22 +29,24 @@ const CartScreen = ({ navigation }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [fontLoaded, setFontLoaded] = useState(false);
   const [address, setAddress] = useState(null);
-  const [paymentMethod, setPaymentMethod] = useState("COD"); // Default to COD
+  const [userInfo, setUserInfo] = useState(null); // Updated to store both name and phoneNumber
+  const [paymentMethod, setPaymentMethod] = useState("COD");
   const tax = 0.0;
   const total = subtotal;
 
   const radioButtons = [
     {
       id: "COD",
-      label: "Cash on Delivery (COD)",
+      label: "Thanh toán khi nhận hàng (COD)",
       value: "COD",
     },
     {
       id: "Online Banking",
-      label: "Online Banking",
+      label: "Ngân hàng trực tuyến",
       value: "Online Banking",
     },
   ];
+
   useEffect(() => {
     const fetchCart = async () => {
       try {
@@ -67,6 +69,8 @@ const CartScreen = ({ navigation }) => {
       try {
         const value = await AsyncStorage.getItem("address");
         setAddress(value ? JSON.parse(value) : null);
+        const recipientInfo = await AsyncStorage.getItem("userInfo");
+        setUserInfo(recipientInfo ? JSON.parse(recipientInfo) : null); // Store name and phoneNumber
         const userInfo = await AsyncStorage.getItem("user");
         setIsLoggedIn(userInfo ? JSON.parse(userInfo) : null);
       } catch (error) {
@@ -120,7 +124,11 @@ const CartScreen = ({ navigation }) => {
   };
 
   const handleCheckout = () => {
+    const name = userInfo?.name || "Người nhận";
+    const phoneNumber = userInfo?.phoneNumber || "Số điện thoại";
     const order = {
+      name,
+      phoneNumber,
       address,
       accountId: isLoggedIn?.id,
       orderDetails: cart.map(({ productId, quantity }) => ({
@@ -164,7 +172,6 @@ const CartScreen = ({ navigation }) => {
                 }
               });
           })
-
           .catch((error) => {
             Toast.fail("Failed to pay order");
             console.error(error);
@@ -179,7 +186,6 @@ const CartScreen = ({ navigation }) => {
               setTimeout(() => {
                 navigation.navigate("Shopping");
               }, 1000);
-            } else {
             }
           })
           .catch((error) => {
@@ -191,7 +197,7 @@ const CartScreen = ({ navigation }) => {
   };
 
   if (!fontLoaded) {
-    return null; // Or a loading indicator
+    return null;
   }
 
   return (
@@ -204,11 +210,11 @@ const CartScreen = ({ navigation }) => {
         {/* Header */}
         <View style={styles.header}>
           <TouchableOpacity onPress={() => navigation.navigate("Shopping")}>
-            <AntDesign name="left" size={24} color="black" />
+            <AntDesign name="left" size={24} color="#FFF" />
           </TouchableOpacity>
           <Text style={styles.title}>Giỏ Hàng</Text>
           <TouchableOpacity>
-            <FontAwesome name="bell" size={24} color="black" />
+            <FontAwesome name="bell" size={24} color="#FFF" />
           </TouchableOpacity>
         </View>
 
@@ -219,20 +225,27 @@ const CartScreen = ({ navigation }) => {
           </Text>
         </View>
 
-        {address ? (
+        {/* Recipient and Address Info */}
+        {address && userInfo ? (
           <View style={styles.addressInfo}>
-            <Text>{`${address.provinceName}, ${address.districtName}, ${address.wardName}`}</Text>
+            <Text style={styles.addressText}>
+              {`${userInfo.name} | ${userInfo.phoneNumber}`}
+            </Text>
+            <Text style={styles.addressText}>
+              {`${address.provinceName}, ${address.districtName}, ${address.wardName}`}
+            </Text>
             <TouchableOpacity
               onPress={() => navigation.navigate("AddressForm")}
+              style={styles.changeAddressButton}
             >
-              <Text style={{ color: "blue" }}>Thay đổi địa chỉ</Text>
+              <Text style={styles.changeAddressText}>Thay đổi địa chỉ</Text>
             </TouchableOpacity>
           </View>
         ) : (
           <TouchableOpacity onPress={() => navigation.navigate("AddressForm")}>
             <View style={styles.addressBar}>
-              <Text>Thêm địa chỉ</Text>
-              <AntDesign name="arrowright" size={20} color="black" />
+              <Text style={styles.addressBarText}>Thêm địa chỉ</Text>
+              <AntDesign name="arrowright" size={20} color="#FFF" />
             </View>
           </TouchableOpacity>
         )}
@@ -244,11 +257,11 @@ const CartScreen = ({ navigation }) => {
           renderItem={({ item }) => (
             <View style={styles.cartItem}>
               <Image source={{ uri: item.image }} style={styles.productImage} />
-              <View>
-                <View style={styles.productDetails}>
-                  <Text style={styles.productName}>{item.productName}</Text>
-                  <Text style={styles.productPrice}>{`${(item.price).toLocaleString("vi-VN")} VND`}</Text>
-                </View>
+              <View style={styles.productInfo}>
+                <Text style={styles.productName}>{item.productName}</Text>
+                <Text style={styles.productPrice}>
+                  {`${item.price.toLocaleString("vi-VN")} VND`}
+                </Text>
                 <View style={styles.quantityContainer}>
                   <TouchableOpacity
                     style={styles.quantityButton}
@@ -256,7 +269,7 @@ const CartScreen = ({ navigation }) => {
                       handleQuantityChange(item.productId, "decrease")
                     }
                   >
-                    <AntDesign name="minus" size={16} color="white" />
+                    <AntDesign name="minus" size={16} color="#FFF" />
                   </TouchableOpacity>
                   <Text style={styles.quantityText}>{item.quantity}</Text>
                   <TouchableOpacity
@@ -265,47 +278,39 @@ const CartScreen = ({ navigation }) => {
                       handleQuantityChange(item.productId, "increase")
                     }
                   >
-                    <AntDesign name="plus" size={16} color="white" />
+                    <AntDesign name="plus" size={16} color="#FFF" />
                   </TouchableOpacity>
                 </View>
               </View>
             </View>
           )}
+          contentContainerStyle={styles.flatListContent}
         />
 
         {/* Order Summary */}
         <View style={styles.summaryContainer}>
-          <Text style={styles.summaryText}>Tổng phụ</Text>
-          <Text style={styles.summaryPrice}>{`${subtotal.toFixed(
-            2
-          )} VND`}</Text>
-        </View>
-
-        <View style={styles.summaryContainer}>
-          <Text style={styles.totalText}>Tổng cộng</Text>
-          <Text style={styles.totalPrice}>{`${total.toFixed(2)} VND`}</Text>
+          <View style={styles.summaryRow}>
+            <Text style={styles.summaryText}>Tổng phụ</Text>
+            <Text style={styles.summaryPrice}>
+              {`${subtotal.toFixed(2)} VND`}
+            </Text>
+          </View>
+          <View style={styles.summaryRow}>
+            <Text style={styles.totalText}>Tổng cộng</Text>
+            <Text style={styles.totalPrice}>{`${total.toFixed(2)} VND`}</Text>
+          </View>
         </View>
 
         {/* Payment Method Selection */}
         <View style={styles.paymentMethodContainer}>
-          <Text style={styles.paymentMethodLabel}>Phương thức thanh toán:</Text>
+          <Text style={styles.paymentMethodLabel}>Phương thức thanh toán</Text>
           <RadioGroup
-            radioButtons={[
-              {
-                id: "COD",
-                label: "Thanh toán khi nhận hàng (COD)",
-                value: "COD",
-              },
-              {
-                id: "Online Banking",
-                label: "Ngân hàng trực tuyến",
-                value: "Online Banking",
-              },
-            ]}
+            radioButtons={radioButtons}
             onPress={setPaymentMethod}
             selectedId={paymentMethod}
             layout="column"
             containerStyle={styles.radioGroup}
+            labelStyle={styles.radioText}
           />
         </View>
 
