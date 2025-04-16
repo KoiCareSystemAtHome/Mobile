@@ -167,7 +167,7 @@ export const styles = StyleSheet.create({
     maxHeight: 40, // Limit text height to prevent overlap
   },
   productPrice: {
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: "bold",
     marginBottom: 0,
   },

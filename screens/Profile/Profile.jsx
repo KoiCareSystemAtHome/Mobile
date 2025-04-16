@@ -17,6 +17,8 @@ const Profile = ({ navigation }) => {
     await AsyncStorage.removeItem("accessToken"); 
     await AsyncStorage.removeItem("user");
     await AsyncStorage.removeItem("cart");
+    await AsyncStorage.removeItem("address");
+    await AsyncStorage.removeItem("userInfo");
     navigation.navigate("Login");
   };
 

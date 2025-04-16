@@ -111,7 +111,9 @@ const Shopping = ({ navigation }) => {
       const matchesCategoryName = filters.categoryName
         ? product.categoryName === filters.categoryName
         : true;
-      const matchesBrand = filters.brand ? product.brand === filters.brand : true;
+      const matchesBrand = filters.brand
+        ? product.brand === filters.brand
+        : true;
       const matchesShopName = filters.shopName
         ? product.shopName === filters.shopName
         : true;
@@ -203,7 +205,10 @@ const Shopping = ({ navigation }) => {
         <TouchableOpacity style={styles.searchIcon}>
           <FontAwesome name="search" size={20} color="#888" />
         </TouchableOpacity>
-        <TouchableOpacity onPress={toggleFilterDrawer} style={styles.filterButton}>
+        <TouchableOpacity
+          onPress={toggleFilterDrawer}
+          style={styles.filterButton}
+        >
           <AntDesign name="filter" size={20} color="#000" />
           <Text style={styles.filterText}>Lọc</Text>
         </TouchableOpacity>
@@ -291,7 +296,9 @@ const Shopping = ({ navigation }) => {
           <View style={styles.filterSection}>
             <View style={styles.filterSectionHeader}>
               <Text style={styles.filterLabel}>Tác Động Thông Số</Text>
-              <TouchableOpacity onPress={() => toggleSection("parameterImpacts")}>
+              <TouchableOpacity
+                onPress={() => toggleSection("parameterImpacts")}
+              >
                 <AntDesign
                   name={openSections.parameterImpacts ? "minus" : "plus"}
                   size={25}
@@ -327,10 +334,15 @@ const Shopping = ({ navigation }) => {
             <Text style={styles.productName}>{item.productName}</Text>
             <Text style={styles.shopName}>{item.shopName}</Text>
             <View style={styles.priceAndButtonContainer}>
-              <Text style={styles.productPrice}>
+              <Text style={styles.productPrice} numberOfLines={1}>
                 {item.price.toLocaleString("vi-VN")} VND
               </Text>
-              <TouchableOpacity style={styles.addToCartButton}>
+              <TouchableOpacity
+                style={styles.addToCartButton}
+                onPress={() => {
+                  navigation.navigate("ProductDetail", { product: item });
+                }}
+              >
                 <Text style={styles.addToCartText}>Thêm vào giỏ</Text>
               </TouchableOpacity>
             </View>

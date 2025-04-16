@@ -26,6 +26,7 @@ import {
   productSelector,
 } from "../../redux/selector";
 import AntDesign from "react-native-vector-icons/AntDesign";
+import enUS from "@ant-design/react-native/lib/locale-provider/en_US";
 
 const OrderTracking = ({ navigation }) => {
   const dispatch = useDispatch();
@@ -129,8 +130,10 @@ const OrderTracking = ({ navigation }) => {
     });
   };
 
+  console.log(orderTrack?.log)
+
   return (
-    <Provider>
+    <Provider locale={enUS}>
       <ImageBackground
         source={require("../../assets/koimain3.jpg")}
         style={styles.background}

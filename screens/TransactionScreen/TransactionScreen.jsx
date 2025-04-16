@@ -80,7 +80,7 @@ const TransactionScreen = ({ navigation }) => {
                 ? `Gói ${item?.pakageName}`
                 : `Đơn ${item?.vnPayTransactionId}`}
             </Text>
-            {(item.transactionType === "Cancel" || item.refund) && (
+            {(item.refund && item.payment) && (
               <Text style={styles.statusText}>Đơn đã được hủy</Text>
             )}
             {(item.payment && !item.refund) && (

@@ -40,6 +40,7 @@ const ProductDetail = ({ navigation }) => {
   const handleIncrement = () => setQuantity(quantity + 1);
   const handleDecrement = () => quantity > 1 && setQuantity(quantity - 1);
 
+
   const addToCart = async () => {
     try {
       const cartData = await AsyncStorage.getItem("cart");
@@ -59,6 +60,7 @@ const ProductDetail = ({ navigation }) => {
           quantity,
           image: product.image,
           shopId: product.shopId,
+          weight:product.weight,
         });
       }
 
@@ -69,6 +71,7 @@ const ProductDetail = ({ navigation }) => {
       console.error("Error adding to cart:", error);
     }
   };
+  console.log(product)
 
   useEffect(() => {
     dispatch(getProductById(product.productId));

@@ -58,7 +58,7 @@ const Tab = createBottomTabNavigator();
 // Create Stack Navigator
 const Stack = createStackNavigator();
 
-// Function to schedule a notification one hour before the maintenance date
+// Function to schedule a local notification one hour before the maintenance date
 const scheduleNotification = async (reminder) => {
   try {
     const maintainDate = new Date(reminder.maintainDate);
@@ -66,7 +66,7 @@ const scheduleNotification = async (reminder) => {
     const now = new Date();
 
     if (notificationDate > now && reminder.seenDate === "0001-01-01T00:00:00") {
-      await Notifications.scheduleNotificationAsync({
+      const notificationId = await Notifications.scheduleNotificationAsync({
         content: {
           title: `Reminder: ${reminder.title}`,
           body: `Your maintenance "${reminder.title}" is due in 1 hour!`,
@@ -77,7 +77,14 @@ const scheduleNotification = async (reminder) => {
         trigger: {
           date: notificationDate,
         },
-      });    }
+      });
+
+      // Store the notification ID in AsyncStorage to avoid duplicates
+      const storedNotifications = await AsyncStorage.getItem('scheduledNotifications');
+      const notifications = storedNotifications ? JSON.parse(storedNotifications) : {};
+      notifications[reminder.pondReminderId] = notificationId;
+      await AsyncStorage.setItem('scheduledNotifications', JSON.stringify(notifications));
+    }
   } catch (error) {
     console.error("Error scheduling notification:", error);
   }
@@ -137,6 +144,7 @@ const AppContent = () => {
       const { status } = await Notifications.requestPermissionsAsync();
       if (status !== 'granted') {
         console.warn("Notification permissions not granted!");
+        return;
       }
 
       // Set notification handler for foreground notifications
@@ -163,32 +171,40 @@ const AppContent = () => {
     initializeApp();
   }, [dispatch]);
 
-  // Schedule notification for the closest reminder
+  // Schedule notifications for all future reminders
   useEffect(() => {
-    if (reminderByOwner && reminderByOwner.length > 0) {
-      // Cancel all existing notifications to avoid duplicates
-      Notifications.cancelAllScheduledNotificationsAsync().catch((error) => {
-        console.error("Error canceling notifications:", error);
-      });
+    const scheduleAllNotifications = async () => {
+      if (reminderByOwner && reminderByOwner.length > 0) {
+        // Load stored notification IDs
+        const storedNotifications = await AsyncStorage.getItem('scheduledNotifications');
+        const scheduledNotificationIds = storedNotifications ? JSON.parse(storedNotifications) : {};
 
-      // Find the closest future reminder
-      const now = new Date();
-      const futureReminders = reminderByOwner.filter((reminder) => {
-        const maintainDate = new Date(reminder.maintainDate);
-        return maintainDate > now;
-      });
+        // Cancel any outdated notifications
+        for (const reminderId in scheduledNotificationIds) {
+          const reminder = reminderByOwner.find(r => r.pondReminderId === reminderId);
+          if (!reminder || reminder.seenDate !== "0001-01-01T00:00:00" || new Date(reminder.maintainDate) <= new Date()) {
+            await Notifications.cancelScheduledNotificationAsync(scheduledNotificationIds[reminderId]);
+            delete scheduledNotificationIds[reminderId];
+          }
+        }
+        await AsyncStorage.setItem('scheduledNotifications', JSON.stringify(scheduledNotificationIds));
 
-      if (futureReminders.length > 0) {
-        const closestReminder = futureReminders.reduce((prev, curr) => {
-          const prevDate = new Date(prev.maintainDate);
-          const currDate = new Date(curr.maintainDate);
-          return currDate < prevDate ? curr : prev;
+        // Schedule notifications for future reminders
+        const now = new Date();
+        const futureReminders = reminderByOwner.filter((reminder) => {
+          const maintainDate = new Date(reminder.maintainDate);
+          return maintainDate > now && reminder.seenDate === "0001-01-01T00:00:00";
         });
 
-        // Schedule notification for the closest reminder
-        scheduleNotification(closestReminder);
+        for (const reminder of futureReminders) {
+          if (!scheduledNotificationIds[reminder.pondReminderId]) {
+            await scheduleNotification(reminder);
+          }
+        }
       }
-    }
+    };
+
+    scheduleAllNotifications();
   }, [reminderByOwner]);
 
   // Handle notification clicks
@@ -203,13 +219,13 @@ const AppContent = () => {
           navigationRef.navigate("ReminderDetail", { reminder: selectedReminder });
         } else {
           console.warn(`Reminder with ID ${reminderId} not found in reminderByOwner`);
-          // Fallback: navigate with just the ID if not found
           navigationRef.navigate("ReminderDetail", { reminder: { pondReminderId: reminderId } });
         }
       }
     });
+
     return () => subscription.remove();
-  }, [navigationRef, reminderByOwner]); // Add reminderByOwner as a dependency
+  }, [navigationRef, reminderByOwner]);
 
   return (
     <NavigationContainer ref={navigationRef}>

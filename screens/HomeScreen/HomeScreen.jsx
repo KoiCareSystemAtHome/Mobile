@@ -42,7 +42,7 @@ const HomeScreen = ({ navigation }) => {
   const toggleDrawer = () => {
     if (drawerOpen) {
       Animated.timing(drawerAnimation, {
-        toValue: -270, 
+        toValue: -270,
         duration: 300,
         useNativeDriver: false,
       }).start(() => setDrawerOpen(false));
@@ -66,10 +66,10 @@ const HomeScreen = ({ navigation }) => {
     try {
       const value = await AsyncStorage.getItem("user");
       setIsLoggedIn(value ? JSON.parse(value) : null);
-      
+
       const newToken = await AsyncStorage.getItem("accessToken");
       setToken(newToken);
-      
+
       if (isLoggedIn?.id) {
         await dispatch(getWallet(isLoggedIn?.id)).unwrap();
       }
@@ -106,6 +106,8 @@ const HomeScreen = ({ navigation }) => {
       await AsyncStorage.removeItem("user");
       await AsyncStorage.removeItem("accessToken");
       await AsyncStorage.removeItem("cart");
+      await AsyncStorage.removeItem("address");
+      await AsyncStorage.removeItem("userInfo");
       setIsLoggedIn(null);
       setToken(null);
       setTooltipVisible(false);
@@ -114,8 +116,8 @@ const HomeScreen = ({ navigation }) => {
       console.error("Logout failed:", error);
     }
   };
-  
-  console.log(isLoggedIn?.id)
+
+  console.log(isLoggedIn?.id);
 
   return (
     <ImageBackground
@@ -312,7 +314,7 @@ const HomeScreen = ({ navigation }) => {
                   <View style={styles.depositHeader}>
                     <Text style={styles.depositText}>
                       <Text style={styles.amount}>
-                        {(walletData?.amount)?.toLocaleString("vi-VN") || "0"}
+                        {walletData?.amount?.toLocaleString("vi-VN") || "0"}
                       </Text>
                       <Text style={styles.currency}> VND</Text>
                     </Text>
@@ -323,8 +325,8 @@ const HomeScreen = ({ navigation }) => {
                     </TouchableOpacity>
                   </View>
                   <Text style={styles.cardDescription}>
-                    Nạp tiền ngay để mở khóa các dịch vụ cao cấp của hệ thống chăm
-                    sóc Koi!
+                    Nạp tiền ngay để mở khóa các dịch vụ cao cấp của hệ thống
+                    chăm sóc Koi!
                   </Text>
                 </LinearGradient>
               </View>

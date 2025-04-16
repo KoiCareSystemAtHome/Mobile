@@ -63,7 +63,7 @@ const CartScreen = ({ navigation }) => {
 
     fetchCart();
   }, []);
-
+  console.log(cart);
   useEffect(() => {
     const getData = async () => {
       try {
@@ -126,6 +126,16 @@ const CartScreen = ({ navigation }) => {
   const handleCheckout = () => {
     const name = userInfo?.name || "Người nhận";
     const phoneNumber = userInfo?.phoneNumber || "Số điện thoại";
+  
+    // Calculate total weight of the cart
+    const totalWeight = cart.reduce((acc, item) => acc + (item.weight * item.quantity), 0);
+  
+    // Check if total weight exceeds 50,000 grams
+    if (totalWeight > 50000) {
+      Toast.fail("Total weight exceeds 50,000 grams. Cannot create order.");
+      return;
+    }
+  
     const order = {
       name,
       phoneNumber,
@@ -141,21 +151,23 @@ const CartScreen = ({ navigation }) => {
       note: "string",
       paymentMethod: paymentMethod,
     };
-
-    if (address === null) {
-      Toast.fail("Please select an address");
+  
+    if (address === null && userInfo === null) {
+      Toast.fail("Please provide recipient information and address");
+      return;
     } else {
       if (paymentMethod === "Online Banking") {
         if (walletData?.amount < total) {
           Toast.fail("Insufficient wallet balance");
           return;
         }
-
+  
         dispatch(createOrder(order))
           .unwrap()
           .then(async (res) => {
             const orderIds = res.map((item) => item.message);
             const email = isLoggedIn?.email;
+            console.log(email, orderIds);
             const values = { email, orderIds };
             dispatch(payOrder(values))
               .unwrap()
@@ -221,7 +233,7 @@ const CartScreen = ({ navigation }) => {
         {/* Wallet Amount */}
         <View style={styles.walletContainer}>
           <Text style={styles.walletText}>
-            Số dư ví: {walletData?.amount?.toFixed(2) || "0.00"} VND
+            Số dư ví: {(walletData?.amount).toLocaleString("vi-VN") || "0.00"} VND
           </Text>
         </View>
 
@@ -290,14 +302,14 @@ const CartScreen = ({ navigation }) => {
         {/* Order Summary */}
         <View style={styles.summaryContainer}>
           <View style={styles.summaryRow}>
-            <Text style={styles.summaryText}>Tổng phụ</Text>
+            <Text style={styles.summaryText}>Cân nặng</Text>
             <Text style={styles.summaryPrice}>
-              {`${subtotal.toFixed(2)} VND`}
+              {`${cart.reduce((acc, item) => acc + (item.weight * item.quantity), 0)}g`}
             </Text>
           </View>
           <View style={styles.summaryRow}>
             <Text style={styles.totalText}>Tổng cộng</Text>
-            <Text style={styles.totalPrice}>{`${total.toFixed(2)} VND`}</Text>
+            <Text style={styles.totalPrice}>{`${total.toLocaleString("vi-VN")} VND`}</Text>
           </View>
         </View>
 
