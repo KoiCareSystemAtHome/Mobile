@@ -40,6 +40,7 @@ export const symptomByTypeSelector = (state) => state.symptomSlice.symptomByType
 export const symptomPredictionSelector = (state) => state.symptomSlice.symptomPredict;
 export const symptomExaminationSelector = (state) => state.symptomSlice.symptomExamination;
 export const diseaseByIdSelector = (state) => state.symptomSlice.diseaseById;
+export const symptomReminderSelector = (state) => state.symptomSlice.reminder;
 
 // Blog Selectors
 export const approvedBlogsSelector = (state) => state.blogSlice.approvedBlogs;

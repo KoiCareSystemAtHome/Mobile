@@ -7,6 +7,7 @@ const initialState = {
   symptomPredict: null,
   symptomExamination: null,
   diseaseById:null,
+  reminder:null
 };
 
 export const symptomSlice = createSlice({
@@ -29,6 +30,9 @@ export const symptomSlice = createSlice({
     })
     .addCase(getDiseaseById.fulfilled, (state, action) => {
       state.diseaseById = action.payload;
+    })
+    .addCase(createSymptomReminder.fulfilled, (state, action) => {
+      state.reminder = action.payload;
     })
     // .addCase(getRequiredParams.fulfilled, (state, action) => {
     //   state.params = action.payload;
@@ -123,10 +127,10 @@ export const createSymptomReminder = createAsyncThunk(
   "symptomSlice/createSymptomReminder",
   async (payload, { rejectWithValue }) => {
     try {
-      const res = await postRequest(`Symptom/reminder?${payload}`);
+      const res = await postRequest(`Symptomp/reminder?pondId=${payload}`);
       return res.data;
     } catch (error) {
-      Alert.alert("Error", "Failed to add test.");
+      Alert.alert("Error", "Failed to add reminder.");
       return rejectWithValue("Add failed");
     }
   }

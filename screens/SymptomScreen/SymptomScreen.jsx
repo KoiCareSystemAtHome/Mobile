@@ -10,6 +10,7 @@ import {
 } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import {
+  createSymptomReminder,
   getExamination,
   getPrediction,
   getSymptomByType,
@@ -19,6 +20,7 @@ import {
   symptomExaminationSelector,
   symptomPredictionSelector,
   pondByOwnerSelector,
+  symptomReminderSelector,
 } from "../../redux/selector";
 import { getPondByOwner } from "../../redux/slices/pondSlice";
 import DropDownPicker from "react-native-dropdown-picker";
@@ -30,6 +32,7 @@ const SymptomScreen = ({ navigation }) => {
   const dispatch = useDispatch();
   const symptomData = useSelector(symptomByTypeSelector);
   const pondData = useSelector(pondByOwnerSelector);
+  const symptomReminder = useSelector(symptomReminderSelector);
 
   // Dropdown states for symptoms
   const [open, setOpen] = useState(false);
@@ -145,6 +148,13 @@ const SymptomScreen = ({ navigation }) => {
     setSelectedValues([])
   };
 
+  useEffect(()=>{
+    if(homePond){
+      dispatch(createSymptomReminder(homePond?.pondID))
+    }
+  },[homePond])
+  console.log(symptomReminder)
+
   return (
     <ImageBackground
       source={require("../../assets/koimain3.jpg")}
@@ -205,9 +215,8 @@ const SymptomScreen = ({ navigation }) => {
           <View style={styles.modalContainer}>
             <View style={styles.modalContent}>
               <Text style={styles.modalText}>
-                Check water quality and temperature!
+                Tạo nhắc nhở
               </Text>
-              <Text style={styles.modalSubText}>Chọn một hồ:</Text>
               <TouchableOpacity
                 onPress={() => setHomePondOpen(!homePondOpen)}
                 style={styles.selector}
