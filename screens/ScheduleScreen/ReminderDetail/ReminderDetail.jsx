@@ -12,6 +12,17 @@ import { styles } from "./styles";
 import { useDispatch } from "react-redux";
 import { getReminderByOwner, updateReminder } from "../../../redux/slices/reminderSlice";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import dayjs from "dayjs"; // Import dayjs
+import "dayjs/locale/vi"; // Import Vietnamese locale
+import utc from "dayjs/plugin/utc"; // Import UTC plugin
+import timezone from "dayjs/plugin/timezone"; // Import timezone plugin
+
+// Extend dayjs with plugins
+dayjs.extend(utc);
+dayjs.extend(timezone);
+
+// Set Vietnamese locale
+dayjs.locale("vi");
 
 const leftArrowIcon = "←";
 const dropdownIcon = "⌄";
@@ -26,21 +37,14 @@ const ReminderDetail = ({ navigation, route }) => {
   );
 
   const isComplete = selectedStatus === "Complete";
-  console.log(reminder.reminderType);
-  console.log(reminder.maintainDate);
-  const date = new Date(reminder.maintainDate);
-  const formattedDate = date.toLocaleDateString("vi-VN", {
-    weekday: "long",
-    day: "numeric",
-    month: "short",
-    year: "numeric",
-  });
-  const startHour = (date.getHours().toString().padStart(2, "0")) - 7;
-  const startMinutes = (date.getMinutes().toString().padStart(2, "0")) - 7;
-  const endHour = (((date.getHours() + 2) % 24).toString().padStart(2, "0")) - 7;
-  const timeRange = `${startHour}:${startMinutes} - ${endHour}:${startMinutes}`;
 
-  const typeDotColor = isComplete 
+  // Format the maintainDate using dayjs
+  const formattedDate = dayjs
+    .utc(reminder.maintainDate) // Parse as UTC
+    .tz("Asia/Ho_Chi_Minh") // Convert to Vietnam timezone (UTC+7)
+    .format("dddd, D MMM, YYYY, HH:mm"); // Format as desired
+
+  const typeDotColor = isComplete
     ? "#4CAF50"
     : reminder.title.toLowerCase().includes("Pond")
     ? "#A5D6A7"
@@ -77,7 +81,6 @@ const ReminderDetail = ({ navigation, route }) => {
     }
   };
 
-  // New function to handle navigation to AddSaltForm
   const handleAddSalt = () => {
     navigation.navigate("AddSaltForm", { pondId: reminder.pondId });
   };
@@ -103,8 +106,10 @@ const ReminderDetail = ({ navigation, route }) => {
               <Text style={styles.headerIcon}>{leftArrowIcon}</Text>
             </TouchableOpacity>
             <Text style={styles.headerDate}>
-              {date
-                .toLocaleDateString("vi-VN", { day: "numeric", month: "short" })
+              {dayjs
+                .utc(reminder.maintainDate)
+                .tz("Asia/Ho_Chi_Minh")
+                .format("D MMM")
                 .toUpperCase()}
             </Text>
             <Text style={styles.headerTitle}>CHI TIẾT LỜI NHẮC</Text>
@@ -112,9 +117,7 @@ const ReminderDetail = ({ navigation, route }) => {
 
           <View style={styles.titleContainer}>
             <Text style={styles.title}>{reminder.title}</Text>
-            <Text style={styles.dateTime}>
-              {formattedDate}, {timeRange}
-            </Text>
+            <Text style={styles.dateTime}>{formattedDate}</Text>
           </View>
 
           <View style={styles.detailsContainer}>
@@ -129,10 +132,10 @@ const ReminderDetail = ({ navigation, route }) => {
                   onPress={handleDropdownPress}
                   disabled={isComplete}
                 >
-                  <Text 
+                  <Text
                     style={[
                       styles.detailValue,
-                      { color: isComplete ? "#4CAF50" : "#000" }
+                      { color: isComplete ? "#4CAF50" : "#000" },
                     ]}
                   >
                     {selectedStatus === "Complete" ? "Hoàn thành" : "Đang chờ"}
@@ -169,16 +172,14 @@ const ReminderDetail = ({ navigation, route }) => {
               </View>
             </View>
 
-            {/* GIF */}
-            <View style={{ alignItems: 'center', marginTop: 20 }}>
+            <View style={{ alignItems: "center", marginTop: 20 }}>
               <Image
-                source={require('../../../assets/ed281664ff39c5251e5ffc26c325d0fc.gif')}
+                source={require("../../../assets/ed281664ff39c5251e5ffc26c325d0fc.gif")}
                 style={{ width: 200, height: 200 }}
                 resizeMode="contain"
               />
             </View>
 
-            {/* Add Salt Button for Pond reminderType */}
             {reminder.reminderType === "Pond" && (
               <TouchableOpacity
                 style={{

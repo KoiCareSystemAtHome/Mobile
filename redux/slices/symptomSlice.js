@@ -119,6 +119,19 @@ export const createSymptom = createAsyncThunk(
   }
 );
 
+export const createSymptomReminder = createAsyncThunk(
+  "symptomSlice/createSymptomReminder",
+  async (payload, { rejectWithValue }) => {
+    try {
+      const res = await postRequest(`Symptom/reminder?${payload}`);
+      return res.data;
+    } catch (error) {
+      Alert.alert("Error", "Failed to add test.");
+      return rejectWithValue("Add failed");
+    }
+  }
+);
+
 export const updateSymptom = createAsyncThunk(
   "testSlice/updateSymptom",
   async (payload, { rejectWithValue }) => {

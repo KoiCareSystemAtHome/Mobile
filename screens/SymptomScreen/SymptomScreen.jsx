@@ -5,6 +5,8 @@ import {
   View,
   FlatList,
   TouchableOpacity,
+  Modal,
+  StyleSheet,
 } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -16,20 +18,52 @@ import {
   symptomByTypeSelector,
   symptomExaminationSelector,
   symptomPredictionSelector,
+  pondByOwnerSelector,
 } from "../../redux/selector";
+import { getPondByOwner } from "../../redux/slices/pondSlice";
 import DropDownPicker from "react-native-dropdown-picker";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import Icon from "react-native-vector-icons/AntDesign";
 import { styles } from "./styles";
 
 const SymptomScreen = ({ navigation }) => {
   const dispatch = useDispatch();
   const symptomData = useSelector(symptomByTypeSelector);
+  const pondData = useSelector(pondByOwnerSelector);
 
-  // Dropdown states
+  // Dropdown states for symptoms
   const [open, setOpen] = useState(false);
   const [items, setItems] = useState([]);
   const [selectedValues, setSelectedValues] = useState([]);
 
-  // Fetch data on mount
+  // Popup state
+  const [isPopupVisible, setIsPopupVisible] = useState(false);
+
+  // Pond selector states
+  const [homePond, setHomePond] = useState(null);
+  const [homePondOpen, setHomePondOpen] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(null);
+
+  // Fetch user data and ponds
+  useEffect(() => {
+    const getData = async () => {
+      try {
+        const value = await AsyncStorage.getItem("user");
+        setIsLoggedIn(value ? JSON.parse(value) : null);
+      } catch (error) {
+        console.error("Failed to fetch user data:", error);
+      }
+    };
+    getData();
+  }, []);
+
+  useEffect(() => {
+    if (isLoggedIn?.id) {
+      dispatch(getPondByOwner(isLoggedIn.id));
+    }
+  }, [isLoggedIn?.id, dispatch]);
+
+  // Fetch symptom data on mount
   useEffect(() => {
     dispatch(getSymptomByType("Common"));
   }, [dispatch]);
@@ -59,6 +93,16 @@ const SymptomScreen = ({ navigation }) => {
     ),
   ];
 
+  // Trigger popup when Common_Enviroment is in selectedTypes
+  useEffect(() => {
+    if (selectedTypes.includes("Common_Enviroment")) {
+      setIsPopupVisible(true);
+    } else {
+      setIsPopupVisible(false);
+      setHomePond(null); // Reset pond selection when modal closes
+      setHomePondOpen(false);
+    }
+  }, [selectedTypes]);
 
   // Render individual symptom item
   const renderSymptomItem = ({ item }) => (
@@ -89,7 +133,16 @@ const SymptomScreen = ({ navigation }) => {
         symtompId: id,
         value: "True",
       })),
+      pondId: homePond?.pondID, // Pass selected pond ID if available
     });
+  };
+
+  // Handle closing the popup
+  const handleClosePopup = () => {
+    setIsPopupVisible(false);
+    setHomePond(null); // Reset pond selection
+    setHomePondOpen(false);
+    setSelectedValues([])
   };
 
   return (
@@ -112,7 +165,9 @@ const SymptomScreen = ({ navigation }) => {
           mode="BADGE"
           placeholder="Select Symptoms"
           style={styles.dropdown}
-          dropDownContainerStyle={{ zIndex: 100 }}
+          dropDownContainerStyle={styles.dropdownContainer}
+          accessibilityLabel="Select fish symptoms"
+          accessibilityRole="combobox"
         />
 
         {selectedSymptoms?.length > 0 && (
@@ -140,6 +195,62 @@ const SymptomScreen = ({ navigation }) => {
           </View>
         )}
 
+        {/* Popup Modal for Common_Enviroment */}
+        <Modal
+          animationType="fade"
+          transparent={true}
+          visible={isPopupVisible}
+          onRequestClose={handleClosePopup}
+        >
+          <View style={styles.modalContainer}>
+            <View style={styles.modalContent}>
+              <Text style={styles.modalText}>
+                Check water quality and temperature!
+              </Text>
+              <Text style={styles.modalSubText}>Chọn một hồ:</Text>
+              <TouchableOpacity
+                onPress={() => setHomePondOpen(!homePondOpen)}
+                style={styles.selector}
+                accessibilityLabel="Select a pond"
+                accessibilityRole="button"
+              >
+                <Text style={styles.selectorText}>
+                  {homePond ? homePond?.name : "Chọn Một Ao"}
+                </Text>
+                <Icon name="down" size={16} color="#000" />
+              </TouchableOpacity>
+              {homePondOpen && (
+                <View style={styles.dropdown1}>
+                  {pondData?.length > 0 ? (
+                    pondData.map((item) => (
+                      <TouchableOpacity
+                        key={item?.pondID}
+                        onPress={() => {
+                          setHomePond(item);
+                          setHomePondOpen(false);
+                        }}
+                        style={styles.dropdownItem}
+                      >
+                        <Text style={styles.dropdownItemText}>{item?.name}</Text>
+                      </TouchableOpacity>
+                    ))
+                  ) : (
+                    <Text style={styles.dropdownItemText}>No ponds available</Text>
+                  )}
+                </View>
+              )}
+              <TouchableOpacity
+                style={styles.closeButton}
+                onPress={handleClosePopup}
+                accessibilityLabel="Close popup"
+                accessibilityRole="button"
+              >
+                <Text style={styles.closeButtonText}>Close</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
+
         {/* Next Button */}
         <TouchableOpacity
           style={[
@@ -148,6 +259,8 @@ const SymptomScreen = ({ navigation }) => {
           ]}
           onPress={handleNext}
           disabled={selectedValues.length === 0}
+          accessibilityLabel="Proceed to prediction"
+          accessibilityRole="button"
         >
           <Text style={styles.nextButtonText}>Tiếp theo</Text>
         </TouchableOpacity>

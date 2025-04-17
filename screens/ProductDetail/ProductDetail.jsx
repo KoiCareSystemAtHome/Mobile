@@ -94,6 +94,7 @@ const ProductDetail = ({ navigation }) => {
       setCurrentPage(currentPage - 1);
     }
   };
+  console.log(productById)
 
   const renderFeedback = ({ item }) => (
     <View style={styles.feedbackItem}>
