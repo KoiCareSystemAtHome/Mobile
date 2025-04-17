@@ -97,7 +97,6 @@ const ReminderDetail = ({ navigation, route }) => {
     };
     getData();
   }, []);
-
   return (
     <SafeAreaView style={styles.container}>
       <TouchableWithoutFeedback onPress={handleOutsidePress}>

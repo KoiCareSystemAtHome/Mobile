@@ -6,7 +6,6 @@ import {
   FlatList,
   TouchableOpacity,
   Modal,
-  StyleSheet,
 } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -46,6 +45,7 @@ const SymptomScreen = ({ navigation }) => {
   const [homePond, setHomePond] = useState(null);
   const [homePondOpen, setHomePondOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(null);
+  const [reminderText, setReminderText] = useState("");
 
   // Fetch user data and ponds
   useEffect(() => {
@@ -102,8 +102,9 @@ const SymptomScreen = ({ navigation }) => {
       setIsPopupVisible(true);
     } else {
       setIsPopupVisible(false);
-      setHomePond(null); // Reset pond selection when modal closes
+      setHomePond(null);
       setHomePondOpen(false);
+      setReminderText("");
     }
   }, [selectedTypes]);
 
@@ -136,24 +137,37 @@ const SymptomScreen = ({ navigation }) => {
         symtompId: id,
         value: "True",
       })),
-      pondId: homePond?.pondID, // Pass selected pond ID if available
+      pondId: homePond?.pondID,
     });
   };
 
   // Handle closing the popup
   const handleClosePopup = () => {
     setIsPopupVisible(false);
-    setHomePond(null); // Reset pond selection
+    setHomePond(null);
     setHomePondOpen(false);
-    setSelectedValues([])
+    setSelectedValues([]);
+    setReminderText("");
   };
 
-  useEffect(()=>{
-    if(homePond){
-      dispatch(createSymptomReminder(homePond?.pondID))
+  // Handle pond selection
+  const handlePondSelect = (item) => {
+    setHomePond(item);
+    setHomePondOpen(false);
+    setReminderText(
+      "Bạn có muốn tạo nhắc nhở để kiểm tra hồ? Các triệu chứng của cá có thể liên quan đến vấn đề môi trường trong hồ."
+    );
+  };
+
+  // Handle confirm button press
+  const handleConfirmReminder = () => {
+    if (homePond) {
+      dispatch(createSymptomReminder(homePond?.pondID));
+      setReminderText("Nhắc nhở đã được tạo thành công!");
     }
-  },[homePond])
-  console.log(symptomReminder)
+  };
+
+  console.log(symptomReminder);
 
   return (
     <ImageBackground
@@ -214,8 +228,9 @@ const SymptomScreen = ({ navigation }) => {
         >
           <View style={styles.modalContainer}>
             <View style={styles.modalContent}>
-              <Text style={styles.modalText}>
-                Tạo nhắc nhở
+              <Text style={styles.modalText}>Tạo Nhắc Nhở</Text>
+              <Text style={styles.modalSubText}>
+                {reminderText || "Vui lòng chọn một hồ để tạo nhắc nhở."}
               </Text>
               <TouchableOpacity
                 onPress={() => setHomePondOpen(!homePondOpen)}
@@ -226,7 +241,11 @@ const SymptomScreen = ({ navigation }) => {
                 <Text style={styles.selectorText}>
                   {homePond ? homePond?.name : "Chọn Một Ao"}
                 </Text>
-                <Icon name="down" size={16} color="#000" />
+                <Icon
+                  name={homePondOpen ? "up" : "down"}
+                  size={16}
+                  color="#1A3C6D"
+                />
               </TouchableOpacity>
               {homePondOpen && (
                 <View style={styles.dropdown1}>
@@ -234,28 +253,41 @@ const SymptomScreen = ({ navigation }) => {
                     pondData.map((item) => (
                       <TouchableOpacity
                         key={item?.pondID}
-                        onPress={() => {
-                          setHomePond(item);
-                          setHomePondOpen(false);
-                        }}
+                        onPress={() => handlePondSelect(item)}
                         style={styles.dropdownItem}
                       >
-                        <Text style={styles.dropdownItemText}>{item?.name}</Text>
+                        <Text style={styles.dropdownItemText}>
+                          {item?.name}
+                        </Text>
                       </TouchableOpacity>
                     ))
                   ) : (
-                    <Text style={styles.dropdownItemText}>No ponds available</Text>
+                    <Text style={styles.dropdownItemText}>Không có hồ nào</Text>
                   )}
                 </View>
               )}
-              <TouchableOpacity
-                style={styles.closeButton}
-                onPress={handleClosePopup}
-                accessibilityLabel="Close popup"
-                accessibilityRole="button"
-              >
-                <Text style={styles.closeButtonText}>Close</Text>
-              </TouchableOpacity>
+              <View style={styles.buttonContainer}>
+                <TouchableOpacity
+                  style={[
+                    styles.confirmButton,
+                    { opacity: homePond ? 1 : 0.5 },
+                  ]}
+                  onPress={handleConfirmReminder}
+                  disabled={!homePond}
+                  accessibilityLabel="Confirm reminder"
+                  accessibilityRole="button"
+                >
+                  <Text style={styles.confirmButtonText} numberOfLines={1}>Tạo</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.closeButton}
+                  onPress={handleClosePopup}
+                  accessibilityLabel="Close popup"
+                  accessibilityRole="button"
+                >
+                  <Text style={styles.closeButtonText}>Đóng</Text>
+                </TouchableOpacity>
+              </View>
             </View>
           </View>
         </Modal>

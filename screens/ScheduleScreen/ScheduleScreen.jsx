@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, TouchableOpacity } from "react-native";
+import { View, Text, TouchableOpacity, ScrollView } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Calendar } from "react-native-calendars";
 import Modal from "react-native-modal";
@@ -42,86 +42,69 @@ const ScheduleScreen = ({ navigation }) => {
   }, [dispatch]);
 
   // Process reminders for calendar and next reminder
-// Process reminders for calendar and next reminder
-useEffect(() => {
-  if (reminderByOwner && reminderByOwner.length > 0) {
-    const newMarkedDates = {};
-    // Get current time and add 7 hours
-    const now = new Date();
-    now.setHours(now.getHours() + 7); // Adjust to UTC+7 equivalent
-    console.log("Adjusted time (UTC+7):", now.toLocaleString("vi-VN", { timeZone: "Asia/Ho_Chi_Minh" }));
-    console.log("Current time (UTC):", new Date().toUTCString());
+  useEffect(() => {
+    if (reminderByOwner && reminderByOwner.length > 0) {
+      const newMarkedDates = {};
+      const now = new Date(); // Current local time
 
-    const futureReminders = reminderByOwner.filter((reminder) => {
-      try {
-        const maintainDate = new Date(reminder.maintainDate);
-        if (isNaN(maintainDate.getTime())) {
-          console.warn("Invalid maintainDate:", reminder.maintainDate);
+      const futureReminders = reminderByOwner.filter((reminder) => {
+        try {
+          // Parse maintainDate as local time (no "Z")
+          const maintainDate = new Date(reminder.maintainDate.replace(" ", "T"));
+          if (isNaN(maintainDate.getTime())) {
+            console.warn("Invalid maintainDate:", reminder.maintainDate);
+            return false;
+          }
+          return maintainDate.getTime() > now.getTime();
+        } catch (error) {
+          console.warn("Error parsing maintainDate:", reminder.maintainDate, error);
           return false;
         }
-        console.log(`Reminder ${reminder.pondReminderId} maintainDate:`, maintainDate.toLocaleString("vi-VN", { timeZone: "Asia/Ho_Chi_Minh" }));
-        return maintainDate.getTime() > now.getTime(); // Compare with adjusted time
-      } catch (error) {
-        console.warn("Error parsing maintainDate:", reminder.maintainDate, error);
-        return false;
+      });
+
+      if (futureReminders.length > 0) {
+        const closestReminder = futureReminders.reduce((prev, curr) => {
+          const prevDate = new Date(prev.maintainDate.replace(" ", "T"));
+          const currDate = new Date(curr.maintainDate.replace(" ", "T"));
+          return currDate.getTime() < prevDate.getTime() ? curr : prev;
+        });
+        setNextReminder(closestReminder);
+      } else {
+        setNextReminder(null);
       }
-    });
 
-    console.log("Future reminders:", futureReminders.map(r => ({
-      id: r.pondReminderId,
-      title: r.title,
-      maintainDate: r.maintainDate
-    })));
+      const filteredReminders = reminderByOwner.filter(
+        (reminder) => reminder.reminderType === filterType
+      );
 
-    if (futureReminders.length > 0) {
-      const closestReminder = futureReminders.reduce((prev, curr) => {
-        const prevDate = new Date(prev.maintainDate);
-        const currDate = new Date(curr.maintainDate);
-        return currDate.getTime() < prevDate.getTime() ? curr : prev;
+      filteredReminders.forEach((reminder) => {
+        try {
+          // Parse maintainDate as local time (no "Z")
+          const maintainDate = new Date(reminder.maintainDate.replace(" ", "T"));
+          const date = maintainDate.toISOString().split("T")[0];
+          const isFinished = reminder.seenDate !== "0001-01-01T00:00:00";
+
+          if (!newMarkedDates[date]) {
+            newMarkedDates[date] = { dots: [] };
+          }
+
+          newMarkedDates[date].dots.push({
+            key: reminder.pondReminderId,
+            color: isFinished ? "#4CAF50" : "#FF6B6B",
+            selectedDotColor: isFinished ? "#4CAF50" : "#FF6B6B",
+            reminder: reminder,
+          });
+        } catch (error) {
+          console.warn("Error processing reminder:", reminder, error);
+        }
       });
-      setNextReminder(closestReminder);
-      console.log("Selected nextReminder:", {
-        id: closestReminder.pondReminderId,
-        title: closestReminder.title,
-        maintainDate: closestReminder.maintainDate
-      });
+
+      setMarkedDates(newMarkedDates);
     } else {
       setNextReminder(null);
-      console.log("No future reminders found");
+      setMarkedDates({});
     }
-
-    // Filter and mark dates
-    const filteredReminders = reminderByOwner.filter(
-      (reminder) => reminder.reminderType === filterType
-    );
-
-    filteredReminders.forEach((reminder) => {
-      try {
-        const date = reminder.maintainDate.split("T")[0];
-        const isFinished = reminder.seenDate !== "0001-01-01T00:00:00";
-
-        if (!newMarkedDates[date]) {
-          newMarkedDates[date] = { dots: [] };
-        }
-
-        newMarkedDates[date].dots.push({
-          key: reminder.pondReminderId,
-          color: isFinished ? "#4CAF50" : "#FF6B6B",
-          selectedDotColor: isFinished ? "#4CAF50" : "#FF6B6B",
-          reminder: reminder,
-        });
-      } catch (error) {
-        console.warn("Error processing reminder:", reminder, error);
-      }
-    });
-
-    setMarkedDates(newMarkedDates);
-  } else {
-    setNextReminder(null);
-    setMarkedDates({});
-    console.log("No reminders available");
-  }
-}, [reminderByOwner, filterType]);
+  }, [reminderByOwner, filterType]);
 
   const handleDayPress = (day) => {
     const dateString = day.dateString;
@@ -133,39 +116,36 @@ useEffect(() => {
   };
 
   const getTimeRange = (maintainDate) => {
-    const date = new Date(maintainDate);
-    // Format start time in UTC
+    // Parse maintainDate as local time (no "Z")
+    const date = new Date(maintainDate.replace(" ", "T"));
+    // Format start time without timezone conversion
     const startTime = date.toLocaleTimeString("vi-VN", {
       hour: "2-digit",
       minute: "2-digit",
       hour12: false,
-      timeZone: "UTC",
     });
-    // Create new Date for end time (+2 hours)
+    // Calculate end time (+2 hours)
     const endDate = new Date(date);
-    endDate.setUTCHours(date.getUTCHours() + 2);
+    endDate.setHours(endDate.getHours() + 2);
     const endTime = endDate.toLocaleTimeString("vi-VN", {
       hour: "2-digit",
       minute: "2-digit",
       hour12: false,
-      timeZone: "UTC",
     });
     return `${startTime}-${endTime}`;
   };
 
   const formatNextReminderDate = (maintainDate) => {
-    const date = new Date(maintainDate);
+    // Parse maintainDate as local time (no "Z")
+    const date = new Date(maintainDate.replace(" ", "T"));
     return date
       .toLocaleDateString("vi-VN", {
         weekday: "long",
         day: "numeric",
         month: "short",
-        timeZone: "UTC",
       })
       .toUpperCase();
   };
-
- console.log("Local time:", new Date().toLocaleString("vi-VN", { timeZone: "Asia/Ho_Chi_Minh" }));
 
   return (
     <SafeAreaView style={styles.container}>
@@ -339,40 +319,42 @@ useEffect(() => {
           </View>
           <View style={styles.modalBody}>
             <Text style={styles.modalDate}>{selectedDate}</Text>
-            {selectedDateEvents.map((event, index) => (
-              <TouchableOpacity
-                key={index}
-                style={[
-                  styles.modalEvent,
-                  {
-                    backgroundColor: event.reminder.title
-                      .toLowerCase()
-                      .includes("feeding")
-                      ? "#E6F4EA"
-                      : event.reminder.title
-                          .toLowerCase()
-                          .includes("maintenance")
-                      ? "#FFF3E0"
-                      : event.reminder.reminderType === "Pond"
-                      ? "#E0F7FA"
-                      : "#E0E0E0",
-                  },
-                ]}
-                onPress={() => {
-                  setModalVisible(false);
-                  navigation.navigate("ReminderDetail", {
-                    reminder: event.reminder,
-                  });
-                }}
-              >
-                <Text style={styles.modalEventTime}>
-                  {getTimeRange(event.reminder.maintainDate).split("-")[0]}
-                </Text>
-                <Text style={styles.modalEventText}>
-                  {event.reminder.title}
-                </Text>
-              </TouchableOpacity>
-            ))}
+            <ScrollView style={{ maxHeight: 300 }}>
+              {selectedDateEvents.map((event, index) => (
+                <TouchableOpacity
+                  key={index}
+                  style={[
+                    styles.modalEvent,
+                    {
+                      backgroundColor: event.reminder.title
+                        .toLowerCase()
+                        .includes("feeding")
+                        ? "#E6F4EA"
+                        : event.reminder.title
+                            .toLowerCase()
+                            .includes("maintenance")
+                        ? "#FFF3E0"
+                        : event.reminder.reminderType === "Pond"
+                        ? "#E0F7FA"
+                        : "#E0E0E0",
+                    },
+                  ]}
+                  onPress={() => {
+                    setModalVisible(false);
+                    navigation.navigate("ReminderDetail", {
+                      reminder: event.reminder,
+                    });
+                  }}
+                >
+                  <Text style={styles.modalEventTime}>
+                    {getTimeRange(event.reminder.maintainDate).split("-")[0]}
+                  </Text>
+                  <Text style={styles.modalEventText}>
+                    {event.reminder.title}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
           </View>
         </View>
       </Modal>

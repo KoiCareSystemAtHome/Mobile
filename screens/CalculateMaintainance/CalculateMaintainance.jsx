@@ -36,7 +36,7 @@ const CalculateMaintainance = () => {
   const [isTimePickerVisible, setTimePickerVisible] = useState(false);
 
   const isMounted = useRef(true);
-  const prevMaintainanceDataRef = useRef(null); // Track previous maintainanceData
+  const prevMaintainanceDataRef = useRef(null);
 
   useEffect(() => {
     return () => {
@@ -66,7 +66,6 @@ const CalculateMaintainance = () => {
     }
   }, [isLoggedIn?.id, dispatch]);
 
-  // Fetch maintenance data only when homePond changes
   useEffect(() => {
     if (homePond) {
       const pondId = homePond?.pondID;
@@ -74,25 +73,34 @@ const CalculateMaintainance = () => {
     }
   }, [homePond, dispatch]);
 
-  // Update endDate only when maintainanceData.maintainDate changes
   useEffect(() => {
     if (
       maintainanceData &&
       maintainanceData.maintainDate &&
       maintainanceData.maintainDate !== prevMaintainanceDataRef.current?.maintainDate
     ) {
-      const utcDate = new Date(maintainanceData.maintainDate);
-      setEndDate(new Date(Date.UTC(utcDate.getUTCFullYear(), utcDate.getUTCMonth(), utcDate.getUTCDate(), utcDate.getUTCHours(), utcDate.getUTCMinutes())));
+      // Parse maintainDate (format: 2025-04-18 19:44:29) as is
+      const date = new Date(maintainanceData.maintainDate.replace(" ", "T"));
+      if (!isNaN(date.getTime())) {
+        setEndDate(date);
+      } else {
+        console.warn("Invalid maintainDate:", maintainanceData.maintainDate);
+      }
     }
     prevMaintainanceDataRef.current = maintainanceData;
   }, [maintainanceData]);
 
-
   const handleSave = () => {
     if (maintainanceData) {
+      // Format seenDate to replace space with T (e.g., 0001-01-01 00:00:00 -> 0001-01-01T00:00:00)
+      const formattedSeenDate = maintainanceData.seenDate
+        ? maintainanceData.seenDate.replace(" ", "T")
+        : maintainanceData.seenDate;
+
       const updatedMaintenanceData = {
         ...maintainanceData,
-        maintainDate: endDate.toISOString(),
+        maintainDate: endDate.toISOString().split(".")[0], // Format: 2025-04-18T19:44:29
+        seenDate: formattedSeenDate, // Format: 0001-01-01T00:00:00
       };
       console.log(updatedMaintenanceData);
       dispatch(saveMaintainance(updatedMaintenanceData))
@@ -113,7 +121,7 @@ const CalculateMaintainance = () => {
   const handleDatePickerChange = (date) => {
     if (isMounted.current) {
       const newDate = new Date(endDate);
-      newDate.setUTCFullYear(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate());
+      newDate.setFullYear(date.getFullYear(), date.getMonth(), date.getDate());
       setEndDate(newDate);
       setDatePickerVisible(false);
     }
@@ -123,7 +131,7 @@ const CalculateMaintainance = () => {
     if (isMounted.current) {
       const [hours, minutes] = time;
       const newDate = new Date(endDate);
-      newDate.setUTCHours(hours, minutes, 0, 0);
+      newDate.setHours(hours, minutes, 0, 0);
       setEndDate(newDate);
       setTimePickerVisible(false);
     }
@@ -142,6 +150,9 @@ const CalculateMaintainance = () => {
     })),
   ];
 
+  console.log("endDate:", endDate.toString());
+  console.log("maintainanceData:", maintainanceData);
+
   return (
     <Provider locale={enUS}>
       <ImageBackground
@@ -152,7 +163,7 @@ const CalculateMaintainance = () => {
         <View style={styles.overlay} />
         <ScrollView contentContainerStyle={styles.container}>
           <Text style={styles.title}>Lịch Trình Bảo Trì</Text>
-          <View style={{ justifyContent: "center", flexDirection: "row" }}>
+          <View style={{ justifyContent: "center", flexDirection: "rowConstant" }}>
             <TouchableOpacity
               onPress={() => setHomePondOpen(!homePondOpen)}
               style={styles.selector}
@@ -206,7 +217,6 @@ const CalculateMaintainance = () => {
                       day: "numeric",
                       month: "long",
                       year: "numeric",
-                      timeZone: "UTC", // Ensure UTC for display
                     })}
                   </Text>
                   <Icon name="calendar" size={20} color="#000" />
@@ -217,7 +227,7 @@ const CalculateMaintainance = () => {
                 data={timeData}
                 cols={2}
                 cascade={false}
-                value={[endDate.getUTCHours(), endDate.getUTCMinutes()]}
+                value={[endDate.getHours(), endDate.getMinutes()]} // Use local hours/minutes
                 onChange={handleTimePickerChange}
                 visible={isTimePickerVisible}
                 onDismiss={() => setTimePickerVisible(false)}
@@ -233,7 +243,6 @@ const CalculateMaintainance = () => {
                       hour: "2-digit",
                       minute: "2-digit",
                       hour12: false,
-                      timeZone: "UTC",
                     })}
                   </Text>
                   <Icon name="clockcircleo" size={20} color="#000" />
