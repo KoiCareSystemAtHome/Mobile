@@ -122,16 +122,17 @@ const ProductDetail = ({ navigation }) => {
       <Text style={styles.productTitle}>{product.productName}</Text>
       <Text style={styles.shopName}>{product.shopName}</Text>
       
-      <Text style={styles.stockQuantity}>
-        Còn: {product.stockQuantity} sản phẩm
-      </Text>
-      <View style={styles.ratingContainer}>
-        <AntDesign name="star" size={16} color="#FFD700" />
-        <Text style={styles.averageRating}>
-        {(isNaN(averageRating) || averageRating === null || averageRating === undefined) ? 0 : averageRating}
-        ({feedbacks.length} đánh giá)
-        </Text>
-      </View>
+      <View style={[styles.ratingContainer, { flexDirection: 'row', alignItems: 'center' }]}>
+  <Text style={styles.stockQuantity}>
+    Còn: {product.stockQuantity} sản phẩm
+  </Text>
+  <Text style={[styles.averageRating, { marginLeft: 10 }]}>
+    <AntDesign name="star" size={16} color="#FFD700" />
+    {(isNaN(averageRating) || averageRating === null || averageRating === undefined) ? 0 : averageRating}
+    ({feedbacks.length} đánh giá)
+  </Text>
+</View>
+
 
       {/* Quantity Selector and Price */}
       <View style={styles.row}>
@@ -168,7 +169,7 @@ const ProductDetail = ({ navigation }) => {
         </Button>
       </View>
 
-      <Text style={styles.productDescription}> here {product.spec}</Text>
+      <Text style={styles.productDescription}> {productById?.spec}</Text>
 
       <Text style={styles.productDescription}>{product.description}</Text>
       
