@@ -5,14 +5,16 @@ import { Calendar } from "react-native-calendars";
 import Modal from "react-native-modal";
 import { styles } from "./styles";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { reminderByOwnerSelector } from "../../redux/selector";
+import { getReminderByOwner } from "../../redux/slices/reminderSlice";
 
 const leftArrowIcon = "←";
 const rightArrowIcon = "→";
 const addIcon = "+";
 
 const ScheduleScreen = ({ navigation }) => {
+  const dispatch = useDispatch();
   const reminderByOwner = useSelector(reminderByOwnerSelector);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isModalVisible, setModalVisible] = useState(false);
@@ -22,48 +24,79 @@ const ScheduleScreen = ({ navigation }) => {
   const [nextReminder, setNextReminder] = useState(null);
   const [filterType, setFilterType] = useState("RecurringMaintenance");
 
-  // Fetch user data
+  // Fetch user data and refresh reminders
   useEffect(() => {
     const getData = async () => {
       try {
         const value = await AsyncStorage.getItem("user");
-        setIsLoggedIn(value ? JSON.parse(value) : null);
+        const user = value ? JSON.parse(value) : null;
+        setIsLoggedIn(user);
+        if (user?.id) {
+          dispatch(getReminderByOwner(user.id)); // Refresh reminders on mount
+        }
       } catch (error) {
         console.error("Error fetching user data:", error);
       }
     };
     getData();
-  }, []);
+  }, [dispatch]);
 
   // Process reminders for calendar and next reminder
-  useEffect(() => {
-    if (reminderByOwner && reminderByOwner.length > 0) {
-      const newMarkedDates = {};
-      const today = new Date();
+// Process reminders for calendar and next reminder
+useEffect(() => {
+  if (reminderByOwner && reminderByOwner.length > 0) {
+    const newMarkedDates = {};
+    // Get current time and add 7 hours
+    const now = new Date();
+    now.setHours(now.getHours() + 7); // Adjust to UTC+7 equivalent
+    console.log("Adjusted time (UTC+7):", now.toLocaleString("vi-VN", { timeZone: "Asia/Ho_Chi_Minh" }));
+    console.log("Current time (UTC):", new Date().toUTCString());
 
-      // Set next reminder
-      const futureReminders = reminderByOwner.filter((reminder) => {
+    const futureReminders = reminderByOwner.filter((reminder) => {
+      try {
         const maintainDate = new Date(reminder.maintainDate);
-        return maintainDate >= today;
-      });
-
-      if (futureReminders.length > 0) {
-        const closestReminder = futureReminders.reduce((prev, curr) => {
-          const prevDate = new Date(prev.maintainDate);
-          const currDate = new Date(curr.maintainDate);
-          return currDate < prevDate ? curr : prev;
-        });
-        setNextReminder(closestReminder);
-      } else {
-        setNextReminder(null);
+        if (isNaN(maintainDate.getTime())) {
+          console.warn("Invalid maintainDate:", reminder.maintainDate);
+          return false;
+        }
+        console.log(`Reminder ${reminder.pondReminderId} maintainDate:`, maintainDate.toLocaleString("vi-VN", { timeZone: "Asia/Ho_Chi_Minh" }));
+        return maintainDate.getTime() > now.getTime(); // Compare with adjusted time
+      } catch (error) {
+        console.warn("Error parsing maintainDate:", reminder.maintainDate, error);
+        return false;
       }
+    });
 
-      // Filter and mark dates
-      const filteredReminders = reminderByOwner.filter(
-        (reminder) => reminder.reminderType === filterType
-      );
+    console.log("Future reminders:", futureReminders.map(r => ({
+      id: r.pondReminderId,
+      title: r.title,
+      maintainDate: r.maintainDate
+    })));
 
-      filteredReminders.forEach((reminder) => {
+    if (futureReminders.length > 0) {
+      const closestReminder = futureReminders.reduce((prev, curr) => {
+        const prevDate = new Date(prev.maintainDate);
+        const currDate = new Date(curr.maintainDate);
+        return currDate.getTime() < prevDate.getTime() ? curr : prev;
+      });
+      setNextReminder(closestReminder);
+      console.log("Selected nextReminder:", {
+        id: closestReminder.pondReminderId,
+        title: closestReminder.title,
+        maintainDate: closestReminder.maintainDate
+      });
+    } else {
+      setNextReminder(null);
+      console.log("No future reminders found");
+    }
+
+    // Filter and mark dates
+    const filteredReminders = reminderByOwner.filter(
+      (reminder) => reminder.reminderType === filterType
+    );
+
+    filteredReminders.forEach((reminder) => {
+      try {
         const date = reminder.maintainDate.split("T")[0];
         const isFinished = reminder.seenDate !== "0001-01-01T00:00:00";
 
@@ -77,16 +110,23 @@ const ScheduleScreen = ({ navigation }) => {
           selectedDotColor: isFinished ? "#4CAF50" : "#FF6B6B",
           reminder: reminder,
         });
-      });
+      } catch (error) {
+        console.warn("Error processing reminder:", reminder, error);
+      }
+    });
 
-      setMarkedDates(newMarkedDates);
-    }
-  }, [reminderByOwner, filterType]);
+    setMarkedDates(newMarkedDates);
+  } else {
+    setNextReminder(null);
+    setMarkedDates({});
+    console.log("No reminders available");
+  }
+}, [reminderByOwner, filterType]);
 
   const handleDayPress = (day) => {
     const dateString = day.dateString;
     if (markedDates[dateString] && markedDates[dateString].dots) {
-      setSelectedDate(dateString); // Use raw date string
+      setSelectedDate(dateString);
       setSelectedDateEvents(markedDates[dateString].dots);
       setModalVisible(true);
     }
@@ -94,13 +134,23 @@ const ScheduleScreen = ({ navigation }) => {
 
   const getTimeRange = (maintainDate) => {
     const date = new Date(maintainDate);
-    const hours = date.getHours(); // Use local hours instead of UTC
-    const minutes = date.getMinutes();
-    const startHour = hours.toString().padStart(2, "0");
-    const startMinutes = minutes.toString().padStart(2, "0");
-    const endHour = (hours + 2) % 24;
-    const endHourStr = endHour.toString().padStart(2, "0");
-    return `${startHour}:${startMinutes}-${endHourStr}:${startMinutes}`;
+    // Format start time in UTC
+    const startTime = date.toLocaleTimeString("vi-VN", {
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false,
+      timeZone: "UTC",
+    });
+    // Create new Date for end time (+2 hours)
+    const endDate = new Date(date);
+    endDate.setUTCHours(date.getUTCHours() + 2);
+    const endTime = endDate.toLocaleTimeString("vi-VN", {
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false,
+      timeZone: "UTC",
+    });
+    return `${startTime}-${endTime}`;
   };
 
   const formatNextReminderDate = (maintainDate) => {
@@ -110,10 +160,12 @@ const ScheduleScreen = ({ navigation }) => {
         weekday: "long",
         day: "numeric",
         month: "short",
+        timeZone: "UTC",
       })
       .toUpperCase();
   };
-  console.log(nextReminder)
+
+ console.log("Local time:", new Date().toLocaleString("vi-VN", { timeZone: "Asia/Ho_Chi_Minh" }));
 
   return (
     <SafeAreaView style={styles.container}>
