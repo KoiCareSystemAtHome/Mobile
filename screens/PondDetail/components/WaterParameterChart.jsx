@@ -3,9 +3,10 @@ import { View, Text, StyleSheet, Dimensions, ScrollView } from "react-native";
 import Svg, { Line, Circle, Text as SvgText } from "react-native-svg";
 
 const { width } = Dimensions.get("window");
-const CHART_WIDTH = width - 60;
+const CHART_WIDTH = width - 80; // Reduced width to make room for labels
 const CHART_HEIGHT = 200;
-const PADDING = 40;
+const PADDING = 50; // Increased padding to ensure space for Y-axis labels
+const LABEL_WIDTH = 40; // Explicit space for Y-axis labels
 
 const parameterColors = {
   "pH Level": "#1E90FF",
@@ -24,42 +25,87 @@ const parameterColors = {
   "Amoniac (NH3)": "#FFD700",
 };
 
-const WaterParametersChart = ({ selectedParameters = [], waterParameterData, pondParameters }) => {
-
-
-  const data = Array.isArray(waterParameterData) && waterParameterData.length > 0
-    ? waterParameterData
-    : [];
+const WaterParametersChart = ({
+  selectedParameters = [],
+  waterParameterData,
+  pondParameters,
+}) => {
+  const data =
+    Array.isArray(waterParameterData) && waterParameterData.length > 0
+      ? waterParameterData
+      : [];
 
   const threeMonthsAgo = new Date();
   threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
-  const filteredData = data.filter(item => new Date(item.calculatedDate) >= threeMonthsAgo);
-  filteredData.sort((a, b) => new Date(a.calculatedDate) - new Date(b.calculatedDate));
+  const filteredData = data.filter(
+    (item) => new Date(item.calculatedDate) >= threeMonthsAgo
+  );
+  filteredData.sort(
+    (a, b) => new Date(a.calculatedDate) - new Date(b.calculatedDate)
+  );
 
-
-
-  const dates = filteredData.map(item => new Date(item.calculatedDate).getTime());
+  const dates = filteredData.map((item) => {
+    const dateStr = item.calculatedDate;
+    const [datePart, timePart] = dateStr.split(" ");
+    const [year, month, day] = datePart.split("-").map(Number);
+    const [hour, minute, second] = timePart.split(":").map(Number);
+    return new Date(year, month - 1, day, hour, minute, second).getTime();
+  });
   const minDate = dates.length > 0 ? Math.min(...dates) : Date.now();
   const maxDate = dates.length > 0 ? Math.max(...dates) : Date.now();
   const dateRange = maxDate - minDate || 1;
 
   const normalizeData = (data, property, maxYValue) => {
-    const validData = data.filter(d => d.hasOwnProperty(property) && d[property] != null);
-    return validData.map((d) => {
-      const dateValue = new Date(d.calculatedDate).getTime();
+    const validData = data.filter(
+      (d) => d.hasOwnProperty(property) && d[property] != null
+    );
+
+    const dayMap = {};
+    validData.forEach((d, index) => {
+      const date = new Date(d.calculatedDate);
+      const dayKey = `${date.getFullYear()}-${
+        date.getMonth() + 1
+      }-${date.getDate()}`;
+      if (!dayMap[dayKey]) {
+        dayMap[dayKey] = [];
+      }
+      dayMap[dayKey].push(index);
+    });
+
+    return validData.map((d, index) => {
+      const date = new Date(d.calculatedDate);
+      const dayKey = `${date.getFullYear()}-${
+        date.getMonth() + 1
+      }-${date.getDate()}`;
+      const dateValue = date.getTime();
       const value = d[property];
-      return {
-        x: (dateRange > 0)
-          ? PADDING + ((dateValue - minDate) / dateRange) * (CHART_WIDTH - PADDING * 2)
-          : CHART_WIDTH / 2,
-        y: maxYValue ? (1 - value / maxYValue) * (CHART_HEIGHT - PADDING * 2) + PADDING : PADDING,
-      };
+
+      let x =
+        dateRange > 0
+          ? PADDING +
+            ((dateValue - minDate) / dateRange) * (CHART_WIDTH - PADDING * 2)
+          : CHART_WIDTH / 2;
+
+      const pointsOnSameDay = dayMap[dayKey];
+      if (pointsOnSameDay.length > 1) {
+        const position = pointsOnSameDay.indexOf(index);
+        const totalPoints = pointsOnSameDay.length;
+        const offsetStep = 10;
+        const maxOffset = (totalPoints - 1) * offsetStep;
+        const startOffset = -(maxOffset / 2);
+        x += startOffset + position * offsetStep;
+      }
+
+      const y = maxYValue
+        ? (1 - value / maxYValue) * (CHART_HEIGHT - PADDING * 2) + PADDING
+        : PADDING;
+      return { x, y };
     });
   };
 
   const getChartConfig = (parameter) => {
-    const paramInfo = pondParameters.find(p => p.parameterName === parameter);
-    let maxYValue = 50; // Default
+    const paramInfo = pondParameters.find((p) => p.parameterName === parameter);
+    let maxYValue = 50;
     let yAxisInterval = 10;
 
     if (paramInfo) {
@@ -67,18 +113,27 @@ const WaterParametersChart = ({ selectedParameters = [], waterParameterData, pon
         paramInfo.warningLower,
         paramInfo.warningUpper,
         paramInfo.dangerLower,
-        paramInfo.dangerUpper
-      ].filter(val => val !== null && val !== undefined);
-      
+        paramInfo.dangerUpper,
+      ].filter((val) => val !== null && val !== undefined);
+
       if (bounds.length > 0) {
-        maxYValue = Math.max(...bounds) * 1.2; // Add 20% padding
+        maxYValue = Math.max(...bounds) * 1.2;
         yAxisInterval = Math.ceil(maxYValue / 5);
       }
     }
 
     return { maxYValue, yAxisInterval };
   };
-
+  selectedParameters.forEach((parameter) => {
+    console.log(`Parameter: ${parameter}`);
+    const valuesWithDates = filteredData
+      .filter((item) => item.hasOwnProperty(parameter) && item[parameter] != null)
+      .map((item) => ({
+        date: item.calculatedDate,
+        value: item[parameter],
+      }));
+    console.log(valuesWithDates);
+  });
   return (
     <ScrollView
       style={styles.container}
@@ -92,46 +147,71 @@ const WaterParametersChart = ({ selectedParameters = [], waterParameterData, pon
           const { maxYValue, yAxisInterval } = getChartConfig(parameter);
           const points = normalizeData(filteredData, parameter, maxYValue);
 
-
           const yAxisLabels = [];
           for (let i = 0; i <= maxYValue; i += yAxisInterval) {
-            const yPosition = (1 - i / maxYValue) * (CHART_HEIGHT - PADDING * 2) + PADDING;
+            const yPosition =
+              (1 - i / maxYValue) * (CHART_HEIGHT - PADDING * 2) + PADDING;
             yAxisLabels.push({ value: i.toFixed(1), y: yPosition });
           }
 
           const xAxisLabels = [];
-          const numLabels = Math.min(filteredData.length, 5);
-          const step = Math.max(1, Math.floor(filteredData.length / numLabels));
-          for (let i = 0; i < filteredData.length; i += step) {
-            const date = new Date(filteredData[i].calculatedDate);
-            const label = `${date.getDate()}/${date.getMonth() + 1}`;
-            const xPosition = points[i]?.x || PADDING;
-            xAxisLabels.push({ value: label, x: xPosition });
+          const numLabels = Math.min(filteredData.length, 5); // Still aim for up to 5 labels
+          if (filteredData.length > 0) {
+            // Calculate even spacing for the labels across the chart width
+            const labelStep = (CHART_WIDTH - PADDING * 2) / (numLabels - 1); // Evenly space labels
+            const dataStep = Math.max(
+              1,
+              Math.floor(filteredData.length / numLabels)
+            ); // Step through data points
+
+            for (let i = 0; i < numLabels; i++) {
+              const dataIndex = Math.min(i * dataStep, filteredData.length - 1); // Get the corresponding data point
+              const date = new Date(filteredData[dataIndex].calculatedDate);
+              const label = `${date.getDate()}/${date.getMonth() + 1}`;
+
+              // Position the label evenly across the chart
+              const xPosition = PADDING + i * labelStep;
+              xAxisLabels.push({ value: label, x: xPosition });
+            }
           }
 
-          const paramInfo = pondParameters.find(p => p.parameterName === parameter);
-          const warningLowerY = paramInfo?.warningLower != null 
-            ? (1 - paramInfo.warningLower / maxYValue) * (CHART_HEIGHT - PADDING * 2) + PADDING
-            : null;
-          const warningUpperY = paramInfo?.warningUpper != null
-            ? (1 - paramInfo.warningUpper / maxYValue) * (CHART_HEIGHT - PADDING * 2) + PADDING
-            : null;
-          const dangerLowerY = paramInfo?.dangerLower != null
-            ? (1 - paramInfo.dangerLower / maxYValue) * (CHART_HEIGHT - PADDING * 2) + PADDING
-            : null;
-          const dangerUpperY = paramInfo?.dangerUpper != null
-            ? (1 - paramInfo.dangerUpper / maxYValue) * (CHART_HEIGHT - PADDING * 2) + PADDING
-            : null;
-
+          const paramInfo = pondParameters.find(
+            (p) => p.parameterName === parameter
+          );
+          const warningLowerY =
+            paramInfo?.warningLower != null
+              ? (1 - paramInfo.warningLower / maxYValue) *
+                  (CHART_HEIGHT - PADDING * 2) +
+                PADDING
+              : null;
+          const warningUpperY =
+            paramInfo?.warningUpper != null
+              ? (1 - paramInfo.warningUpper / maxYValue) *
+                  (CHART_HEIGHT - PADDING * 2) +
+                PADDING
+              : null;
+          const dangerLowerY =
+            paramInfo?.dangerLower != null
+              ? (1 - paramInfo.dangerLower / maxYValue) *
+                  (CHART_HEIGHT - PADDING * 2) +
+                PADDING
+              : null;
+          const dangerUpperY =
+            paramInfo?.dangerUpper != null
+              ? (1 - paramInfo.dangerUpper / maxYValue) *
+                  (CHART_HEIGHT - PADDING * 2) +
+                PADDING
+              : null;
+              console.log("Selected Parameters:", selectedParameters);
           return (
             <View key={parameter} style={styles.chartContainer}>
               <Text style={styles.chartTitle}>{parameter}</Text>
-              <Svg width={CHART_WIDTH} height={CHART_HEIGHT + 40}>
+              <Svg width={CHART_WIDTH + LABEL_WIDTH} height={CHART_HEIGHT + 40}>
                 {/* Y-axis labels */}
                 {yAxisLabels.map((label, index) => (
                   <SvgText
                     key={`y-label-${parameter}-${index}`}
-                    x={PADDING - 25}
+                    x={LABEL_WIDTH - 10} // Adjusted position to ensure visibility
                     y={label.y + 5}
                     fontSize="12"
                     fill="black"
@@ -149,6 +229,9 @@ const WaterParametersChart = ({ selectedParameters = [], waterParameterData, pon
                     fontSize="12"
                     fill="black"
                     textAnchor="middle"
+                    transform={`rotate(-45 ${label.x} ${
+                      CHART_HEIGHT - PADDING + 30
+                    })`} // Rotate 45 degrees
                   >
                     {label.value}
                   </SvgText>
@@ -254,6 +337,7 @@ const styles = StyleSheet.create({
   scrollContent: {
     paddingVertical: 10,
     paddingBottom: 20,
+    paddingHorizontal: 10, // Added padding to prevent clipping
   },
   chartContainer: {
     backgroundColor: "#fff",
@@ -265,7 +349,8 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 3,
-    minHeight: CHART_HEIGHT + 80, // Ensure enough space for chart + title + labels
+    minHeight: CHART_HEIGHT + 80,
+    overflow: "visible",
   },
   chartTitle: {
     fontSize: 16,
