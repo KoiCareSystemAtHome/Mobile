@@ -186,7 +186,7 @@ const WaterParameter = () => {
             ))}
           </ScrollView>
           <Text style={styles.infoText}>
-            Outdoor Temp: need to be supervised regularly
+          Nhiệt độ ngoài trời: cần được giám sát thường xuyêns
           </Text>
         </View>
       );
@@ -336,7 +336,7 @@ const WaterParameter = () => {
           style={styles.changeButton}
           onPress={handleChangeParameters}
         >
-          <Text style={styles.changeButtonText}>Add Parameters</Text>
+          <Text style={styles.changeButtonText}>Thêm thông số nước</Text>
         </TouchableOpacity>
       </ImageBackground>
     </Provider>
