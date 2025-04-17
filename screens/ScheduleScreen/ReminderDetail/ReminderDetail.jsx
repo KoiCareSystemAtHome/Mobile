@@ -27,17 +27,17 @@ const ReminderDetail = ({ navigation, route }) => {
 
   const isComplete = selectedStatus === "Complete";
   console.log(reminder.reminderType);
-  
+  console.log(reminder.maintainDate);
   const date = new Date(reminder.maintainDate);
-  const formattedDate = date.toLocaleDateString("en-US", {
+  const formattedDate = date.toLocaleDateString("vi-VN", {
     weekday: "long",
     day: "numeric",
     month: "short",
     year: "numeric",
   });
-  const startHour = date.getHours().toString().padStart(2, "0");
-  const startMinutes = date.getMinutes().toString().padStart(2, "0");
-  const endHour = ((date.getHours() + 2) % 24).toString().padStart(2, "0");
+  const startHour = (date.getHours().toString().padStart(2, "0")) - 7;
+  const startMinutes = (date.getMinutes().toString().padStart(2, "0")) - 7;
+  const endHour = (((date.getHours() + 2) % 24).toString().padStart(2, "0")) - 7;
   const timeRange = `${startHour}:${startMinutes} - ${endHour}:${startMinutes}`;
 
   const typeDotColor = isComplete 
