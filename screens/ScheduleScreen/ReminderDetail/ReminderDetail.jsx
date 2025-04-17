@@ -12,10 +12,10 @@ import { styles } from "./styles";
 import { useDispatch } from "react-redux";
 import { getReminderByOwner, updateReminder } from "../../../redux/slices/reminderSlice";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import dayjs from "dayjs"; // Import dayjs
-import "dayjs/locale/vi"; // Import Vietnamese locale
-import utc from "dayjs/plugin/utc"; // Import UTC plugin
-import timezone from "dayjs/plugin/timezone"; // Import timezone plugin
+import dayjs from "dayjs";
+import "dayjs/locale/vi";
+import utc from "dayjs/plugin/utc";
+import timezone from "dayjs/plugin/timezone";
 
 // Extend dayjs with plugins
 dayjs.extend(utc);
@@ -39,10 +39,11 @@ const ReminderDetail = ({ navigation, route }) => {
   const isComplete = selectedStatus === "Complete";
 
   // Format the maintainDate using dayjs
-  const formattedDate = dayjs
-    .utc(reminder.maintainDate) // Parse as UTC
-    .tz("Asia/Ho_Chi_Minh") // Convert to Vietnam timezone (UTC+7)
-    .format("dddd, D MMM, YYYY, HH:mm"); // Format as desired
+  const date = dayjs.utc(reminder.maintainDate).tz("Asia/Ho_Chi_Minh");
+  const weekday = date.format("dddd");
+  // Capitalize the first letter of the weekday
+  const capitalizedWeekday = weekday.charAt(0).toUpperCase() + weekday.slice(1);
+  const formattedDate = `${capitalizedWeekday}, ${date.format("D MMM, YYYY, HH:mm")}`;
 
   const typeDotColor = isComplete
     ? "#4CAF50"
