@@ -113,6 +113,7 @@ const ScheduleScreen = ({ navigation }) => {
       })
       .toUpperCase();
   };
+  console.log(nextReminder)
 
   return (
     <SafeAreaView style={styles.container}>

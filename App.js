@@ -171,40 +171,47 @@ const AppContent = () => {
     initializeApp();
   }, [dispatch]);
 
-  // Schedule notifications for all future reminders
+  // Schedule notification for the next reminder within the next 1 hour
   useEffect(() => {
-    const scheduleAllNotifications = async () => {
+    const scheduleNextNotification = async () => {
       if (reminderByOwner && reminderByOwner.length > 0) {
+        const now = new Date();
+        const oneHourFromNow = new Date(now.getTime() + 60 * 60 * 1000); // 1 hour from now
+
         // Load stored notification IDs
         const storedNotifications = await AsyncStorage.getItem('scheduledNotifications');
         const scheduledNotificationIds = storedNotifications ? JSON.parse(storedNotifications) : {};
 
-        // Cancel any outdated notifications
+        // Cancel any outdated or seen notifications
         for (const reminderId in scheduledNotificationIds) {
           const reminder = reminderByOwner.find(r => r.pondReminderId === reminderId);
-          if (!reminder || reminder.seenDate !== "0001-01-01T00:00:00" || new Date(reminder.maintainDate) <= new Date()) {
+          if (!reminder || reminder.seenDate !== "0001-01-01T00:00:00" || new Date(reminder.maintainDate) <= now) {
             await Notifications.cancelScheduledNotificationAsync(scheduledNotificationIds[reminderId]);
             delete scheduledNotificationIds[reminderId];
           }
         }
         await AsyncStorage.setItem('scheduledNotifications', JSON.stringify(scheduledNotificationIds));
 
-        // Schedule notifications for future reminders
-        const now = new Date();
-        const futureReminders = reminderByOwner.filter((reminder) => {
-          const maintainDate = new Date(reminder.maintainDate);
-          return maintainDate > now && reminder.seenDate === "0001-01-01T00:00:00";
-        });
+        // Find the next reminder within the next 1 hour
+        const nextReminder = reminderByOwner
+          .filter((reminder) => {
+            const maintainDate = new Date(reminder.maintainDate);
+            return (
+              maintainDate > now &&
+              maintainDate <= oneHourFromNow &&
+              reminder.seenDate === "0001-01-01T00:00:00"
+            );
+          })
+          .sort((a, b) => new Date(a.maintainDate) - new Date(b.maintainDate))[0]; // Earliest reminder
 
-        for (const reminder of futureReminders) {
-          if (!scheduledNotificationIds[reminder.pondReminderId]) {
-            await scheduleNotification(reminder);
-          }
+        // Schedule notification for the next reminder, if it exists and isn't already scheduled
+        if (nextReminder && !scheduledNotificationIds[nextReminder.pondReminderId]) {
+          await scheduleNotification(nextReminder);
         }
       }
     };
 
-    scheduleAllNotifications();
+    scheduleNextNotification();
   }, [reminderByOwner]);
 
   // Handle notification clicks

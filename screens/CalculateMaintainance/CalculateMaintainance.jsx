@@ -36,6 +36,7 @@ const CalculateMaintainance = () => {
   const [isTimePickerVisible, setTimePickerVisible] = useState(false);
 
   const isMounted = useRef(true);
+  const prevMaintainanceDataRef = useRef(null); // Track previous maintainanceData
 
   useEffect(() => {
     return () => {
@@ -65,6 +66,7 @@ const CalculateMaintainance = () => {
     }
   }, [isLoggedIn?.id, dispatch]);
 
+  // Fetch maintenance data only when homePond changes
   useEffect(() => {
     if (homePond) {
       const pondId = homePond?.pondID;
@@ -72,20 +74,33 @@ const CalculateMaintainance = () => {
     }
   }, [homePond, dispatch]);
 
+  // Update endDate only when maintainanceData.maintainDate changes
+  useEffect(() => {
+    if (
+      maintainanceData &&
+      maintainanceData.maintainDate &&
+      maintainanceData.maintainDate !== prevMaintainanceDataRef.current?.maintainDate
+    ) {
+      const utcDate = new Date(maintainanceData.maintainDate);
+      setEndDate(new Date(Date.UTC(utcDate.getUTCFullYear(), utcDate.getUTCMonth(), utcDate.getUTCDate(), utcDate.getUTCHours(), utcDate.getUTCMinutes())));
+    }
+    prevMaintainanceDataRef.current = maintainanceData;
+  }, [maintainanceData]);
+
+
   const handleSave = () => {
     if (maintainanceData) {
       const updatedMaintenanceData = {
         ...maintainanceData,
         maintainDate: endDate.toISOString(),
       };
-      console.log(updatedMaintenanceData)
+      console.log(updatedMaintenanceData);
       dispatch(saveMaintainance(updatedMaintenanceData))
         .unwrap()
         .then((res) => {
           if (res.message) {
             Alert.alert(res.message);
-                      dispatch(getReminderByOwner(isLoggedIn?.id));
-            
+            dispatch(getReminderByOwner(isLoggedIn?.id));
           }
         })
         .catch((error) => {
@@ -98,7 +113,7 @@ const CalculateMaintainance = () => {
   const handleDatePickerChange = (date) => {
     if (isMounted.current) {
       const newDate = new Date(endDate);
-      newDate.setFullYear(date.getFullYear(), date.getMonth(), date.getDate());
+      newDate.setUTCFullYear(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate());
       setEndDate(newDate);
       setDatePickerVisible(false);
     }
@@ -136,10 +151,7 @@ const CalculateMaintainance = () => {
       >
         <View style={styles.overlay} />
         <ScrollView contentContainerStyle={styles.container}>
-          {/* Title */}
           <Text style={styles.title}>Lịch Trình Bảo Trì</Text>
-
-          {/* Pond Selector */}
           <View style={{ justifyContent: "center", flexDirection: "row" }}>
             <TouchableOpacity
               onPress={() => setHomePondOpen(!homePondOpen)}
@@ -175,8 +187,6 @@ const CalculateMaintainance = () => {
               <Text style={styles.selectorText}>
                 {maintainanceData?.description}
               </Text>
-
-              {/* Date Picker */}
               <Text style={styles.label}>NGÀY BẢO TRÌ</Text>
               <DatePicker
                 value={endDate}
@@ -196,13 +206,12 @@ const CalculateMaintainance = () => {
                       day: "numeric",
                       month: "long",
                       year: "numeric",
+                      timeZone: "UTC", // Ensure UTC for display
                     })}
                   </Text>
                   <Icon name="calendar" size={20} color="#000" />
                 </TouchableOpacity>
               </DatePicker>
-
-              {/* Time Picker */}
               <Text style={styles.label}>GIỜ BẢO TRÌ</Text>
               <Picker
                 data={timeData}

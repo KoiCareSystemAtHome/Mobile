@@ -6,7 +6,7 @@ import {
   Text,
   TouchableOpacity,
   View,
-  Alert, // Added Alert import
+  Alert,
 } from "react-native";
 import { getPondByOwner } from "../../redux/slices/pondSlice";
 import { useDispatch, useSelector } from "react-redux";
@@ -32,7 +32,7 @@ const CalculateMaintainance = () => {
   const [homePond, setHomePond] = useState(null);
   const [homePondOpen, setHomePondOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [endDate, setEndDate] = useState(new Date());
+  const [endDate, setEndDate] = useState(new Date()); // Initialized to current local time
   const [cycleDays, setCycleDays] = useState("30"); // Default to 30 days
   const [isDatePickerVisible, setDatePickerVisible] = useState(false);
   const [isTimePickerVisible, setTimePickerVisible] = useState(false);
@@ -102,7 +102,7 @@ const CalculateMaintainance = () => {
     if (isMounted.current) {
       const [hours, minutes] = time;
       const newDate = new Date(endDate);
-      newDate.setUTCHours(hours, minutes, 0, 0);
+      newDate.setHours(hours, minutes, 0, 0); // Set local hours and minutes
       setEndDate(newDate);
       setTimePickerVisible(false);
     }
@@ -131,7 +131,7 @@ const CalculateMaintainance = () => {
         <View style={styles.overlay} />
         <ScrollView contentContainerStyle={styles.container}>
           <Text style={styles.title}>Lịch Trình Bảo Trì</Text>
-  
+
           {/* Pond Dropdown */}
           <View style={{ justifyContent: "center", flexDirection: "row" }}>
             <TouchableOpacity
@@ -161,7 +161,7 @@ const CalculateMaintainance = () => {
               </View>
             )}
           </View>
-  
+
           <View>
             {/* Date Picker */}
             <Text style={styles.label}>NGÀY KẾT THÚC LỊCH TRÌNH</Text>
@@ -183,19 +183,20 @@ const CalculateMaintainance = () => {
                     day: "numeric",
                     month: "long",
                     year: "numeric",
+                    timeZone: "Asia/Ho_Chi_Minh", // Display Vietnam local time
                   })}
                 </Text>
                 <Icon name="calendar" size={20} color="#000" />
               </TouchableOpacity>
             </DatePicker>
-  
+
             {/* Time Picker */}
             <Text style={styles.label}>GIỜ KẾT THÚC LỊCH TRÌNH</Text>
             <Picker
               data={timeData}
               cols={2}
               cascade={false}
-              value={[endDate.getUTCHours(), endDate.getUTCMinutes()]}
+              value={[endDate.getHours(), endDate.getMinutes()]} // Use local hours and minutes
               onChange={handleTimePickerChange}
               visible={isTimePickerVisible}
               onDismiss={() => setTimePickerVisible(false)}
@@ -211,13 +212,13 @@ const CalculateMaintainance = () => {
                     hour: "2-digit",
                     minute: "2-digit",
                     hour12: false,
-                    timeZone: "UTC",
+                    timeZone: "Asia/Ho_Chi_Minh", // Display Vietnam local time
                   })}
                 </Text>
                 <Icon name="clockcircleo" size={20} color="#000" />
               </TouchableOpacity>
             </Picker>
-  
+
             {/* Cycle Days Toggle */}
             <Text style={styles.label}>NGÀY CHU KỲ</Text>
             <View style={styles.toggleContainer}>
@@ -243,7 +244,7 @@ const CalculateMaintainance = () => {
             </View>
           </View>
         </ScrollView>
-  
+
         <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
           <Text style={styles.saveButtonText}>Lưu</Text>
         </TouchableOpacity>

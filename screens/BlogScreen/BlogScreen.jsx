@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react"; // Added useState
+import React, { useEffect, useState } from "react";
 import {
   ImageBackground,
   Text,
@@ -6,7 +6,8 @@ import {
   FlatList,
   Image,
   TouchableOpacity,
-  TextInput, // Added TextInput
+  TextInput,
+  ScrollView,
 } from "react-native";
 import { styles } from "./styles";
 import { useDispatch, useSelector } from "react-redux";
@@ -17,59 +18,79 @@ import FontAwesome from "react-native-vector-icons/FontAwesome";
 const BlogScreen = ({ navigation }) => {
   const dispatch = useDispatch();
   const blogData = useSelector(approvedBlogsSelector);
-  const [searchQuery, setSearchQuery] = useState(""); // State for search input
+  const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
     dispatch(getApprovedBlogs());
   }, [dispatch]);
 
-  // Handle search input change
   const handleSearch = (text) => {
     setSearchQuery(text);
     if (text) {
       dispatch(searchBlogs(text));
     } else {
-      dispatch(getApprovedBlogs()); // Reset to all blogs when search is cleared
+      dispatch(getApprovedBlogs());
     }
   };
 
+  const renderProductItem = ({ item }) => (
+    <TouchableOpacity
+      style={styles.productCard}
+      onPress={() => {
+        navigation.navigate("ProductDetail", { product: item });
+      }}
+    >
+      <Image
+        source={{ uri: item.image }}
+        style={styles.productImage}
+        resizeMode="cover"
+      />
+      <Text style={styles.productName} numberOfLines={2}>
+        {item.name}
+      </Text>
+      <Text style={styles.productPrice}>
+        {`${item.price.toLocaleString("vi-VN")} VND`}
+      </Text>
+    </TouchableOpacity>
+  );
+
   const renderBlogItem = ({ item }) => (
     <View style={styles.blogCard}>
-      <View
-        style={{ flexDirection: "row", alignItems: "center", marginBottom: 10 }}
-      >
+      <View style={styles.blogHeader}>
         <Image
           source={require("../../assets/shopImage.jpg")}
-          style={{ width: 50, height: 50, borderRadius: 25, marginRight: 10 }}
+          style={styles.shopImage}
         />
-        <Text
-          style={{
-            fontSize: 12,
-            fontWeight: "bold",
-            fontFamily: "serif",
-            width: 250,
-          }}
-        >
-          {item.title.toUpperCase()}
-        </Text>
+        <View>
+          <Text style={styles.blogTitle}>{item.title.toUpperCase()}</Text>
+          <Text style={styles.shopName}>{item.shop.name}</Text>
+        </View>
       </View>
 
-      <Text
-        style={{
-          ...styles.blogContent,
-          paddingLeft: 8,
-          paddingRight: 8,
-          textAlign: "justify",
-        }}
-      >
-        {item.content}
+      <Text style={styles.blogContent} numberOfLines={4}>
+        {item.content.replace(/<[^>]+>/g, "")} {/* Strip HTML tags */}
       </Text>
 
       {item.images && (
         <Image
           source={{ uri: item.images }}
-          style={[styles.blogImage, { paddingBottom: 20 }]}
+          style={styles.blogImage}
+          resizeMode="cover"
         />
+      )}
+
+      {item.products && item.products.length > 0 && (
+        <View style={styles.productsContainer}>
+          <Text style={styles.productsTitle}>Sản phẩm liên quan</Text>
+          <FlatList
+            data={item.products}
+            renderItem={renderProductItem}
+            keyExtractor={(product) => product.productId}
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.productsList}
+          />
+        </View>
       )}
     </View>
   );
@@ -84,7 +105,7 @@ const BlogScreen = ({ navigation }) => {
         <View style={styles.overlay} />
         <View style={styles.header}>
           <TouchableOpacity onPress={() => navigation.goBack()}>
-            <FontAwesome name="arrow-left" size={24} color="#fff" />
+            <FontAwesome name="arrow-left" size={24} color="#FFF" />
           </TouchableOpacity>
           <Text style={styles.title}>Blog</Text>
           <View style={{ width: 24 }} />
@@ -92,14 +113,11 @@ const BlogScreen = ({ navigation }) => {
 
         {/* Search Bar */}
         <View style={styles.searchContainer}>
-          <FontAwesome name="search" size={20} color="#666" />
+          <FontAwesome name="search" size={20} color="#FFF" />
           <TextInput
-            style={{
-              flex: 1,
-              padding: 10,
-              fontSize: 16,
-            }}
-            placeholder="Search blog titles..."
+            style={styles.searchInput}
+            placeholder="Tìm kiếm bài viết..."
+            placeholderTextColor="#B0C4DE"
             value={searchQuery}
             onChangeText={handleSearch}
           />
