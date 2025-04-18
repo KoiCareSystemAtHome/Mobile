@@ -30,31 +30,78 @@ const WaterParametersChart = ({
   waterParameterData,
   pondParameters,
 }) => {
-  const data =
-    Array.isArray(waterParameterData) && waterParameterData.length > 0
-      ? waterParameterData
-      : [];
+  // Validate waterParameterData
+  if (!Array.isArray(waterParameterData)) {
+    console.error("waterParameterData is not an array:", waterParameterData);
+    return <Text style={styles.noDataText}>Invalid data provided</Text>;
+  }
 
+  const data = waterParameterData.length > 0 ? waterParameterData : [];
   const threeMonthsAgo = new Date();
   threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
-  const filteredData = data.filter(
-    (item) => new Date(item.calculatedDate) >= threeMonthsAgo
-  );
+
+  // Filter data with valid calculatedDate
+  const filteredData = data.filter((item) => {
+    if (!item?.calculatedDate || typeof item.calculatedDate !== "string") {
+      console.warn("Invalid or missing calculatedDate:", item);
+      return false;
+    }
+    const date = new Date(item.calculatedDate);
+    return !isNaN(date.getTime()) && date >= threeMonthsAgo;
+  });
+
   filteredData.sort(
     (a, b) => new Date(a.calculatedDate) - new Date(b.calculatedDate)
   );
 
+  // Map dates with validation
   const dates = filteredData.map((item) => {
     const dateStr = item.calculatedDate;
-    const [datePart, timePart] = dateStr.split(" ");
-    const [year, month, day] = datePart.split("-").map(Number);
-    const [hour, minute, second] = timePart.split(":").map(Number);
-    return new Date(year, month - 1, day, hour, minute, second).getTime();
-  });
+    if (!dateStr || typeof dateStr !== "string") {
+      console.warn("Skipping invalid dateStr:", dateStr, "for item:", item);
+      return null; // Skip invalid dates
+    }
+
+    const parts = dateStr.split(" ");
+    if (parts.length !== 2) {
+      console.warn(
+        "Invalid date format, expected 'YYYY-MM-DD HH:MM:SS':",
+        dateStr
+      );
+      return null;
+    }
+
+    const [datePart, timePart] = parts;
+    const dateComponents = datePart.split("-").map(Number);
+    const timeComponents = timePart.split(":").map(Number);
+
+    if (
+      dateComponents.length !== 3 ||
+      timeComponents.length !== 3 ||
+      dateComponents.some(isNaN) ||
+      timeComponents.some(isNaN)
+    ) {
+      console.warn("Invalid date or time components:", dateStr);
+      return null;
+    }
+
+    const [year, month, day] = dateComponents;
+    const [hour, minute, second] = timeComponents;
+    const date = new Date(year, month - 1, day, hour, minute, second);
+
+    if (isNaN(date.getTime())) {
+      console.warn("Invalid date constructed from:", dateStr);
+      return null;
+    }
+
+    return date.getTime();
+  }).filter((time) => time !== null); // Remove null entries
+
   const minDate = dates.length > 0 ? Math.min(...dates) : Date.now();
   const maxDate = dates.length > 0 ? Math.max(...dates) : Date.now();
   const dateRange = maxDate - minDate || 1;
 
+  // Rest of the component remains unchanged
   const normalizeData = (data, property, maxYValue) => {
     const validData = data.filter(
       (d) => d.hasOwnProperty(property) && d[property] != null
@@ -124,6 +171,7 @@ const WaterParametersChart = ({
 
     return { maxYValue, yAxisInterval };
   };
+
   selectedParameters.forEach((parameter) => {
     console.log(`Parameter: ${parameter}`);
     const valuesWithDates = filteredData
@@ -134,6 +182,7 @@ const WaterParametersChart = ({
       }));
     console.log(valuesWithDates);
   });
+
   return (
     <ScrollView
       style={styles.container}
@@ -202,7 +251,8 @@ const WaterParametersChart = ({
                   (CHART_HEIGHT - PADDING * 2) +
                 PADDING
               : null;
-              console.log("Selected Parameters:", selectedParameters);
+          console.log("Selected Parameters:", selectedParameters);
+
           return (
             <View key={parameter} style={styles.chartContainer}>
               <Text style={styles.chartTitle}>{parameter}</Text>

@@ -15,6 +15,7 @@ export const styles = StyleSheet.create({
     alignItems: "center",
     paddingHorizontal: 20,
     paddingVertical: 20,
+    marginTop:20
   },
   title: {
     fontSize: 22,

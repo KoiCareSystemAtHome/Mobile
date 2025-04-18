@@ -169,6 +169,7 @@ const CartScreen = ({ navigation }) => {
             const email = isLoggedIn?.email;
             console.log(email, orderIds);
             const values = { email, orderIds };
+            console.log(values);
             dispatch(payOrder(values))
               .unwrap()
               .then((res) => {
