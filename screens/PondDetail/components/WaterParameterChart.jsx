@@ -30,78 +30,63 @@ const WaterParametersChart = ({
   waterParameterData,
   pondParameters,
 }) => {
-  // Validate waterParameterData
   if (!Array.isArray(waterParameterData)) {
-    console.error("waterParameterData is not an array:", waterParameterData);
-    return <Text style={styles.noDataText}>Invalid data provided</Text>;
+    console.warn("waterParameterData is not an array");
+    return (
+      <View style={styles.container}>
+        <Text style={styles.noDataText}>Dữ liệu không hợp lệ</Text>
+      </View>
+    );
   }
+  const data =
+    Array.isArray(waterParameterData) && waterParameterData.length > 0
+      ? waterParameterData
+      : [];
 
-  const data = waterParameterData.length > 0 ? waterParameterData : [];
   const threeMonthsAgo = new Date();
   threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
+  const filteredData = data
+    .filter((item) => {
+      if (!item.calculatedDate || typeof item.calculatedDate !== "string") {
+        console.warn("Invalid calculatedDate:", item);
+        return false;
+      }
+      try {
+        const date = new Date(item.calculatedDate);
+        return date >= threeMonthsAgo && !isNaN(date.getTime());
+      } catch (error) {
+        console.warn("Error parsing calculatedDate:", item.calculatedDate);
+        return false;
+      }
+    })
+    .sort((a, b) => new Date(a.calculatedDate) - new Date(b.calculatedDate));
 
-  // Filter data with valid calculatedDate
-  const filteredData = data.filter((item) => {
-    if (!item?.calculatedDate || typeof item.calculatedDate !== "string") {
-      console.warn("Invalid or missing calculatedDate:", item);
-      return false;
-    }
-    const date = new Date(item.calculatedDate);
-    return !isNaN(date.getTime()) && date >= threeMonthsAgo;
-  });
-
-  filteredData.sort(
-    (a, b) => new Date(a.calculatedDate) - new Date(b.calculatedDate)
-  );
-
-  // Map dates with validation
-  const dates = filteredData.map((item) => {
-    const dateStr = item.calculatedDate;
-    if (!dateStr || typeof dateStr !== "string") {
-      console.warn("Skipping invalid dateStr:", dateStr, "for item:", item);
-      return null; // Skip invalid dates
-    }
-
-    const parts = dateStr.split(" ");
-    if (parts.length !== 2) {
-      console.warn(
-        "Invalid date format, expected 'YYYY-MM-DD HH:MM:SS':",
-        dateStr
-      );
-      return null;
-    }
-
-    const [datePart, timePart] = parts;
-    const dateComponents = datePart.split("-").map(Number);
-    const timeComponents = timePart.split(":").map(Number);
-
-    if (
-      dateComponents.length !== 3 ||
-      timeComponents.length !== 3 ||
-      dateComponents.some(isNaN) ||
-      timeComponents.some(isNaN)
-    ) {
-      console.warn("Invalid date or time components:", dateStr);
-      return null;
-    }
-
-    const [year, month, day] = dateComponents;
-    const [hour, minute, second] = timeComponents;
-    const date = new Date(year, month - 1, day, hour, minute, second);
-
-    if (isNaN(date.getTime())) {
-      console.warn("Invalid date constructed from:", dateStr);
-      return null;
-    }
-
-    return date.getTime();
-  }).filter((time) => time !== null); // Remove null entries
-
+  const dates = filteredData
+    .filter(
+      (item) => item.calculatedDate && typeof item.calculatedDate === "string"
+    )
+    .map((item) => {
+      try {
+        const date = new Date(item.calculatedDate);
+        if (isNaN(date.getTime())) {
+          console.warn(
+            `Invalid date format for calculatedDate: ${item.calculatedDate}`
+          );
+          return null;
+        }
+        return date.getTime();
+      } catch (error) {
+        console.warn(
+          `Error parsing date ${item.calculatedDate}: ${error.message}`
+        );
+        return null;
+      }
+    })
+    .filter((date) => date !== null);
   const minDate = dates.length > 0 ? Math.min(...dates) : Date.now();
   const maxDate = dates.length > 0 ? Math.max(...dates) : Date.now();
   const dateRange = maxDate - minDate || 1;
 
-  // Rest of the component remains unchanged
   const normalizeData = (data, property, maxYValue) => {
     const validData = data.filter(
       (d) => d.hasOwnProperty(property) && d[property] != null
@@ -171,18 +156,18 @@ const WaterParametersChart = ({
 
     return { maxYValue, yAxisInterval };
   };
-
   selectedParameters.forEach((parameter) => {
     console.log(`Parameter: ${parameter}`);
     const valuesWithDates = filteredData
-      .filter((item) => item.hasOwnProperty(parameter) && item[parameter] != null)
+      .filter(
+        (item) => item.hasOwnProperty(parameter) && item[parameter] != null
+      )
       .map((item) => ({
         date: item.calculatedDate,
         value: item[parameter],
       }));
     console.log(valuesWithDates);
   });
-
   return (
     <ScrollView
       style={styles.container}
@@ -204,21 +189,18 @@ const WaterParametersChart = ({
           }
 
           const xAxisLabels = [];
-          const numLabels = Math.min(filteredData.length, 5); // Still aim for up to 5 labels
+          const numLabels = Math.min(filteredData.length, 5);
           if (filteredData.length > 0) {
-            // Calculate even spacing for the labels across the chart width
-            const labelStep = (CHART_WIDTH - PADDING * 2) / (numLabels - 1); // Evenly space labels
+            const labelStep = (CHART_WIDTH - PADDING * 2) / (numLabels - 1);
             const dataStep = Math.max(
               1,
               Math.floor(filteredData.length / numLabels)
-            ); // Step through data points
-
+            );
             for (let i = 0; i < numLabels; i++) {
-              const dataIndex = Math.min(i * dataStep, filteredData.length - 1); // Get the corresponding data point
+              const dataIndex = Math.min(i * dataStep, filteredData.length - 1);
               const date = new Date(filteredData[dataIndex].calculatedDate);
+              if (isNaN(date.getTime())) continue; // Skip invalid dates
               const label = `${date.getDate()}/${date.getMonth() + 1}`;
-
-              // Position the label evenly across the chart
               const xPosition = PADDING + i * labelStep;
               xAxisLabels.push({ value: label, x: xPosition });
             }
@@ -252,7 +234,6 @@ const WaterParametersChart = ({
                 PADDING
               : null;
           console.log("Selected Parameters:", selectedParameters);
-
           return (
             <View key={parameter} style={styles.chartContainer}>
               <Text style={styles.chartTitle}>{parameter}</Text>

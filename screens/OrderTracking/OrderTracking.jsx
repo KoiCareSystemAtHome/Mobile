@@ -84,6 +84,8 @@ const OrderTracking = ({ navigation }) => {
         payload = { orderId, status: "Delivered" };
       } else if (orderTrack.status === "delivered") {
         payload = { orderId, status: "Complete" };
+      } else if (orderTrack.status === "return") {
+        payload = { orderId, status: "Return" };
       }
       if (payload) {
         dispatch(updateOrderStatus(payload));
@@ -94,7 +96,7 @@ const OrderTracking = ({ navigation }) => {
   const handleCancelOrder = () => {
     setCancelModalVisible(true);
   };
-
+  console.log(orderTrack.status);
   const confirmCancelOrder = () => {
     if (!cancelReason.trim()) {
       Toast.fail("Vui lòng nhập lý do hủy đơn hàng");
@@ -130,7 +132,7 @@ const OrderTracking = ({ navigation }) => {
     });
   };
 
-  console.log(orderTrack?.log)
+  console.log(orderTrack?.log);
 
   return (
     <Provider locale={enUS}>
@@ -311,7 +313,7 @@ const OrderTracking = ({ navigation }) => {
                   delivered: "Đã giao hàng",
                   delivering: "Đang giao hàng",
                   storing: "Đang đóng gói",
-                  picked: "Đã nhận hàng",
+                  picked: "Đã lấy hàng",
                   picking: "Đang lấy hàng",
                   delivery_fail: "Giao hàng thất bại",
                 };
