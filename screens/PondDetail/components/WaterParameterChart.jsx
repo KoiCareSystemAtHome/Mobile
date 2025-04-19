@@ -1,6 +1,12 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { View, Text, StyleSheet, Dimensions, ScrollView } from "react-native";
 import Svg, { Line, Circle, Text as SvgText } from "react-native-svg";
+import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
+import timezone from 'dayjs/plugin/timezone';
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
 const { width } = Dimensions.get("window");
 const CHART_WIDTH = width - 80;
@@ -38,45 +44,30 @@ const WaterParametersChart = ({
       </View>
     );
   }
-  const data =
-    Array.isArray(waterParameterData) && waterParameterData.length > 0
-      ? waterParameterData
-      : [];
 
-  const threeMonthsAgo = new Date();
-  threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
-  const filteredData = data
-    .filter((item) => {
-      if (!item.calculatedDate || typeof item.calculatedDate !== "string") {
-        console.warn("Invalid calculatedDate:", item);
-        return false;
-      }
-      try {
-        const date = new Date(item.calculatedDate);
-        return date >= threeMonthsAgo && !isNaN(date.getTime());
-      } catch (error) {
-        console.warn("Error parsing calculatedDate:", item.calculatedDate);
-        return false;
-      }
-    })
-    .sort((a, b) => new Date(a.calculatedDate) - new Date(b.calculatedDate));
+  const data = Array.isArray(waterParameterData) && waterParameterData.length > 0
+    ? waterParameterData
+    : [];
 
-  // Get unique dates for X-axis labels
-  const uniqueDates = [
-    ...new Set(
-      filteredData.map((item) => {
-        const date = new Date(item.calculatedDate);
-        return `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
+  // Memoize filteredData to prevent recomputation
+  const filteredData = useMemo(() => {
+    const threeMonthsAgo = dayjs().subtract(3, 'month').startOf('day');
+    return data
+      .filter((item) => {
+        if (!item.calculatedDate || typeof item.calculatedDate !== "string") {
+          console.warn("Invalid calculatedDate:", item);
+          return false;
+        }
+        try {
+          const date = dayjs.utc(item.calculatedDate);
+          return date.isAfter(threeMonthsAgo) && date.isValid();
+        } catch (error) {
+          console.warn("Error parsing calculatedDate:", item.calculatedDate);
+          return false;
+        }
       })
-    ),
-  ].map((dateStr) => {
-    const [year, month, day] = dateStr.split("-").map(Number);
-    return new Date(year, month - 1, day).getTime();
-  }).sort((a, b) => a - b);
-
-  const minDate = uniqueDates.length > 0 ? Math.min(...uniqueDates) : Date.now();
-  const maxDate = uniqueDates.length > 0 ? Math.max(...uniqueDates) : Date.now();
-  const dateRange = maxDate - minDate || 1;
+      .sort((a, b) => dayjs.utc(a.calculatedDate).valueOf() - dayjs.utc(b.calculatedDate).valueOf());
+  }, [data]);
 
   const normalizeData = (data, property, maxYValue) => {
     const validData = data.filter(
@@ -85,18 +76,31 @@ const WaterParametersChart = ({
 
     const dayMap = {};
     validData.forEach((d, index) => {
-      const date = new Date(d.calculatedDate);
-      const dayKey = `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
+      const date = dayjs.utc(d.calculatedDate);
+      const dayKey = date.format('YYYY-MM-DD');
       if (!dayMap[dayKey]) {
         dayMap[dayKey] = [];
       }
       dayMap[dayKey].push(index);
     });
 
+    // Get unique dates for X-axis scaling
+    const uniqueDates = [
+      ...new Set(
+        validData.map((item) => dayjs.utc(item.calculatedDate).format('YYYY-MM-DD'))
+      ),
+    ]
+      .map((dateStr) => dayjs.utc(dateStr).valueOf())
+      .sort((a, b) => a - b);
+
+    const minDate = uniqueDates.length > 0 ? Math.min(...uniqueDates) : dayjs.utc().valueOf();
+    const maxDate = uniqueDates.length > 0 ? Math.max(...uniqueDates) : dayjs.utc().valueOf();
+    const dateRange = maxDate - minDate || 1;
+
     return validData.map((d, index) => {
-      const date = new Date(d.calculatedDate);
-      const dayKey = `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
-      const dateValue = new Date(date.getFullYear(), date.getMonth(), date.getDate()).getTime();
+      const date = dayjs.utc(d.calculatedDate);
+      const dayKey = date.format('YYYY-MM-DD');
+      const dateValue = date.valueOf();
       const value = d[property];
 
       let x =
@@ -118,7 +122,7 @@ const WaterParametersChart = ({
       const y = maxYValue
         ? (1 - value / maxYValue) * (CHART_HEIGHT - PADDING * 2) + PADDING
         : PADDING;
-      return { x, y };
+      return { x, y, date: dateValue };
     });
   };
 
@@ -143,7 +147,7 @@ const WaterParametersChart = ({
 
     return { maxYValue, yAxisInterval };
   };
-console.log("", selectedParameters, filteredData);
+
   return (
     <ScrollView
       style={styles.container}
@@ -164,20 +168,30 @@ console.log("", selectedParameters, filteredData);
             yAxisLabels.push({ value: i.toFixed(1), y: yPosition });
           }
 
-          // Generate X-axis labels based on unique dates
-          const xAxisLabels = [];
-          const maxLabels = 5; // Limit to 5 labels to avoid clutter
-          const step = Math.max(1, Math.floor(uniqueDates.length / maxLabels));
-          uniqueDates.forEach((dateTimestamp, index) => {
-            if (index % step === 0 || index === uniqueDates.length - 1) {
-              const date = new Date(dateTimestamp);
-              const label = `${date.getDate()}/${date.getMonth() + 1}`;
+          // Generate X-axis labels based on points
+          const uniquePointDates = [
+            ...new Set(
+              points.map((point) => dayjs.utc(point.date).format('YYYY-MM-DD'))
+            ),
+          ]
+            .map((dateStr) => ({
+              date: dayjs.utc(dateStr).valueOf(),
+              label: dayjs.utc(dateStr).format('DD/MM'),
+            }))
+            .sort((a, b) => a.date - b.date);
+
+          const maxLabels = Math.min(5, uniquePointDates.length);
+          const step = uniquePointDates.length > maxLabels ? Math.ceil(uniquePointDates.length / maxLabels) : 1;
+          const xAxisLabels = uniquePointDates
+            .filter((_, index) => index % step === 0 || index === uniquePointDates.length - 1)
+            .map((item) => {
               const x =
                 PADDING +
-                ((dateTimestamp - minDate) / dateRange) * (CHART_WIDTH - PADDING * 2);
-              xAxisLabels.push({ value: label, x });
-            }
-          });
+                ((item.date - Math.min(...uniquePointDates.map(d => d.date))) /
+                  (Math.max(...uniquePointDates.map(d => d.date)) - Math.min(...uniquePointDates.map(d => d.date)) || 1)) *
+                  (CHART_WIDTH - PADDING * 2);
+              return { value: item.label, x };
+            });
 
           const paramInfo = pondParameters.find(
             (p) => p.parameterName === parameter

@@ -88,7 +88,6 @@ const FishStatistic = ({ navigation }) => {
     }
   };
 
-  console.log(fishData);
 
   const renderFishCard = ({ item }) => {
     const latestReport =

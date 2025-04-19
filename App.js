@@ -52,6 +52,7 @@ import ReviewScreen from './screens/ReviewScreen/ReviewScreen';
 import ForgetPassword from './screens/FogetPassword/ForgetPassword';
 import ResetPasswordForm from './screens/FogetPassword/components/ResetPasswordForm';
 import "react-native-reanimated";
+import FishList from './screens/PondDetail/components/FishList/FishList';
 
 // Create Bottom Tab Navigator
 const Tab = createBottomTabNavigator();
@@ -300,6 +301,7 @@ const AppContent = () => {
         <Stack.Screen name="ReviewScreen" component={ReviewScreen} options={{ headerShown: false }} />
         <Stack.Screen name="ForgetPassword" component={ForgetPassword} options={{ headerShown: false }} />
         <Stack.Screen name="ResetPasswordForm" component={ResetPasswordForm} options={{ headerShown: false }} />
+        <Stack.Screen name="FishList" component={FishList} options={{ headerShown: false }} />
         <Stack.Screen name="MainTabs" component={MainTabNavigator} options={{ headerShown: false }} />
       </Stack.Navigator>
     </NavigationContainer>

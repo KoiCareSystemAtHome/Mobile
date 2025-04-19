@@ -104,7 +104,6 @@ const PondDetail = ({ navigation, route }) => {
     };
     getData();
   }, []);
-
   const chunkArray = (array, chunkSize) => {
     const result = [];
     for (let i = 0; i < array.length; i += chunkSize) {
@@ -235,7 +234,27 @@ const PondDetail = ({ navigation, route }) => {
                 <View style={styles.infoRow}>
                   <View style={styles.infoBlock}>
                     <Text style={styles.infoLabel}>Số Cá</Text>
-                    <Text style={styles.infoValue}>{pond?.fishAmount}</Text>
+                    <View
+                      style={{ flexDirection: "row", alignItems: "center" }}
+                    >
+                      <Text style={styles.infoValue}>{pond?.fishAmount}</Text>
+                      <TouchableOpacity
+                        onPress={() =>
+                          navigation.navigate("FishList", {
+                            pondID: pond.pondID,
+                            userId: isLoggedIn?.id
+                          })
+                        }
+                        disabled={pond?.fishAmount === 0}
+                      >
+                        <FontAwesome
+                          name="eye"
+                          size={16}
+                          color={pond?.fishAmount === 0 ? "#ccc" : "#0077B6"}
+                          style={{ marginLeft: 6 }}
+                        />
+                      </TouchableOpacity>
+                    </View>
                   </View>
                   <View style={styles.infoBlock}>
                     <Text style={styles.infoLabel}>Dung Tích</Text>
@@ -276,7 +295,8 @@ const PondDetail = ({ navigation, route }) => {
                     onPress={() => toggleParameter(param)}
                     style={[
                       styles.parameterCard,
-                      selectedParameters.includes(param) && styles.parameterCardActive,
+                      selectedParameters.includes(param) &&
+                        styles.parameterCardActive,
                     ]}
                   >
                     <Text style={styles.parameterLabel}>{param}</Text>
@@ -305,7 +325,7 @@ const PondDetail = ({ navigation, route }) => {
 
           <View style={styles.suggestedContainer}>
             <Text style={styles.sectionTitle}>Sản Phẩm Đề Xuất</Text>
-            {recommendedProducts.length > 0 ? (
+            {recommendedProducts?.length > 0 ? (
               <ScrollView
                 horizontal
                 showsHorizontalScrollIndicator={false}
@@ -329,7 +349,9 @@ const PondDetail = ({ navigation, route }) => {
                       {item.productName}
                     </Text>
                     <Text style={styles.productPrice}>
-                      {item.price ? `${item.price.toLocaleString("vi-VN")} VND` : "N/A"}
+                      {item.price
+                        ? `${item.price.toLocaleString("vi-VN")} VND`
+                        : "N/A"}
                     </Text>
                     <TouchableOpacity style={styles.addToCartButton}>
                       <Text style={styles.addToCartText}>Thêm Vào Giỏ</Text>
@@ -379,7 +401,9 @@ const PondDetail = ({ navigation, route }) => {
                   <Form.Item
                     name="name"
                     initialValue={pond?.name}
-                    rules={[{ required: true, message: "Vui lòng nhập tên ao" }]}
+                    rules={[
+                      { required: true, message: "Vui lòng nhập tên ao" },
+                    ]}
                   >
                     <Input placeholder="Tên Ao" style={styles.input} />
                   </Form.Item>

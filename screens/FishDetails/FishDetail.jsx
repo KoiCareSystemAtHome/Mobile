@@ -115,6 +115,7 @@ const FishDetail = ({ route, navigation }) => {
         items.some((item) => item.value === fish.pond.pondID)
       ) {
         setSelectedPond(fish.pond.pondID);
+        setTempPond(fish.pond.pondID); // Ensure tempPond is synced
       }
     }
   }, [pondData, fish.pond.pondID]);
@@ -127,16 +128,14 @@ const FishDetail = ({ route, navigation }) => {
     const product = products.find((p) => p.productId === medicineId);
     return product?.productName || "Không xác định";
   };
-  console.log(fish.pond);
   const handleUpdatePond = () => {
     if (!selectedPond) {
       Toast.fail("Vui lòng chọn một ao!");
       return;
     }
-
     const koiID = fish.koiID;
     const name = fish.name;
-    const pondID = selectedPond;
+    const pondID = tempPond;
     const physique = fishById?.physique || fish.physique;
     const sex = fish.sex;
     const breeder = fishById?.breeder || fish.breeder;
@@ -162,7 +161,7 @@ const FishDetail = ({ route, navigation }) => {
       size,
       weight,
     };
-
+    console.log("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", value);
     dispatch(updateFish(value))
       .unwrap()
       .then((res) => {
@@ -170,6 +169,7 @@ const FishDetail = ({ route, navigation }) => {
           Toast.success("Cập nhật ao thành công");
           dispatch(getFishByOwner(isLoggedIn?.id));
           dispatch(getFishById(fish.koiID));
+          dispatch(getPondByOwner(isLoggedIn?.id));
         } else {
           Toast.fail("Cập nhật ao thất bại");
         }
@@ -369,33 +369,37 @@ const FishDetail = ({ route, navigation }) => {
                 {fish?.price?.toLocaleString("vi-VN")} VND
               </Text>
               <View style={styles.pondPickerContainer}>
-  <DropDownPicker
-    open={openPondPicker}
-    value={tempPond}
-    items={pondItems}
-    setOpen={setOpenPondPicker}
-    setValue={setTempPond}
-    setItems={setPondItems}
-    placeholder="Chọn một ao"
-    placeholderStyle={styles.dropdownPlaceholder}
-    style={styles.dropdown}
-    dropDownContainerStyle={styles.dropdownBox}
-    textStyle={styles.dropdownText}
-    listMode="SCROLLVIEW"
-    zIndex={1000}
-    zIndexInverse={2000}
-  />
-  <TouchableOpacity
-    style={[
-      styles.savePondButton,
-      tempPond === selectedPond && styles.savePondButtonDisabled,
-    ]}
-    onPress={handleConfirmPondChange}
-    disabled={tempPond === selectedPond}
-  >
-    <Text style={styles.savePondButtonText}>Lưu Ao</Text>
-  </TouchableOpacity>
-</View>
+                <DropDownPicker
+                  open={openPondPicker}
+                  value={tempPond}
+                  items={pondItems}
+                  setOpen={setOpenPondPicker}
+                  setValue={(callback) => {
+                    const newValue = callback(tempPond);
+                    console.log("New tempPond value:", newValue); // Debug
+                    setTempPond(newValue);
+                  }}
+                  setItems={setPondItems}
+                  placeholder="Chọn một ao"
+                  placeholderStyle={styles.dropdownPlaceholder}
+                  style={styles.dropdown}
+                  dropDownContainerStyle={styles.dropdownBox}
+                  textStyle={styles.dropdownText}
+                  listMode="SCROLLVIEW"
+                  zIndex={1000}
+                  zIndexInverse={2000}
+                />
+                <TouchableOpacity
+                  style={[
+                    styles.savePondButton,
+                    tempPond === selectedPond && styles.savePondButtonDisabled,
+                  ]}
+                  onPress={handleConfirmPondChange}
+                  disabled={tempPond === selectedPond}
+                >
+                  <Text style={styles.savePondButtonText}>Lưu Ao</Text>
+                </TouchableOpacity>
+              </View>
               <View style={styles.infoRow}>
                 <View style={styles.infoBlock}>
                   <Text style={styles.infoLabel}>Tuổi</Text>
