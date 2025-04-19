@@ -72,6 +72,77 @@ export const styles = StyleSheet.create({
     color: "#0077B6",
     marginBottom: 12,
   },
+  pondPickerContainer: {
+    flexDirection: "row", // Align picker and button side by side
+    justifyContent: "flex-start", // Align children to the left
+    alignItems: "center", // Vertically center the picker and button
+    width: "70%", // Span the full width of the parent
+    marginBottom: 12,
+    alignSelf: "flex-start", 
+    paddingInline:10
+  },
+  dropdown: {
+    flex: 1, // Take up available space
+    backgroundColor: "#fff",
+    borderWidth: 1,
+    borderColor: "#E2E8F0",
+    borderRadius: 10,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    height: 48, // Match input height
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+    minWidth: 150, // Ensure picker doesn't shrink too much
+  },
+  dropdownContainer: {
+    backgroundColor: "#fff",
+    borderWidth: 1,
+    borderColor: "#E2E8F0",
+    borderRadius: 10,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 6,
+    elevation: 5,
+    maxHeight: 200, // Limit dropdown height
+  },
+  dropdownText: {
+    fontSize: 16,
+    color: "#1A3C5A",
+    fontWeight: "500",
+  },
+  dropdownPlaceholder: {
+    fontSize: 16,
+    color: "#A0AEC0",
+    fontWeight: "400",
+  },
+  savePondButton: {
+    backgroundColor: "#0077B6",
+    borderRadius: 8,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    marginLeft: 8, // Space between picker and button
+    height: 48, // Match picker height
+    justifyContent: "center",
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  savePondButtonDisabled: {
+    backgroundColor: "#A0AEC0",
+    opacity: 0.6,
+  },
+  savePondButtonText: {
+    fontSize: 16,
+    color: "#fff",
+    fontWeight: "600",
+  },
   infoRow: {
     flexDirection: "row",
     justifyContent: "space-between",

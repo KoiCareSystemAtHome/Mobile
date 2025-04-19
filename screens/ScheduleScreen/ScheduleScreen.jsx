@@ -137,7 +137,7 @@ const ScheduleScreen = ({ navigation }) => {
       .toUpperCase();
   };
 
-
+console.log(reminderByOwner)
   return (
     <SafeAreaView style={styles.container}>
       {/* Header */}

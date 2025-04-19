@@ -101,10 +101,24 @@ const WaterParameter = () => {
     const image = selectedPond?.image;
     const createDate = selectedPond?.createDate;
     const ownerId = selectedPond?.ownerId;
-    const requirementPondParam = requiredParams.map((param) => ({
-      historyId: param.parameterId,
-      value: values[param.parameterId] || 0,
-    }));
+
+    // Only include parameters with valid, non-empty values
+    const requirementPondParam = requiredParams
+      .filter((param) => {
+        const value = values[param.parameterId];
+        return value !== undefined && value !== "" && value !== null;
+      })
+      .map((param) => ({
+        historyId: param.parameterId,
+        value: parseFloat(values[param.parameterId]), // Convert to number
+      }));
+
+    // Only dispatch if there are valid parameters to update
+    if (requirementPondParam.length === 0) {
+      setModalVisible(false);
+      return; // Exit early if no valid parameters
+    }
+
     const updatedPond = {
       pondID,
       name,
@@ -113,6 +127,7 @@ const WaterParameter = () => {
       ownerId,
       requirementPondParam,
     };
+
     dispatch(updatePond(updatedPond))
       .unwrap()
       .then(() => {
@@ -178,7 +193,7 @@ const WaterParameter = () => {
                   <Text key={paramIndex} style={styles.greenText}>
                     {param.parameterName}:{" "}
                     <Text style={styles.boldText}>
-                      {(param.value).toFixed(2)} {param.unitName}
+                      {param.value.toFixed(2)} {param.unitName}
                     </Text>
                   </Text>
                 ))}
@@ -186,7 +201,7 @@ const WaterParameter = () => {
             ))}
           </ScrollView>
           <Text style={styles.infoText}>
-          Nhiệt độ ngoài trời: cần được giám sát thường xuyêns
+            Nhiệt độ ngoài trời: cần được giám sát thường xuyêns
           </Text>
         </View>
       );
@@ -306,7 +321,9 @@ const WaterParameter = () => {
                           placeholder={`Nhập giá trị`}
                           style={styles.paramInput}
                           keyboardType="numeric"
-                          onChangeText={(text) => handleParamChange(text, param)}
+                          onChangeText={(text) =>
+                            handleParamChange(text, param)
+                          }
                         />
                       </Form.Item>
                       {warnings[param.parameterId]?.message ? (

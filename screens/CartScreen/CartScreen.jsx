@@ -42,7 +42,7 @@ const CartScreen = ({ navigation }) => {
     },
     {
       id: "Online Banking",
-      label: "Ngân hàng trực tuyến",
+      label: "Thanh toán bằng ví",
       value: "Online Banking",
     },
   ];

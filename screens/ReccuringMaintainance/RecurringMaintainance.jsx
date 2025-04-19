@@ -77,7 +77,7 @@ const CalculateMaintainance = () => {
       adjustedEndDate.setHours(adjustedEndDate.getHours() + 7);
       const formattedEndDate = adjustedEndDate.toISOString().split(".")[0];
       const values = { pondId, endDate: formattedEndDate, cycleDays };
-      console.log(values);
+      console.log("save", values);
       dispatch(reccuringMaintainance(values))
         .unwrap()
         .then((res) => {

@@ -27,6 +27,7 @@ import {
 } from "../../redux/selector";
 import AntDesign from "react-native-vector-icons/AntDesign";
 import enUS from "@ant-design/react-native/lib/locale-provider/en_US";
+import { getWallet } from "../../redux/slices/authSlice";
 
 const OrderTracking = ({ navigation }) => {
   const dispatch = useDispatch();
@@ -109,6 +110,7 @@ const OrderTracking = ({ navigation }) => {
         if (res.status === "success") {
           Toast.success("Đơn hàng đã được hủy");
           dispatch(getOrderByAccount(userId));
+          dispatch(getWallet(userId));
           setCancelModalVisible(false);
           setCancelReason("");
           navigation.goBack();

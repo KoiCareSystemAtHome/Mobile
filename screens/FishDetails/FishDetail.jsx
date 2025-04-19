@@ -24,6 +24,7 @@ import {
   fishByIdSelector,
   profileByFishSelector,
   productSelector,
+  pondByOwnerSelector,
 } from "../../redux/selector";
 import {
   addFishNote,
@@ -33,10 +34,12 @@ import {
   updateFish,
 } from "../../redux/slices/fishSlice";
 import { getProduct } from "../../redux/slices/productSlice";
+import { getPondByOwner } from "../../redux/slices/pondSlice";
 import enUS from "@ant-design/react-native/lib/locale-provider/en_US";
 import { styles } from "./styles";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import AntDesign from "react-native-vector-icons/AntDesign";
+import DropDownPicker from "react-native-dropdown-picker";
 
 const FishDetail = ({ route, navigation }) => {
   const { fish } = route.params;
@@ -44,6 +47,7 @@ const FishDetail = ({ route, navigation }) => {
   const fishById = useSelector(fishByIdSelector);
   const koiProfile = useSelector(profileByFishSelector) || [];
   const products = useSelector(productSelector) || [];
+  const pondData = useSelector(pondByOwnerSelector);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isHealthModalVisible, setHealthModalVisible] = useState(false);
   const [isNoteModalVisible, setNoteModalVisible] = useState(false);
@@ -53,6 +57,10 @@ const FishDetail = ({ route, navigation }) => {
   const [notes, setNotes] = useState(fish.notes || []);
   const [newSize, setNewSize] = useState("");
   const [newWeight, setNewWeight] = useState("");
+  const [openPondPicker, setOpenPondPicker] = useState(false);
+  const [selectedPond, setSelectedPond] = useState(fish.pond.pondID);
+  const [pondItems, setPondItems] = useState([]);
+  const [tempPond, setTempPond] = useState(fish.pond.pondID);
   const latestReport =
     fish.fishReportInfos?.length > 0
       ? fish.fishReportInfos.reduce((latest, current) =>
@@ -68,7 +76,10 @@ const FishDetail = ({ route, navigation }) => {
       dispatch(getKoiProfile(fish.koiID));
       dispatch(getProduct());
     }
-  }, [fish, dispatch]);
+    if (isLoggedIn?.id) {
+      dispatch(getPondByOwner(isLoggedIn.id));
+    }
+  }, [fish, dispatch, isLoggedIn?.id]);
 
   useEffect(() => {
     if (
@@ -92,6 +103,22 @@ const FishDetail = ({ route, navigation }) => {
     getData();
   }, []);
 
+  useEffect(() => {
+    if (pondData) {
+      const items = pondData.map((pond) => ({
+        label: pond.name,
+        value: pond.pondID,
+      }));
+      setPondItems(items);
+      if (
+        fish.pond.pondID &&
+        items.some((item) => item.value === fish.pond.pondID)
+      ) {
+        setSelectedPond(fish.pond.pondID);
+      }
+    }
+  }, [pondData, fish.pond.pondID]);
+
   const handleHealthRecordSubmit = (values) => {
     console.log("Health Record Submitted:", values);
   };
@@ -100,7 +127,63 @@ const FishDetail = ({ route, navigation }) => {
     const product = products.find((p) => p.productId === medicineId);
     return product?.productName || "Không xác định";
   };
+  console.log(fish.pond);
+  const handleUpdatePond = () => {
+    if (!selectedPond) {
+      Toast.fail("Vui lòng chọn một ao!");
+      return;
+    }
 
+    const koiID = fish.koiID;
+    const name = fish.name;
+    const pondID = selectedPond;
+    const physique = fishById?.physique || fish.physique;
+    const sex = fish.sex;
+    const breeder = fishById?.breeder || fish.breeder;
+    const age = fish.age;
+    const varietyName = fish.variety.varietyName;
+    const inPondSince = (fishById?.inPondSince || fish?.inPondSince) + "Z";
+    const image = fish.image;
+    const price = fish.price;
+    const size = latestReport ? latestReport.size : fish.size;
+    const weight = latestReport ? latestReport.weight : fish.weight;
+    const value = {
+      koiID,
+      pondID,
+      name,
+      physique,
+      sex,
+      breeder,
+      age,
+      varietyName,
+      inPondSince,
+      image,
+      price,
+      size,
+      weight,
+    };
+
+    dispatch(updateFish(value))
+      .unwrap()
+      .then((res) => {
+        if (res.status === "200") {
+          Toast.success("Cập nhật ao thành công");
+          dispatch(getFishByOwner(isLoggedIn?.id));
+          dispatch(getFishById(fish.koiID));
+        } else {
+          Toast.fail("Cập nhật ao thất bại");
+        }
+      })
+      .catch((error) => {
+        console.error("Error updating pond:", error);
+        Toast.fail("Cập nhật ao thất bại");
+      });
+  };
+
+  const handleConfirmPondChange = () => {
+    setSelectedPond(tempPond);
+    handleUpdatePond();
+  };
   const renderHealthCard = (profile) => {
     if (!profile)
       return (
@@ -167,9 +250,7 @@ const FishDetail = ({ route, navigation }) => {
 
   const handleAddGrowth = () => {
     if (newSize.trim() && newWeight.trim()) {
-      const today = new Date().toISOString().split("T")[0]; // Get today's date in YYYY-MM-DD format
-
-      // Check if a growth record exists for today
+      const today = new Date().toISOString().split("T")[0];
       const hasRecordToday = fish.fishReportInfos?.some((report) => {
         const reportDate = new Date(report.calculatedDate)
           .toISOString()
@@ -187,13 +268,13 @@ const FishDetail = ({ route, navigation }) => {
 
       const koiID = fish.koiID;
       const name = fish.name;
-      const pondID = fish.pond.pondID;
+      const pondID = selectedPond;
       const physique = fishById?.physique || fish.physique;
       const sex = fish.sex;
       const breeder = fishById?.breeder || fish.breeder;
       const age = fish.age;
       const varietyName = fish.variety.varietyName;
-      const inPondSince = (fishById?.inPondSince || fish.inPondSince) + "Z";
+      const inPondSince = (fishById?.inPondSince || fish?.inPondSince) + "Z";
       const image = fish.image;
       const price = fish.price;
       const size = Number(newSize);
@@ -247,7 +328,7 @@ const FishDetail = ({ route, navigation }) => {
       </Text>
     ));
   };
-console.log(fishById)
+
   return (
     <Provider locale={enUS}>
       <ImageBackground
@@ -287,6 +368,34 @@ console.log(fishById)
               <Text style={styles.price}>
                 {fish?.price?.toLocaleString("vi-VN")} VND
               </Text>
+              <View style={styles.pondPickerContainer}>
+  <DropDownPicker
+    open={openPondPicker}
+    value={tempPond}
+    items={pondItems}
+    setOpen={setOpenPondPicker}
+    setValue={setTempPond}
+    setItems={setPondItems}
+    placeholder="Chọn một ao"
+    placeholderStyle={styles.dropdownPlaceholder}
+    style={styles.dropdown}
+    dropDownContainerStyle={styles.dropdownBox}
+    textStyle={styles.dropdownText}
+    listMode="SCROLLVIEW"
+    zIndex={1000}
+    zIndexInverse={2000}
+  />
+  <TouchableOpacity
+    style={[
+      styles.savePondButton,
+      tempPond === selectedPond && styles.savePondButtonDisabled,
+    ]}
+    onPress={handleConfirmPondChange}
+    disabled={tempPond === selectedPond}
+  >
+    <Text style={styles.savePondButtonText}>Lưu Ao</Text>
+  </TouchableOpacity>
+</View>
               <View style={styles.infoRow}>
                 <View style={styles.infoBlock}>
                   <Text style={styles.infoLabel}>Tuổi</Text>
@@ -318,7 +427,7 @@ console.log(fishById)
               <Text style={styles.sectionText}>
                 <Text style={styles.sectionLabel}>Trong ao: </Text>
                 {fish.pond.name} từ{" "}
-                {new Date(fishById.inPondSince).toLocaleDateString("vi-VN", {
+                {new Date(fishById?.inPondSince).toLocaleDateString("vi-VN", {
                   day: "numeric",
                   month: "long",
                   year: "numeric",
