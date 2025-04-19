@@ -24,8 +24,11 @@ const AddSaltForm = () => {
   const handleSave = () => {
     const saltValue = parseFloat(addedSaltKg);
 
-    if (isNaN(saltValue) || saltValue <= 0) {
-      Alert.alert("Error", "Vui lòng nhập lượng muối hợp lệ (lớn hơn 0 Kg).");
+    if (isNaN(saltValue) || saltValue <= 0 ) {
+      Alert.alert("Error", "Vui lòng nhập nồng độ muối hợp lệ (lớn hơn 0 %).");
+      return;
+    }else if(isNaN(saltValue) || saltValue > 2 ){
+      Alert.alert("Error", "Vui lòng nhập nồng độ muối hợp lệ (nhỏ hơn hoặc bằng 2%).");
       return;
     }
 
@@ -52,17 +55,17 @@ const AddSaltForm = () => {
     >
       <View style={styles.overlay} />
       <ScrollView contentContainerStyle={styles.scrollContainer}>
-        <Text style={styles.title}>Thêm Muối</Text>
+        <Text style={styles.title}>Thêm nồng độ muối</Text>
 
         {/* Form Container */}
         <View style={styles.formContainer}>
-          <Text style={styles.label}>Lượng Muối Thêm Vào (Kg):</Text>
+          <Text style={styles.label}>Lượng Muối Thêm Vào (%):</Text>
           <TextInput
             style={styles.input}
             value={addedSaltKg}
             onChangeText={setAddedSaltKg}
-            keyboardType="numeric" // Restrict to numeric input
-            placeholder="Nhập lượng muối (Ví dụ: 1.5)"
+            keyboardType="numeric"
+            placeholder="Nhập nồng độ muối (Ví dụ: 1.5)"
             placeholderTextColor="#999"
           />
           <TouchableOpacity style={styles.saveButton} onPress={handleSave}>

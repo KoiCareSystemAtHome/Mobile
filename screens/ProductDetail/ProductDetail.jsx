@@ -40,7 +40,6 @@ const ProductDetail = ({ navigation }) => {
   const handleIncrement = () => setQuantity(quantity + 1);
   const handleDecrement = () => quantity > 1 && setQuantity(quantity - 1);
 
-
   const addToCart = async () => {
     try {
       const cartData = await AsyncStorage.getItem("cart");
@@ -60,7 +59,7 @@ const ProductDetail = ({ navigation }) => {
           quantity,
           image: product.image,
           shopId: product.shopId,
-          weight:product.weight,
+          weight: product.weight,
         });
       }
 
@@ -71,7 +70,7 @@ const ProductDetail = ({ navigation }) => {
       console.error("Error adding to cart:", error);
     }
   };
-  console.log(product)
+  console.log(product);
 
   useEffect(() => {
     dispatch(getProductById(product.productId));
@@ -121,18 +120,26 @@ const ProductDetail = ({ navigation }) => {
       {/* Product Info */}
       <Text style={styles.productTitle}>{product.productName}</Text>
       <Text style={styles.shopName}>{product.shopName}</Text>
-      
-      <View style={[styles.ratingContainer, { flexDirection: 'row', alignItems: 'center' }]}>
-  <Text style={styles.stockQuantity}>
-    Còn: {product.stockQuantity} sản phẩm
-  </Text>
-  <Text style={[styles.averageRating, { marginLeft: 10 }]}>
-    <AntDesign name="star" size={16} color="#FFD700" />
-    {(isNaN(averageRating) || averageRating === null || averageRating === undefined) ? 0 : averageRating}
-    ({feedbacks.length} đánh giá)
-  </Text>
-</View>
 
+      <View
+        style={[
+          styles.ratingContainer,
+          { flexDirection: "row", alignItems: "center" },
+        ]}
+      >
+        <Text style={styles.stockQuantity}>
+          Còn: {product.stockQuantity} sản phẩm
+        </Text>
+        <Text style={[styles.averageRating, { marginLeft: 10 }]}>
+          <AntDesign name="star" size={16} color="#FFD700" />
+          {isNaN(averageRating) ||
+          averageRating === null ||
+          averageRating === undefined
+            ? 0
+            : averageRating}
+          ({feedbacks.length} đánh giá)
+        </Text>
+      </View>
 
       {/* Quantity Selector and Price */}
       <View style={styles.row}>
@@ -154,17 +161,22 @@ const ProductDetail = ({ navigation }) => {
         <Text style={styles.productPrice}>{product.price} VND</Text>
       </View>
 
-      {/* Buttons */}
       <View style={styles.buttonContainer}>
-
         <Button
           type="primary"
           style={styles.addToCartButton}
           onPress={addToCart}
+          disabled={product.stockQuantity === 0}
         >
           <View style={styles.buttonContent}>
-            <AntDesign name="shoppingcart" size={18} color="#fff" />
-            <Text style={styles.buttonText}> Thêm vào giỏ</Text>
+            {product.stockQuantity === 0 ? (
+              <Text style={styles.buttonText}>Hết hàng</Text>
+            ) : (
+              <>
+                <AntDesign name="shoppingcart" size={18} color="#fff" />
+                <Text style={styles.buttonText}>Thêm vào giỏ</Text>
+              </>
+            )}
           </View>
         </Button>
       </View>
@@ -172,7 +184,7 @@ const ProductDetail = ({ navigation }) => {
       <Text style={styles.productDescription}> {productById?.spec}</Text>
 
       <Text style={styles.productDescription}>{product.description}</Text>
-      
+
       {/* Feedback Section Title */}
       <View style={styles.feedbackSection}>
         <Text style={styles.feedbackTitle}>Đánh giá sản phẩm</Text>
@@ -190,7 +202,7 @@ const ProductDetail = ({ navigation }) => {
         onPress={handlePrevPage}
         disabled={currentPage === 1}
       >
-        <Text style={styles.paginationText}>{' < '}</Text>
+        <Text style={styles.paginationText}>{" < "}</Text>
       </TouchableOpacity>
       <Text style={styles.pageInfo}>
         {currentPage}/{totalPages}
@@ -203,7 +215,7 @@ const ProductDetail = ({ navigation }) => {
         onPress={handleNextPage}
         disabled={currentPage === totalPages}
       >
-        <Text style={styles.paginationText}>{' > '}</Text>
+        <Text style={styles.paginationText}>{" > "}</Text>
       </TouchableOpacity>
     </View>
   );

@@ -3,10 +3,10 @@ import { View, Text, StyleSheet, Dimensions, ScrollView } from "react-native";
 import Svg, { Line, Circle, Text as SvgText } from "react-native-svg";
 
 const { width } = Dimensions.get("window");
-const CHART_WIDTH = width - 80; // Reduced width to make room for labels
+const CHART_WIDTH = width - 80;
 const CHART_HEIGHT = 200;
-const PADDING = 50; // Increased padding to ensure space for Y-axis labels
-const LABEL_WIDTH = 40; // Explicit space for Y-axis labels
+const PADDING = 50;
+const LABEL_WIDTH = 40;
 
 const parameterColors = {
   "pH Level": "#1E90FF",
@@ -61,30 +61,21 @@ const WaterParametersChart = ({
     })
     .sort((a, b) => new Date(a.calculatedDate) - new Date(b.calculatedDate));
 
-  const dates = filteredData
-    .filter(
-      (item) => item.calculatedDate && typeof item.calculatedDate === "string"
-    )
-    .map((item) => {
-      try {
+  // Get unique dates for X-axis labels
+  const uniqueDates = [
+    ...new Set(
+      filteredData.map((item) => {
         const date = new Date(item.calculatedDate);
-        if (isNaN(date.getTime())) {
-          console.warn(
-            `Invalid date format for calculatedDate: ${item.calculatedDate}`
-          );
-          return null;
-        }
-        return date.getTime();
-      } catch (error) {
-        console.warn(
-          `Error parsing date ${item.calculatedDate}: ${error.message}`
-        );
-        return null;
-      }
-    })
-    .filter((date) => date !== null);
-  const minDate = dates.length > 0 ? Math.min(...dates) : Date.now();
-  const maxDate = dates.length > 0 ? Math.max(...dates) : Date.now();
+        return `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
+      })
+    ),
+  ].map((dateStr) => {
+    const [year, month, day] = dateStr.split("-").map(Number);
+    return new Date(year, month - 1, day).getTime();
+  }).sort((a, b) => a - b);
+
+  const minDate = uniqueDates.length > 0 ? Math.min(...uniqueDates) : Date.now();
+  const maxDate = uniqueDates.length > 0 ? Math.max(...uniqueDates) : Date.now();
   const dateRange = maxDate - minDate || 1;
 
   const normalizeData = (data, property, maxYValue) => {
@@ -95,9 +86,7 @@ const WaterParametersChart = ({
     const dayMap = {};
     validData.forEach((d, index) => {
       const date = new Date(d.calculatedDate);
-      const dayKey = `${date.getFullYear()}-${
-        date.getMonth() + 1
-      }-${date.getDate()}`;
+      const dayKey = `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
       if (!dayMap[dayKey]) {
         dayMap[dayKey] = [];
       }
@@ -106,10 +95,8 @@ const WaterParametersChart = ({
 
     return validData.map((d, index) => {
       const date = new Date(d.calculatedDate);
-      const dayKey = `${date.getFullYear()}-${
-        date.getMonth() + 1
-      }-${date.getDate()}`;
-      const dateValue = date.getTime();
+      const dayKey = `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
+      const dateValue = new Date(date.getFullYear(), date.getMonth(), date.getDate()).getTime();
       const value = d[property];
 
       let x =
@@ -156,18 +143,7 @@ const WaterParametersChart = ({
 
     return { maxYValue, yAxisInterval };
   };
-  selectedParameters.forEach((parameter) => {
-    console.log(`Parameter: ${parameter}`);
-    const valuesWithDates = filteredData
-      .filter(
-        (item) => item.hasOwnProperty(parameter) && item[parameter] != null
-      )
-      .map((item) => ({
-        date: item.calculatedDate,
-        value: item[parameter],
-      }));
-    console.log(valuesWithDates);
-  });
+console.log("", selectedParameters, filteredData);
   return (
     <ScrollView
       style={styles.container}
@@ -188,23 +164,20 @@ const WaterParametersChart = ({
             yAxisLabels.push({ value: i.toFixed(1), y: yPosition });
           }
 
+          // Generate X-axis labels based on unique dates
           const xAxisLabels = [];
-          const numLabels = Math.min(filteredData.length, 5);
-          if (filteredData.length > 0) {
-            const labelStep = (CHART_WIDTH - PADDING * 2) / (numLabels - 1);
-            const dataStep = Math.max(
-              1,
-              Math.floor(filteredData.length / numLabels)
-            );
-            for (let i = 0; i < numLabels; i++) {
-              const dataIndex = Math.min(i * dataStep, filteredData.length - 1);
-              const date = new Date(filteredData[dataIndex].calculatedDate);
-              if (isNaN(date.getTime())) continue; // Skip invalid dates
+          const maxLabels = 5; // Limit to 5 labels to avoid clutter
+          const step = Math.max(1, Math.floor(uniqueDates.length / maxLabels));
+          uniqueDates.forEach((dateTimestamp, index) => {
+            if (index % step === 0 || index === uniqueDates.length - 1) {
+              const date = new Date(dateTimestamp);
               const label = `${date.getDate()}/${date.getMonth() + 1}`;
-              const xPosition = PADDING + i * labelStep;
-              xAxisLabels.push({ value: label, x: xPosition });
+              const x =
+                PADDING +
+                ((dateTimestamp - minDate) / dateRange) * (CHART_WIDTH - PADDING * 2);
+              xAxisLabels.push({ value: label, x });
             }
-          }
+          });
 
           const paramInfo = pondParameters.find(
             (p) => p.parameterName === parameter
@@ -233,7 +206,6 @@ const WaterParametersChart = ({
                   (CHART_HEIGHT - PADDING * 2) +
                 PADDING
               : null;
-          console.log("Selected Parameters:", selectedParameters);
           return (
             <View key={parameter} style={styles.chartContainer}>
               <Text style={styles.chartTitle}>{parameter}</Text>
@@ -242,7 +214,7 @@ const WaterParametersChart = ({
                 {yAxisLabels.map((label, index) => (
                   <SvgText
                     key={`y-label-${parameter}-${index}`}
-                    x={LABEL_WIDTH - 10} // Adjusted position to ensure visibility
+                    x={LABEL_WIDTH - 10}
                     y={label.y + 5}
                     fontSize="12"
                     fill="black"
@@ -262,7 +234,7 @@ const WaterParametersChart = ({
                     textAnchor="middle"
                     transform={`rotate(-45 ${label.x} ${
                       CHART_HEIGHT - PADDING + 30
-                    })`} // Rotate 45 degrees
+                    })`}
                   >
                     {label.value}
                   </SvgText>
@@ -368,7 +340,7 @@ const styles = StyleSheet.create({
   scrollContent: {
     paddingVertical: 10,
     paddingBottom: 20,
-    paddingHorizontal: 10, // Added padding to prevent clipping
+    paddingHorizontal: 10,
   },
   chartContainer: {
     backgroundColor: "#fff",

@@ -77,7 +77,7 @@ const CalculateMaintainance = () => {
       adjustedEndDate.setHours(adjustedEndDate.getHours() + 7);
       const formattedEndDate = adjustedEndDate.toISOString().split(".")[0];
       const values = { pondId, endDate: formattedEndDate, cycleDays };
-      console.log(values)
+      console.log(values);
       dispatch(reccuringMaintainance(values))
         .unwrap()
         .then((res) => {
@@ -249,8 +249,19 @@ const CalculateMaintainance = () => {
           </View>
         </ScrollView>
 
-        <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
-          <Text style={styles.saveButtonText}>Lưu</Text>
+        <TouchableOpacity
+          style={[styles.saveButton, !homePond && {backgroundColor:"#ccc"}]}
+          onPress={handleSave}
+          disabled={!homePond}
+        >
+          <Text
+            style={[
+              styles.saveButtonText,
+              !homePond && styles.saveButtonTextDisabled,
+            ]}
+          >
+            Lưu
+          </Text>
         </TouchableOpacity>
       </ImageBackground>
     </Provider>

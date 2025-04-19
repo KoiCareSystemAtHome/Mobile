@@ -30,7 +30,6 @@ const TransactionScreen = ({ navigation }) => {
   const [expandedItems, setExpandedItems] = useState({});
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
-
   const orderTransactionData = useSelector(orderTransactionSelector);
   const packageTransactionData = useSelector(packageTransactionSelector);
   const depositeTransactionData = useSelector(depositTransactionOrder);
@@ -80,14 +79,23 @@ const TransactionScreen = ({ navigation }) => {
                 ? `Gói ${item?.pakageName}`
                 : `Đơn ${item?.vnPayTransactionId}`}
             </Text>
-            {(item.refund && item.payment) && (
-              <Text style={styles.statusText}>Đơn đã được hủy</Text>
-            )}
-            {(item.payment && !item.refund) && (
-              <Text style={[styles.statusText,{color:"green"}]}>Đơn đã được trả</Text>
-            )}
-            {(!item.payment && !item.refund) && (
-              <Text style={[styles.statusText,{color:"yellow"}]}>Chờ thanh toán</Text>
+            {/* Conditionally render status text only for orderTransactionData (Sản phẩm tab) */}
+            {activeTab === "Sản phẩm" && (
+              <>
+                {item.refund && item.payment && (
+                  <Text style={styles.statusText}>Đơn đã được hủy</Text>
+                )}
+                {item.payment && !item.refund && (
+                  <Text style={[styles.statusText, { color: "green" }]}>
+                    Đơn đã được trả
+                  </Text>
+                )}
+                {!item.payment && !item.refund && (
+                  <Text style={[styles.statusText, { color: "yellow" }]}>
+                    Chờ thanh toán
+                  </Text>
+                )}
+              </>
             )}
             <Text style={styles.orderDetails}>
               Mua ngày: {dayjs(item.transactionDate).format("ddd, D MMMM YYYY")}

@@ -8,6 +8,11 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useSelector, useDispatch } from "react-redux";
 import { reminderByOwnerSelector } from "../../redux/selector";
 import { getReminderByOwner } from "../../redux/slices/reminderSlice";
+import dayjs from "dayjs"; // Import dayjs
+import utc from "dayjs/plugin/utc"; // Import UTC plugin
+
+// Enable UTC plugin
+dayjs.extend(utc);
 
 const leftArrowIcon = "←";
 const rightArrowIcon = "→";
@@ -32,7 +37,7 @@ const ScheduleScreen = ({ navigation }) => {
         const user = value ? JSON.parse(value) : null;
         setIsLoggedIn(user);
         if (user?.id) {
-          dispatch(getReminderByOwner(user.id)); // Refresh reminders on mount
+          dispatch(getReminderByOwner(user.id));
         }
       } catch (error) {
         console.error("Error fetching user data:", error);
@@ -45,12 +50,11 @@ const ScheduleScreen = ({ navigation }) => {
   useEffect(() => {
     if (reminderByOwner && reminderByOwner.length > 0) {
       const newMarkedDates = {};
-      const now = new Date(); // Current local time
+      const now = new Date();
 
       const futureReminders = reminderByOwner.filter((reminder) => {
         try {
-          // Parse maintainDate as local time (no "Z")
-          const maintainDate = new Date(reminder.maintainDate.replace(" ", "T"));
+          const maintainDate = new Date(reminder.maintainDate);
           if (isNaN(maintainDate.getTime())) {
             console.warn("Invalid maintainDate:", reminder.maintainDate);
             return false;
@@ -64,8 +68,8 @@ const ScheduleScreen = ({ navigation }) => {
 
       if (futureReminders.length > 0) {
         const closestReminder = futureReminders.reduce((prev, curr) => {
-          const prevDate = new Date(prev.maintainDate.replace(" ", "T"));
-          const currDate = new Date(curr.maintainDate.replace(" ", "T"));
+          const prevDate = new Date(prev.maintainDate);
+          const currDate = new Date(curr.maintainDate);
           return currDate.getTime() < prevDate.getTime() ? curr : prev;
         });
         setNextReminder(closestReminder);
@@ -79,8 +83,7 @@ const ScheduleScreen = ({ navigation }) => {
 
       filteredReminders.forEach((reminder) => {
         try {
-          // Parse maintainDate as local time (no "Z")
-          const maintainDate = new Date(reminder.maintainDate.replace(" ", "T"));
+          const maintainDate = new Date(reminder.maintainDate);
           const date = maintainDate.toISOString().split("T")[0];
           const isFinished = reminder.seenDate !== "0001-01-01T00:00:00";
 
@@ -116,36 +119,24 @@ const ScheduleScreen = ({ navigation }) => {
   };
 
   const getTimeRange = (maintainDate) => {
-    // Parse maintainDate as local time (no "Z")
-    const date = new Date(maintainDate.replace(" ", "T"));
-    // Format start time without timezone conversion
-    const startTime = date.toLocaleTimeString("vi-VN", {
-      hour: "2-digit",
-      minute: "2-digit",
-      hour12: false,
-    });
+    // Parse maintainDate as UTC
+    const date = dayjs.utc(maintainDate);
+    // Format start time in UTC
+    const startTime = date.format("HH:mm");
     // Calculate end time (+2 hours)
-    const endDate = new Date(date);
-    endDate.setHours(endDate.getHours() + 2);
-    const endTime = endDate.toLocaleTimeString("vi-VN", {
-      hour: "2-digit",
-      minute: "2-digit",
-      hour12: false,
-    });
+    const endTime = date.add(2, "hour").format("HH:mm");
     return `${startTime}-${endTime}`;
   };
 
   const formatNextReminderDate = (maintainDate) => {
-    // Parse maintainDate as local time (no "Z")
-    const date = new Date(maintainDate.replace(" ", "T"));
+    // Parse maintainDate as UTC
+    const date = dayjs.utc(maintainDate);
+    // Format date in UTC
     return date
-      .toLocaleDateString("vi-VN", {
-        weekday: "long",
-        day: "numeric",
-        month: "short",
-      })
+      .format("dddd, D MMMM")
       .toUpperCase();
   };
+
 
   return (
     <SafeAreaView style={styles.container}>
@@ -181,7 +172,7 @@ const ScheduleScreen = ({ navigation }) => {
         </View>
       )}
 
-      {/* Toggle Switch - Updated with Pond/Salt option */}
+      {/* Toggle Switch */}
       <View
         style={{
           flexDirection: "row",

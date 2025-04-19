@@ -178,7 +178,7 @@ const WaterParameter = () => {
                   <Text key={paramIndex} style={styles.greenText}>
                     {param.parameterName}:{" "}
                     <Text style={styles.boldText}>
-                      {param.value} {param.unitName}
+                      {(param.value).toFixed(2)} {param.unitName}
                     </Text>
                   </Text>
                 ))}

@@ -23,6 +23,11 @@ import {
 } from "../../redux/slices/reminderSlice";
 import { DatePicker, Provider, Picker } from "@ant-design/react-native";
 import enUS from "@ant-design/react-native/lib/locale-provider/en_US";
+import dayjs from "dayjs"; // Import dayjs
+import utc from "dayjs/plugin/utc"; // Import UTC plugin
+
+// Enable UTC plugin
+dayjs.extend(utc);
 
 const CalculateMaintainance = () => {
   const dispatch = useDispatch();
@@ -79,10 +84,11 @@ const CalculateMaintainance = () => {
       maintainanceData.maintainDate &&
       maintainanceData.maintainDate !== prevMaintainanceDataRef.current?.maintainDate
     ) {
-      // Parse maintainDate (format: 2025-04-18 19:44:29) as is
-      const date = new Date(maintainanceData.maintainDate.replace(" ", "T"));
-      if (!isNaN(date.getTime())) {
-        setEndDate(date);
+      // Parse maintainDate as UTC
+      const date = dayjs.utc(maintainanceData.maintainDate);
+      if (date.isValid()) {
+        // Convert to JavaScript Date object while preserving UTC
+        setEndDate(date.toDate());
       } else {
         console.warn("Invalid maintainDate:", maintainanceData.maintainDate);
       }
@@ -92,15 +98,15 @@ const CalculateMaintainance = () => {
 
   const handleSave = () => {
     if (maintainanceData) {
-      // Format seenDate to replace space with T (e.g., 0001-01-01 00:00:00 -> 0001-01-01T00:00:00)
+      // Format seenDate to replace space with T
       const formattedSeenDate = maintainanceData.seenDate
         ? maintainanceData.seenDate.replace(" ", "T")
         : maintainanceData.seenDate;
 
       const updatedMaintenanceData = {
         ...maintainanceData,
-        maintainDate: endDate.toISOString().split(".")[0], // Format: 2025-04-18T19:44:29
-        seenDate: formattedSeenDate, // Format: 0001-01-01T00:00:00
+        maintainDate: dayjs.utc(endDate).format("YYYY-MM-DDTHH:mm:ss"),
+        seenDate: formattedSeenDate,
       };
       console.log(updatedMaintenanceData);
       dispatch(saveMaintainance(updatedMaintenanceData))
@@ -120,9 +126,13 @@ const CalculateMaintainance = () => {
 
   const handleDatePickerChange = (date) => {
     if (isMounted.current) {
-      const newDate = new Date(endDate);
-      newDate.setFullYear(date.getFullYear(), date.getMonth(), date.getDate());
-      setEndDate(newDate);
+      const newDate = dayjs.utc(endDate);
+      const selectedDate = dayjs.utc(date);
+      const updatedDate = newDate
+        .set("year", selectedDate.year())
+        .set("month", selectedDate.month())
+        .set("date", selectedDate.date());
+      setEndDate(updatedDate.toDate());
       setDatePickerVisible(false);
     }
   };
@@ -130,9 +140,8 @@ const CalculateMaintainance = () => {
   const handleTimePickerChange = (time) => {
     if (isMounted.current) {
       const [hours, minutes] = time;
-      const newDate = new Date(endDate);
-      newDate.setHours(hours, minutes, 0, 0);
-      setEndDate(newDate);
+      const newDate = dayjs.utc(endDate).set("hour", hours).set("minute", minutes).set("second", 0);
+      setEndDate(newDate.toDate());
       setTimePickerVisible(false);
     }
   };
@@ -163,7 +172,7 @@ const CalculateMaintainance = () => {
         <View style={styles.overlay} />
         <ScrollView contentContainerStyle={styles.container}>
           <Text style={styles.title}>Lịch Trình Bảo Trì</Text>
-          <View style={{ justifyContent: "center", flexDirection: "rowConstant" }}>
+          <View style={{ justifyContent: "center", flexDirection: "row" }}>
             <TouchableOpacity
               onPress={() => setHomePondOpen(!homePondOpen)}
               style={styles.selector}
@@ -213,11 +222,7 @@ const CalculateMaintainance = () => {
                   onPress={() => setDatePickerVisible(true)}
                 >
                   <Text style={styles.dateText}>
-                    {endDate.toLocaleDateString("vi-VN", {
-                      day: "numeric",
-                      month: "long",
-                      year: "numeric",
-                    })}
+                    {dayjs.utc(endDate).format("DD MMMM YYYY")}
                   </Text>
                   <Icon name="calendar" size={20} color="#000" />
                 </TouchableOpacity>
@@ -227,7 +232,7 @@ const CalculateMaintainance = () => {
                 data={timeData}
                 cols={2}
                 cascade={false}
-                value={[endDate.getHours(), endDate.getMinutes()]} // Use local hours/minutes
+                value={[dayjs.utc(endDate).hour(), dayjs.utc(endDate).minute()]}
                 onChange={handleTimePickerChange}
                 visible={isTimePickerVisible}
                 onDismiss={() => setTimePickerVisible(false)}
@@ -239,11 +244,7 @@ const CalculateMaintainance = () => {
                   onPress={() => setTimePickerVisible(true)}
                 >
                   <Text style={styles.dateText}>
-                    {endDate.toLocaleTimeString("vi-VN", {
-                      hour: "2-digit",
-                      minute: "2-digit",
-                      hour12: false,
-                    })}
+                    {dayjs.utc(endDate).format("HH:mm")}
                   </Text>
                   <Icon name="clockcircleo" size={20} color="#000" />
                 </TouchableOpacity>

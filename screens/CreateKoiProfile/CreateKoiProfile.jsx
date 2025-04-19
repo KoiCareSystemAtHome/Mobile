@@ -81,8 +81,9 @@ const CreateKoiProfile = ({ route, navigation }) => {
     console.log("Saving profile with values:", values);
     dispatch(createKoiProfile(values))
     .unwrap()
-    .then(()=>{
-        Alertp.alert("Success", "Lưu lịch sử bệnh thành công!");
+    .then((res)=>{
+        console.log(res)
+        Alert.alert("Success", "Lưu lịch sử bệnh thành công!");
         navigation.navigate("FishStatistic")
     })
   };

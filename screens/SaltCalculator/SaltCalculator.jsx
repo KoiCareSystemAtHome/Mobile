@@ -28,10 +28,10 @@ import {
 import { Button } from "react-native-paper";
 import Icon1 from "react-native-vector-icons/MaterialIcons"; // Add MaterialIcons for better icons
 import { getReminderByOwner } from "../../redux/slices/reminderSlice";
+import dayjs from "dayjs";
 
 const SaltCalculator = ({ navigation }) => {
   const dispatch = useDispatch();
-
   const pondData = useSelector(pondByOwnerSelector);
   const saltData = useSelector(saltSelector);
   const instructionData = useSelector(instructionSelector);
@@ -106,7 +106,7 @@ const SaltCalculator = ({ navigation }) => {
     const pondId = homePond?.pondID;
     const reminders = reminderData?.reminders;
     const values = { pondId, reminders };
-    console.log(values);
+    console.log("Saving reminders:", values);
     dispatch(saveReminder(values))
       .unwrap()
       .then((res) => {
@@ -119,6 +119,8 @@ const SaltCalculator = ({ navigation }) => {
         console.error("Failed to save reminders:", error);
       });
   };
+
+  console.log(reminderData)
 
   return (
     <ImageBackground
@@ -396,7 +398,7 @@ const SaltCalculator = ({ navigation }) => {
                   </Text>
                   <Text style={styles.reminderDate}>
                     Thời gian:{" "}
-                    {new Date(reminder.maintainDate).toLocaleString()}
+                    {dayjs(reminder.maintainDate).utc().format("DD/MM/YYYY HH:mm")}
                   </Text>
                 </View>
               ))}

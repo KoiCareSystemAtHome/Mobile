@@ -74,17 +74,16 @@ const OrderTracking = ({ navigation }) => {
     if (orderTrack?.status) {
       const values = { orderId, status: orderTrack.status };
       dispatch(updateShipType(values));
-
       let payload;
-      if (["picked", "picking", "storing"].includes(orderTrack.status)) {
+      if (["picked", "picking", "storing"].includes(orderTrack?.status)) {
         payload = { orderId, status: "In Progress" };
-      } else if (orderTrack.status === "delivery_fail") {
+      } else if (orderTrack?.status === "delivery_fail") {
         payload = { orderId, status: "Fail" };
-      } else if (orderTrack.status === "delivering") {
+      } else if (orderTrack?.status === "delivering") {
         payload = { orderId, status: "Delivered" };
-      } else if (orderTrack.status === "delivered") {
+      } else if (orderTrack?.status === "delivered") {
         payload = { orderId, status: "Complete" };
-      } else if (orderTrack.status === "return") {
+      } else if (orderTrack?.status === "return") {
         payload = { orderId, status: "Return" };
       }
       if (payload) {
@@ -96,7 +95,6 @@ const OrderTracking = ({ navigation }) => {
   const handleCancelOrder = () => {
     setCancelModalVisible(true);
   };
-  console.log(orderTrack.status);
   const confirmCancelOrder = () => {
     if (!cancelReason.trim()) {
       Toast.fail("Vui lòng nhập lý do hủy đơn hàng");
@@ -316,6 +314,7 @@ const OrderTracking = ({ navigation }) => {
                   picked: "Đã lấy hàng",
                   picking: "Đang lấy hàng",
                   delivery_fail: "Giao hàng thất bại",
+                  return:"Trả hàng"
                 };
                 return (
                   <View key={index} style={styles.trackingItem}>

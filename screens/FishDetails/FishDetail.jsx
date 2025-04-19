@@ -247,7 +247,7 @@ const FishDetail = ({ route, navigation }) => {
       </Text>
     ));
   };
-
+console.log(fishById)
   return (
     <Provider locale={enUS}>
       <ImageBackground
@@ -318,7 +318,7 @@ const FishDetail = ({ route, navigation }) => {
               <Text style={styles.sectionText}>
                 <Text style={styles.sectionLabel}>Trong ao: </Text>
                 {fish.pond.name} từ{" "}
-                {new Date(fish.inPondSince).toLocaleDateString("vi-VN", {
+                {new Date(fishById.inPondSince).toLocaleDateString("vi-VN", {
                   day: "numeric",
                   month: "long",
                   year: "numeric",
