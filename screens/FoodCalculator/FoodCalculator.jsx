@@ -25,8 +25,13 @@ const FoodCalculator = ({ navigation }) => {
   const [token, setToken] = useState();
   const [food, setFood] = useState();
 
-  const [growth, setGrowth] = useState("Trung bình");
-  const growthOptions = ["Thấp", "Trung bình", "Cao"];
+  const [growth, setGrowth] = useState("medium");
+  const growthOptions = [
+    { label: "Thấp", value: "low" },
+    { label: "Trung bình", value: "medium" },
+    { label: "Cao", value: "high" },
+  ];
+  
 
   const temperatureOptions = [
     { label: "6 - 8º", temperatureLower: 6, temperatureUpper: 8 },
@@ -78,7 +83,7 @@ const FoodCalculator = ({ navigation }) => {
       dispatch(calculateFood(values))
         .unwrap()
         .then((response) => {
-          setFood(response?.foodAmount);
+          setFood(response);
         });
     }
   }, [homePond, growth, temperature, dispatch]);
@@ -126,27 +131,28 @@ const FoodCalculator = ({ navigation }) => {
         </View>
 
         <Text style={styles.subtitle}>Mức Tăng Trưởng Mong Muốn</Text>
-        <View style={styles.toggleContainer}>
-          {growthOptions.map((option) => (
-            <TouchableOpacity
-              key={option}
-              style={[
-                styles.toggleButton,
-                growth === option && styles.activeToggle,
-              ]}
-              onPress={() => setGrowth(option)}
-            >
-              <Text
-                style={[
-                  styles.toggleText,
-                  growth === option && styles.activeText,
-                ]}
-              >
-                {option}
-              </Text>
-            </TouchableOpacity>
-          ))}
-        </View>
+<View style={styles.toggleContainer}>
+  {growthOptions.map((option) => (
+    <TouchableOpacity
+      key={option.value}
+      style={[
+        styles.toggleButton,
+        growth === option.value && styles.activeToggle,
+      ]}
+      onPress={() => setGrowth(option.value)}
+    >
+      <Text
+        style={[
+          styles.toggleText,
+          growth === option.value && styles.activeText,
+        ]}
+      >
+        {option.label}  {/* Hiển thị "Thấp", "Trung bình", "Cao" */}
+      </Text>
+    </TouchableOpacity>
+  ))}
+</View>
+
 
         <Text style={styles.subtitle}>Nhiệt Độ Nước</Text>
         <View style={styles.toggleContainer}>
@@ -172,16 +178,44 @@ const FoodCalculator = ({ navigation }) => {
         </View>
 
         <Text style={styles.infoText}>
+          
+        </Text>
+        {food?.numberOfFish != null && food?.totalFishWeight != null && (
+  <View style={styles.fishInfoContainer}>
+    <Text style={styles.fishInfoItem}>
+      Tổng cá: <Text style={styles.fishInfoItemBold}>{food.numberOfFish} 🐟</Text>
+    </Text>
+    <Text style={styles.fishInfoItem}>
+      Tổng trọng lượng: <Text style={styles.fishInfoItemBold}>{food.totalFishWeight} (kg)</Text>
+    </Text>
+  </View>
+)}
+
+{food?.feedingOften && (
+  <Text style={styles.fishInfoItem}>
+     🔁 Tần suất gợi ý: <Text style={styles.fishInfoItemBold}>{food.feedingOften}</Text>
+  </Text>
+)}
+
+{food?.addtionalInstruction && (
+  <Text style={styles.fishInfoItem}>
+    ⚠️Bị ảnh hưởng bởi:{"\n"}
+    <Text style={styles.fishInfoItemBold}>{food.addtionalInstruction}</Text>
+  </Text>
+)}
+
+
+
+        <Text style={styles.infoText}>
           Lượng thức ăn được khuyến nghị nên được chia đều thành 3 - 5 lần cho ăn mỗi ngày. 
           Bằng cách này, cá koi sẽ tiêu hóa thức ăn tốt hơn...
         </Text>
 
         <View style={styles.recommendationButton}>
           <Text style={styles.recommendationText}>
-            {homePond ? `Lượng Đề Xuất: ${food}g` : "Vui Lòng Chọn Một Ao"}
+            {homePond ? `Lượng Đề Xuất: ${food?.foodAmount}kg` : "Vui Lòng Chọn Một Ao"}
           </Text>
         </View>
-
         {homePond && (
           <TouchableOpacity 
             style={styles.suggestButton}
