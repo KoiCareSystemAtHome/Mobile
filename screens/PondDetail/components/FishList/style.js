@@ -38,7 +38,7 @@ export const styles = StyleSheet.create({
     width: "48%", // Slightly less than 33.33% to account for margins
     backgroundColor: "#fff",
     borderRadius: 12,
-    padding: 8,
+    padding: 4,
     marginBottom: 12,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 4 },
