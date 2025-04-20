@@ -186,7 +186,7 @@ const FoodCalculator = ({ navigation }) => {
       Tổng cá: <Text style={styles.fishInfoItemBold}>{food.numberOfFish} 🐟</Text>
     </Text>
     <Text style={styles.fishInfoItem}>
-      Tổng trọng lượng: <Text style={styles.fishInfoItemBold}>{food.totalFishWeight} 🐟</Text>
+      Tổng trọng lượng: <Text style={styles.fishInfoItemBold}>{food.totalFishWeight} (kg)</Text>
     </Text>
   </View>
 )}
@@ -213,7 +213,7 @@ const FoodCalculator = ({ navigation }) => {
 
         <View style={styles.recommendationButton}>
           <Text style={styles.recommendationText}>
-            {homePond ? `Lượng Đề Xuất: ${food?.foodAmount}g` : "Vui Lòng Chọn Một Ao"}
+            {homePond ? `Lượng Đề Xuất: ${food?.foodAmount}kg` : "Vui Lòng Chọn Một Ao"}
           </Text>
         </View>
         {homePond && (
