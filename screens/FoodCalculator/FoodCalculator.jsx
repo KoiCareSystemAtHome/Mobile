@@ -25,7 +25,7 @@ const FoodCalculator = ({ navigation }) => {
   const [token, setToken] = useState();
   const [food, setFood] = useState();
 
-  const [growth, setGrowth] = useState("Trung bình");
+  const [growth, setGrowth] = useState("medium");
   const growthOptions = [
     { label: "Thấp", value: "low" },
     { label: "Trung bình", value: "medium" },
