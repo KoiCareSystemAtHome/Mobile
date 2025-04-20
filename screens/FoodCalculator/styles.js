@@ -70,7 +70,7 @@ export const styles = StyleSheet.create({
   },
   toggleText: {
     fontSize: 12,
-    color: "#fff",
+    color: "#grey",
   },
   activeText: {
     fontWeight: "bold",
