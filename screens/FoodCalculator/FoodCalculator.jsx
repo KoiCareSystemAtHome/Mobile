@@ -26,7 +26,12 @@ const FoodCalculator = ({ navigation }) => {
   const [food, setFood] = useState();
 
   const [growth, setGrowth] = useState("Trung bình");
-  const growthOptions = ["Thấp", "Trung bình", "Cao"];
+  const growthOptions = [
+    { label: "Thấp", value: "low" },
+    { label: "Trung bình", value: "medium" },
+    { label: "Cao", value: "high" },
+  ];
+  
 
   const temperatureOptions = [
     { label: "6 - 8º", temperatureLower: 6, temperatureUpper: 8 },
@@ -126,27 +131,28 @@ const FoodCalculator = ({ navigation }) => {
         </View>
 
         <Text style={styles.subtitle}>Mức Tăng Trưởng Mong Muốn</Text>
-        <View style={styles.toggleContainer}>
-          {growthOptions.map((option) => (
-            <TouchableOpacity
-              key={option}
-              style={[
-                styles.toggleButton,
-                growth === option && styles.activeToggle,
-              ]}
-              onPress={() => setGrowth(option)}
-            >
-              <Text
-                style={[
-                  styles.toggleText,
-                  growth === option && styles.activeText,
-                ]}
-              >
-                {option}
-              </Text>
-            </TouchableOpacity>
-          ))}
-        </View>
+<View style={styles.toggleContainer}>
+  {growthOptions.map((option) => (
+    <TouchableOpacity
+      key={option.value}
+      style={[
+        styles.toggleButton,
+        growth === option.value && styles.activeToggle,
+      ]}
+      onPress={() => setGrowth(option.value)}
+    >
+      <Text
+        style={[
+          styles.toggleText,
+          growth === option.value && styles.activeText,
+        ]}
+      >
+        {option.label}  {/* Hiển thị "Thấp", "Trung bình", "Cao" */}
+      </Text>
+    </TouchableOpacity>
+  ))}
+</View>
+
 
         <Text style={styles.subtitle}>Nhiệt Độ Nước</Text>
         <View style={styles.toggleContainer}>
