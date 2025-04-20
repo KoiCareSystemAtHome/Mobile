@@ -26,7 +26,7 @@ const FishList = ({ navigation, route }) => {
   }, [userId, dispatch]);
 
   // Filter fish to only include those with matching pondID
-  const filteredFish = fishByOwner.filter(
+  const filteredFish = fishByOwner?.filter(
     (fish) => fish.pond.pondID === pondID
   );
 
@@ -47,7 +47,7 @@ const FishList = ({ navigation, route }) => {
             <View style={{ width: 24 }} />
           </View>
 
-          {filteredFish.length > 0 ? (
+          {filteredFish?.length > 0 ? (
             <View style={styles.fishGrid}>
               {filteredFish.map((fish) => (
                 <TouchableOpacity
