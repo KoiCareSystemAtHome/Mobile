@@ -78,7 +78,7 @@ const FoodCalculator = ({ navigation }) => {
       dispatch(calculateFood(values))
         .unwrap()
         .then((response) => {
-          setFood(response?.foodAmount);
+          setFood(response);
         });
     }
   }, [homePond, growth, temperature, dispatch]);
@@ -172,16 +172,44 @@ const FoodCalculator = ({ navigation }) => {
         </View>
 
         <Text style={styles.infoText}>
+          
+        </Text>
+        {food?.numberOfFish != null && food?.totalFishWeight != null && (
+  <View style={styles.fishInfoContainer}>
+    <Text style={styles.fishInfoItem}>
+      Tổng cá: <Text style={styles.fishInfoItemBold}>{food.numberOfFish} 🐟</Text>
+    </Text>
+    <Text style={styles.fishInfoItem}>
+      Tổng trọng lượng: <Text style={styles.fishInfoItemBold}>{food.totalFishWeight} 🐟</Text>
+    </Text>
+  </View>
+)}
+
+{food?.feedingOften && (
+  <Text style={styles.fishInfoItem}>
+     🔁 Tần suất gợi ý: <Text style={styles.fishInfoItemBold}>{food.feedingOften}</Text>
+  </Text>
+)}
+
+{food?.addtionalInstruction && (
+  <Text style={styles.fishInfoItem}>
+    ⚠️Bị ảnh hưởng bởi:{"\n"}
+    <Text style={styles.fishInfoItemBold}>{food.addtionalInstruction}</Text>
+  </Text>
+)}
+
+
+
+        <Text style={styles.infoText}>
           Lượng thức ăn được khuyến nghị nên được chia đều thành 3 - 5 lần cho ăn mỗi ngày. 
           Bằng cách này, cá koi sẽ tiêu hóa thức ăn tốt hơn...
         </Text>
 
         <View style={styles.recommendationButton}>
           <Text style={styles.recommendationText}>
-            {homePond ? `Lượng Đề Xuất: ${food}g` : "Vui Lòng Chọn Một Ao"}
+            {homePond ? `Lượng Đề Xuất: ${food?.foodAmount}g` : "Vui Lòng Chọn Một Ao"}
           </Text>
         </View>
-
         {homePond && (
           <TouchableOpacity 
             style={styles.suggestButton}

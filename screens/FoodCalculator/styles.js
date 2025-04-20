@@ -78,17 +78,32 @@ export const styles = StyleSheet.create({
   },
   infoText: {
     fontSize: 14,
-    color: "#fff",
+    color: "grey",
     marginTop: 20,
     textAlign: "justify",
   },
-  recommendationButton: {
+  fishInfoContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     marginTop: 20,
+  },
+  
+  fishInfoItem: {
+    fontSize: 16,
+    color: 'black',
+    textAlign: 'justify',
+    paddingBottom:3
+  },
+  fishInfoItemBold: {
+    fontWeight: 'bold',
+  },
+  recommendationButton: {
+    marginBottom: 20,
     backgroundColor: "#222",
     borderRadius: 10,
     paddingVertical: 15,
-    paddingHorizontal: 20,
-    width: "80%",
+    paddingHorizontal: 0,
+    width: "70%",
     alignItems: "center",
     justifyContent: "center",
     shadowColor: "#000",
