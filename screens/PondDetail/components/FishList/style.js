@@ -35,7 +35,7 @@ export const styles = StyleSheet.create({
     justifyContent: "space-between",
   },
   fishCard: {
-    width: "48%", // Slightly less than 33.33% to account for margins
+    width: "48%", // Slightly less than 33.o33% to account for margins
     backgroundColor: "#fff",
     borderRadius: 12,
     padding: 4,
