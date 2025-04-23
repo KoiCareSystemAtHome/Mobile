@@ -115,7 +115,7 @@ const FishDetail = ({ route, navigation }) => {
         items.some((item) => item.value === fish.pond.pondID)
       ) {
         setSelectedPond(fish.pond.pondID);
-        setTempPond(fish.pond.pondID); // Ensure tempPond is synced
+        setTempPond(fish.pond.pondID);
       }
     }
   }, [pondData, fish.pond.pondID]);
@@ -128,6 +128,7 @@ const FishDetail = ({ route, navigation }) => {
     const product = products.find((p) => p.productId === medicineId);
     return product?.productName || "Không xác định";
   };
+
   const handleUpdatePond = () => {
     if (!selectedPond) {
       Toast.fail("Vui lòng chọn một ao!");
@@ -161,7 +162,6 @@ const FishDetail = ({ route, navigation }) => {
       size,
       weight,
     };
-    console.log("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", value);
     dispatch(updateFish(value))
       .unwrap()
       .then((res) => {
@@ -184,6 +184,7 @@ const FishDetail = ({ route, navigation }) => {
     setSelectedPond(tempPond);
     handleUpdatePond();
   };
+
   const renderHealthCard = (profile) => {
     if (!profile)
       return (
@@ -368,7 +369,7 @@ const FishDetail = ({ route, navigation }) => {
               <Text style={styles.price}>
                 {fish?.price?.toLocaleString("vi-VN")} VND
               </Text>
-              <View style={styles.pondPickerContainer}>
+              <View style={[styles.pondPickerContainer, { position: "relative", zIndex: 3000 }]}>
                 <DropDownPicker
                   open={openPondPicker}
                   value={tempPond}
@@ -376,18 +377,19 @@ const FishDetail = ({ route, navigation }) => {
                   setOpen={setOpenPondPicker}
                   setValue={(callback) => {
                     const newValue = callback(tempPond);
-                    console.log("New tempPond value:", newValue); // Debug
+                    console.log("New tempPond value:", newValue);
                     setTempPond(newValue);
                   }}
                   setItems={setPondItems}
                   placeholder="Chọn một ao"
                   placeholderStyle={styles.dropdownPlaceholder}
                   style={styles.dropdown}
-                  dropDownContainerStyle={styles.dropdownBox}
+                  dropDownContainerStyle={styles.dropDownContainerStyle}
                   textStyle={styles.dropdownText}
                   listMode="SCROLLVIEW"
-                  zIndex={1000}
-                  zIndexInverse={2000}
+                  disableLocalSearch={true}
+                  zIndex={3000}
+                  zIndexInverse={4000}
                 />
                 <TouchableOpacity
                   style={[
@@ -400,7 +402,7 @@ const FishDetail = ({ route, navigation }) => {
                   <Text style={styles.savePondButtonText}>Lưu Ao</Text>
                 </TouchableOpacity>
               </View>
-              <View style={styles.infoRow}>
+              <View style={[styles.infoRow, { zIndex: 1 }]}>
                 <View style={styles.infoBlock}>
                   <Text style={styles.infoLabel}>Tuổi</Text>
                   <Text style={styles.infoValue}>{fish.age} năm</Text>

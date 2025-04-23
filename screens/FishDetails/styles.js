@@ -6,7 +6,7 @@ export const styles = StyleSheet.create({
   },
   overlay: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: "rgba(0, 50, 80, 0.4)", // Darker aquatic overlay
+    backgroundColor: "rgba(0, 50, 80, 0.4)",
   },
   container: {
     flex: 1,
@@ -27,7 +27,7 @@ export const styles = StyleSheet.create({
     fontWeight: "700",
     color: "#fff",
     textAlign: "center",
-    fontFamily: "Roboto", // Replace with custom font if available
+    fontFamily: "Roboto",
     textShadowColor: "rgba(0, 0, 0, 0.2)",
     textShadowOffset: { width: 1, height: 1 },
     textShadowRadius: 2,
@@ -73,31 +73,33 @@ export const styles = StyleSheet.create({
     marginBottom: 12,
   },
   pondPickerContainer: {
-    flexDirection: "row", // Align picker and button side by side
-    justifyContent: "flex-start", // Align children to the left
-    alignItems: "center", // Vertically center the picker and button
-    width: "70%", // Span the full width of the parent
-    marginBottom: 12,
-    alignSelf: "flex-start", 
-    paddingInline:10
+    flexDirection: "row",
+    justifyContent: "flex-start",
+    alignItems: "center",
+    width: "70%",
+    marginBottom: 20,
+    alignSelf: "flex-start",
+    paddingInline: 10,
+    zIndex: 3000,
   },
   dropdown: {
-    flex: 1, // Take up available space
+    flex: 1,
     backgroundColor: "#fff",
     borderWidth: 1,
     borderColor: "#E2E8F0",
     borderRadius: 10,
     paddingHorizontal: 12,
     paddingVertical: 8,
-    height: 48, // Match input height
+    height: 48,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
-    elevation: 3,
-    minWidth: 150, // Ensure picker doesn't shrink too much
+    elevation: 10,
+    minWidth: 150,
+    zIndex: 3000,
   },
-  dropdownContainer: {
+  dropDownContainerStyle: {
     backgroundColor: "#fff",
     borderWidth: 1,
     borderColor: "#E2E8F0",
@@ -106,8 +108,9 @@ export const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.1,
     shadowRadius: 6,
-    elevation: 5,
-    maxHeight: 200, // Limit dropdown height
+    elevation: 10,
+    maxHeight: 200,
+    zIndex: 3000,
   },
   dropdownText: {
     fontSize: 16,
@@ -124,8 +127,8 @@ export const styles = StyleSheet.create({
     borderRadius: 8,
     paddingHorizontal: 16,
     paddingVertical: 12,
-    marginLeft: 8, // Space between picker and button
-    height: 48, // Match picker height
+    marginLeft: 8,
+    height: 48,
     justifyContent: "center",
     alignItems: "center",
     shadowColor: "#000",
@@ -150,6 +153,7 @@ export const styles = StyleSheet.create({
     backgroundColor: "#F8FAFC",
     borderRadius: 10,
     padding: 12,
+    zIndex: 1,
   },
   infoBlock: {
     alignItems: "center",

@@ -30,7 +30,7 @@ const CreateKoiProfile = ({ route, navigation }) => {
   const [note, setNote] = useState("");
   const [endDate, setEndDate] = useState(new Date());
   const [isDatePickerVisible, setDatePickerVisible] = useState(false);
-  const [selectedMedicineId, setSelectedMedicineId] = useState("");
+  const [selectedMedicineId, setSelectedMedicineId] = useState(null);
   const [cart, setCart] = useState([]);
 
   const isMounted = useRef(true);
@@ -101,7 +101,7 @@ const CreateKoiProfile = ({ route, navigation }) => {
       note,
       diseaseId,
       status: "Pending",
-      medicineId: selectedMedicineId,
+      medicineId: selectedMedicineId || null,
       symptoms,
     };
     console.log("Saving profile with values:", values);
