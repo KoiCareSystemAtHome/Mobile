@@ -19,7 +19,6 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Picker, DatePicker, Provider } from "@ant-design/react-native";
 import enUS from "@ant-design/react-native/lib/locale-provider/en_US";
 import { getDiseaseById } from "../../redux/slices/symptomSlice";
-import { getProductById } from "../../redux/slices/productSlice";
 
 const CreateKoiProfile = ({ route, navigation }) => {
   const { diseaseId, symptoms } = route.params;
@@ -31,7 +30,7 @@ const CreateKoiProfile = ({ route, navigation }) => {
   const [note, setNote] = useState("");
   const [endDate, setEndDate] = useState(new Date());
   const [isDatePickerVisible, setDatePickerVisible] = useState(false);
-  const [selectedMedicineIds, setSelectedMedicineIds] = useState([]);
+  const [selectedMedicineId, setSelectedMedicineId] = useState("");
   const [cart, setCart] = useState([]);
 
   const isMounted = useRef(true);
@@ -62,7 +61,6 @@ const CreateKoiProfile = ({ route, navigation }) => {
     if (isLoggedIn?.id) {
       dispatch(getFishByOwner(isLoggedIn.id));
     }
-
     dispatch(getDiseaseById(diseaseId));
   }, [isLoggedIn?.id, dispatch, diseaseId]);
 
@@ -76,26 +74,12 @@ const CreateKoiProfile = ({ route, navigation }) => {
   };
 
   const handleMedicineSelect = (medicineId) => {
-    // Toggle selection: add if not selected, remove if already selected
-    setSelectedMedicineIds((prev) =>
-      prev.includes(medicineId)
-        ? prev.filter((id) => id !== medicineId)
-        : [...prev, medicineId]
-    );
+    // Toggle selection: deselect if the same medicine is clicked again
+    setSelectedMedicineId(selectedMedicineId === medicineId ? "" : medicineId);
   };
 
   const handleAddToCart = (medicine) => {
-    if(medicine?.productId){
-      dispatch(getProductById(medicine?.productId))
-        .unwrap()
-        .then((res) => {
-          navigation.navigate("ProductDetail", { product: res });
-        })
-        .catch((error) => {
-          
-        });
-
-    }
+    
   };
 
   const handleSave = () => {
@@ -107,8 +91,8 @@ const CreateKoiProfile = ({ route, navigation }) => {
       Alert.alert("Lỗi", "Không tìm thấy thông tin bệnh.");
       return;
     }
-    if (selectedMedicineIds.length === 0) {
-      Alert.alert("Lỗi", "Vui lòng chọn ít nhất một loại thuốc.");
+    if (!selectedMedicineId) {
+      Alert.alert("Lỗi", "Vui lòng chọn thuốc");
       return;
     }
     const values = {
@@ -117,7 +101,7 @@ const CreateKoiProfile = ({ route, navigation }) => {
       note,
       diseaseId,
       status: "Pending",
-      medicineIds: selectedMedicineIds, 
+      medicineId: selectedMedicineId,
       symptoms,
     };
     console.log("Saving profile with values:", values);
@@ -146,10 +130,9 @@ const CreateKoiProfile = ({ route, navigation }) => {
     <TouchableOpacity
       style={[
         styles.medicineCard,
-        selectedMedicineIds.includes(item.medicineId) && styles.medicineCardSelected,
+        selectedMedicineId === item.medicineId && styles.medicineCardSelected,
       ]}
       onPress={() => handleMedicineSelect(item.medicineId)}
-      accessibilityLabel={`Chọn thuốc ${item.name}`}
     >
       <View style={styles.medicineContent}>
         {item.image && (
@@ -171,7 +154,7 @@ const CreateKoiProfile = ({ route, navigation }) => {
         >
           <Text style={styles.addToCartButtonText}>Thêm vào giỏ</Text>
         </TouchableOpacity>
-        {selectedMedicineIds.includes(item.medicineId) && (
+        {selectedMedicineId === item.medicineId && (
           <AntDesign
             name="checkcircle"
             size={20}
