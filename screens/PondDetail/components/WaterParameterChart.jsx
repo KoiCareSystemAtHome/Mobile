@@ -45,9 +45,7 @@ const WaterParametersChart = ({
     );
   }
 
-  const data = Array.isArray(waterParameterData) && waterParameterData.length > 0
-    ? waterParameterData
-    : [];
+  const data = waterParameterData.length > 0 ? waterParameterData : [];
 
   // Memoize filteredData to prevent recomputation
   const filteredData = useMemo(() => {
@@ -74,6 +72,9 @@ const WaterParametersChart = ({
       (d) => d.hasOwnProperty(property) && d[property] != null
     );
 
+    if (validData.length === 0) return [];
+
+    // Group data by date for same-day handling
     const dayMap = {};
     validData.forEach((d, index) => {
       const date = dayjs.utc(d.calculatedDate);
@@ -103,26 +104,31 @@ const WaterParametersChart = ({
       const dateValue = date.valueOf();
       const value = d[property];
 
-      let x =
-        dateRange > 0
-          ? PADDING +
-            ((dateValue - minDate) / dateRange) * (CHART_WIDTH - PADDING * 2)
-          : CHART_WIDTH / 2;
+      // Base X position based on date
+      let x = uniqueDates.length > 1
+        ? PADDING + ((dateValue - minDate) / dateRange) * (CHART_WIDTH - PADDING * 2)
+        : CHART_WIDTH / 2;
 
+      // Adjust X position for same-day points
       const pointsOnSameDay = dayMap[dayKey];
       if (pointsOnSameDay.length > 1) {
         const position = pointsOnSameDay.indexOf(index);
         const totalPoints = pointsOnSameDay.length;
-        const offsetStep = 10;
+        const offsetStep = 10; // Small offset to separate points
         const maxOffset = (totalPoints - 1) * offsetStep;
         const startOffset = -(maxOffset / 2);
         x += startOffset + position * offsetStep;
       }
 
+      // Ensure X is within chart bounds
+      x = Math.max(PADDING, Math.min(CHART_WIDTH - PADDING, x));
+
+      // Calculate Y position
       const y = maxYValue
         ? (1 - value / maxYValue) * (CHART_HEIGHT - PADDING * 2) + PADDING
-        : PADDING;
-      return { x, y, date: dateValue };
+        : CHART_HEIGHT - PADDING;
+
+      return { x, y, date: dateValue, value };
     });
   };
 
@@ -139,8 +145,15 @@ const WaterParametersChart = ({
         paramInfo.dangerUpper,
       ].filter((val) => val !== null && val !== undefined);
 
-      if (bounds.length > 0) {
-        maxYValue = Math.max(...bounds) * 1.2;
+      const maxDataValue = Math.max(
+        ...filteredData
+          .filter((d) => d.hasOwnProperty(parameter) && d[parameter] != null)
+          .map((d) => d[parameter]),
+        0
+      );
+
+      if (bounds.length > 0 || maxDataValue > 0) {
+        maxYValue = Math.max(...bounds, maxDataValue) * 1.2 || 50;
         yAxisInterval = Math.ceil(maxYValue / 5);
       }
     }
@@ -161,6 +174,15 @@ const WaterParametersChart = ({
           const { maxYValue, yAxisInterval } = getChartConfig(parameter);
           const points = normalizeData(filteredData, parameter, maxYValue);
 
+          if (points.length === 0) {
+            return (
+              <View key={parameter} style={styles.chartContainer}>
+                <Text style={styles.chartTitle}>{parameter}</Text>
+                <Text style={styles.noDataText}>Không có dữ liệu cho {parameter}</Text>
+              </View>
+            );
+          }
+
           const yAxisLabels = [];
           for (let i = 0; i <= maxYValue; i += yAxisInterval) {
             const yPosition =
@@ -168,7 +190,7 @@ const WaterParametersChart = ({
             yAxisLabels.push({ value: i.toFixed(1), y: yPosition });
           }
 
-          // Generate X-axis labels based on points
+          // Generate X-axis labels
           const uniquePointDates = [
             ...new Set(
               points.map((point) => dayjs.utc(point.date).format('YYYY-MM-DD'))
@@ -185,11 +207,12 @@ const WaterParametersChart = ({
           const xAxisLabels = uniquePointDates
             .filter((_, index) => index % step === 0 || index === uniquePointDates.length - 1)
             .map((item) => {
-              const x =
-                PADDING +
-                ((item.date - Math.min(...uniquePointDates.map(d => d.date))) /
-                  (Math.max(...uniquePointDates.map(d => d.date)) - Math.min(...uniquePointDates.map(d => d.date)) || 1)) *
-                  (CHART_WIDTH - PADDING * 2);
+              const x = uniquePointDates.length > 1
+                ? PADDING +
+                  ((item.date - Math.min(...uniquePointDates.map(d => d.date))) /
+                    (Math.max(...uniquePointDates.map(d => d.date)) - Math.min(...uniquePointDates.map(d => d.date)) || 1)) *
+                    (CHART_WIDTH - PADDING * 2)
+                : CHART_WIDTH / 2;
               return { value: item.label, x };
             });
 
@@ -220,6 +243,7 @@ const WaterParametersChart = ({
                   (CHART_HEIGHT - PADDING * 2) +
                 PADDING
               : null;
+
           return (
             <View key={parameter} style={styles.chartContainer}>
               <Text style={styles.chartTitle}>{parameter}</Text>

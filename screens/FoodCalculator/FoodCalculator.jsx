@@ -31,7 +31,6 @@ const FoodCalculator = ({ navigation }) => {
     { label: "Trung bình", value: "medium" },
     { label: "Cao", value: "high" },
   ];
-  
 
   const temperatureOptions = [
     { label: "6 - 8º", temperatureLower: 6, temperatureUpper: 8 },
@@ -43,7 +42,7 @@ const FoodCalculator = ({ navigation }) => {
   const [temperature, setTemperature] = useState(temperatureOptions[2]);
 
   useEffect(() => {
-    const getData = async (key) => {
+    const getData = async () => {
       try {
         const value = await AsyncStorage.getItem("user");
         setIsLoggedIn(value ? JSON.parse(value) : null);
@@ -88,8 +87,6 @@ const FoodCalculator = ({ navigation }) => {
     }
   }, [homePond, growth, temperature, dispatch]);
 
-  
-
   return (
     <ImageBackground
       source={require("../../assets/koimain3.jpg")}
@@ -97,7 +94,10 @@ const FoodCalculator = ({ navigation }) => {
       resizeMode="cover"
     >
       <View style={styles.overlay} />
-      <ScrollView contentContainerStyle={[styles.container, { paddingBottom: 80 }]}>
+      <ScrollView
+        contentContainerStyle={[styles.container, { paddingBottom: 100 }]}
+        showsVerticalScrollIndicator={true}
+      >
         <Text style={styles.title}>Tính Lượng Thức Ăn</Text>
 
         <View style={{ justifyContent: "center", flexDirection: "row" }}>
@@ -111,7 +111,7 @@ const FoodCalculator = ({ navigation }) => {
             <Icon name="down" size={16} color="#000" />
           </TouchableOpacity>
         </View>
-        
+
         <View style={{ justifyContent: "center", flexDirection: "row" }}>
           {homePondOpen && (
             <View style={styles.dropdown}>
@@ -131,28 +131,27 @@ const FoodCalculator = ({ navigation }) => {
         </View>
 
         <Text style={styles.subtitle}>Mức Tăng Trưởng Mong Muốn</Text>
-<View style={styles.toggleContainer}>
-  {growthOptions.map((option) => (
-    <TouchableOpacity
-      key={option.value}
-      style={[
-        styles.toggleButton,
-        growth === option.value && styles.activeToggle,
-      ]}
-      onPress={() => setGrowth(option.value)}
-    >
-      <Text
-        style={[
-          styles.toggleText,
-          growth === option.value && styles.activeText,
-        ]}
-      >
-        {option.label}  {/* Hiển thị "Thấp", "Trung bình", "Cao" */}
-      </Text>
-    </TouchableOpacity>
-  ))}
-</View>
-
+        <View style={styles.toggleContainer}>
+          {growthOptions.map((option) => (
+            <TouchableOpacity
+              key={option.value}
+              style={[
+                styles.toggleButton,
+                growth === option.value && styles.activeToggle,
+              ]}
+              onPress={() => setGrowth(option.value)}
+            >
+              <Text
+                style={[
+                  styles.toggleText,
+                  growth === option.value && styles.activeText,
+                ]}
+              >
+                {option.label}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </View>
 
         <Text style={styles.subtitle}>Nhiệt Độ Nước</Text>
         <View style={styles.toggleContainer}>
@@ -177,73 +176,81 @@ const FoodCalculator = ({ navigation }) => {
           ))}
         </View>
 
-        <Text style={styles.infoText}>
-          
-        </Text>
         {food?.numberOfFish != null && food?.totalFishWeight != null && (
-  <View style={styles.fishInfoContainer}>
-    <Text style={styles.fishInfoItem}>
-      Tổng cá: <Text style={styles.fishInfoItemBold}>{food.numberOfFish} 🐟</Text>
-    </Text>
-    <Text style={styles.fishInfoItem}>
-      Tổng trọng lượng: <Text style={styles.fishInfoItemBold}>{food.totalFishWeight} (kg)</Text>
-    </Text>
-  </View>
-)}
+          <View style={styles.fishInfoContainer}>
+            <Text style={styles.fishInfoItem}>
+              Tổng cá:{" "}
+              <Text style={styles.fishInfoItemBold}>
+                {food.numberOfFish} 🐟
+              </Text>
+            </Text>
+            <Text style={styles.fishInfoItem}>
+              Tổng trọng lượng:{" "}
+              <Text style={styles.fishInfoItemBold}>
+                {food.totalFishWeight} (kg)
+              </Text>
+            </Text>
+          </View>
+        )}
 
-{food?.feedingOften && (
-  <Text style={styles.fishInfoItem}>
-     🔁 Tần suất gợi ý: <Text style={styles.fishInfoItemBold}>{food.feedingOften}</Text>
-  </Text>
-)}
-
-{food?.addtionalInstruction && (
-  <Text style={styles.fishInfoItem}>
-    ⚠️Bị ảnh hưởng bởi:{"\n"}
-    <Text style={styles.fishInfoItemBold}>{food.addtionalInstruction}</Text>
-  </Text>
-)}
-
-
+        {food?.feedingOften && (
+          <Text style={styles.fishInfoItem}>
+            🔁 Tần suất gợi ý:{" "}
+            <Text style={styles.fishInfoItemBold}>{food.feedingOften}</Text>
+          </Text>
+        )}
+        {food?.addtionalInstruction && (
+          <Text style={styles.fishInfoItem}>
+            ⚠️Bị ảnh hưởng bởi:{"\n"}
+            <Text style={styles.fishInfoItemBold}>
+              {food.addtionalInstruction}
+            </Text>
+          </Text>
+        )}
 
         <Text style={styles.infoText}>
-          Lượng thức ăn được khuyến nghị nên được chia đều thành 3 - 5 lần cho ăn mỗi ngày. 
-          Bằng cách này, cá koi sẽ tiêu hóa thức ăn tốt hơn...
+          Lượng thức ăn được khuyến nghị nên được chia đều thành 3 - 5 lần cho
+          ăn mỗi ngày. Bằng cách này, cá koi sẽ tiêu hóa thức ăn tốt hơn
         </Text>
 
         <View style={styles.recommendationButton}>
           <Text style={styles.recommendationText}>
-            {homePond ? `Lượng Đề Xuất: ${food?.foodAmount}kg` : "Vui Lòng Chọn Một Ao"}
+            {homePond
+              ? `Lượng Đề Xuất: ${food?.foodAmount}kg`
+              : "Vui Lòng Chọn Một Ao"}
           </Text>
         </View>
         {homePond && (
-          <TouchableOpacity 
+          <TouchableOpacity
             style={styles.suggestButton}
-            onPress={() => navigation.navigate("SuggestFood", { pondId: homePond?.pondID })}
+            onPress={() =>
+              navigation.navigate("SuggestFood", { pondId: homePond?.pondID })
+            }
           >
             <Text style={styles.recommendationText}>Mới</Text>
           </TouchableOpacity>
         )}
-
       </ScrollView>
 
       <TouchableOpacity
         style={{
-          position: 'absolute',
+          position: "absolute",
           bottom: 20,
           right: 20,
-          backgroundColor: '#007AFF',
+          backgroundColor: "#007AFF",
           paddingVertical: 10,
           paddingHorizontal: 20,
           borderRadius: 25,
         }}
         onPress={() => navigation.navigate("SymptomScreen")}
       >
-        <Text style={{
-          color: '#FFFFFF',
-          fontSize: 16,
-          fontWeight: 'bold',
-        }}>
+        <Text
+          style={{
+            color: "#FFFFFF",
+            fontSize: 16,
+            fontWeight: "bold",
+          }}
+        >
           Tiếp Theo
         </Text>
       </TouchableOpacity>

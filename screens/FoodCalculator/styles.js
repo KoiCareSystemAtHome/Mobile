@@ -79,17 +79,17 @@ export const styles = StyleSheet.create({
   infoText: {
     fontSize: 14,
     color: "grey",
-    marginTop: 20,
+    marginTop: 5,
     textAlign: "justify",
   },
   fishInfoContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginTop: 20,
+    marginTop: 10,
   },
   
   fishInfoItem: {
-    fontSize: 16,
+    fontSize: 14,
     color: 'black',
     textAlign: 'justify',
     paddingBottom:3
