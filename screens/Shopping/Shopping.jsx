@@ -323,31 +323,60 @@ const Shopping = ({ navigation }) => {
         keyExtractor={(item) => item.productId}
         numColumns={2}
         contentContainerStyle={styles.productList}
-        renderItem={({ item }) => (
-          <TouchableOpacity
-            style={styles.productCard}
-            onPress={() => {
-              navigation.navigate("ProductDetail", { product: item });
-            }}
-          >
-            <Image source={{ uri: item.image }} style={styles.productImage} />
-            <Text style={styles.productName}>{item.productName}</Text>
-            <Text style={styles.shopName}>{item.shopName}</Text>
-            <View style={styles.priceAndButtonContainer}>
-              <Text style={styles.productPrice} numberOfLines={1}>
-                {item.price.toLocaleString("vi-VN")} VND
-              </Text>
-              <TouchableOpacity
-                style={styles.addToCartButton}
-                onPress={() => {
+        renderItem={({ item }) => {
+          const isOutOfStock = item.stockQuantity === 0;
+
+          return (
+            <TouchableOpacity
+              style={[
+                styles.productCard,
+                isOutOfStock && styles.outOfStockCard, // Apply greyed-out style if out of stock
+              ]}
+              onPress={() => {
+                if (!isOutOfStock) {
                   navigation.navigate("ProductDetail", { product: item });
-                }}
-              >
-                <Text style={styles.addToCartText}>Thêm vào giỏ</Text>
-              </TouchableOpacity>
-            </View>
-          </TouchableOpacity>
-        )}
+                }
+              }}
+              disabled={isOutOfStock} // Disable interaction if out of stock
+            >
+              <Image
+                source={{ uri: item.image }}
+                style={[
+                  styles.productImage,
+                  isOutOfStock && styles.outOfStockImage, // Optional: grey out image
+                ]}
+              />
+              <Text style={styles.productName}>{item.productName}</Text>
+              <Text style={styles.shopName}>{item.shopName}</Text>
+              <View style={styles.priceAndButtonContainer}>
+                <Text style={styles.productPrice} numberOfLines={1}>
+                  {item.price.toLocaleString("vi-VN")} VND
+                </Text>
+                <TouchableOpacity
+                  style={[
+                    styles.addToCartButton,
+                    isOutOfStock && styles.outOfStockButton, // Grey out button
+                  ]}
+                  onPress={() => {
+                    if (!isOutOfStock) {
+                      navigation.navigate("ProductDetail", { product: item });
+                    }
+                  }}
+                  disabled={isOutOfStock}
+                >
+                  <Text
+                    style={[
+                      styles.addToCartText,
+                      isOutOfStock && styles.outOfStockText, // Style for "Hết Hàng" text
+                    ]}
+                  >
+                    {isOutOfStock ? "Hết Hàng" : "Thêm vào giỏ"}
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </TouchableOpacity>
+          );
+        }}
       />
 
       {/* Pagination Controls */}

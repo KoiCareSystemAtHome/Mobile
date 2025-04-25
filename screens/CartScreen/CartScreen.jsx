@@ -63,7 +63,7 @@ const CartScreen = ({ navigation }) => {
 
     fetchCart();
   }, []);
-  console.log(cart);
+
   useEffect(() => {
     const getData = async () => {
       try {
@@ -111,13 +111,21 @@ const CartScreen = ({ navigation }) => {
     let updatedCart = cart
       .map((item) => {
         if (item.productId === productId) {
-          const newQuantity =
-            type === "increase" ? item.quantity + 1 : item.quantity - 1;
-          return newQuantity > 0 ? { ...item, quantity: newQuantity } : null;
+          if (type === "increase") {
+            // Only increase quantity if it's less than stockQuantity
+            if (item.quantity < item.stockQuantity) {
+              return { ...item, quantity: item.quantity + 1 };
+            }
+            return item; // No change if quantity equals stockQuantity
+          } else if (type === "decrease") {
+            const newQuantity = item.quantity - 1;
+            return newQuantity > 0 ? { ...item, quantity: newQuantity } : null;
+          }
         }
         return item;
       })
       .filter(Boolean);
+
     setCart(updatedCart);
     calculateSubtotal(updatedCart);
     await AsyncStorage.setItem("cart", JSON.stringify(updatedCart));
@@ -126,16 +134,16 @@ const CartScreen = ({ navigation }) => {
   const handleCheckout = () => {
     const name = userInfo?.name || "Người nhận";
     const phoneNumber = userInfo?.phoneNumber || "Số điện thoại";
-  
+
     // Calculate total weight of the cart
     const totalWeight = cart.reduce((acc, item) => acc + (item.weight * item.quantity), 0);
-  
+
     // Check if total weight exceeds 50,000 grams
     if (totalWeight > 50000) {
       Toast.fail("Total weight exceeds 50,000 grams. Cannot create order.");
       return;
     }
-  
+
     const order = {
       name,
       phoneNumber,
@@ -151,7 +159,7 @@ const CartScreen = ({ navigation }) => {
       note: "string",
       paymentMethod: paymentMethod,
     };
-  
+
     if (address === null && userInfo === null) {
       Toast.fail("Please provide recipient information and address");
       return;
@@ -161,7 +169,7 @@ const CartScreen = ({ navigation }) => {
           Toast.fail("Insufficient wallet balance");
           return;
         }
-  
+
         dispatch(createOrder(order))
           .unwrap()
           .then(async (res) => {
@@ -286,10 +294,14 @@ const CartScreen = ({ navigation }) => {
                   </TouchableOpacity>
                   <Text style={styles.quantityText}>{item.quantity}</Text>
                   <TouchableOpacity
-                    style={styles.quantityButton}
+                    style={[
+                      styles.quantityButton,
+                      item.quantity >= item.stockQuantity && {backgroundColor:"#ddd"},
+                    ]}
                     onPress={() =>
                       handleQuantityChange(item.productId, "increase")
                     }
+                    disabled={item.quantity >= item.stockQuantity}
                   >
                     <AntDesign name="plus" size={16} color="#FFF" />
                   </TouchableOpacity>

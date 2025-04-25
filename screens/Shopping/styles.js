@@ -226,5 +226,19 @@ export const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "bold",
     marginBottom: 5,
-  }
+  },
+  outOfStockCard: {
+    backgroundColor: "#e0e0e0", // Grey background for the card
+    opacity: 0.6, // Reduce opacity to indicate disabled state
+  },
+  outOfStockImage: {
+    opacity: 0.7,
+  },
+  outOfStockButton: {
+    backgroundColor: "#cccccc", // Grey background for the button
+  },
+  outOfStockText: {
+    color: "#666", // Darker grey text for "Hết Hàng"
+    fontWeight: "bold",
+  },
 });

@@ -207,4 +207,5 @@ export const styles = StyleSheet.create({
     marginLeft: 5,
     fontWeight: "600",
   },
+  
 });

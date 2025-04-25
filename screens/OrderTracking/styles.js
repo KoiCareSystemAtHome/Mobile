@@ -242,4 +242,8 @@ export const styles = StyleSheet.create({
     textAlign: "center",
     padding: 12,
   },
+  disabledButton: {
+    backgroundColor: "#A0AEC0", // Grayed out background
+    opacity: 0.6, // Reduced opacity to indicate disabled state
+  },
 });

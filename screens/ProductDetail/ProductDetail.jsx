@@ -37,7 +37,12 @@ const ProductDetail = ({ navigation }) => {
         ).toFixed(1)
       : "N/A";
 
-  const handleIncrement = () => setQuantity(quantity + 1);
+  const handleIncrement = () => {
+    if (quantity < product.stockQuantity) {
+      setQuantity(quantity + 1);
+    }
+  };
+
   const handleDecrement = () => quantity > 1 && setQuantity(quantity - 1);
 
   const addToCart = async () => {
@@ -60,6 +65,7 @@ const ProductDetail = ({ navigation }) => {
           image: product.image,
           shopId: product.shopId,
           weight: product.weight,
+          stockQuantity: product.stockQuantity,
         });
       }
 
@@ -70,7 +76,6 @@ const ProductDetail = ({ navigation }) => {
       console.error("Error adding to cart:", error);
     }
   };
-  console.log(product);
 
   useEffect(() => {
     dispatch(getProductById(product.productId));
@@ -152,10 +157,14 @@ const ProductDetail = ({ navigation }) => {
           </TouchableOpacity>
           <Text style={styles.quantityValue}>{quantity}</Text>
           <TouchableOpacity
-            style={styles.quantityButton}
+            style={[
+              styles.quantityButton,
+             
+            ]}
             onPress={handleIncrement}
+            disabled={quantity >= product.stockQuantity}
           >
-            <Text style={styles.quantityText}>+</Text>
+            <Text style={[styles.quantityText,  quantity >= product.stockQuantity && {color:"#ddd"}]}>+</Text>
           </TouchableOpacity>
         </View>
         <Text style={styles.productPrice}>{product.price} VND</Text>
@@ -181,7 +190,7 @@ const ProductDetail = ({ navigation }) => {
         </Button>
       </View>
 
-      <Text style={styles.productDescription}> {productById?.spec}</Text>
+      <Text style={styles.productDescription}>{productById?.spec}</Text>
 
       <Text style={styles.productDescription}>{product.description}</Text>
 

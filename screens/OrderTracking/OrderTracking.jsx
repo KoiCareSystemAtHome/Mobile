@@ -42,6 +42,25 @@ const OrderTracking = ({ navigation }) => {
   const [cancelModalVisible, setCancelModalVisible] = useState(false);
   const [cancelReason, setCancelReason] = useState("");
 
+  // Function to check if the Report button should be displayed (within 3 days of delivery)
+  const isReportButtonVisible = () => {
+    if (!orderTrack?.log) return false;
+
+    // Find the "delivered" status in the log
+    const deliveredLog = orderTrack.log.find(
+      (log) => log.status === "delivered"
+    );
+
+    if (!deliveredLog) return false;
+
+    const deliveredDate = new Date(deliveredLog.updated_date);
+    const currentDate = new Date("2025-04-25"); // Current date (April 25, 2025)
+    const timeDiff = currentDate - deliveredDate; // Difference in milliseconds
+    const daysDiff = timeDiff / (1000 * 60 * 60 * 24); // Convert to days
+
+    return daysDiff <= 3; // Show button if within 3 days
+  };
+
   useEffect(() => {
     dispatch(getOrderDetail(orderId));
   }, [dispatch, orderId]);
@@ -96,17 +115,16 @@ const OrderTracking = ({ navigation }) => {
   const handleCancelOrder = () => {
     setCancelModalVisible(true);
   };
+
   const confirmCancelOrder = () => {
     if (!cancelReason.trim()) {
       Toast.fail("Vui lòng nhập lý do hủy đơn hàng");
       return;
     }
     const payload = { orderId, reason: cancelReason };
-    console.log("payload", payload);
     dispatch(rejectOrder(payload))
       .unwrap()
       .then((res) => {
-        console.log("response", res);
         if (res.status === "success") {
           Toast.success("Đơn hàng đã được hủy");
           dispatch(getOrderByAccount(userId));
@@ -131,8 +149,6 @@ const OrderTracking = ({ navigation }) => {
       year: "numeric",
     });
   };
-
-  console.log(orderTrack?.log);
 
   return (
     <Provider locale={enUS}>
@@ -316,7 +332,9 @@ const OrderTracking = ({ navigation }) => {
                   picked: "Đã lấy hàng",
                   picking: "Đang lấy hàng",
                   delivery_fail: "Giao hàng thất bại",
-                  return:"Trả hàng"
+                  return: "Trả hàng",
+                  transporting: "Đang vận chuyển",
+                  sorting: "Đang phân loại",
                 };
                 return (
                   <View key={index} style={styles.trackingItem}>
@@ -367,16 +385,17 @@ const OrderTracking = ({ navigation }) => {
             <View style={styles.buttonContainer}>
               {(orderTrack?.status === "delivered" ||
                 orderDetail?.status === "Complete" ||
-                orderDetail?.status === "Completed") && (
-                <TouchableOpacity
-                  style={styles.actionButton}
-                  onPress={() => {
-                    navigation.navigate("Report", { orderId });
-                  }}
-                >
-                  <Text style={styles.buttonText}>Báo Cáo</Text>
-                </TouchableOpacity>
-              )}
+                orderDetail?.status === "Completed") &&
+                isReportButtonVisible() && ( // Conditionally render the Report button
+                  <TouchableOpacity
+                    style={styles.actionButton}
+                    onPress={() => {
+                      navigation.navigate("Report", { orderId });
+                    }}
+                  >
+                    <Text style={styles.buttonText}>Báo Cáo</Text>
+                  </TouchableOpacity>
+                )}
               {orderTrack?.status === "delivering" && (
                 <TouchableOpacity
                   style={[styles.actionButton, styles.confirmButton]}
