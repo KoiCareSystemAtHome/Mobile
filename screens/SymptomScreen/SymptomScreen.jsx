@@ -6,6 +6,7 @@ import {
   FlatList,
   TouchableOpacity,
   Modal,
+  Alert,
 } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -162,12 +163,16 @@ const SymptomScreen = ({ navigation }) => {
   // Handle confirm button press
   const handleConfirmReminder = () => {
     if (homePond) {
-      dispatch(createSymptomReminder(homePond?.pondID));
+      dispatch(createSymptomReminder(homePond?.pondID))
+      .unwrap()
+      .then(()=>{
+        Alert.alert("Nhắc nhở đã được tạo thành công!");
+      })
       setReminderText("Nhắc nhở đã được tạo thành công!");
     }
   };
 
-  console.log(symptomReminder);
+
 
   return (
     <ImageBackground

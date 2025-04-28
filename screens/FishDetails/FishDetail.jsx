@@ -128,7 +128,7 @@ const FishDetail = ({ route, navigation }) => {
     const product = products.find((p) => p.productId === medicineId);
     return product?.productName || "Không xác định";
   };
-
+console.log(koiProfile)
   const handleUpdatePond = () => {
     if (!selectedPond) {
       Toast.fail("Vui lòng chọn một ao!");

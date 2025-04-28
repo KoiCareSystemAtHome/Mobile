@@ -23,8 +23,8 @@ import {
 } from "../../redux/slices/reminderSlice";
 import { DatePicker, Provider, Picker } from "@ant-design/react-native";
 import enUS from "@ant-design/react-native/lib/locale-provider/en_US";
-import dayjs from "dayjs"; // Import dayjs
-import utc from "dayjs/plugin/utc"; // Import UTC plugin
+import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
 
 // Enable UTC plugin
 dayjs.extend(utc);
@@ -36,7 +36,7 @@ const CalculateMaintainance = () => {
   const [homePond, setHomePond] = useState(null);
   const [homePondOpen, setHomePondOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [endDate, setEndDate] = useState(new Date());
+  const [endDate, setEndDate] = useState(dayjs.utc().toDate()); // Initialize as UTC
   const [isDatePickerVisible, setDatePickerVisible] = useState(false);
   const [isTimePickerVisible, setTimePickerVisible] = useState(false);
 
@@ -87,7 +87,7 @@ const CalculateMaintainance = () => {
       // Parse maintainDate as UTC
       const date = dayjs.utc(maintainanceData.maintainDate);
       if (date.isValid()) {
-        // Convert to JavaScript Date object while preserving UTC
+        // Set endDate as a UTC Date object
         setEndDate(date.toDate());
       } else {
         console.warn("Invalid maintainDate:", maintainanceData.maintainDate);
@@ -100,7 +100,7 @@ const CalculateMaintainance = () => {
     if (maintainanceData) {
       // Format seenDate to replace space with T
       const formattedSeenDate = maintainanceData.seenDate
-        ? maintainanceData.seenDate.replace(" ", "T")
+        ? maintainanceData.seenDate.replace(" ", "-all")
         : maintainanceData.seenDate;
 
       const updatedMaintenanceData = {
@@ -126,8 +126,9 @@ const CalculateMaintainance = () => {
 
   const handleDatePickerChange = (date) => {
     if (isMounted.current) {
+      // Treat the selected date as local time and convert to UTC
+      const selectedDate = dayjs(date).local();
       const newDate = dayjs.utc(endDate);
-      const selectedDate = dayjs.utc(date);
       const updatedDate = newDate
         .set("year", selectedDate.year())
         .set("month", selectedDate.month())
@@ -140,7 +141,11 @@ const CalculateMaintainance = () => {
   const handleTimePickerChange = (time) => {
     if (isMounted.current) {
       const [hours, minutes] = time;
-      const newDate = dayjs.utc(endDate).set("hour", hours).set("minute", minutes).set("second", 0);
+      const newDate = dayjs
+        .utc(endDate)
+        .set("hour", hours)
+        .set("minute", minutes)
+        .set("second", 0);
       setEndDate(newDate.toDate());
       setTimePickerVisible(false);
     }
@@ -222,7 +227,9 @@ const CalculateMaintainance = () => {
                   onPress={() => setDatePickerVisible(true)}
                 >
                   <Text style={styles.dateText}>
-                    {dayjs.utc(endDate).format("DD MMMM YYYY")}
+                    {dayjs(endDate)
+                      .local()
+                      .format("DD MMMM YYYY")}
                   </Text>
                   <Icon name="calendar" size={20} color="#000" />
                 </TouchableOpacity>

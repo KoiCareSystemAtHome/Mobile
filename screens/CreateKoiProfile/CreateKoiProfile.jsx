@@ -78,9 +78,7 @@ const CreateKoiProfile = ({ route, navigation }) => {
     setSelectedMedicineId(selectedMedicineId === medicineId ? "" : medicineId);
   };
 
-  const handleAddToCart = (medicine) => {
-    
-  };
+  const handleAddToCart = (medicine) => {};
 
   const handleSave = () => {
     if (!selectedFishId) {
@@ -89,10 +87,6 @@ const CreateKoiProfile = ({ route, navigation }) => {
     }
     if (!diseaseId) {
       Alert.alert("Lỗi", "Không tìm thấy thông tin bệnh.");
-      return;
-    }
-    if (!selectedMedicineId) {
-      Alert.alert("Lỗi", "Vui lòng chọn thuốc");
       return;
     }
     const values = {
@@ -209,8 +203,8 @@ const CreateKoiProfile = ({ route, navigation }) => {
             >
               <TouchableOpacity style={styles.pickerContainer}>
                 <Text style={styles.pickerText}>
-                  {fishData.find((fish) => fish.value === selectedFishId)?.label ||
-                    "Chọn con cá đang gặp vấn đề"}
+                  {fishData.find((fish) => fish.value === selectedFishId)
+                    ?.label || "Chọn con cá đang gặp vấn đề"}
                 </Text>
                 <AntDesign name="down" size={16} color="#000" />
               </TouchableOpacity>

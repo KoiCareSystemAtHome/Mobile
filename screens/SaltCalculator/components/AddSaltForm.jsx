@@ -24,20 +24,29 @@ const AddSaltForm = () => {
   const handleSave = () => {
     const saltValue = parseFloat(addedSaltKg);
 
-    if (isNaN(saltValue) || saltValue <= 0 ) {
+    if (isNaN(saltValue) || saltValue <= 0) {
       Alert.alert("Error", "Vui lòng nhập nồng độ muối hợp lệ (lớn hơn 0 %).");
       return;
-    }else if(isNaN(saltValue) || saltValue > 2 ){
-      Alert.alert("Error", "Vui lòng nhập nồng độ muối hợp lệ (nhỏ hơn hoặc bằng 2%).");
+    } else if (isNaN(saltValue) || saltValue > 2) {
+      Alert.alert(
+        "Error",
+        "Vui lòng nhập nồng độ muối hợp lệ (nhỏ hơn hoặc bằng 2%)."
+      );
       return;
     }
 
     // Dispatch action to update pond salt (to be implemented in pondSlice)
+    console.log(pondId, addedSaltKg)
     dispatch(updateSalt({ pondId, addedSaltKg: saltValue }))
       .unwrap()
       .then((res) => {
-        Alert.alert("Success", "Muối đã được thêm thành công!");
-        navigation.goBack(); // Return to the previous screen
+        console.log(res)
+        if (res && res.success === true) {
+          Alert.alert("Success", res.message);
+          navigation.goBack(); 
+        }else if(res && res.success === false) {
+          Alert.alert("Failed", res.message);
+        }
       })
       .catch((error) => {
         Alert.alert("Error", "Thêm muối không thành công. Vui lòng thử lại!");

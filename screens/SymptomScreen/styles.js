@@ -149,7 +149,7 @@ export const styles = StyleSheet.create({
     borderColor: "#4A90E2",
     marginBottom: 12,
     width: "80%",
-    maxHeight: 150,
+    maxHeight: 1000,
     overflow: "hidden",
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
