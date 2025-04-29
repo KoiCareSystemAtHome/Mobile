@@ -44,8 +44,6 @@ const AddSaltForm = () => {
         if (res && res.success === true) {
           Alert.alert("Success", res.message);
           navigation.goBack(); 
-        }else if(res && res.success === false) {
-          Alert.alert("Failed", res.message);
         }
       })
       .catch((error) => {
