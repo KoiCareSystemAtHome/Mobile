@@ -69,27 +69,28 @@ const PackageScreen = ({ navigation }) => {
     const email = isLoggedIn?.email;
     const packageId = pkg?.packageId;
     const packageTitle = pkg?.packageTitle;
+  
     if (isLoggedIn?.packageID) {
       dispatch(payPackage({ email, packageId, confirmPurchase: false }))
         .unwrap()
         .then((res) => {
-          if (res.confirmationRequired) {
-            const daysLeftMatch = res.message.match(
-              /\((\d+\.\d+)\s+days\s+left\)/
-            );
-            const daysLeft = daysLeftMatch ? daysLeftMatch[1] : "không xác định";
+          console.log(res);
+          if (res && res.confirmationRequired) {
+            // Updated days left logic
+            const daysLeftMatch = res.message.match(/\((\d+\.\d+)\s+còn\s+lại\)/);
+            const daysLeft = daysLeftMatch ? parseFloat(daysLeftMatch[1]) : "không xác định";
+  
             const originalPrice = pkg.packagePrice;
             const discountedPrice = parseFloat(res.discountedPrice);
             const discountPercentage = Math.round(
               ((originalPrice - discountedPrice) / originalPrice) * 100
             );
+  
             Alert.alert(
               "Nâng cấp gói",
-              `Gói hiện tại: "${currentPackageName}" có hạn đến ${dayjs(
-                res.expirationDate
-              ).format(
-                "DD/MM/YYYY [lúc] HH:mm:ss"
-              )} (${daysLeft} ngày còn lại).\n\nNâng cấp lên gói "${packageTitle}" chỉ với giá ${discountedPrice.toLocaleString(
+              `Gói hiện tại: "${currentPackageName}" có hạn đến ${
+                res.expirationDate.split("UTC")[0]
+              } (${daysLeft} ngày còn lại).\n\nNâng cấp lên gói "${packageTitle}" chỉ với giá ${discountedPrice.toLocaleString(
                 "vi-VN"
               )} VND và tiết kiệm ${discountPercentage}%!\n\nBạn có muốn nâng cấp?`,
               [
@@ -107,7 +108,9 @@ const PackageScreen = ({ navigation }) => {
                       .unwrap()
                       .then((finalRes) => {
                         console.log(finalRes);
-                        if (finalRes.message === "Package upgraded successfully!") {
+                        if (
+                          finalRes.message === "Package upgraded successfully!"
+                        ) {
                           updateUserPackage(packageId);
                           navigation.navigate("MainTabs");
                           Alert.alert(
@@ -144,6 +147,8 @@ const PackageScreen = ({ navigation }) => {
                 cancelable: false,
               }
             );
+          } else {
+            Alert.alert("Không thành công", "Gói này đã hết hạn");
           }
         })
         .catch((err) => {
