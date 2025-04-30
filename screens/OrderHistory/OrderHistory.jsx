@@ -13,7 +13,7 @@ import { styles } from "./styles";
 import AntDesign from "react-native-vector-icons/AntDesign";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useDispatch, useSelector } from "react-redux";
-import { getOrderByAccount } from "../../redux/slices/ghnSlice";
+import { getOrderByAccount, resetOrderTrack } from "../../redux/slices/ghnSlice";
 import { orderbyAccountSelector, productSelector } from "../../redux/selector";
 import { getProduct } from "../../redux/slices/productSlice";
 
@@ -49,6 +49,7 @@ const OrderHistory = ({ navigation }) => {
     if (isLoggedIn?.id) {
       dispatch(getProduct());
       dispatch(getOrderByAccount(isLoggedIn?.id));
+      dispatch(resetOrderTrack())
     }
   }, [dispatch, isLoggedIn]);
 

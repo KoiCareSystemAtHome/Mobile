@@ -24,6 +24,10 @@ export const ghnSlice = createSlice({
     setData: (state, action) => {
       state.data = action.payload;
     },
+    resetOrderTrack(state) {
+      state.orderTrack = null; // Reset orderTrack state
+      state.orderDetail = null
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -168,5 +172,5 @@ export const rejectOrder = createAsyncThunk(
   }
 );
 
-export const { setData } = ghnSlice.actions;
+export const { setData, resetOrderTrack } = ghnSlice.actions;
 export default ghnSlice;

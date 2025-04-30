@@ -128,7 +128,7 @@ const FishDetail = ({ route, navigation }) => {
     const product = products.find((p) => p.productId === medicineId);
     return product?.productName || "Không xác định";
   };
-console.log(koiProfile)
+
   const handleUpdatePond = () => {
     if (!selectedPond) {
       Toast.fail("Vui lòng chọn một ao!");
@@ -224,6 +224,20 @@ console.log(koiProfile)
         </View>
       </Card>
     );
+  };
+
+  // New function to get the latest health status
+  const getLatestHealthStatus = () => {
+    if (!Array.isArray(koiProfile) || koiProfile.length === 0) {
+      return "Chưa có dữ liệu"; // Default if no profile exists
+    }
+
+    // Find the latest profile based on endDate
+    const latestProfile = koiProfile.reduce((latest, current) =>
+      new Date(current.endDate) > new Date(latest.endDate) ? current : latest
+    );
+
+    return latestProfile.status === 0 ? "Ốm" : "Khỏe mạnh";
   };
 
   const handleAddNote = () => {
@@ -428,7 +442,7 @@ console.log(koiProfile)
             <Card style={styles.card}>
               <Text style={styles.sectionText}>
                 <Text style={styles.sectionLabel}>Tình trạng: </Text>
-                Khỏe mạnh
+                {getLatestHealthStatus()}
               </Text>
               <Text style={styles.sectionText}>
                 <Text style={styles.sectionLabel}>Trong ao: </Text>

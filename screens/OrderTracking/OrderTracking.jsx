@@ -1,5 +1,5 @@
 import { Provider, Toast, Modal } from "@ant-design/react-native";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import {
   Image,
   ImageBackground,
@@ -10,7 +10,7 @@ import {
   View,
 } from "react-native";
 import { styles } from "./styles";
-import { useRoute } from "@react-navigation/native";
+import { useRoute, useFocusEffect } from "@react-navigation/native";
 import {
   getOrderByAccount,
   getOrderDetail,
@@ -18,6 +18,7 @@ import {
   rejectOrder,
   updateOrderStatus,
   updateShipType,
+  resetOrderTrack, // Import the new action
 } from "../../redux/slices/ghnSlice";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -42,43 +43,49 @@ const OrderTracking = ({ navigation }) => {
   const [cancelModalVisible, setCancelModalVisible] = useState(false);
   const [cancelReason, setCancelReason] = useState("");
 
-  // Function to check if the Report button should be displayed (within 3 days of delivery)
+  // Function to check if the Report button should be displayed
   const isReportButtonVisible = () => {
     if (!orderTrack?.log) return false;
-
-    // Find the "delivered" status in the log
     const deliveredLog = orderTrack.log.find(
       (log) => log.status === "delivered"
     );
-
     if (!deliveredLog) return false;
-
     const deliveredDate = new Date(deliveredLog.updated_date);
-    const currentDate = new Date("2025-04-25"); // Current date (April 25, 2025)
-    const timeDiff = currentDate - deliveredDate; // Difference in milliseconds
-    const daysDiff = timeDiff / (1000 * 60 * 60 * 24); // Convert to days
-
-    return daysDiff <= 3; // Show button if within 3 days
+    const currentDate = new Date("2025-04-25");
+    const timeDiff = currentDate - deliveredDate;
+    const daysDiff = timeDiff / (1000 * 60 * 60 * 24);
+    return daysDiff <= 3;
   };
 
+  // Reset state and fetch order details when screen is focused
   useEffect(() => {
+    dispatch(resetOrderTrack()); // Reset on mount
     dispatch(getOrderDetail(orderId));
+  
+    return () => {
+      dispatch(resetOrderTrack()); // Reset on unmount
+    };
   }, [dispatch, orderId]);
-
+  // Fetch order tracking data
   useEffect(() => {
     if (orderDetail?.oder_code) {
       const order_code = orderDetail?.oder_code;
       dispatch(getOrderTracking({ order_code }))
         .unwrap()
         .then((response) => {
-          if (response?.status === "delivered") {
-            setProgress(2);
-          } else if (
-            response?.status === "picking" ||
-            response?.status === "picked" ||
-            ( orderDetail?.status === "Complete" && response?.status === "delivering")
-          ) {
-            setProgress(1);
+          if (response?.order_code === order_code) {
+            if (response?.status === "delivered") {
+              setProgress(2);
+            } else if (
+              response?.status === "picking" ||
+              response?.status === "picked" ||
+              (orderDetail?.status === "Complete" &&
+                response?.status === "delivering")
+            ) {
+              setProgress(1);
+            } else {
+              setProgress(0);
+            }
           } else {
             setProgress(0);
           }
@@ -86,10 +93,12 @@ const OrderTracking = ({ navigation }) => {
         .catch((error) => {
           console.error("Error fetching order tracking:", error);
           Toast.fail("Không thể tải trạng thái đơn hàng");
+          setProgress(0);
         });
     }
-  }, [dispatch, orderDetail]);
+  }, [dispatch, orderDetail?.oder_code]);
 
+  // Update order status based on tracking
   useEffect(() => {
     if (orderTrack?.status) {
       const values = { orderId, status: orderTrack.status };
@@ -167,6 +176,7 @@ const OrderTracking = ({ navigation }) => {
         </View>
 
         <ScrollView contentContainerStyle={styles.container}>
+          {/* Rest of the JSX remains unchanged */}
           <View style={styles.orderCard}>
             <Text style={styles.sectionTitle}>Chi Tiết Đơn Hàng</Text>
             {orderDetail?.details?.length > 0 ? (
@@ -243,12 +253,7 @@ const OrderTracking = ({ navigation }) => {
                   Ngày thanh toán:{" "}
                   {formatPaymentDate(order.transactionInfo.payment.date)}
                 </Text>
-                <Text style={styles.paymentSource}>
-                  {order.shopName} •{" "}
-                  <Text style={styles.paymentStatus}>
-                    {order.transactionInfo.transactionType}
-                  </Text>
-                </Text>
+                <Text style={styles.paymentSource}>{order.shopName}</Text>
               </View>
             )}
           </View>
@@ -386,7 +391,7 @@ const OrderTracking = ({ navigation }) => {
               {(orderTrack?.status === "delivered" ||
                 orderDetail?.status === "Complete" ||
                 orderDetail?.status === "Completed") &&
-                isReportButtonVisible() && ( // Conditionally render the Report button
+                isReportButtonVisible() && (
                   <TouchableOpacity
                     style={styles.actionButton}
                     onPress={() => {

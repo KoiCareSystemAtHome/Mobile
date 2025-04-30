@@ -79,8 +79,6 @@ const EditFish = ({ route, navigation }) => {
   const onFinish = (values) => {
     let image = fish?.image || "string";
     values.age = Number(values?.age);
-    values.length = 5;
-    values.weight = Number(values?.weight);
     values.price = Number(values?.purchasePrice);
     values.inPondSince = inPondSince.toISOString();
     values.physique = "string";
@@ -190,20 +188,7 @@ const EditFish = ({ route, navigation }) => {
                   </Form.Item>
                 </View>
               </View>
-              <View style={styles.row}>
-                <View style={styles.inputRow}>
-                  <Text style={styles.inputLabel}>Chiều dài:</Text>
-                  <Form.Item name="length" style={styles.input} extra="cm">
-                    <Input placeholder="Chiều dài" />
-                  </Form.Item>
-                </View>
-                <View style={styles.inputRow}>
-                  <Text style={styles.inputLabel}>Cân nặng:</Text>
-                  <Form.Item name="weight" style={styles.input} extra="kg">
-                    <Input placeholder="Cân nặng" />
-                  </Form.Item>
-                </View>
-              </View>
+
               <View style={styles.row}>
                 <View style={styles.inputRow}>
                   <Text style={styles.inputLabel}>Giới tính:</Text>
