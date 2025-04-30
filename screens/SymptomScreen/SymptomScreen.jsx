@@ -121,11 +121,11 @@ const SymptomScreen = ({ navigation }) => {
     <View style={styles.symptomItem}>
       <Text style={styles.symptomText}>
         {item === "Common_Food"
-          ? "Thức Ăn"
+          ? "Thức Ăn"
           : item === "Common_Enviroment"
-          ? "Môi trường"
+          ? "Môi trường"
           : item === "Common_Disease"
-          ? "Loại bệnh phổ biển"
+          ? "Loại bệnh phổ biến"
           : item}
       </Text>
     </View>
@@ -164,15 +164,91 @@ const SymptomScreen = ({ navigation }) => {
   const handleConfirmReminder = () => {
     if (homePond) {
       dispatch(createSymptomReminder(homePond?.pondID))
-      .unwrap()
-      .then(()=>{
-        Alert.alert("Nhắc nhở đã được tạo thành công!");
-      })
+        .unwrap()
+        .then(() => {
+          Alert.alert("Nhắc nhở đã được tạo thành công!");
+        });
       setReminderText("Nhắc nhở đã được tạo thành công!");
     }
   };
 
+  // Data for main FlatList
+  const listData = [
+    { type: "title", id: "title" },
+    { type: "subtitle", id: "subtitle" },
+    { type: "dropdown", id: "dropdown" },
+    ...(selectedSymptoms?.length > 0
+      ? [{ type: "symptoms", id: "symptoms", data: selectedSymptoms }]
+      : []),
+    ...(selectedTypes?.length > 0
+      ? [{ type: "types", id: "types", data: selectedTypes }]
+      : []),
+  ];
 
+  // Render item for main FlatList
+  const renderItem = ({ item }) => {
+    switch (item.type) {
+      case "title":
+        return <Text style={styles.title}>Chẩn Đoán Bệnh Cá</Text>;
+      case "subtitle":
+        return (
+          <Text style={styles.subTitle}>
+            Chọn các triệu chứng của cá để chẩn đoán
+          </Text>
+        );
+      case "dropdown":
+        return (
+          <View style={styles.dropdownWrapper}>
+            <DropDownPicker
+              open={open}
+              value={selectedValues}
+              items={items}
+              setOpen={setOpen}
+              setValue={setSelectedValues}
+              multiple={true}
+              mode="BADGE"
+              placeholder="Chọn triệu chứng"
+              style={[styles.dropdown, { marginBottom: open ? 200 : 20 }]}
+              dropDownContainerStyle={styles.dropdownContainer}
+              accessibilityLabel="Select fish symptoms"
+              accessibilityRole="combobox"
+              listMode="SCROLLVIEW"
+              scrollViewProps={{
+                nestedScrollEnabled: true,
+              }}
+            />
+          </View>
+        );
+      case "symptoms":
+        return (
+          <View style={styles.symptomCard}>
+            <Text style={styles.cardTitle}>Triệu Chứng Đã Chọn</Text>
+            <FlatList
+              data={item.data}
+              renderItem={renderSymptomItem}
+              keyExtractor={(item, index) => index.toString()}
+              style={styles.symptomList}
+              nestedScrollEnabled={true}
+            />
+          </View>
+        );
+      case "types":
+        return (
+          <View style={styles.symptomCard}>
+            <Text style={styles.cardTitle}>Vấn Đề Tiềm Ẩn</Text>
+            <FlatList
+              data={item.data}
+              renderItem={renderTypeItem}
+              keyExtractor={(item, index) => index.toString()}
+              style={styles.symptomList}
+              nestedScrollEnabled={true}
+            />
+          </View>
+        );
+      default:
+        return null;
+    }
+  };
 
   return (
     <ImageBackground
@@ -182,60 +258,27 @@ const SymptomScreen = ({ navigation }) => {
     >
       <View style={styles.overlay} />
       <View style={styles.container}>
-        <Text style={styles.title}>Chẩn Đoán Bệnh</Text>
-        <Text style={styles.subTitle}>Hãy chọn triệu chứng của cá</Text>
-        <DropDownPicker
-          open={open}
-          value={selectedValues}
-          items={items}
-          setOpen={setOpen}
-          setValue={setSelectedValues}
-          multiple={true}
-          mode="BADGE"
-          placeholder="Select Symptoms"
-          style={styles.dropdown}
-          dropDownContainerStyle={styles.dropdownContainer}
-          accessibilityLabel="Select fish symptoms"
-          accessibilityRole="combobox"
+        <FlatList
+          data={listData}
+          renderItem={renderItem}
+          keyExtractor={(item) => item.id}
+          contentContainerStyle={styles.listContent}
+          showsVerticalScrollIndicator={false}
         />
-
-        {selectedSymptoms?.length > 0 && (
-          <View style={styles.symptomCard}>
-            <FlatList
-              data={selectedSymptoms}
-              renderItem={renderSymptomItem}
-              keyExtractor={(item, index) => index.toString()}
-              style={styles.symptomList}
-            />
-          </View>
-        )}
-
-        {selectedTypes?.length > 0 && (
-          <View style={styles.symptomCard}>
-            <Text style={styles.cardTitle}>
-              Có vẻ hồ cá của bạn đang gặp vấn đề về:
-            </Text>
-            <FlatList
-              data={selectedTypes}
-              renderItem={renderTypeItem}
-              keyExtractor={(item, index) => index.toString()}
-              style={styles.symptomList}
-            />
-          </View>
-        )}
 
         {/* Popup Modal for Common_Enviroment */}
         <Modal
-          animationType="fade"
+          animationType="slide"
           transparent={true}
           visible={isPopupVisible}
           onRequestClose={handleClosePopup}
         >
           <View style={styles.modalContainer}>
             <View style={styles.modalContent}>
-              <Text style={styles.modalText}>Tạo Nhắc Nhở</Text>
+              <Text style={styles.modalText}>Tạo Nhắc Nhở Kiểm Tra Hồ</Text>
               <Text style={styles.modalSubText}>
-                {reminderText || "Vui lòng chọn một hồ để tạo nhắc nhở."}
+                {reminderText ||
+                  "Vui lòng chọn một hồ để tạo nhắc nhở kiểm tra môi trường."}
               </Text>
               <TouchableOpacity
                 onPress={() => setHomePondOpen(!homePondOpen)}
@@ -244,12 +287,12 @@ const SymptomScreen = ({ navigation }) => {
                 accessibilityRole="button"
               >
                 <Text style={styles.selectorText}>
-                  {homePond ? homePond?.name : "Chọn Một Ao"}
+                  {homePond ? homePond?.name : "Chọn Một Hồ"}
                 </Text>
                 <Icon
                   name={homePondOpen ? "up" : "down"}
                   size={16}
-                  color="#1A3C6D"
+                  color="#004D40"
                 />
               </TouchableOpacity>
               {homePondOpen && (
@@ -282,7 +325,7 @@ const SymptomScreen = ({ navigation }) => {
                   accessibilityLabel="Confirm reminder"
                   accessibilityRole="button"
                 >
-                  <Text style={styles.confirmButtonText} numberOfLines={1}>Tạo</Text>
+                  <Text style={styles.confirmButtonText}>Tạo Nhắc Nhở</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
                   style={styles.closeButton}
@@ -297,7 +340,7 @@ const SymptomScreen = ({ navigation }) => {
           </View>
         </Modal>
 
-        {/* Next Button */}
+        {/* Fixed Next Button */}
         <TouchableOpacity
           style={[
             styles.nextButton,
@@ -308,7 +351,7 @@ const SymptomScreen = ({ navigation }) => {
           accessibilityLabel="Proceed to prediction"
           accessibilityRole="button"
         >
-          <Text style={styles.nextButtonText}>Tiếp theo</Text>
+          <Text style={styles.nextButtonText}>Tiếp Theo</Text>
         </TouchableOpacity>
       </View>
     </ImageBackground>

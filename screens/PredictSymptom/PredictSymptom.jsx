@@ -1,22 +1,21 @@
 import React, { useEffect, useState } from "react";
-import { styles } from "./style";
+import {
+  ImageBackground,
+  Text,
+  View,
+  FlatList,
+  TouchableOpacity,
+} from "react-native";
 import { useDispatch, useSelector } from "react-redux";
-import { get } from "react-native/Libraries/TurboModule/TurboModuleRegistry";
 import { getExamination, getPrediction } from "../../redux/slices/symptomSlice";
 import {
   symptomExaminationSelector,
   symptomPredictionSelector,
 } from "../../redux/selector";
-import {
-  FlatList,
-  ImageBackground,
-  Text,
-  View,
-  TouchableOpacity,
-} from "react-native";
 import DropDownPicker from "react-native-dropdown-picker";
 import { useNavigation } from "@react-navigation/native";
 import AntDesign from "react-native-vector-icons/AntDesign";
+import { styles } from "./style";
 
 const PredictSymptom = ({ route }) => {
   const dispatch = useDispatch();
@@ -38,7 +37,7 @@ const PredictSymptom = ({ route }) => {
       );
       setItems(dropdownItems);
     }
-  }, [symptomPrediction, dispatch]);
+  }, [symptomPrediction]);
 
   useEffect(() => {
     dispatch(getPrediction(selectedSymptomIds));
@@ -64,8 +63,6 @@ const PredictSymptom = ({ route }) => {
     </View>
   );
 
-  console.log(symptomPrediction);
-
   const handleCreateProfile = () => {
     const symptomsData = selectedValues.map((symptomId) => ({
       symptomID: symptomId,
@@ -77,6 +74,92 @@ const PredictSymptom = ({ route }) => {
       symptoms: symptomsData,
     });
   };
+
+  // Data for main FlatList
+  const listData = [
+    { type: "title", id: "title" },
+    { type: "dropdown", id: "dropdown" },
+    ...(symptomPrediction?.causeGroupType === "Cá ăn quá no"
+      ? [
+          {
+            type: "cause",
+            id: "cause",
+            causeGroupType: symptomPrediction?.causeGroupType,
+          },
+        ]
+      : []),
+    ...(selectedSymptoms?.length > 0
+      ? [{ type: "symptoms", id: "symptoms", data: selectedSymptoms }]
+      : []),
+    ...(selectedValues?.length > 0 && diseaseDiagnosis?.diseaseName
+      ? [
+          {
+            type: "diagnosis",
+            id: "diagnosis",
+            diseaseName: diseaseDiagnosis?.diseaseName,
+          },
+        ]
+      : []),
+  ];
+
+  // Render item for main FlatList
+  const renderItem = ({ item }) => {
+    switch (item.type) {
+      case "title":
+        return <Text style={styles.title}>Chẩn Đoán Bệnh</Text>;
+      case "dropdown":
+        return (
+          <View style={styles.dropdownWrapper}>
+            <DropDownPicker
+              open={open}
+              value={selectedValues}
+              items={items}
+              setOpen={setOpen}
+              setValue={setSelectedValues}
+              multiple={true}
+              mode="BADGE"
+              placeholder="Chọn triệu chứng"
+              style={[styles.dropdown, { marginBottom: open ? 200 : 20 }]}
+              dropDownContainerStyle={styles.dropdownContainer}
+              accessibilityLabel="Select fish symptoms"
+              accessibilityRole="combobox"
+              listMode="SCROLLVIEW"
+              scrollViewProps={{
+                nestedScrollEnabled: true,
+              }}
+            />
+          </View>
+        );
+      case "cause":
+        return (
+          <View style={styles.symptomCard}>
+            <Text style={styles.cardTitle}>Nguyên Nhân: {item.causeGroupType}</Text>
+          </View>
+        );
+      case "symptoms":
+        return (
+          <View style={styles.symptomCard}>
+            <Text style={styles.cardTitle}>Triệu Chứng Đã Chọn</Text>
+            <FlatList
+              data={item.data}
+              renderItem={renderSymptomItem}
+              keyExtractor={(item, index) => index.toString()}
+              style={styles.symptomList}
+              nestedScrollEnabled={true}
+            />
+          </View>
+        );
+      case "diagnosis":
+        return (
+          <View style={styles.symptomCard}>
+            <Text style={styles.cardTitle}>Chẩn Đoán: {item.diseaseName}</Text>
+          </View>
+        );
+      default:
+        return null;
+    }
+  };
+
   return (
     <ImageBackground
       source={require("../../assets/koimain3.jpg")}
@@ -85,51 +168,22 @@ const PredictSymptom = ({ route }) => {
     >
       <View style={styles.overlay} />
       <View style={styles.container}>
-        <Text style={styles.title}>Chẩn Đoán Bệnh</Text>
-        <DropDownPicker
-          open={open}
-          value={selectedValues}
-          items={items}
-          setOpen={setOpen}
-          setValue={setSelectedValues}
-          multiple={true}
-          mode="BADGE"
-          placeholder="Select Symptoms"
-          style={styles.dropdown}
-          dropDownContainerStyle={{ zIndex: 100 }}
+        <FlatList
+          data={listData}
+          renderItem={renderItem}
+          keyExtractor={(item) => item.id}
+          contentContainerStyle={styles.listContent}
+          showsVerticalScrollIndicator={false}
         />
-
-        {symptomPrediction?.causeGroupType === "Cá ăn quá no"  && (
-          <View style={styles.symptomCard}>
-            <Text style={styles.cardTitle}>
-              Triệu chứng: {symptomPrediction?.causeGroupType}
-            </Text>
-          </View>
-        )}
-        {selectedSymptoms?.length > 0 && (
-          <View style={styles.symptomCard}>
-            <FlatList
-              data={selectedSymptoms}
-              renderItem={renderSymptomItem}
-              keyExtractor={(item, index) => index.toString()}
-              style={styles.symptomList}
-            />
-          </View>
-        )}
-        {selectedValues?.length > 0 && (
-          <View style={styles.symptomCard}>
-            <Text style={styles.cardTitle}>
-              Chẩn đoán bệnh: {diseaseDiagnosis?.diseaseName}
-            </Text>
-          </View>
-        )}
 
         {selectedValues?.length > 0 && (
           <TouchableOpacity
             style={styles.createButton}
             onPress={handleCreateProfile}
+            accessibilityLabel="Save disease history"
+            accessibilityRole="button"
           >
-            <Text style={styles.createButtonText}>Lưu lịch sử bệnh</Text>
+            <Text style={styles.createButtonText}>Lưu Lịch Sử Bệnh</Text>
           </TouchableOpacity>
         )}
       </View>

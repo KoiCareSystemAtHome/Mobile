@@ -6,6 +6,8 @@ import {
   Image,
   TouchableWithoutFeedback,
   Alert,
+  ImageBackground,
+  ScrollView,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { styles } from "./styles";
@@ -46,12 +48,12 @@ const ReminderDetail = ({ navigation, route }) => {
   const formattedDate = `${capitalizedWeekday}, ${date.format("D MMM, YYYY, HH:mm")}`;
 
   const typeDotColor = isComplete
-    ? "#4CAF50"
-    : reminder.title.toLowerCase().includes("Pond")
-    ? "#A5D6A7"
+    ? "#4CAF50" // Green for complete
+    : reminder.title.toLowerCase().includes("pond")
+    ? "#A5D6A7" // Light green for pond
     : reminder.title.toLowerCase().includes("fish")
-    ? "#FFCC80"
-    : "#B0BEC5";
+    ? "#FFCC80" // Light orange for fish
+    : "#B0BEC5"; // Gray for others
 
   const handleStatusSelect = (status) => {
     if (!isComplete) {
@@ -62,7 +64,7 @@ const ReminderDetail = ({ navigation, route }) => {
           .unwrap()
           .then((res) => {
             if (res === "success") {
-              Alert.alert("Updated Successfully");
+              Alert.alert("Cập nhật thành công");
               dispatch(getReminderByOwner(isLoggedIn?.id));
             }
           });
@@ -97,109 +99,121 @@ const ReminderDetail = ({ navigation, route }) => {
     };
     getData();
   }, []);
+
   return (
-    <SafeAreaView style={styles.container}>
-      <TouchableWithoutFeedback onPress={handleOutsidePress}>
-        <View style={{ flex: 1 }}>
-          <View style={styles.header}>
-            <TouchableOpacity onPress={() => navigation.goBack()}>
-              <Text style={styles.headerIcon}>{leftArrowIcon}</Text>
-            </TouchableOpacity>
-            <Text style={styles.headerDate}>
-              {dayjs
-                .utc(reminder.maintainDate)
-                .tz("Asia/Ho_Chi_Minh")
-                .format("D MMM")
-                .toUpperCase()}
-            </Text>
-            <Text style={styles.headerTitle}>CHI TIẾT LỜI NHẮC</Text>
-          </View>
-
-          <View style={styles.titleContainer}>
-            <Text style={styles.title}>{reminder.title}</Text>
-            <Text style={styles.dateTime}>{formattedDate}</Text>
-          </View>
-
-          <View style={styles.detailsContainer}>
-            <View style={styles.detailRow}>
-              <Text style={styles.detailLabel}>{reminder?.pondName}</Text>
-              <View style={styles.detailValueContainer}>
-                <View
-                  style={[styles.typeDot, { backgroundColor: typeDotColor }]}
-                />
+    <SafeAreaView style={styles.safeArea}>
+      <ImageBackground
+        source={require("../../../assets/koimain3.jpg")}
+        style={styles.background}
+        resizeMode="cover"
+      >
+        <View style={styles.overlay} />
+        <TouchableWithoutFeedback onPress={handleOutsidePress}>
+          <View style={styles.container}>
+            <ScrollView
+              contentContainerStyle={styles.scrollContent}
+              showsVerticalScrollIndicator={false}
+            >
+              <View style={styles.header}>
                 <TouchableOpacity
-                  style={styles.detailValueContainer}
-                  onPress={handleDropdownPress}
-                  disabled={isComplete}
+                  onPress={() => navigation.goBack()}
+                  accessibilityLabel="Go back"
+                  accessibilityRole="button"
                 >
-                  <Text
-                    style={[
-                      styles.detailValue,
-                      { color: isComplete ? "#4CAF50" : "#000" },
-                    ]}
-                  >
-                    {selectedStatus === "Complete" ? "Hoàn thành" : "Đang chờ"}
-                  </Text>
-                  {!isComplete && (
-                    <Text style={styles.dropdownIcon}>{dropdownIcon}</Text>
-                  )}
+                  <Text style={styles.headerIcon}>{leftArrowIcon}</Text>
                 </TouchableOpacity>
-                {isStatusDropdownVisible && !isComplete && (
-                  <TouchableWithoutFeedback>
-                    <View style={styles.dropdownContainer}>
-                      <TouchableOpacity
-                        style={styles.dropdownItem}
-                        onPress={() => handleStatusSelect("Pending")}
-                      >
-                        <Text style={styles.dropdownItemText}>Đang chờ</Text>
-                      </TouchableOpacity>
-                      <TouchableOpacity
-                        style={styles.dropdownItem}
-                        onPress={() => handleStatusSelect("Complete")}
-                      >
-                        <Text style={styles.dropdownItemText}>Hoàn thành</Text>
-                      </TouchableOpacity>
-                    </View>
-                  </TouchableWithoutFeedback>
-                )}
+                <Text style={styles.headerDate}>
+                  {dayjs
+                    .utc(reminder.maintainDate)
+                    .tz("Asia/Ho_Chi_Minh")
+                    .format("D MMM")
+                    .toUpperCase()}
+                </Text>
+                <Text style={styles.headerTitle}>CHI TIẾT LỜI NHẮC</Text>
               </View>
-            </View>
 
-            <View style={styles.description}>
-              <Text style={styles.detailLabel}>MÔ TẢ</Text>
-              <View style={styles.detailValueContainer}>
-                <Text style={styles.detailValue}>{reminder.description}</Text>
+              <View style={styles.titleContainer}>
+                <Text style={styles.title}>{reminder.title}</Text>
+                <Text style={styles.dateTime}>{formattedDate}</Text>
               </View>
-            </View>
 
-            <View style={{ alignItems: "center", marginTop: 20 }}>
-              <Image
-                source={require("../../../assets/ed281664ff39c5251e5ffc26c325d0fc.gif")}
-                style={{ width: 200, height: 200 }}
-                resizeMode="contain"
-              />
-            </View>
+              <View style={styles.detailsContainer}>
+                <View style={styles.detailRow}>
+                  <Text style={styles.detailLabel}>{reminder?.pondName}</Text>
+                  <View style={styles.detailValueContainer}>
+                    <View
+                      style={[styles.typeDot, { backgroundColor: typeDotColor }]}
+                    />
+                    <TouchableOpacity
+                      style={styles.detailValueContainer}
+                      onPress={handleDropdownPress}
+                      disabled={isComplete}
+                      accessibilityLabel="Select status"
+                      accessibilityRole="button"
+                    >
+                      <Text
+                        style={[
+                          styles.detailValue,
+                          { color: isComplete ? "#4CAF50" : "#004D40" },
+                        ]}
+                      >
+                        {selectedStatus === "Complete" ? "Hoàn thành" : "Đang chờ"}
+                      </Text>
+                      {!isComplete && (
+                        <Text style={styles.dropdownIcon}>{dropdownIcon}</Text>
+                      )}
+                    </TouchableOpacity>
+                    {isStatusDropdownVisible && !isComplete && (
+                      <TouchableWithoutFeedback>
+                        <View style={styles.dropdownContainer}>
+                          <TouchableOpacity
+                            style={styles.dropdownItem}
+                            onPress={() => handleStatusSelect("Pending")}
+                          >
+                            <Text style={styles.dropdownItemText}>Đang chờ</Text>
+                          </TouchableOpacity>
+                          <TouchableOpacity
+                            style={styles.dropdownItem}
+                            onPress={() => handleStatusSelect("Complete")}
+                          >
+                            <Text style={styles.dropdownItemText}>Hoàn thành</Text>
+                          </TouchableOpacity>
+                        </View>
+                      </TouchableWithoutFeedback>
+                    )}
+                  </View>
+                </View>
+
+                <View style={styles.description}>
+                  <Text style={styles.detailLabel}>MÔ TẢ</Text>
+                  <View style={styles.detailValueContainer}>
+                    <Text style={styles.detailValue}>{reminder.description}</Text>
+                  </View>
+                </View>
+
+                <View style={styles.gifContainer}>
+                  <Image
+                    source={require("../../../assets/ed281664ff39c5251e5ffc26c325d0fc.gif")}
+                    style={styles.gif}
+                    resizeMode="contain"
+                  />
+                </View>
+              </View>
+            </ScrollView>
 
             {reminder.reminderType === "Pond" && (
               <TouchableOpacity
-                style={{
-                  backgroundColor: "#6A5ACD",
-                  padding: 15,
-                  borderRadius: 10,
-                  alignItems: "center",
-                  marginTop: 20,
-                  marginHorizontal: 20,
-                }}
+                style={styles.addSaltButton}
                 onPress={handleAddSalt}
+                accessibilityLabel="Add salt"
+                accessibilityRole="button"
               >
-                <Text style={{ color: "#FFF", fontWeight: "bold", fontSize: 16 }}>
-                  Add Salt
-                </Text>
+                <Text style={styles.addSaltButtonText}>Thêm Muối</Text>
               </TouchableOpacity>
             )}
           </View>
-        </View>
-      </TouchableWithoutFeedback>
+        </TouchableWithoutFeedback>
+      </ImageBackground>
     </SafeAreaView>
   );
 };

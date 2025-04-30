@@ -1,34 +1,116 @@
 import { StyleSheet } from "react-native";
 
 export const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+  },
+  background: {
+    flex: 1,
+  },
+  overlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: "rgba(255, 255, 255, 0.8)", // Match previous screens
+  },
   container: {
     flex: 1,
-    backgroundColor: "#F5F5F5",
+    paddingHorizontal: 20,
   },
   header: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    paddingHorizontal: 15,
-    paddingVertical: 10,
+    paddingVertical: 15,
   },
   headerIcon: {
+    fontSize: 28,
+    color: "#26A69A", // Teal
+  },
+  headerTitle: {
     fontSize: 24,
-    color: "#000",
+    fontWeight: "700",
+    color: "#004D40", // Deep teal
   },
   headerIcons: {
     flexDirection: "row",
     gap: 15,
   },
-  calendar: {
-    backgroundColor: "#FFF",
+  nextReminderContainer: {
+    backgroundColor: "#FFFFFF",
+    borderRadius: 16,
+    padding: 20,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 5,
+    zIndex: 1,
+  },
+  nextReminderTitle: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#00695C", // Lighter teal
+    marginBottom: 10,
+  },
+  nextReminderDetails: {
+    paddingLeft: 10,
+  },
+  nextReminderDate: {
+    fontSize: 16,
+    fontWeight: "700",
+    color: "#004D40",
+    marginBottom: 5,
+  },
+  nextReminderText: {
+    fontSize: 18,
+    fontWeight: "600",
+    color: "#004D40",
+    marginBottom: 5,
+  },
+  nextReminderDescription: {
+    fontSize: 14,
+    color: "#37474F", // Darker gray
+    lineHeight: 20,
+  },
+  toggleContainer: {
+    flexDirection: "row",
+    backgroundColor: "#E0F2F1", // Light teal
+    borderRadius: 12,
+    marginVertical: 10,
+    padding: 4,
+    alignSelf: "center",
+    width: "90%",
+  },
+  toggleButton: {
+    flex: 1,
+    paddingVertical: 10,
     borderRadius: 10,
-    marginHorizontal: 10,
+    alignItems: "center",
+  },
+  toggleButtonActive: {
+    backgroundColor: "#26A69A", // Teal
+  },
+  toggleText: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: "#004D40",
+  },
+  toggleTextActive: {
+    color: "#FFFFFF",
+  },
+  calendar: {
+    backgroundColor: "#FFFFFF",
+    borderRadius: 16,
+    marginVertical: 10,
     paddingBottom: 10,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 5,
   },
   arrow: {
     fontSize: 24,
-    color: "#000",
+    color: "#26A69A",
   },
   legendContainer: {
     flexDirection: "row",
@@ -41,57 +123,49 @@ export const styles = StyleSheet.create({
     alignItems: "center",
   },
   legendDot: {
-    width: 20,
-    height: 10,
-    borderRadius: 5,
-    marginRight: 5,
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    marginRight: 8,
   },
   legendText: {
-    fontSize: 12,
-    color: "#000",
+    fontSize: 14,
+    fontWeight: "500",
+    color: "#004D40",
   },
   fab: {
     position: "absolute",
     bottom: 20,
     right: 20,
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    backgroundColor: "#000",
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: "#26A69A", // Teal
     alignItems: "center",
     justifyContent: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.3,
+    shadowRadius: 6,
+    elevation: 8,
+    zIndex: 100,
   },
   fabText: {
-    fontSize: 24,
-    color: "#FFF",
+    fontSize: 28,
+    color: "#FFFFFF",
   },
-  todayLabel: {
-    position: "absolute",
-    bottom: 20,
-    alignSelf: "center",
-    backgroundColor: "#FFF",
-    paddingVertical: 5,
-    paddingHorizontal: 15,
-    borderRadius: 15,
-    borderWidth: 1,
-    borderColor: "#DDD",
-  },
-  todayLabelText: {
-    fontSize: 14,
-    color: "#FF0000",
-    fontWeight: "bold",
-  },
-  // Modal styles
-modal: {
-    justifyContent: "center",
+  modal: {
+    justifyContent: "flex-end",
     margin: 0,
   },
   modalContent: {
-    backgroundColor: "#FFF",
+    backgroundColor: "#FFFFFF",
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     padding: 20,
-    height: "50%", // Adjust height as needed
+    height: "50%",
+    borderWidth: 2,
+    borderColor: "#26A69A",
   },
   modalHeader: {
     flexDirection: "row",
@@ -99,96 +173,45 @@ modal: {
     marginBottom: 20,
   },
   modalHeaderIcon: {
-    fontSize: 24,
+    fontSize: 28,
+    color: "#26A69A",
     marginRight: 20,
   },
   modalTitle: {
-    fontSize: 18,
-    fontWeight: "bold",
-    color: "#000",
+    fontSize: 20,
+    fontWeight: "700",
+    color: "#004D40",
   },
   modalBody: {
     flex: 1,
   },
   modalDate: {
-    fontSize: 16,
-    fontWeight: "bold",
-    color: "#000",
-    marginBottom: 20,
+    fontSize: 18,
+    fontWeight: "600",
+    color: "#004D40",
+    marginBottom: 15,
   },
   modalEvent: {
     flexDirection: "row",
     alignItems: "center",
-    padding: 10,
-    borderRadius: 10,
+    padding: 12,
+    borderRadius: 12,
     marginBottom: 10,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
   },
   modalEventTime: {
     fontSize: 14,
-    fontWeight: "bold",
-    color: "#000",
-    marginRight: 20,
+    fontWeight: "600",
+    color: "#004D40",
+    marginRight: 15,
   },
   modalEventText: {
     fontSize: 16,
-    color: "#000",
+    fontWeight: "500",
+    color: "#004D40",
   },
-  modalEventDescription: {
-    fontSize: 14,
-    color: "#666",
-  },
-  modalTodayLabel: {
-    alignSelf: "center",
-    backgroundColor: "#6A5ACD", // Purple like the header
-    paddingVertical: 5,
-    paddingHorizontal: 15,
-    borderRadius: 15,
-    marginBottom: 10,
-  },
-  modalTodayLabelText: {
-    fontSize: 14,
-    color: "#FFF",
-    fontWeight: "bold",
-  },
-  nextReminderContainer: {
-  backgroundColor: "#FFF",
-  borderRadius: 10,
-  marginHorizontal: 10,
-  marginVertical: 15,
-  padding: 15,
-  shadowColor: "#000",
-  shadowOffset: {
-    width: 0,
-    height: 2,
-  },
-  shadowOpacity: 0.1,
-  shadowRadius: 4,
-  elevation: 3,
-},
-nextReminderTitle: {
-  fontSize: 14,
-  fontWeight: "bold",
-  color: "#666",
-  marginBottom: 10,
-},
-nextReminderDetails: {
-  paddingLeft: 10,
-},
-nextReminderDate: {
-  fontSize: 16,
-  fontWeight: "bold",
-  color: "#000",
-  marginBottom: 5,
-},
-nextReminderText: {
-  fontSize: 18,
-  fontWeight: "500",
-  color: "#333",
-  marginBottom: 5,
-},
-nextReminderDescription: {
-  fontSize: 14,
-  color: "#666",
-  lineHeight: 20,
-},
 });

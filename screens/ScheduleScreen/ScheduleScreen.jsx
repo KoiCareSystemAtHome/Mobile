@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, TouchableOpacity, ScrollView } from "react-native";
+import { View, Text, TouchableOpacity, ImageBackground, ScrollView } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Calendar } from "react-native-calendars";
 import Modal from "react-native-modal";
@@ -8,8 +8,8 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useSelector, useDispatch } from "react-redux";
 import { reminderByOwnerSelector } from "../../redux/selector";
 import { getReminderByOwner } from "../../redux/slices/reminderSlice";
-import dayjs from "dayjs"; // Import dayjs
-import utc from "dayjs/plugin/utc"; // Import UTC plugin
+import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
 
 // Enable UTC plugin
 dayjs.extend(utc);
@@ -93,8 +93,8 @@ const ScheduleScreen = ({ navigation }) => {
 
           newMarkedDates[date].dots.push({
             key: reminder.pondReminderId,
-            color: isFinished ? "#4CAF50" : "#FF6B6B",
-            selectedDotColor: isFinished ? "#4CAF50" : "#FF6B6B",
+            color: isFinished ? "#4CAF50" : "#26A69A", // Teal for pending
+            selectedDotColor: isFinished ? "#4CAF50" : "#26A69A",
             reminder: reminder,
           });
         } catch (error) {
@@ -119,236 +119,225 @@ const ScheduleScreen = ({ navigation }) => {
   };
 
   const getTimeRange = (maintainDate) => {
-    // Parse maintainDate as UTC
     const date = dayjs.utc(maintainDate);
-    // Format start time in UTC
     const startTime = date.format("HH:mm");
-    // Calculate end time (+2 hours)
     const endTime = date.add(2, "hour").format("HH:mm");
     return `${startTime}-${endTime}`;
   };
 
   const formatNextReminderDate = (maintainDate) => {
-    // Parse maintainDate as UTC
     const date = dayjs.utc(maintainDate);
-    // Format date in UTC
-    return date
-      .format("dddd, D MMMM")
-      .toUpperCase();
+    return date.format("dddd, D MMMM").toUpperCase();
   };
 
-console.log(reminderByOwner)
   return (
-    <SafeAreaView style={styles.container}>
-      {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Text style={styles.headerIcon}>{leftArrowIcon}</Text>
-        </TouchableOpacity>
-        <Text style={styles.headerIcon}>Lịch trình</Text>
-        <View style={styles.headerIcons}>
-          <TouchableOpacity>
-            <Text style={styles.headerIcon}></Text>
-          </TouchableOpacity>
-          <TouchableOpacity>
-            <Text style={styles.headerIcon}></Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-
-      {nextReminder && (
-        <View style={styles.nextReminderContainer}>
-          <Text style={styles.nextReminderTitle}>LỜI NHẮC TIẾP THEO</Text>
-          <View style={styles.nextReminderDetails}>
-            <Text style={styles.nextReminderDate}>
-              {formatNextReminderDate(nextReminder.maintainDate)} lúc{" "}
-              {getTimeRange(nextReminder.maintainDate).split("-")[0]}
-            </Text>
-            <Text style={styles.nextReminderText}>{nextReminder.title}</Text>
-            <Text style={styles.nextReminderDescription}>
-              {nextReminder.description}
-            </Text>
-          </View>
-        </View>
-      )}
-
-      {/* Toggle Switch */}
-      <View
-        style={{
-          flexDirection: "row",
-          backgroundColor: "#E0E0E0",
-          borderRadius: 20,
-          margin: 10,
-          width: 330,
-          alignSelf: "center",
-        }}
+    <SafeAreaView style={styles.safeArea}>
+      <ImageBackground
+        source={require("../../assets/koimain3.jpg")}
+        style={styles.background}
+        resizeMode="cover"
       >
-        <TouchableOpacity
-          style={{
-            flex: 1,
-            padding: 10,
-            borderRadius: 20,
-            backgroundColor:
-              filterType === "RecurringMaintenance" ? "#6A5ACD" : "transparent",
-            alignItems: "center",
-          }}
-          onPress={() => setFilterType("RecurringMaintenance")}
-        >
-          <Text
-            style={{
-              color: filterType === "RecurringMaintenance" ? "#FFF" : "#000",
-              fontWeight: "bold",
-              fontSize: 12,
-            }}
-          >
-            Định kỳ
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={{
-            flex: 1,
-            padding: 10,
-            borderRadius: 20,
-            backgroundColor:
-              filterType === "Maintenance" ? "#6A5ACD" : "transparent",
-            alignItems: "center",
-          }}
-          onPress={() => setFilterType("Maintenance")}
-        >
-          <Text
-            style={{
-              color: filterType === "Maintenance" ? "#FFF" : "#000",
-              fontWeight: "bold",
-              fontSize: 12,
-            }}
-          >
-            Bảo trì
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={{
-            flex: 1,
-            padding: 10,
-            borderRadius: 20,
-            backgroundColor: filterType === "Pond" ? "#6A5ACD" : "transparent",
-            alignItems: "center",
-          }}
-          onPress={() => setFilterType("Pond")}
-        >
-          <Text
-            style={{
-              color: filterType === "Pond" ? "#FFF" : "#000",
-              fontWeight: "bold",
-              fontSize: 12,
-            }}
-          >
-            Muối
-          </Text>
-        </TouchableOpacity>
-      </View>
-
-      <Calendar
-        current={new Date().toISOString().split("T")[0]}
-        markedDates={markedDates}
-        markingType={"multi-dot"}
-        theme={{
-          backgroundColor: "#FFF",
-          calendarBackground: "#FFF",
-          textSectionTitleColor: "#666",
-          dayTextColor: "#000",
-          textDisabledColor: "#D9E1E8",
-          monthTextColor: "#000",
-          textMonthFontSize: 24,
-          textMonthFontWeight: "bold",
-          textDayHeaderFontSize: 14,
-          textDayHeaderFontWeight: "bold",
-          arrowColor: "#000",
-          todayTextColor: "#ddd",
-          selectedDayBackgroundColor: "#6A5ACD",
-        }}
-        onDayPress={handleDayPress}
-        renderArrow={(direction) => (
-          <Text style={styles.arrow}>
-            {direction === "left" ? leftArrowIcon : rightArrowIcon}
-          </Text>
-        )}
-        style={styles.calendar}
-      />
-
-      {/* Legend */}
-      <View style={styles.legendContainer}>
-        <View style={styles.legendItem}>
-          <View style={[styles.legendDot, { backgroundColor: "#FF6B6B" }]} />
-          <Text style={styles.legendText}>Chưa hoàn thành</Text>
-        </View>
-        <View style={styles.legendItem}>
-          <View style={[styles.legendDot, { backgroundColor: "#4CAF50" }]} />
-          <Text style={styles.legendText}>Đã hoàn thành</Text>
-        </View>
-      </View>
-
-      {/* Floating Action Button */}
-      <TouchableOpacity
-        style={styles.fab}
-        onPress={() => navigation.navigate("ReminderScreen")}
-      >
-        <Text style={styles.fabText}>{addIcon}</Text>
-      </TouchableOpacity>
-
-      {/* Modal for Event Details */}
-      <Modal
-        isVisible={isModalVisible}
-        onBackdropPress={() => setModalVisible(false)}
-        style={styles.modal}
-      >
-        <View style={styles.modalContent}>
-          <View style={styles.modalHeader}>
-            <TouchableOpacity onPress={() => setModalVisible(false)}>
-              <Text style={styles.modalHeaderIcon}>{leftArrowIcon}</Text>
+        <View style={styles.overlay} />
+        <View style={styles.container}>
+          {/* Header */}
+          <View style={styles.header}>
+            <TouchableOpacity
+              onPress={() => navigation.goBack()}
+              accessibilityLabel="Go back"
+              accessibilityRole="button"
+            >
+              <Text style={styles.headerIcon}>{leftArrowIcon}</Text>
             </TouchableOpacity>
-            <Text style={styles.modalTitle}>XEM LỜI NHẮC</Text>
+            <Text style={styles.headerTitle}>Lịch Trình</Text>
+            <View style={styles.headerIcons}>
+              <TouchableOpacity disabled>
+                <Text style={styles.headerIcon}></Text>
+              </TouchableOpacity>
+              <TouchableOpacity disabled>
+                <Text style={styles.headerIcon}></Text>
+              </TouchableOpacity>
+            </View>
           </View>
-          <View style={styles.modalBody}>
-            <Text style={styles.modalDate}>{selectedDate}</Text>
-            <ScrollView style={{ maxHeight: 300 }}>
-              {selectedDateEvents.map((event, index) => (
+
+          {nextReminder && (
+            <View style={styles.nextReminderContainer}>
+              <Text style={styles.nextReminderTitle}>LỜI NHẮC TIẾP THEO</Text>
+              <View style={styles.nextReminderDetails}>
+                <Text style={styles.nextReminderDate}>
+                  {formatNextReminderDate(nextReminder.maintainDate)} lúc{" "}
+                  {getTimeRange(nextReminder.maintainDate).split("-")[0]}
+                </Text>
+                <Text style={styles.nextReminderText}>{nextReminder.title}</Text>
+                <Text style={styles.nextReminderDescription}>
+                  {nextReminder.description}
+                </Text>
+              </View>
+            </View>
+          )}
+
+          {/* Toggle Switch */}
+          <View style={styles.toggleContainer}>
+            <TouchableOpacity
+              style={[
+                styles.toggleButton,
+                filterType === "RecurringMaintenance" && styles.toggleButtonActive,
+              ]}
+              onPress={() => setFilterType("RecurringMaintenance")}
+            >
+              <Text
+                style={[
+                  styles.toggleText,
+                  filterType === "RecurringMaintenance" && styles.toggleTextActive,
+                ]}
+              >
+                Định Kỳ
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[
+                styles.toggleButton,
+                filterType === "Maintenance" && styles.toggleButtonActive,
+              ]}
+              onPress={() => setFilterType("Maintenance")}
+            >
+              <Text
+                style={[
+                  styles.toggleText,
+                  filterType === "Maintenance" && styles.toggleTextActive,
+                ]}
+              >
+                Bảo Trì
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[
+                styles.toggleButton,
+                filterType === "Pond" && styles.toggleButtonActive,
+              ]}
+              onPress={() => setFilterType("Pond")}
+            >
+              <Text
+                style={[
+                  styles.toggleText,
+                  filterType === "Pond" && styles.toggleTextActive,
+                ]}
+              >
+                Muối
+              </Text>
+            </TouchableOpacity>
+          </View>
+
+          <Calendar
+            current={new Date().toISOString().split("T")[0]}
+            markedDates={markedDates}
+            markingType={"multi-dot"}
+            theme={{
+              backgroundColor: "#FFFFFF",
+              calendarBackground: "#FFFFFF",
+              textSectionTitleColor: "#00695C",
+              dayTextColor: "#004D40",
+              textDisabledColor: "#B0BEC5",
+              monthTextColor: "#004D40",
+              textMonthFontSize: 24,
+              textMonthFontWeight: "700",
+              textDayHeaderFontSize: 14,
+              textDayHeaderFontWeight: "600",
+              arrowColor: "#26A69A",
+              todayTextColor: "#26A69A",
+              selectedDayBackgroundColor: "#26A69A",
+              selectedDayTextColor: "#FFFFFF",
+            }}
+            onDayPress={handleDayPress}
+            renderArrow={(direction) => (
+              <Text style={styles.arrow}>
+                {direction === "left" ? leftArrowIcon : rightArrowIcon}
+              </Text>
+            )}
+            style={styles.calendar}
+          />
+
+          {/* Legend */}
+          <View style={styles.legendContainer}>
+            <View style={styles.legendItem}>
+              <View style={[styles.legendDot, { backgroundColor: "#26A69A" }]} />
+              <Text style={styles.legendText}>Chưa Hoàn Thành</Text>
+            </View>
+            <View style={styles.legendItem}>
+              <View style={[styles.legendDot, { backgroundColor: "#4CAF50" }]} />
+              <Text style={styles.legendText}>Đã Hoàn Thành</Text>
+            </View>
+          </View>
+
+          {/* Floating Action Button */}
+          <TouchableOpacity
+            style={styles.fab}
+            onPress={() => navigation.navigate("ReminderScreen")}
+            accessibilityLabel="Add reminder"
+            accessibilityRole="button"
+          >
+            <Text style={styles.fabText}>{addIcon}</Text>
+          </TouchableOpacity>
+
+          {/* Modal for Event Details */}
+          <Modal
+            isVisible={isModalVisible}
+            onBackdropPress={() => setModalVisible(false)}
+            style={styles.modal}
+          >
+            <View style={styles.modalContent}>
+              <View style={styles.modalHeader}>
                 <TouchableOpacity
-                  key={index}
-                  style={[
-                    styles.modalEvent,
-                    {
-                      backgroundColor: event.reminder.title
-                        .toLowerCase()
-                        .includes("feeding")
-                        ? "#E6F4EA"
-                        : event.reminder.title
-                            .toLowerCase()
-                            .includes("maintenance")
-                        ? "#FFF3E0"
-                        : event.reminder.reminderType === "Pond"
-                        ? "#E0F7FA"
-                        : "#E0E0E0",
-                    },
-                  ]}
-                  onPress={() => {
-                    setModalVisible(false);
-                    navigation.navigate("ReminderDetail", {
-                      reminder: event.reminder,
-                    });
-                  }}
+                  onPress={() => setModalVisible(false)}
+                  accessibilityLabel="Close modal"
+                  accessibilityRole="button"
                 >
-                  <Text style={styles.modalEventTime}>
-                    {getTimeRange(event.reminder.maintainDate).split("-")[0]}
-                  </Text>
-                  <Text style={styles.modalEventText}>
-                    {event.reminder.title}
-                  </Text>
+                  <Text style={styles.modalHeaderIcon}>{leftArrowIcon}</Text>
                 </TouchableOpacity>
-              ))}
-            </ScrollView>
-          </View>
+                <Text style={styles.modalTitle}>XEM LỜI NHẮC</Text>
+              </View>
+              <View style={styles.modalBody}>
+                <Text style={styles.modalDate}>{selectedDate}</Text>
+                <ScrollView style={{ maxHeight: 300 }}>
+                  {selectedDateEvents.map((event, index) => (
+                    <TouchableOpacity
+                      key={index}
+                      style={[
+                        styles.modalEvent,
+                        {
+                          backgroundColor: event.reminder.title
+                            .toLowerCase()
+                            .includes("feeding")
+                            ? "#E6F4EA"
+                            : event.reminder.title
+                                .toLowerCase()
+                                .includes("maintenance")
+                            ? "#FFF3E0"
+                            : event.reminder.reminderType === "Pond"
+                            ? "#E0F2F1" // Light teal
+                            : "#E0E0E0",
+                        },
+                      ]}
+                      onPress={() => {
+                        setModalVisible(false);
+                        navigation.navigate("ReminderDetail", {
+                          reminder: event.reminder,
+                        });
+                      }}
+                    >
+                      <Text style={styles.modalEventTime}>
+                        {getTimeRange(event.reminder.maintainDate).split("-")[0]}
+                      </Text>
+                      <Text style={styles.modalEventText}>
+                        {event.reminder.title}
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
+                </ScrollView>
+              </View>
+            </View>
+          </Modal>
         </View>
-      </Modal>
+      </ImageBackground>
     </SafeAreaView>
   );
 };

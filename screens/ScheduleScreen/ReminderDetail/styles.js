@@ -1,112 +1,171 @@
 import { StyleSheet } from "react-native";
 
-// Styles (update your styles.js file)
 export const styles = StyleSheet.create({
-    container: {
-      flex: 1,
-      backgroundColor: "#FFF",
-      paddingHorizontal: 20,
-    },
-    header: {
-      flexDirection: "row",
-      alignItems: "center",
-      marginTop: 10,
-      marginBottom: 20,
-    },
-    headerIcon: {
-      fontSize: 24,
-      color: "#FF6B6B", // Red color for the back arrow
-      marginRight: 15,
-    },
-    headerDate: {
-      fontSize: 16,
-      fontWeight: "bold",
-      color: "#000",
-      marginRight: 10,
-    },
-    headerTitle: {
-      fontSize: 16,
-      fontWeight: "bold",
-      color: "#000",
-    },
-    titleContainer: {
-      marginBottom: 20,
-    },
-    title: {
-      fontSize: 24,
-      fontWeight: "bold",
-      color: "#000",
-      marginBottom: 5,
-    },
-    dateTime: {
-      fontSize: 16,
-      color: "#666",
-    },
-    detailsContainer: {
-      marginTop: 10,
-    },
-    detailRow: {
-      flexDirection: "row",
-      justifyContent: "space-between",
-      alignItems: "center",
-      paddingVertical: 15,
-      borderBottomWidth: 1,
-      borderBottomColor: "#E0E0E0",
-    },
-    description: {
-      alignItems: "flex-start", // Align items to the top for description
-      paddingVertical: 15,
-      borderBottomWidth: 1,
-      borderBottomColor: "#E0E0E0",
-    },
-    detailLabel: {
-      fontSize: 16,
-      fontWeight: "bold",
-      color: "#666",
-    },
-    detailValueContainer: {
-      flexDirection: "row",
-      alignItems: "center",
-    },
-    typeDot: {
-      width: 20,
-      height: 20,
-      borderRadius: 10,
-      marginRight: 10,
-    },
-    detailValue: {
-      fontSize: 16,
-      color: "#000",
-    },
-    dropdownIcon: {
-      fontSize: 16,
-      color: "#666",
-      marginLeft: 10,
-    },
-    dropdownContainer: {
-      backgroundColor: "#FFF",
-      borderWidth: 1,
-      borderColor: "#E0E0E0",
-      borderRadius: 5,
-      marginTop: 5,
-      position: "absolute",
-      right: 0,
-      bottom: 60, 
-      width: 120, 
-      zIndex: 1, 
-      elevation: 5,
-      shadowColor: "#000",
-      shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: 0.2,
-      shadowRadius: 2,
-    },
-    dropdownItem: {
-      padding: 10,
-      borderBottomWidth: 1,
-      borderBottomColor: "#E0E0E0",
-    },
-    dropdownItemText: {
-      fontSize: 16,
-      color: "#000",
-    },
-  });
+  safeArea: {
+    flex: 1,
+  },
+  background: {
+    flex: 1,
+  },
+  overlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: "rgba(255, 255, 255, 0.8)", // Match SymptomScreen
+  },
+  container: {
+    flex: 1,
+    paddingHorizontal: 20,
+  },
+  scrollContent: {
+    paddingTop: 20,
+    paddingBottom: 100, // Space for fixed button
+  },
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 20,
+  },
+  headerIcon: {
+    fontSize: 28,
+    color: "#26A69A", // Teal for consistency
+    marginRight: 15,
+  },
+  headerDate: {
+    fontSize: 16,
+    fontWeight: "700",
+    color: "#004D40", // Deep teal
+    marginRight: 10,
+  },
+  headerTitle: {
+    fontSize: 16,
+    fontWeight: "700",
+    color: "#004D40",
+  },
+  titleContainer: {
+    marginBottom: 20,
+  },
+  title: {
+    fontSize: 28,
+    fontWeight: "bold",
+    color: "#004D40",
+    marginBottom: 8,
+  },
+  dateTime: {
+    fontSize: 16,
+    fontWeight: "500",
+    color: "#00695C", // Lighter teal
+    lineHeight: 22,
+  },
+  detailsContainer: {
+    backgroundColor: "#FFFFFF",
+    borderRadius: 16,
+    padding: 20,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 5,
+    zIndex: 1, // Below button
+  },
+  detailRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingVertical: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: "#E0F2F1", // Light teal
+  },
+  description: {
+    paddingVertical: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: "#E0F2F1",
+  },
+  detailLabel: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#004D40",
+  },
+  detailValueContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  typeDot: {
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    marginRight: 10,
+  },
+  detailValue: {
+    fontSize: 16,
+    fontWeight: "500",
+    color: "#004D40",
+  },
+  dropdownIcon: {
+    fontSize: 16,
+    color: "#26A69A",
+    marginLeft: 10,
+  },
+  dropdownContainer: {
+    backgroundColor: "#E0F2F1", // Light teal
+    borderWidth: 2,
+    borderColor: "#26A69A",
+    borderRadius: 12,
+    marginTop: 5,
+    position: "absolute",
+    right: 0,
+    top: 40, // Position below the status text
+    width: 120,
+    zIndex: 1000, // Above other elements
+    elevation: 5,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 2,
+  },
+  dropdownItem: {
+    padding: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: "#E0F2F1",
+  },
+  dropdownItemText: {
+    fontSize: 16,
+    color: "#004D40",
+    fontWeight: "500",
+  },
+  gifContainer: {
+    alignItems: "center",
+    marginTop: 20,
+  },
+  gif: {
+    width: 250,
+    height: 150, // Rectangular, fits page
+    borderRadius: 12,
+    borderWidth: 2,
+    borderColor: "#26A69A",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  addSaltButton: {
+    position: "absolute",
+    bottom: 20,
+    right: 20,
+    backgroundColor: "#26A69A", // Teal
+    paddingVertical: 14,
+    paddingHorizontal: 32,
+    borderRadius: 50,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.3,
+    shadowRadius: 6,
+    elevation: 8,
+    zIndex: 100, // Above details
+  },
+  addSaltButtonText: {
+    color: "#FFFFFF",
+    fontSize: 18,
+    fontWeight: "600",
+    textAlign: "center",
+  },
+});
