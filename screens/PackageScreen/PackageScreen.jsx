@@ -79,7 +79,6 @@ const PackageScreen = ({ navigation }) => {
             // Updated days left logic
             const daysLeftMatch = res.message.match(/\((\d+\.\d+)\s+còn\s+lại\)/);
             const daysLeft = daysLeftMatch ? parseFloat(daysLeftMatch[1]) : "không xác định";
-  
             const originalPrice = pkg.packagePrice;
             const discountedPrice = parseFloat(res.discountedPrice);
             const discountPercentage = Math.round(

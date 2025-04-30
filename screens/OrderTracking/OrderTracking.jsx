@@ -76,7 +76,7 @@ const OrderTracking = ({ navigation }) => {
           } else if (
             response?.status === "picking" ||
             response?.status === "picked" ||
-            response?.status === "delivering"
+            ( orderDetail?.status === "Complete" && response?.status === "delivering")
           ) {
             setProgress(1);
           } else {
@@ -400,7 +400,7 @@ const OrderTracking = ({ navigation }) => {
                 <TouchableOpacity
                   style={[styles.actionButton, styles.confirmButton]}
                   onPress={() => {
-                    const payload = { orderId, status: "Complete" };
+                    const payload = { orderId, status: "Delivered" };
                     dispatch(updateOrderStatus(payload))
                       .unwrap()
                       .then(() => {
