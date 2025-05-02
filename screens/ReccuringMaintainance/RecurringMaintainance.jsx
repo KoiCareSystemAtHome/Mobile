@@ -83,12 +83,12 @@ const CalculateMaintainance = () => {
         .then((res) => {
           dispatch(getReminderByOwner(isLoggedIn?.id));
           if (Array.isArray(res) && res.length > 0) {
-            Alert.alert("Success", "Recurring Maintenance Saved");
+            Alert.alert("Thành công", "Lịch Định Kỳ Được Lưu Thành Công" );
           }
         })
         .catch((error) => {
           console.error("Error saving maintenance:", error);
-          Alert.alert("Error", "Failed to save maintenance");
+          Alert.alert("Thất Bại", "Lưu lịch không thành công");
         });
     }
   };

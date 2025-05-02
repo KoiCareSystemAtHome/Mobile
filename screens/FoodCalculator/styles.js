@@ -78,9 +78,10 @@ export const styles = StyleSheet.create({
   },
   infoText: {
     fontSize: 14,
-    color: "grey",
+    color: "#000",
     marginTop: 5,
     textAlign: "justify",
+    borderRadius: 10,
   },
   fishInfoContainer: {
     flexDirection: 'row',

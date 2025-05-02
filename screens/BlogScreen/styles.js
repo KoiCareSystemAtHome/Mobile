@@ -86,6 +86,7 @@ export const styles = StyleSheet.create({
     color: "#004D73", // Dark blue for koi theme
     flexShrink: 1,
     lineHeight: 24,
+    maxWidth: width - 110
   },
   shopName: {
     fontSize: 14,

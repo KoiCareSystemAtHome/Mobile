@@ -96,7 +96,7 @@ const SaltCalculator = ({ navigation }) => {
           dispatch(generateReminder({ pondId: homePond?.pondID, cycleHours }))
             .unwrap()
             .then(() => {
-              setReminderModalVisible(true); 
+              setReminderModalVisible(true);
             });
         });
     }
@@ -113,14 +113,14 @@ const SaltCalculator = ({ navigation }) => {
         console.log("Reminders saved successfully!", res);
         dispatch(getReminderByOwner(isLoggedIn?.id));
 
-        setReminderModalVisible(false); 
+        setReminderModalVisible(false);
       })
       .catch((error) => {
         console.error("Failed to save reminders:", error);
       });
   };
 
-  console.log(reminderData)
+  console.log(reminderData);
 
   return (
     <ImageBackground
@@ -137,10 +137,23 @@ const SaltCalculator = ({ navigation }) => {
             onPress={() => setHomePondOpen(!homePondOpen)}
             style={styles.selector}
           >
-            <Text style={styles.selectorText}>
-              {homePond ? homePond?.name : "Vui lòng chọn hồ"}
-            </Text>
-            <Icon name="down" size={16} color="#000" />
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                borderRadius: 10,
+                borderWidth: 1,
+                borderColor: "#000",
+                padding: 10,
+                backgroundColor: "#fff",
+                gap: 10,
+              }}
+            >
+              <Text style={styles.selectorText}>
+                {homePond ? homePond?.name : "Vui lòng chọn hồ"}
+              </Text>
+              <Icon name="down" size={16} color="#000" />
+            </View>
           </TouchableOpacity>
         </View>
         {homePondOpen && (
@@ -398,7 +411,9 @@ const SaltCalculator = ({ navigation }) => {
                   </Text>
                   <Text style={styles.reminderDate}>
                     Thời gian:{" "}
-                    {dayjs(reminder.maintainDate).utc().format("DD/MM/YYYY HH:mm")}
+                    {dayjs(reminder.maintainDate)
+                      .utc()
+                      .format("DD/MM/YYYY HH:mm")}
                   </Text>
                 </View>
               ))}

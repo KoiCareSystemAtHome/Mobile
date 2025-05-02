@@ -28,6 +28,7 @@ export const styles = StyleSheet.create({
   selectorContainer: {
     flexDirection: "row",
     justifyContent: "space-center",
+    width: "110%",
   },
   selector: {
     flexDirection: "row",

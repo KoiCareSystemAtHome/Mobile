@@ -105,10 +105,23 @@ const FoodCalculator = ({ navigation }) => {
             onPress={() => setHomePondOpen(!homePondOpen)}
             style={styles.selector}
           >
-            <Text style={styles.selectorText}>
-              {homePond ? homePond?.name : "Chọn Một Ao"}
-            </Text>
-            <Icon name="down" size={16} color="#000" />
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                borderRadius: 10,
+                borderWidth: 1,
+                borderColor: "#000",
+                padding: 10,
+                backgroundColor: "#fff",
+                gap: 10,
+              }}
+            >
+              <Text style={styles.selectorText}>
+                {homePond ? homePond?.name : "Chọn Một Ao"}
+              </Text>
+              <Icon name="down" size={16} color="#000" />
+            </View>
           </TouchableOpacity>
         </View>
 

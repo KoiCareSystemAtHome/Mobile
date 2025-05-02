@@ -108,8 +108,8 @@ const OrderTracking = ({ navigation }) => {
         payload = { orderId, status: "In Progress" };
       } else if (orderTrack?.status === "delivery_fail") {
         payload = { orderId, status: "Fail" };
-      } else if (orderTrack?.status === "delivering") {
-        payload = { orderId, status: "Delivered" };
+      } else if (orderTrack?.status === "delivering" && orderDetail?.status !== "Delivered") {
+        payload = { orderId, status: "In Progress" };
       } else if (orderTrack?.status === "delivered") {
         payload = { orderId, status: "Complete" };
       } else if (orderTrack?.status === "return") {

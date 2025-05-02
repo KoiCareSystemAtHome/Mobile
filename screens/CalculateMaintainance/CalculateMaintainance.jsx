@@ -36,7 +36,7 @@ const CalculateMaintainance = () => {
   const [homePond, setHomePond] = useState(null);
   const [homePondOpen, setHomePondOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [endDate, setEndDate] = useState(dayjs.utc().toDate()); // Initialize as UTC
+  const [endDate, setEndDate] = useState(dayjs.utc().toDate()); // Initialize to UTC
   const [isDatePickerVisible, setDatePickerVisible] = useState(false);
   const [isTimePickerVisible, setTimePickerVisible] = useState(false);
 
@@ -87,8 +87,7 @@ const CalculateMaintainance = () => {
       // Parse maintainDate as UTC
       const date = dayjs.utc(maintainanceData.maintainDate);
       if (date.isValid()) {
-        // Set endDate as a UTC Date object
-        setEndDate(date.toDate());
+        setEndDate(date.toDate()); // Keep as UTC
       } else {
         console.warn("Invalid maintainDate:", maintainanceData.maintainDate);
       }
@@ -119,7 +118,7 @@ const CalculateMaintainance = () => {
         })
         .catch((error) => {
           console.error("Error saving maintenance:", error);
-          Alert.alert("Error", "Failed to save maintenance");
+          Alert.alert("Thất Bại", "Lưu không thành công.");
         });
     }
   };
@@ -164,7 +163,8 @@ const CalculateMaintainance = () => {
     })),
   ];
 
-  console.log("endDate:", endDate.toString());
+  console.log("endDate (UTC):", dayjs.utc(endDate).format("YYYY-MM-DD HH:mm:ss"));
+  console.log("endDate (Local):", dayjs(endDate).local().format("YYYY-MM-DD HH:mm:ss"));
   console.log("maintainanceData:", maintainanceData);
 
   return (
@@ -227,9 +227,7 @@ const CalculateMaintainance = () => {
                   onPress={() => setDatePickerVisible(true)}
                 >
                   <Text style={styles.dateText}>
-                    {dayjs(endDate)
-                      .local()
-                      .format("DD MMMM YYYY")}
+                    {dayjs.utc(endDate).format("DD MMMM YYYY")}
                   </Text>
                   <Icon name="calendar" size={20} color="#000" />
                 </TouchableOpacity>
