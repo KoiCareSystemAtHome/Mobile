@@ -221,7 +221,7 @@ const AddFish = ({ navigation, route }) => {
                   </Form.Item>
                 </View>
                 <View style={styles.inputRow}>
-                  <Text style={styles.inputLabel}>Tuổi</Text>
+                  <Text style={styles.inputLabel}>Tuổi (ngày)</Text>
                   <Form.Item
                     noStyle
                     name="age"
@@ -232,7 +232,7 @@ const AddFish = ({ navigation, route }) => {
                   >
                     <Input
                       style={styles.input}
-                      placeholder="Tuổi"
+                      placeholder="Tuổi (ngày)"
                       keyboardType="numeric"
                       placeholderTextColor="#A0AEC0"
                     />

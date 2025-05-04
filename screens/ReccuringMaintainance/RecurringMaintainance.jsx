@@ -32,7 +32,11 @@ const CalculateMaintainance = () => {
   const [homePond, setHomePond] = useState(null);
   const [homePondOpen, setHomePondOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [endDate, setEndDate] = useState(new Date()); // Initialized to current local time
+  const [endDate, setEndDate] = useState(() => {
+    const minDate = new Date();
+    minDate.setMonth(minDate.getMonth() + 2); // Default to 2 months from now
+    return minDate;
+  });
   const [cycleDays, setCycleDays] = useState("30"); // Default to 30 days
   const [isDatePickerVisible, setDatePickerVisible] = useState(false);
   const [isTimePickerVisible, setTimePickerVisible] = useState(false);
@@ -41,6 +45,13 @@ const CalculateMaintainance = () => {
   const cycleOptions = ["30", "60", "90"];
 
   const isMounted = useRef(true);
+
+  // Calculate minDate (2 months from now)
+  const getMinDate = () => {
+    const minDate = new Date();
+    minDate.setMonth(minDate.getMonth() + 2); // Set to 2 months from now
+    return minDate;
+  };
 
   useEffect(() => {
     return () => {
@@ -83,12 +94,12 @@ const CalculateMaintainance = () => {
         .then((res) => {
           dispatch(getReminderByOwner(isLoggedIn?.id));
           if (Array.isArray(res) && res.length > 0) {
-            Alert.alert("Thành công", "Lịch Định Kỳ Được Lưu Thành Công" );
+            Alert.alert("Thành công", "Lịch Định Kỳ Được Lưu Thành Công");
           }
         })
         .catch((error) => {
           console.error("Error saving maintenance:", error);
-          Alert.alert("Thất Bại", "Lưu lịch không thành công");
+          Alert.alert("Thất Bại", "Lưu lịch không thành công");
         });
     }
   };
@@ -172,7 +183,7 @@ const CalculateMaintainance = () => {
             <DatePicker
               value={endDate}
               mode="date"
-              minDate={new Date()}
+              minDate={getMinDate()} // At least 2 months from now
               format="DD MMMM YYYY"
               onChange={handleDatePickerChange}
               visible={isDatePickerVisible}
@@ -250,7 +261,7 @@ const CalculateMaintainance = () => {
         </ScrollView>
 
         <TouchableOpacity
-          style={[styles.saveButton, !homePond && {backgroundColor:"#ccc"}]}
+          style={[styles.saveButton, !homePond && { backgroundColor: "#ccc" }]}
           onPress={handleSave}
           disabled={!homePond}
         >

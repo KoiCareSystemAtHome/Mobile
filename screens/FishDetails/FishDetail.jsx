@@ -419,7 +419,7 @@ const FishDetail = ({ route, navigation }) => {
               <View style={[styles.infoRow, { zIndex: 1 }]}>
                 <View style={styles.infoBlock}>
                   <Text style={styles.infoLabel}>Tuổi</Text>
-                  <Text style={styles.infoValue}>{fish.age} năm</Text>
+                  <Text style={styles.infoValue}>{fish.age} ngày</Text>
                 </View>
                 <View style={styles.infoBlock}>
                   <Text style={styles.infoLabel}>Chiều dài</Text>

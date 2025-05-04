@@ -182,9 +182,9 @@ const EditFish = ({ route, navigation }) => {
                   </Form.Item>
                 </View>
                 <View style={styles.inputRow}>
-                  <Text style={styles.inputLabel}>Tuổi:</Text>
+                  <Text style={styles.inputLabel}>Tuổi (ngày):</Text>
                   <Form.Item name="age" style={styles.input}>
-                    <Input placeholder="Tuổi" />
+                    <Input placeholder="Tuổi (ngày)" />
                   </Form.Item>
                 </View>
               </View>

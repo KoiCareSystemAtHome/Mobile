@@ -130,7 +130,7 @@ const FishStatistic = ({ navigation }) => {
               <View style={styles.infoRow}>
                 <Text style={styles.fishDetail}>
                   <Text style={styles.label}>Tuổi: </Text>
-                  {item.age} năm
+                  {item.age} ngày
                 </Text>
                 <Text style={styles.fishDetail}>
                   <Text style={styles.label}>Dài: </Text>
