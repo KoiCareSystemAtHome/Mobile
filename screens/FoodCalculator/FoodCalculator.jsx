@@ -6,7 +6,6 @@ import {
   ImageBackground,
   TouchableOpacity,
 } from "react-native";
-import { Button } from "react-native-elements";
 import { styles } from "./styles";
 import Icon from "react-native-vector-icons/AntDesign";
 import { useDispatch, useSelector } from "react-redux";
@@ -95,50 +94,47 @@ const FoodCalculator = ({ navigation }) => {
     >
       <View style={styles.overlay} />
       <ScrollView
-        contentContainerStyle={[styles.container, { paddingBottom: 100 }]}
-        showsVerticalScrollIndicator={true}
+        contentContainerStyle={styles.container}
+        showsVerticalScrollIndicator={false}
       >
         <Text style={styles.title}>Tính Lượng Thức Ăn</Text>
 
-        <View style={{ justifyContent: "center", flexDirection: "row" }}>
+        <View style={styles.selectorWrapper}>
           <TouchableOpacity
             onPress={() => setHomePondOpen(!homePondOpen)}
             style={styles.selector}
+            accessibilityLabel="Select a pond"
+            accessibilityRole="button"
           >
-            <View
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                borderRadius: 10,
-                borderWidth: 1,
-                borderColor: "#000",
-                padding: 10,
-                backgroundColor: "#fff",
-                gap: 10,
-              }}
-            >
+            <View style={styles.selectorInner}>
               <Text style={styles.selectorText}>
                 {homePond ? homePond?.name : "Chọn Một Ao"}
               </Text>
-              <Icon name="down" size={16} color="#000" />
+              <Icon
+                name={homePondOpen ? "up" : "down"}
+                size={16}
+                color="#004D40"
+              />
             </View>
           </TouchableOpacity>
-        </View>
-
-        <View style={{ justifyContent: "center", flexDirection: "row" }}>
           {homePondOpen && (
             <View style={styles.dropdown}>
-              {pondData?.map((item) => (
-                <TouchableOpacity
-                  key={item?.pondID}
-                  onPress={() => {
-                    setHomePond(item);
-                    setHomePondOpen(false);
-                  }}
-                >
-                  <Text style={styles.dropdownItem}>{item?.name}</Text>
-                </TouchableOpacity>
-              ))}
+              {pondData?.length > 0 ? (
+                pondData.map((item) => (
+                  <TouchableOpacity
+                    key={item?.pondID}
+                    onPress={() => {
+                      setHomePond(item);
+                      setHomePondOpen(false);
+                    }}
+                    style={styles.dropdownItem}
+                  >
+                    <Text style={styles.dropdownItemText}>{item?.name}</Text>
+                  </TouchableOpacity>
+                ))
+              ) : (
+                <Text style={styles.dropdownItemText}>Không có ao nào</Text>
+              )}
             </View>
           )}
         </View>
@@ -153,6 +149,8 @@ const FoodCalculator = ({ navigation }) => {
                 growth === option.value && styles.activeToggle,
               ]}
               onPress={() => setGrowth(option.value)}
+              accessibilityLabel={`Select ${option.label} growth`}
+              accessibilityRole="button"
             >
               <Text
                 style={[
@@ -176,6 +174,8 @@ const FoodCalculator = ({ navigation }) => {
                 temperature.label === option.label && styles.activeToggle,
               ]}
               onPress={() => setTemperature(option)}
+              accessibilityLabel={`Select ${option.label} temperature`}
+              accessibilityRole="button"
             >
               <Text
                 style={[
@@ -191,81 +191,63 @@ const FoodCalculator = ({ navigation }) => {
 
         {food?.numberOfFish != null && food?.totalFishWeight != null && (
           <View style={styles.fishInfoContainer}>
-            <Text style={styles.fishInfoItem}>
-              Tổng cá:{" "}
-              <Text style={styles.fishInfoItemBold}>
-                {food.numberOfFish} 🐟
+            <Text style={styles.fishInfoTitle}>Thông Tin Hồ</Text>
+            <View style={styles.fishInfoRow}>
+              <Text style={styles.fishInfoItem}>
+                Tổng cá: <Text style={styles.fishInfoItemBold}>{food.numberOfFish} 🐟</Text>
               </Text>
-            </Text>
-            <Text style={styles.fishInfoItem}>
-              Tổng trọng lượng:{" "}
-              <Text style={styles.fishInfoItemBold}>
-                {food.totalFishWeight} (kg)
+              <Text style={styles.fishInfoItem}>
+                Tổng trọng lượng: <Text style={styles.fishInfoItemBold}>{food.totalFishWeight} kg</Text>
               </Text>
-            </Text>
+            </View>
           </View>
         )}
 
-        {food?.feedingOften && (
-          <Text style={styles.fishInfoItem}>
-            🔁 Tần suất gợi ý:{" "}
-            <Text style={styles.fishInfoItemBold}>{food.feedingOften}</Text>
-          </Text>
-        )}
-        {food?.addtionalInstruction && (
-          <Text style={styles.fishInfoItem}>
-            ⚠️Bị ảnh hưởng bởi:{"\n"}
-            <Text style={styles.fishInfoItemBold}>
-              {food.addtionalInstruction}
-            </Text>
-          </Text>
+        {(food?.feedingOften || food?.addtionalInstruction) && (
+          <View style={styles.fishInfoContainer}>
+            <Text style={styles.fishInfoTitle}>Thông Tin Thức Ăn</Text>
+            {food?.feedingOften && (
+              <Text style={styles.fishInfoItem}>
+                🔁 Tần suất gợi ý: <Text style={styles.fishInfoItemBold}>{food.feedingOften}</Text>
+              </Text>
+            )}
+            {food?.addtionalInstruction && (
+              <Text style={styles.fishInfoItem}>
+                ⚠️ Bị ảnh hưởng bởi: <Text style={styles.fishInfoItemBold}>{food.addtionalInstruction}</Text>
+              </Text>
+            )}
+          </View>
         )}
 
         <Text style={styles.infoText}>
-          Lượng thức ăn được khuyến nghị nên được chia đều thành 3 - 5 lần cho
-          ăn mỗi ngày. Bằng cách này, cá koi sẽ tiêu hóa thức ăn tốt hơn
+          Lượng thức ăn được khuyến nghị nên được chia đều thành 3 - 5 lần cho ăn mỗi ngày. Bằng cách này, cá koi sẽ tiêu hóa thức ăn tốt hơn.
         </Text>
 
-        <View style={styles.recommendationButton}>
+        <View style={styles.recommendationContainer}>
           <Text style={styles.recommendationText}>
-            {homePond
-              ? `Lượng Đề Xuất: ${food?.foodAmount}kg`
-              : "Vui Lòng Chọn Một Ao"}
+            {homePond ? `Lượng Đề Xuất: ${food?.foodAmount || "0"} kg` : "Vui Lòng Chọn Một Ao"}
           </Text>
         </View>
+
         {homePond && (
           <TouchableOpacity
             style={styles.suggestButton}
-            onPress={() =>
-              navigation.navigate("SuggestFood", { pondId: homePond?.pondID })
-            }
+            onPress={() => navigation.navigate("SuggestFood", { pondId: homePond?.pondID })}
+            accessibilityLabel="Suggest new food"
+            accessibilityRole="button"
           >
-            <Text style={styles.recommendationText}>Mới</Text>
+            <Text style={styles.suggestButtonText}>Mới</Text>
           </TouchableOpacity>
         )}
       </ScrollView>
 
       <TouchableOpacity
-        style={{
-          position: "absolute",
-          bottom: 20,
-          right: 20,
-          backgroundColor: "#007AFF",
-          paddingVertical: 10,
-          paddingHorizontal: 20,
-          borderRadius: 25,
-        }}
+        style={styles.nextButton}
         onPress={() => navigation.navigate("SymptomScreen")}
+        accessibilityLabel="Proceed to symptom screen"
+        accessibilityRole="button"
       >
-        <Text
-          style={{
-            color: "#FFFFFF",
-            fontSize: 16,
-            fontWeight: "bold",
-          }}
-        >
-          Tiếp Theo
-        </Text>
+        <Text style={styles.nextButtonText}>Tiếp Theo</Text>
       </TouchableOpacity>
     </ImageBackground>
   );

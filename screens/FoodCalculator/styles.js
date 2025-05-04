@@ -6,57 +6,85 @@ export const styles = StyleSheet.create({
   },
   overlay: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: "rgba(255, 255, 255, 0.5)",
+    backgroundColor: "rgba(255, 255, 255, 0.5)", 
   },
   container: {
-    flex: 1,
     paddingHorizontal: 20,
-    paddingTop: 60,
+    paddingTop: 50,
+    paddingBottom: 100, // Space for fixed button
   },
   title: {
-    fontSize: 24,
+    fontSize: 32,
     fontWeight: "bold",
-    color: "#333",
+    color: "#004D40", // Deep teal
     textAlign: "center",
     marginVertical: 20,
-  },
-  selector: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    backgroundColor: "transparent",
-    padding: 10,
-    borderRadius: 10,
-    width: "50%",
-  },
-  selectorText: {
-    fontSize: 16,
-    color: "#000",
-  },
-  dropdown: {
-    backgroundColor: "#fff",
-    borderRadius: 10,
-    marginTop: 5,
-    padding: 10,
-    width: "50%",
-  },
-  dropdownItem: {
-    fontSize: 16,
-    paddingVertical: 5,
+    letterSpacing: 1,
   },
   subtitle: {
     fontSize: 18,
-    fontWeight: "bold",
-    color: "#fff",
+    fontWeight: "600",
+    color: "#004D40",
     marginTop: 20,
     marginBottom: 10,
+  },
+  selectorWrapper: {
+    zIndex: 2000, // Above all elements
+    alignItems: "center",
+    marginBottom: 20,
+  },
+  selector: {
+    width: "80%",
+    backgroundColor: "#E0F2F1", // Light teal
+    borderRadius: 12,
+    borderWidth: 2,
+    borderColor: "#26A69A", // Teal
+    paddingVertical: 2,
+    paddingHorizontal: 15,
+  },
+  selectorInner: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  selectorText: {
+    fontSize: 16,
+    fontWeight: "500",
+    color: "#004D40",
+  },
+  dropdown: {
+    backgroundColor: "#E0F2F1",
+    borderRadius: 12,
+    borderWidth: 2,
+    borderColor: "#26A69A",
+    marginTop: 5,
+    width: "80%",
+    maxHeight: 1000, // Enable scrolling
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 3,
+    zIndex: 2000,
+  },
+  dropdownItem: {
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: "#E0F2F1",
+  },
+  dropdownItemText: {
+    fontSize: 16,
+    fontWeight: "500",
+    color: "#004D40",
   },
   toggleContainer: {
     flexDirection: "row",
     justifyContent: "space-around",
-    backgroundColor: "rgba(255, 255, 255, 0.3)",
-    borderRadius: 10,
-    padding: 10,
+    backgroundColor: "#E0F2F1",
+    borderRadius: 12,
+    padding: 8,
+    marginBottom: 10,
   },
   toggleButton: {
     flex: 1,
@@ -66,72 +94,116 @@ export const styles = StyleSheet.create({
     alignItems: "center",
   },
   activeToggle: {
-    backgroundColor: "#FFA500", // Orange for active
+    backgroundColor: "#26A69A", // Teal
   },
   toggleText: {
     fontSize: 12,
-    color: "#grey",
+    fontWeight: "600",
+    color: "#004D40",
   },
   activeText: {
-    fontWeight: "bold",
-    color: "#000",
+    color: "#FFFFFF",
+    fontWeight: "700",
+  },
+  fishInfoContainer: {
+    backgroundColor: "#FFFFFF",
+    borderRadius: 16,
+    padding: 20,
+    marginVertical: 10,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 5,
+    zIndex: 1,
+  },
+  fishInfoTitle: {
+    fontSize: 18,
+    fontWeight: "600",
+    color: "#004D40",
+    marginBottom: 12,
+  },
+  fishInfoRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
+  fishInfoItem: {
+    fontSize: 16,
+    fontWeight: "500",
+    color: "#37474F", // Darker gray
+    marginBottom: 8,
+  },
+  fishInfoItemBold: {
+    fontWeight: "700",
+    color: "#004D40",
   },
   infoText: {
     fontSize: 14,
-    color: "#000",
-    marginTop: 5,
+    fontWeight: "500",
+    color: "#37474F",
     textAlign: "justify",
-    borderRadius: 10,
+    marginVertical: 15,
+    lineHeight: 20,
   },
-  fishInfoContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginTop: 10,
+  recommendationContainer: {
+    backgroundColor: "#FFFFFF",
+    borderRadius: 16,
+    padding: 20,
+    marginVertical: 10,
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 5,
+    zIndex: 1,
   },
-  
-  fishInfoItem: {
-    fontSize: 14,
-    color: 'black',
-    textAlign: 'justify',
-    paddingBottom:3
+  recommendationText: {
+    fontSize: 18,
+    fontWeight: "600",
+    color: "#004D40",
   },
-  fishInfoItemBold: {
-    fontWeight: 'bold',
-  },
-  recommendationButton: {
-    marginBottom: 20,
-    backgroundColor: "#222",
-    borderRadius: 10,
-    paddingVertical: 15,
-    paddingHorizontal: 0,
-    width: "70%",
+  suggestButton: {
+    position: "absolute",
+    top: 20,
+    right: 20,
+    backgroundColor: "#26A69A", // Teal
+    width: 50,
+    height: 50,
+    borderRadius: 25,
     alignItems: "center",
     justifyContent: "center",
     shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-    elevation: 5, // For Android shadow
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.3,
+    shadowRadius: 6,
+    elevation: 8,
+    zIndex: 100,
   },
-  suggestButton: {
-    backgroundColor: "#FF0000", // Red background
-    borderRadius: 25, // Circular shape
-    width: 50, // Fixed width
-    height: 50, // Fixed height for a circle
-    position: 'absolute',
-    top: 20,
+  suggestButtonText: {
+    fontSize: 18,
+    fontWeight: "600",
+    color: "#FFFFFF",
+  },
+  nextButton: {
+    position: "absolute",
+    bottom: 20,
     right: 20,
-    alignItems: 'center', // Center text horizontally
-    justifyContent: 'center', // Center text vertically
+    backgroundColor: "#26A69A", // Teal
+    paddingVertical: 14,
+    paddingHorizontal: 32,
+    borderRadius: 50,
     shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-    elevation: 5, // For Android shadow
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.3,
+    shadowRadius: 6,
+    elevation: 8,
+    zIndex: 100,
   },
-  recommendationText: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "bold",
+  nextButtonText: {
+    color: "#FFFFFF",
+    fontSize: 18,
+    fontWeight: "600",
+    textAlign: "center",
   },
 });

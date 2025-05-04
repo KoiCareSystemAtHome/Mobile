@@ -12,7 +12,7 @@ import {
   ScrollView,
   TouchableOpacity,
   View,
-  RefreshControl, // Add this import
+  RefreshControl,
 } from "react-native";
 import { styles } from "./styles";
 import { useDispatch, useSelector } from "react-redux";
@@ -28,11 +28,9 @@ import {
   updatePond,
 } from "../../redux/slices/pondSlice";
 import Icon from "react-native-vector-icons/AntDesign";
-import { color } from "react-native-elements/dist/helpers";
 
 const WaterParameter = () => {
   const dispatch = useDispatch();
-
   const pondData = useSelector(pondByOwnerSelector);
   const requiredParams = useSelector(requiredParamsSelector);
   const [homePond, setHomePond] = useState(null);
@@ -41,14 +39,12 @@ const WaterParameter = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isModalVisible, setModalVisible] = useState(false);
   const [warnings, setWarnings] = useState({});
-  const [refreshing, setRefreshing] = useState(false); // Add state for refreshing
+  const [refreshing, setRefreshing] = useState(false);
 
   const [form] = Form.useForm();
 
-  // Function to handle pull-to-refresh
   const onRefresh = () => {
     setRefreshing(true);
-    // Fetch updated data
     Promise.all([
       dispatch(getRequiredParams()),
       isLoggedIn?.id && dispatch(getPondByOwner(isLoggedIn.id)),
@@ -59,7 +55,7 @@ const WaterParameter = () => {
             setSelectedPond(response);
           }),
     ]).finally(() => {
-      setRefreshing(false); // Stop refreshing after data is fetched
+      setRefreshing(false);
     });
   };
 
@@ -71,20 +67,20 @@ const WaterParameter = () => {
     const value = parseFloat(text);
     let message = "";
     let type = "";
-    const dangerLower = param.dangerLower ?? 0;
-    const dangerUpper = param.dangerUpper ?? 100;
-    const warningLower = param.warningLower ?? dangerLower;
+    const dangerLower = param.dangerLower ?? -Infinity;
+    const dangerUpper = param.dangerUpper ?? Infinity;
+    const warningLowwer = param.warningLowwer ?? dangerLower;
     const warningUpper = param.warningUpper ?? dangerUpper;
 
     if (!isNaN(value)) {
       if (value < dangerLower || value > dangerUpper) {
-        message = `Nguy hiểm! (${value}) vượt ngoài ${dangerLower} - ${dangerUpper}`;
+        message = `Nguy hiểm! (${value}) vượt ngoài ${dangerLower === -Infinity ? '0' : dangerLower} - ${dangerUpper === Infinity ? '100' : dangerUpper}`;
         type = "danger";
       } else if (
-        (value >= dangerLower && value < warningLower) ||
+        (value >= dangerLower && value < warningLowwer) ||
         (value > warningUpper && value <= dangerUpper)
       ) {
-        message = `Cảnh báo! (${value}) ngoài vùng ${warningLower} - ${warningUpper}`;
+        message = `Cảnh báo! (${value}) ngoài vùng ${warningLowwer === -Infinity ? '0' : warningLowwer} - ${warningUpper === Infinity ? '100' : warningUpper}`;
         type = "warning";
       }
     }
@@ -102,7 +98,6 @@ const WaterParameter = () => {
     const createDate = selectedPond?.createDate;
     const ownerId = selectedPond?.ownerId;
 
-    // Only include parameters with valid, non-empty values
     const requirementPondParam = requiredParams
       .filter((param) => {
         const value = values[param.parameterId];
@@ -110,13 +105,12 @@ const WaterParameter = () => {
       })
       .map((param) => ({
         historyId: param.parameterId,
-        value: parseFloat(values[param.parameterId]), // Convert to number
+        value: parseFloat(values[param.parameterId]),
       }));
 
-    // Only dispatch if there are valid parameters to update
     if (requirementPondParam.length === 0) {
       setModalVisible(false);
-      return; // Exit early if no valid parameters
+      return;
     }
 
     const updatedPond = {
@@ -141,6 +135,7 @@ const WaterParameter = () => {
       });
     setModalVisible(false);
   };
+console.log(requiredParams)
 
   const renderPondCards = (parameters) => {
     if (!parameters || parameters.length === 0) return null;
@@ -190,9 +185,9 @@ const WaterParameter = () => {
             {rows.map((row, rowIndex) => (
               <View key={rowIndex} style={styles.parameterRow}>
                 {row.map((param, paramIndex) => (
-                  <Text key={paramIndex} style={styles.greenText}>
+                  <Text key={paramIndex} style={styles.parameterText}>
                     {param.parameterName}:{" "}
-                    <Text style={styles.boldText}>
+                    <Text style={styles.parameterValue}>
                       {param.value.toFixed(2)} {param.unitName}
                     </Text>
                   </Text>
@@ -201,7 +196,7 @@ const WaterParameter = () => {
             ))}
           </ScrollView>
           <Text style={styles.infoText}>
-            Nhiệt độ ngoài trời: cần được giám sát thường xuyêns
+            Nhiệt độ ngoài trời: cần được giám sát thường xuyên
           </Text>
         </View>
       );
@@ -246,54 +241,65 @@ const WaterParameter = () => {
         <ScrollView
           contentContainerStyle={styles.container}
           refreshControl={
-            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={onRefresh}
+              tintColor="#26A69A"
+            />
           }
         >
           <Text style={styles.title}>Thông số nước</Text>
-          <View style={{ justifyContent: "center", flexDirection: "row" }}>
+          <View style={styles.selectorContainer}>
             <TouchableOpacity
               onPress={() => setHomePondOpen(!homePondOpen)}
               style={styles.selector}
+              accessibilityLabel="Select a pond"
+              accessibilityRole="button"
             >
-              <View
-                style={{
-                  flexDirection: "row",
-                  alignItems: "center",
-                  borderRadius: 10,
-                  borderWidth: 1,
-                  borderColor: "#000",
-                  padding: 10,
-                  backgroundColor: "#fff",
-                  gap:10
-                }}
-              >
+              <View style={styles.selectorInner}>
                 <Text style={styles.selectorText}>
-                  {homePond ? homePond?.name : "Select a Pond"}
+                  {homePond ? homePond?.name : "Chọn hồ"}
                 </Text>
-                <Icon name="down" size={16} color="#000" />
+                <Icon
+                  name={homePondOpen ? "up" : "down"}
+                  size={16}
+                  color="#004D40"
+                />
               </View>
             </TouchableOpacity>
-          </View>
-          <View style={{ justifyContent: "center", flexDirection: "row" }}>
             {homePondOpen && (
               <View style={styles.dropdown}>
-                {pondData.map((item) => (
-                  <TouchableOpacity
-                    key={item?.pondID}
-                    onPress={() => {
-                      setHomePond(item);
-                      setHomePondOpen(false);
-                    }}
-                  >
-                    <Text style={styles.dropdownItem}>{item?.name}</Text>
-                  </TouchableOpacity>
-                ))}
+                {pondData.length === 0 ? (
+                  <Text style={styles.dropdownEmpty}>Không có hồ nào</Text>
+                ) : (
+                  pondData.map((item) => (
+                    <TouchableOpacity
+                      key={item?.pondID}
+                      onPress={() => {
+                        setHomePond(item);
+                        setHomePondOpen(false);
+                      }}
+                      style={styles.dropdownItem}
+                      accessibilityLabel={`Select pond ${item?.name}`}
+                      accessibilityRole="button"
+                    >
+                      <Text style={styles.dropdownItemText}>{item?.name}</Text>
+                    </TouchableOpacity>
+                  ))
+                )}
               </View>
             )}
           </View>
-
           {homePond && renderPondCards(selectedPond?.pondParameters)}
         </ScrollView>
+        <TouchableOpacity
+          style={styles.addParamsFab}
+          onPress={handleChangeParameters}
+          accessibilityLabel="Add water parameters"
+          accessibilityRole="button"
+        >
+          <Icon name="plus" size={28} color="#FFFFFF" />
+        </TouchableOpacity>
         <Modal
           visible={isModalVisible}
           transparent={true}
@@ -316,17 +322,17 @@ const WaterParameter = () => {
                       </Text>
                       <Text style={{ flexDirection: "row", flexWrap: "wrap" }}>
                         <Text style={styles.dangerText}>
-                          ← {param.dangerLower ?? 0}
+                          ← {param.dangerLower ?? '0'}
                         </Text>
                         <Text style={styles.warningText}>
-                          --{param.warningLower ?? param.dangerLower ?? 0}
+                          --{param.warningLowwer ?? param.dangerLower ?? '0'}
                         </Text>
                         <Text style={styles.greenText}>-- an toàn --</Text>
                         <Text style={styles.warningText}>
-                          {param.warningUpper ?? param.dangerUpper ?? 100}--
+                          {param.warningUpper ?? param.dangerUpper ?? '100'}--
                         </Text>
                         <Text style={styles.dangerText}>
-                          {param.dangerUpper ?? 100}→
+                          {param.dangerUpper ?? '100'}→
                         </Text>
                       </Text>
                       <Form.Item name={param.parameterId}>
@@ -362,12 +368,6 @@ const WaterParameter = () => {
             </View>
           </ScrollView>
         </Modal>
-        <TouchableOpacity
-          style={styles.changeButton}
-          onPress={handleChangeParameters}
-        >
-          <Text style={styles.changeButtonText}>Thêm thông số nước</Text>
-        </TouchableOpacity>
       </ImageBackground>
     </Provider>
   );

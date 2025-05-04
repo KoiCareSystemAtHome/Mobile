@@ -156,7 +156,7 @@ const CartScreen = ({ navigation }) => {
       shipFee: 10,
       shipType: "string",
       status: "Pending",
-      note: "string",
+      note: "Không có ghi chú",
       paymentMethod: paymentMethod,
     };
 

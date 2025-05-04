@@ -26,7 +26,7 @@ import {
   saveReminder,
 } from "../../redux/slices/calculatorSlice";
 import { Button } from "react-native-paper";
-import Icon1 from "react-native-vector-icons/MaterialIcons"; // Add MaterialIcons for better icons
+import Icon1 from "react-native-vector-icons/MaterialIcons";
 import { getReminderByOwner } from "../../redux/slices/reminderSlice";
 import dayjs from "dayjs";
 
@@ -112,7 +112,6 @@ const SaltCalculator = ({ navigation }) => {
       .then((res) => {
         console.log("Reminders saved successfully!", res);
         dispatch(getReminderByOwner(isLoggedIn?.id));
-
         setReminderModalVisible(false);
       })
       .catch((error) => {
@@ -129,60 +128,63 @@ const SaltCalculator = ({ navigation }) => {
       resizeMode="cover"
     >
       <View style={styles.overlay} />
-      <ScrollView contentContainerStyle={styles.scrollContainer}>
+      <ScrollView
+        contentContainerStyle={styles.scrollContainer}
+        showsVerticalScrollIndicator={false}
+      >
         <Text style={styles.title}>Ước Tính Lượng Muối</Text>
 
-        <View style={styles.selectorContainer}>
+        <View style={styles.selectorWrapper}>
           <TouchableOpacity
             onPress={() => setHomePondOpen(!homePondOpen)}
             style={styles.selector}
+            accessibilityLabel="Select a pond"
+            accessibilityRole="button"
           >
-            <View
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                borderRadius: 10,
-                borderWidth: 1,
-                borderColor: "#000",
-                padding: 10,
-                backgroundColor: "#fff",
-                gap: 10,
-              }}
-            >
+            <View style={styles.selectorInner}>
               <Text style={styles.selectorText}>
-                {homePond ? homePond?.name : "Vui lòng chọn hồ"}
+                {homePond ? homePond?.name : "Vui Lòng Chọn Hồ"}
               </Text>
-              <Icon name="down" size={16} color="#000" />
+              <Icon
+                name={homePondOpen ? "up" : "down"}
+                size={16}
+                color="#004D40"
+              />
             </View>
           </TouchableOpacity>
+          {homePondOpen && (
+            <View style={styles.dropdown}>
+              {pondData?.length > 0 ? (
+                pondData.map((item) => (
+                  <TouchableOpacity
+                    key={item?.pondID}
+                    onPress={() => {
+                      setHomePond(item);
+                      setHomePondOpen(false);
+                    }}
+                    style={styles.dropdownItemContainer}
+                  >
+                    <Text style={styles.dropdownItemText}>{item?.name}</Text>
+                  </TouchableOpacity>
+                ))
+              ) : (
+                <Text style={styles.dropdownItemText}>Không có hồ nào</Text>
+              )}
+            </View>
+          )}
         </View>
-        {homePondOpen && (
-          <View style={styles.dropdown}>
-            {pondData.map((item) => (
-              <TouchableOpacity
-                key={item?.pondID}
-                onPress={() => {
-                  setHomePond(item);
-                  setHomePondOpen(false);
-                }}
-                style={styles.dropdownItemContainer}
-              >
-                <Text style={styles.dropdownItem}>{item?.name}</Text>
-              </TouchableOpacity>
-            ))}
-          </View>
-        )}
+
         {homePond ? (
           <>
             <View style={styles.card}>
               <Text style={styles.label}>
-                Thể tích hồ: <Text style={styles.value}>{pondVolume}L</Text>
+                Thể Tích Hồ: <Text style={styles.value}>{pondVolume} L</Text>
               </Text>
             </View>
 
             {/* Desired Concentration */}
             <View style={styles.card}>
-              <Text style={styles.label}>Nồng độ mong muốn:</Text>
+              <Text style={styles.label}>Nồng Độ Mong Muốn:</Text>
               <View style={styles.toggleContainer}>
                 {growthOptions.map((option) => (
                   <TouchableOpacity
@@ -192,6 +194,8 @@ const SaltCalculator = ({ navigation }) => {
                       growth === option && styles.activeToggle,
                     ]}
                     onPress={() => setGrowth(option)}
+                    accessibilityLabel={`Select ${growthLabels[option]} concentration`}
+                    accessibilityRole="button"
                   >
                     <Text
                       style={[
@@ -199,7 +203,7 @@ const SaltCalculator = ({ navigation }) => {
                         growth === option && styles.activeText,
                       ]}
                     >
-                      {growthLabels[option]} {/* Display Vietnamese label */}
+                      {growthLabels[option]}
                     </Text>
                   </TouchableOpacity>
                 ))}
@@ -208,7 +212,7 @@ const SaltCalculator = ({ navigation }) => {
 
             <View style={styles.card}>
               <Text style={styles.label}>
-                Lượng nước trong hồ:{" "}
+                Lượng Nước Trong Hồ:{" "}
                 <Text style={styles.value}>
                   {previewValue} L (
                   {((previewValue / pondVolume) * 100).toFixed(0)}%)
@@ -222,151 +226,72 @@ const SaltCalculator = ({ navigation }) => {
                 value={waterChange}
                 onValueChange={(value) => setPreviewValue(value)}
                 onSlidingComplete={(value) => setWaterChange(value)}
-                minimumTrackTintColor="#007AFF"
-                maximumTrackTintColor="#ccc"
-                thumbTintColor="#007AFF"
+                minimumTrackTintColor="#26A69A"
+                maximumTrackTintColor="#B0BEC5"
+                thumbTintColor="#26A69A"
               />
             </View>
-
-            {/* <View style={styles.saltBox}>
-              <Text style={styles.saltText}>
-                Lượng muối hiện tại: {saltData?.currentSalt || 0} Kg
-              </Text>
-              <Text style={styles.saltText}>
-                Lượng muối cần thiết: {saltData?.saltNeeded || 0} Kg
-              </Text>
-              <Text style={styles.saltText}>
-                Lượng muối tối ưu: {saltData?.totalSalt || 0} Kg
-              </Text>
-              <Text style={styles.saltText}>
-                Lượng nước phải thay: {saltData?.waterNeeded || 0} L
-              </Text>
-              <Text style={styles.saltText}>
-                Lượng muối dư thừa: {saltData?.excessSalt || 0} Kg
-              </Text>
-              <Text style={styles.saltText}>
-                Lượng muối tối ưu từ: {saltData?.optimalSaltFrom || 0} Kg đến{" "}
-                {saltData?.optimalSaltTo || 0} Kg
-              </Text>
-            </View> */}
 
             <View style={styles.saltBox}>
               <Text style={styles.sectionTitle}>Thông Tin Lượng Muối</Text>
               <View style={styles.saltItemContainer}>
-                <Icon1
-                  name="water-drop"
-                  size={20}
-                  color="#007AFF"
-                  style={styles.saltIcon}
-                />
+                <Icon1 name="water-drop" size={20} color="#26A69A" style={styles.saltIcon} />
                 <Text style={styles.saltText}>
                   <Text style={styles.saltLabel}>Lượng muối hiện tại: </Text>
-                  <Text style={styles.saltValue}>
-                    {saltData?.currentSalt || 0} Kg
-                  </Text>
+                  <Text style={styles.saltValue}>{saltData?.currentSalt || 0} Kg</Text>
                 </Text>
               </View>
               <View style={styles.saltItemContainer}>
-                <Icon1
-                  name="add-circle"
-                  size={20}
-                  color="#007AFF"
-                  style={styles.saltIcon}
-                />
+                <Icon1 name="add-circle" size={20} color="#26A69A" style={styles.saltIcon} />
                 <Text style={styles.saltText}>
                   <Text style={styles.saltLabel}>Lượng muối cần thiết: </Text>
-                  <Text style={styles.saltValue}>
-                    {saltData?.saltNeeded || 0} Kg
-                  </Text>
+                  <Text style={styles.saltValue}>{saltData?.saltNeeded || 0} Kg</Text>
                 </Text>
               </View>
               <View style={styles.saltItemContainer}>
-                <Icon1
-                  name="check-circle"
-                  size={20}
-                  color="#007AFF"
-                  style={styles.saltIcon}
-                />
+                <Icon1 name="check-circle" size={20} color="#26A69A" style={styles.saltIcon} />
                 <Text style={styles.saltText}>
                   <Text style={styles.saltLabel}>Lượng muối tối ưu: </Text>
-                  <Text style={styles.saltValue}>
-                    {saltData?.totalSalt || 0} Kg
-                  </Text>
+                  <Text style={styles.saltValue}>{saltData?.totalSalt || 0} Kg</Text>
                 </Text>
               </View>
               <View style={styles.saltItemContainer}>
-                <Icon1
-                  name="sync"
-                  size={20}
-                  color="#007AFF"
-                  style={styles.saltIcon}
-                />
+                <Icon1 name="sync" size={20} color="#26A69A" style={styles.saltIcon} />
                 <Text style={styles.saltText}>
                   <Text style={styles.saltLabel}>Lượng nước phải thay: </Text>
-                  <Text style={styles.saltValue}>
-                    {saltData?.waterNeeded || 0} L
-                  </Text>
+                  <Text style={styles.saltValue}>{saltData?.waterNeeded || 0} L</Text>
                 </Text>
               </View>
               <View style={styles.saltItemContainer}>
-                <Icon1
-                  name="warning"
-                  size={20}
-                  color="#FF9500"
-                  style={styles.saltIcon}
-                />
+                <Icon1 name="warning" size={20} color="#FF9500" style={styles.saltIcon} />
                 <Text style={styles.saltText}>
                   <Text style={styles.saltLabel}>Lượng muối dư thừa: </Text>
-                  <Text style={styles.saltValue}>
-                    {saltData?.excessSalt || 0} Kg
-                  </Text>
+                  <Text style={styles.saltValue}>{saltData?.excessSalt || 0} Kg</Text>
                 </Text>
               </View>
               <View style={styles.saltItemContainer}>
-                <Icon1
-                  name="trending-up"
-                  size={20}
-                  color="#007AFF"
-                  style={styles.saltIcon}
-                />
+                <Icon1 name="trending-up" size={20} color="#26A69A" style={styles.saltIcon} />
                 <Text style={styles.saltText}>
                   <Text style={styles.saltLabel}>Lượng muối tối ưu từ: </Text>
                   <Text style={styles.saltValue}>
-                    {saltData?.optimalSaltFrom || 0} Kg đến{" "}
-                    {saltData?.optimalSaltTo || 0} Kg
+                    {saltData?.optimalSaltFrom || 0} Kg đến {saltData?.optimalSaltTo || 0} Kg
                   </Text>
                 </Text>
               </View>
             </View>
 
-            {/* Instruction Display */}
             {instructionData?.instructions && (
-              // <View style={styles.saltBox}>
-              //   <Text style={styles.instructionLabel}>Instructions:</Text>
-              //   {instructionData.instructions.map((instruction, index) => (
-              //     <Text key={index} style={styles.instructionItem}>
-              //       {instructionData.instructions.length > 1
-              //         ? `${index + 1}. `
-              //         : ""}
-              //       {instruction}
-              //     </Text>
-              //   ))}
-              // </View>
               <View style={styles.saltBox}>
-                <Text style={styles.instructionLabel}>Hướng Dẫn Bổ Sung:</Text>
-                <Text style={styles.saltText}>
-                  -{" "}
-                  {saltData?.additionalInstruction?.join("\n - ") ||
-                    "No instructions available"}
+                <Text style={styles.sectionTitle}>Hướng Dẫn Bổ Sung</Text>
+                <Text style={styles.instructionText}>
+                  - {saltData?.additionalInstruction?.join("\n- ") || "Không có hướng dẫn"}
                 </Text>
               </View>
             )}
           </>
         ) : (
-          <></>
+          <Text style={styles.noPondText}>Vui lòng chọn một hồ để tiếp tục</Text>
         )}
-
-        <View style={{ height: 100 }} />
       </ScrollView>
 
       {/* Reminder Modal */}
@@ -374,14 +299,13 @@ const SaltCalculator = ({ navigation }) => {
         <Modal
           visible={isReminderModalVisible}
           transparent={true}
-          animationType="fade"
+          animationType="slide"
           onRequestClose={() => setReminderModalVisible(false)}
         >
-          <View style={[styles.saltBox]}>
+          <View style={styles.modalOverlay}>
             <View style={styles.modalContainer}>
-              <Text style={styles.instructionLabel}>
-                Chu kỳ nhắc nhở (giờ):
-              </Text>
+              <Text style={styles.modalTitle}>Nhắc Nhở Thêm Muối</Text>
+              <Text style={styles.instructionLabel}>Chu Kỳ Nhắc Nhở (giờ):</Text>
               <View style={styles.toggleContainer}>
                 {cycleOptions.map((option) => (
                   <TouchableOpacity
@@ -391,6 +315,8 @@ const SaltCalculator = ({ navigation }) => {
                       cycleHours === option && styles.activeToggle,
                     ]}
                     onPress={() => setCycleHours(option)}
+                    accessibilityLabel={`Select ${option} hour cycle`}
+                    accessibilityRole="button"
                   >
                     <Text
                       style={[
@@ -403,39 +329,33 @@ const SaltCalculator = ({ navigation }) => {
                   </TouchableOpacity>
                 ))}
               </View>
-              <Text style={styles.instructionLabel}>Nhắc nhở thêm muối:</Text>
-              {reminderData.reminders.map((reminder, index) => (
-                <View key={index} style={styles.reminderItem}>
-                  <Text style={styles.reminderText}>
-                    {reminder.title}: {reminder.description}
-                  </Text>
-                  <Text style={styles.reminderDate}>
-                    Thời gian:{" "}
-                    {dayjs(reminder.maintainDate)
-                      .utc()
-                      .format("DD/MM/YYYY HH:mm")}
-                  </Text>
-                </View>
-              ))}
-              <View
-                style={{
-                  flexDirection: "row",
-                  justifyContent: "space-between",
-                  marginTop: 20,
-                }}
-              >
+              <Text style={styles.instructionLabel}>Lịch Nhắc Nhở:</Text>
+              <ScrollView style={styles.reminderList}>
+                {reminderData.reminders.map((reminder, index) => (
+                  <View key={index} style={styles.reminderItem}>
+                    <Text style={styles.reminderText}>
+                      {reminder.title}: {reminder.description}
+                    </Text>
+                    <Text style={styles.reminderDate}>
+                      Thời gian: {dayjs(reminder.maintainDate).utc().format("DD/MM/YYYY HH:mm")}
+                    </Text>
+                  </View>
+                ))}
+              </ScrollView>
+              <View style={styles.modalButtonContainer}>
                 <Button
                   mode="outlined"
                   onPress={() => setReminderModalVisible(false)}
-                  style={{ flex: 1, marginRight: 10 }}
+                  style={styles.modalButton}
+                  labelStyle={styles.modalButtonText}
                 >
                   Hủy
                 </Button>
                 <Button
                   mode="contained"
                   onPress={handleSaveReminder}
-                  style={{ flex: 1 }}
-                  labelStyle={styles.saveReminderText}
+                  style={[styles.modalButton, styles.saveButton]}
+                  labelStyle={styles.modalButtonText}
                 >
                   Lưu
                 </Button>
@@ -454,8 +374,10 @@ const SaltCalculator = ({ navigation }) => {
           }
         }}
         disabled={!homePond}
+        accessibilityLabel="Proceed to add salt form"
+        accessibilityRole="button"
       >
-        <Text style={styles.nextButtonText}>Tiếp theo</Text>
+        <Text style={styles.nextButtonText}>Tiếp Theo</Text>
       </TouchableOpacity>
     </ImageBackground>
   );

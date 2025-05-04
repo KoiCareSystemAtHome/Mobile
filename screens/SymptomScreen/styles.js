@@ -6,7 +6,7 @@ export const styles = StyleSheet.create({
   },
   overlay: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: "rgba(255, 255, 255, 0.8)",
+    backgroundColor: "rgba(255, 255, 255, 0.5)",
   },
   container: {
     flex: 1,
@@ -158,7 +158,7 @@ export const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: "#26A69A",
     width: "85%",
-    maxHeight: 150,
+    maxHeight: 1000,
     overflow: "hidden",
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 3 },

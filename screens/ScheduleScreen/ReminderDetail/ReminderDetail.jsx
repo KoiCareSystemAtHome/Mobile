@@ -164,22 +164,20 @@ const ReminderDetail = ({ navigation, route }) => {
                       )}
                     </TouchableOpacity>
                     {isStatusDropdownVisible && !isComplete && (
-                      <TouchableWithoutFeedback>
-                        <View style={styles.dropdownContainer}>
-                          <TouchableOpacity
-                            style={styles.dropdownItem}
-                            onPress={() => handleStatusSelect("Pending")}
-                          >
-                            <Text style={styles.dropdownItemText}>Đang chờ</Text>
-                          </TouchableOpacity>
-                          <TouchableOpacity
-                            style={styles.dropdownItem}
-                            onPress={() => handleStatusSelect("Complete")}
-                          >
-                            <Text style={styles.dropdownItemText}>Hoàn thành</Text>
-                          </TouchableOpacity>
-                        </View>
-                      </TouchableWithoutFeedback>
+                      <View style={styles.dropdownContainer}>
+                        <TouchableOpacity
+                          style={styles.dropdownItem}
+                          onPress={() => handleStatusSelect("Pending")}
+                        >
+                          <Text style={styles.dropdownItemText}>Đang chờ</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                          style={styles.dropdownItem}
+                          onPress={() => handleStatusSelect("Complete")}
+                        >
+                          <Text style={styles.dropdownItemText}>Hoàn thành</Text>
+                        </TouchableOpacity>
+                      </View>
                     )}
                   </View>
                 </View>

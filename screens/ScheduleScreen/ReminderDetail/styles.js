@@ -9,7 +9,7 @@ export const styles = StyleSheet.create({
   },
   overlay: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: "rgba(255, 255, 255, 0.8)", // Match SymptomScreen
+    backgroundColor: "rgba(255, 255, 255, 0.8)",
   },
   container: {
     flex: 1,
@@ -17,7 +17,7 @@ export const styles = StyleSheet.create({
   },
   scrollContent: {
     paddingTop: 20,
-    paddingBottom: 100, // Space for fixed button
+    paddingBottom: 100,
   },
   header: {
     flexDirection: "row",
@@ -26,13 +26,13 @@ export const styles = StyleSheet.create({
   },
   headerIcon: {
     fontSize: 28,
-    color: "#26A69A", // Teal for consistency
+    color: "#26A69A",
     marginRight: 15,
   },
   headerDate: {
     fontSize: 16,
     fontWeight: "700",
-    color: "#004D40", // Deep teal
+    color: "#004D40",
     marginRight: 10,
   },
   headerTitle: {
@@ -52,7 +52,7 @@ export const styles = StyleSheet.create({
   dateTime: {
     fontSize: 16,
     fontWeight: "500",
-    color: "#00695C", // Lighter teal
+    color: "#00695C",
     lineHeight: 22,
   },
   detailsContainer: {
@@ -64,7 +64,7 @@ export const styles = StyleSheet.create({
     shadowOpacity: 0.2,
     shadowRadius: 8,
     elevation: 5,
-    zIndex: 1, // Below button
+    zIndex: 1,
   },
   detailRow: {
     flexDirection: "row",
@@ -72,7 +72,7 @@ export const styles = StyleSheet.create({
     alignItems: "center",
     paddingVertical: 15,
     borderBottomWidth: 1,
-    borderBottomColor: "#E0F2F1", // Light teal
+    borderBottomColor: "#E0F2F1",
   },
   description: {
     paddingVertical: 15,
@@ -105,17 +105,17 @@ export const styles = StyleSheet.create({
     marginLeft: 10,
   },
   dropdownContainer: {
-    backgroundColor: "#E0F2F1", // Light teal
+    backgroundColor: "#E0F2F1",
     borderWidth: 2,
     borderColor: "#26A69A",
     borderRadius: 12,
     marginTop: 5,
     position: "absolute",
     right: 0,
-    top: 40, // Position below the status text
+    top: "100%", // Position below the detailValueContainer
     width: 120,
-    zIndex: 1000, // Above other elements
-    elevation: 5,
+    zIndex: 1000,
+    elevation: 10,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
@@ -134,10 +134,11 @@ export const styles = StyleSheet.create({
   gifContainer: {
     alignItems: "center",
     marginTop: 20,
+    zIndex: 0, // Ensure GIF is below dropdown
   },
   gif: {
     width: 250,
-    height: 150, // Rectangular, fits page
+    height: 150,
     borderRadius: 12,
     borderWidth: 2,
     borderColor: "#26A69A",
@@ -151,7 +152,7 @@ export const styles = StyleSheet.create({
     position: "absolute",
     bottom: 20,
     right: 20,
-    backgroundColor: "#26A69A", // Teal
+    backgroundColor: "#26A69A",
     paddingVertical: 14,
     paddingHorizontal: 32,
     borderRadius: 50,
@@ -160,7 +161,7 @@ export const styles = StyleSheet.create({
     shadowOpacity: 0.3,
     shadowRadius: 6,
     elevation: 8,
-    zIndex: 100, // Above details
+    zIndex: 100,
   },
   addSaltButtonText: {
     color: "#FFFFFF",

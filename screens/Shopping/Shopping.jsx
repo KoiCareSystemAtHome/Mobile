@@ -6,7 +6,6 @@ import {
   TextInput,
   TouchableOpacity,
   FlatList,
-  ScrollView,
   TouchableWithoutFeedback,
 } from "react-native";
 import { ImageBackground } from "react-native";
@@ -25,7 +24,6 @@ import Animated, {
 
 const Shopping = ({ navigation }) => {
   const [searchText, setSearchText] = useState("");
-  const [cart, setCart] = useState(false);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [filters, setFilters] = useState({
     categoryName: "",
@@ -55,7 +53,8 @@ const Shopping = ({ navigation }) => {
     const getData = async () => {
       try {
         const cartData = await AsyncStorage.getItem("cart");
-        setCart(cartData ? JSON.parse(cartData) : null);
+        // Note: cart state is set but unused; consider using it or removing
+        // setCart(cartData ? JSON.parse(cartData) : null);
       } catch (error) {
         console.error("Error fetching cart data:", error);
       }
@@ -96,7 +95,7 @@ const Shopping = ({ navigation }) => {
     ...new Set(
       products?.flatMap((p) => {
         if (p.parameterImpacts && typeof p.parameterImpacts === "object") {
-          return Object.keys(p.parameterImpacts); // Only get parameter names
+          return Object.keys(p.parameterImpacts);
         }
         return [];
       })
@@ -119,7 +118,7 @@ const Shopping = ({ navigation }) => {
         : true;
       const matchesParameterImpacts = filters.parameterImpacts
         ? product.parameterImpacts &&
-          filters.parameterImpacts in product.parameterImpacts // Check if parameter exists
+          filters.parameterImpacts in product.parameterImpacts
         : true;
 
       return (
@@ -163,11 +162,15 @@ const Shopping = ({ navigation }) => {
           [filterType]: prevFilters[filterType] === item ? "" : item,
         }));
       }}
+      style={[
+        styles.filterOption,
+        filters[filterType] === item && styles.selectedOption,
+      ]}
     >
       <Text
         style={[
-          styles.filterOption,
-          filters[filterType] === item && styles.selectedOption,
+          styles.filterOptionText,
+          filters[filterType] === item && styles.selectedOptionText,
         ]}
       >
         {item}
@@ -177,7 +180,7 @@ const Shopping = ({ navigation }) => {
 
   return (
     <ImageBackground
-      source={require("../../assets/koiimg.jpg")}
+      source={require("../../assets/koimain3.jpg")}
       style={styles.background}
       resizeMode="cover"
     >
@@ -185,36 +188,52 @@ const Shopping = ({ navigation }) => {
 
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.navigate("MainTabs")}>
-          <AntDesign name="left" size={24} color="black" />
+        <TouchableOpacity
+          onPress={() => navigation.navigate("MainTabs")}
+          accessibilityLabel="Go back"
+          accessibilityRole="button"
+        >
+          <AntDesign name="left" size={24} color="#26A69A" />
         </TouchableOpacity>
         <Text style={styles.title}>Cửa Hàng</Text>
-        <TouchableOpacity onPress={() => navigation.navigate("CartScreen")}>
-          <AntDesign name="shoppingcart" size={28} color="black" />
+        <TouchableOpacity
+          onPress={() => navigation.navigate("CartScreen")}
+          accessibilityLabel="View cart"
+          accessibilityRole="button"
+        >
+          <AntDesign name="shoppingcart" size={28} color="#26A69A" />
         </TouchableOpacity>
       </View>
 
       {/* Search Bar and Filter Button */}
       <View style={styles.searchContainer}>
-        <TextInput
-          style={styles.searchInput}
-          placeholder="Tìm kiếm sản phẩm..."
-          value={searchText}
-          onChangeText={setSearchText}
-        />
-        <TouchableOpacity style={styles.searchIcon}>
-          <FontAwesome name="search" size={20} color="#888" />
-        </TouchableOpacity>
+        <View style={styles.searchInputWrapper}>
+          <TextInput
+            style={styles.searchInput}
+            placeholder="Tìm kiếm sản phẩm..."
+            value={searchText}
+            onChangeText={setSearchText}
+            accessibilityLabel="Search products"
+          />
+          <FontAwesome
+            name="search"
+            size={20}
+            color="#00695C"
+            style={styles.searchIcon}
+          />
+        </View>
         <TouchableOpacity
           onPress={toggleFilterDrawer}
           style={styles.filterButton}
+          accessibilityLabel="Open filters"
+          accessibilityRole="button"
         >
-          <AntDesign name="filter" size={20} color="#000" />
+          <AntDesign name="filter" size={20} color="#004D40" />
           <Text style={styles.filterText}>Lọc</Text>
         </TouchableOpacity>
       </View>
 
-      {/* Drawer Overlay (for press outside to close) */}
+      {/* Drawer Overlay */}
       {isFilterOpen && (
         <TouchableWithoutFeedback onPress={toggleFilterDrawer}>
           <View style={styles.drawerOverlay} />
@@ -224,97 +243,59 @@ const Shopping = ({ navigation }) => {
       {/* Animated Filter Drawer */}
       <Animated.View style={[styles.filterDrawer, animatedStyle]}>
         <View style={styles.filterHeader}>
-          <Text style={styles.filterTitle}>Sắp Xếp</Text>
-          <TouchableOpacity onPress={toggleFilterDrawer}>
-            <AntDesign name="close" size={24} color="black" />
+          <Text style={styles.filterTitle}>Bộ Lọc</Text>
+          <TouchableOpacity
+            onPress={toggleFilterDrawer}
+            accessibilityLabel="Close filter drawer"
+            accessibilityRole="button"
+          >
+            <AntDesign name="close" size={24} color="#004D40" />
           </TouchableOpacity>
         </View>
 
-        <ScrollView style={styles.filterScrollContainer}>
-          {/* Category Name Filter */}
-          <View style={styles.filterSection}>
-            <View style={styles.filterSectionHeader}>
-              <Text style={styles.filterLabel}>Tên Danh Mục</Text>
-              <TouchableOpacity onPress={() => toggleSection("categoryName")}>
-                <AntDesign
-                  name={openSections.categoryName ? "minus" : "plus"}
-                  size={25}
-                  color="black"
-                />
-              </TouchableOpacity>
-            </View>
-            {openSections.categoryName && (
-              <View>
-                {uniqueCategoryNames.map((item) =>
-                  renderFilterOption(item, "categoryName")
-                )}
+        <FlatList
+          data={[
+            {
+              title: "Tên Danh Mục",
+              section: "categoryName",
+              items: uniqueCategoryNames,
+            },
+            { title: "Thương Hiệu", section: "brand", items: uniqueBrands },
+            { title: "Tên Cửa Hàng", section: "shopName", items: uniqueShopNames },
+            {
+              title: "Tác Động Thông Số",
+              section: "parameterImpacts",
+              items: uniqueParameterImpacts,
+            },
+          ]}
+          keyExtractor={(item) => item.section}
+          renderItem={({ item }) => (
+            <View style={styles.filterSection}>
+              <View style={styles.filterSectionHeader}>
+                <Text style={styles.filterLabel}>{item.title}</Text>
+                <TouchableOpacity
+                  onPress={() => toggleSection(item.section)}
+                  accessibilityLabel={`Toggle ${item.title} section`}
+                  accessibilityRole="button"
+                >
+                  <AntDesign
+                    name={openSections[item.section] ? "minus" : "plus"}
+                    size={20}
+                    color="#004D40"
+                  />
+                </TouchableOpacity>
               </View>
-            )}
-          </View>
-
-          {/* Brand Filter */}
-          <View style={styles.filterSection}>
-            <View style={styles.filterSectionHeader}>
-              <Text style={styles.filterLabel}>Thương Hiệu</Text>
-              <TouchableOpacity onPress={() => toggleSection("brand")}>
-                <AntDesign
-                  name={openSections.brand ? "minus" : "plus"}
-                  size={25}
-                  color="black"
-                />
-              </TouchableOpacity>
+              {openSections[item.section] && (
+                <View style={styles.filterOptions}>
+                  {item.items.map((option) =>
+                    renderFilterOption(option, item.section)
+                  )}
+                </View>
+              )}
             </View>
-            {openSections.brand && (
-              <View>
-                {uniqueBrands.map((item) => renderFilterOption(item, "brand"))}
-              </View>
-            )}
-          </View>
-
-          {/* Shop Name Filter */}
-          <View style={styles.filterSection}>
-            <View style={styles.filterSectionHeader}>
-              <Text style={styles.filterLabel}>Tên Cửa Hàng</Text>
-              <TouchableOpacity onPress={() => toggleSection("shopName")}>
-                <AntDesign
-                  name={openSections.shopName ? "minus" : "plus"}
-                  size={25}
-                  color="black"
-                />
-              </TouchableOpacity>
-            </View>
-            {openSections.shopName && (
-              <View>
-                {uniqueShopNames.map((item) =>
-                  renderFilterOption(item, "shopName")
-                )}
-              </View>
-            )}
-          </View>
-
-          {/* Parameter Impacts Filter */}
-          <View style={styles.filterSection}>
-            <View style={styles.filterSectionHeader}>
-              <Text style={styles.filterLabel}>Tác Động Thông Số</Text>
-              <TouchableOpacity
-                onPress={() => toggleSection("parameterImpacts")}
-              >
-                <AntDesign
-                  name={openSections.parameterImpacts ? "minus" : "plus"}
-                  size={25}
-                  color="black"
-                />
-              </TouchableOpacity>
-            </View>
-            {openSections.parameterImpacts && (
-              <View>
-                {uniqueParameterImpacts.map((item) =>
-                  renderFilterOption(item, "parameterImpacts")
-                )}
-              </View>
-            )}
-          </View>
-        </ScrollView>
+          )}
+          contentContainerStyle={styles.filterScrollContainer}
+        />
       </Animated.View>
 
       {/* Product List */}
@@ -330,32 +311,42 @@ const Shopping = ({ navigation }) => {
             <TouchableOpacity
               style={[
                 styles.productCard,
-                isOutOfStock && styles.outOfStockCard, // Apply greyed-out style if out of stock
+                isOutOfStock && styles.outOfStockCard,
               ]}
               onPress={() => {
                 if (!isOutOfStock) {
                   navigation.navigate("ProductDetail", { product: item });
                 }
               }}
-              disabled={isOutOfStock} // Disable interaction if out of stock
+              disabled={isOutOfStock}
+              accessibilityLabel={item.productName}
+              accessibilityRole="button"
             >
               <Image
                 source={{ uri: item.image }}
                 style={[
                   styles.productImage,
-                  isOutOfStock && styles.outOfStockImage, // Optional: grey out image
+                  isOutOfStock && styles.outOfStockImage,
                 ]}
               />
-              <Text style={styles.productName}>{item.productName}</Text>
-              <Text style={styles.shopName}>{item.shopName}</Text>
-              <View style={styles.priceAndButtonContainer}>
+              <View style={styles.textContainer}>
+                <Text
+                  style={styles.productName}
+                  numberOfLines={2}
+                  ellipsizeMode="tail"
+                >
+                  {item.productName}
+                </Text>
+                <Text style={styles.shopName}>{item.shopName}</Text>
                 <Text style={styles.productPrice} numberOfLines={1}>
                   {item.price.toLocaleString("vi-VN")} VND
                 </Text>
+              </View>
+              <View style={styles.buttonContainer}>
                 <TouchableOpacity
                   style={[
                     styles.addToCartButton,
-                    isOutOfStock && styles.outOfStockButton, // Grey out button
+                    isOutOfStock && styles.outOfStockButton,
                   ]}
                   onPress={() => {
                     if (!isOutOfStock) {
@@ -363,14 +354,18 @@ const Shopping = ({ navigation }) => {
                     }
                   }}
                   disabled={isOutOfStock}
+                  accessibilityLabel={
+                    isOutOfStock ? "Out of stock" : "Add to cart"
+                  }
+                  accessibilityRole="button"
                 >
                   <Text
                     style={[
                       styles.addToCartText,
-                      isOutOfStock && styles.outOfStockText, // Style for "Hết Hàng" text
+                      isOutOfStock && styles.outOfStockText,
                     ]}
                   >
-                    {isOutOfStock ? "Hết Hàng" : "Thêm vào giỏ"}
+                    {isOutOfStock ? "Hết Hàng" : "Thêm Vào Giỏ"}
                   </Text>
                 </TouchableOpacity>
               </View>
@@ -389,10 +384,14 @@ const Shopping = ({ navigation }) => {
             ]}
             onPress={handlePreviousPage}
             disabled={currentPage === 1}
+            accessibilityLabel="Previous page"
+            accessibilityRole="button"
           >
-            <Text style={styles.paginationText}>
-              <AntDesign name="left" size={20} color="black" />
-            </Text>
+            <AntDesign
+              name="left"
+              size={20}
+              color={currentPage === 1 ? "#B0BEC5" : "#004D40"}
+            />
           </TouchableOpacity>
           <Text style={styles.pageText}>
             {currentPage}/{totalPages}
@@ -404,13 +403,27 @@ const Shopping = ({ navigation }) => {
             ]}
             onPress={handleNextPage}
             disabled={currentPage === totalPages}
+            accessibilityLabel="Next page"
+            accessibilityRole="button"
           >
-            <Text style={styles.paginationText}>
-              <AntDesign name="right" size={20} color="black" />
-            </Text>
+            <AntDesign
+              name="right"
+              size={20}
+              color={currentPage === totalPages ? "#B0BEC5" : "#004D40"}
+            />
           </TouchableOpacity>
         </View>
       )}
+
+      {/* Fixed Cart Button */}
+      <TouchableOpacity
+        style={styles.cartFab}
+        onPress={() => navigation.navigate("CartScreen")}
+        accessibilityLabel="View cart"
+        accessibilityRole="button"
+      >
+        <AntDesign name="shoppingcart" size={28} color="#FFFFFF" />
+      </TouchableOpacity>
     </ImageBackground>
   );
 };
