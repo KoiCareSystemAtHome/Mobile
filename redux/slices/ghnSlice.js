@@ -15,6 +15,7 @@ const initialState = {
   orderByAccount: null,
   orderDetail: null,
   orderTrack: null,
+  invoice:[]
 };
 
 export const ghnSlice = createSlice({
@@ -48,7 +49,10 @@ export const ghnSlice = createSlice({
       })
       .addCase(getOrderTracking.fulfilled, (state, action) => {
         state.orderTrack = action.payload;
-      });
+      })
+      .addCase(calculateOrderInvoice.fulfilled, (state, action) => {
+        state.invoice = action.payload;
+      })
   },
 });
 
@@ -136,6 +140,20 @@ export const createOrder = createAsyncThunk(
     }
   }
 );
+
+export const calculateOrderInvoice = createAsyncThunk(
+  "ghnSlice/calculateOrderInvoice",
+  async (values) => {
+    try {
+      console.log(values)
+      const res = await postRequest(`Order/CalculateOrderInvoices`, values);
+      return res.data;
+    } catch (error) {
+      console.log(error)
+    }
+  }
+);
+
 
 export const updateShipType = createAsyncThunk(
   "ghnSlice/updateShipType",

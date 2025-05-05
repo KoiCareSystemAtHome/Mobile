@@ -2,7 +2,7 @@ import { StyleSheet } from "react-native";
 
 export const styles = StyleSheet.create({
   safeArea: {
-    flex: 1,
+    flex: 1
   },
   background: {
     flex: 1,
@@ -75,7 +75,7 @@ export const styles = StyleSheet.create({
     flexDirection: "row",
     backgroundColor: "#E0F2F1", // Light teal
     borderRadius: 12,
-    marginVertical: 10,
+    marginVertical: 5,
     padding: 4,
     alignSelf: "center",
     width: "90%",
@@ -100,7 +100,6 @@ export const styles = StyleSheet.create({
   calendar: {
     backgroundColor: "#FFFFFF",
     borderRadius: 16,
-    marginVertical: 10,
     paddingBottom: 10,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 4 },

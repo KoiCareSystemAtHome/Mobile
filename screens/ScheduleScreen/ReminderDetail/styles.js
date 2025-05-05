@@ -1,23 +1,24 @@
 import { StyleSheet } from "react-native";
 
 export const styles = StyleSheet.create({
-  safeArea: {
+safeArea: {
     flex: 1,
   },
   background: {
     flex: 1,
   },
   overlay: {
-    ...StyleSheet.absoluteFillObject,
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
     backgroundColor: "rgba(255, 255, 255, 0.8)",
   },
   container: {
     flex: 1,
     paddingHorizontal: 20,
-  },
-  scrollContent: {
     paddingTop: 20,
-    paddingBottom: 100,
   },
   header: {
     flexDirection: "row",
@@ -64,7 +65,6 @@ export const styles = StyleSheet.create({
     shadowOpacity: 0.2,
     shadowRadius: 8,
     elevation: 5,
-    zIndex: 1,
   },
   detailRow: {
     flexDirection: "row",
@@ -85,6 +85,10 @@ export const styles = StyleSheet.create({
     color: "#004D40",
   },
   detailValueContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  statusWrapper: {
     flexDirection: "row",
     alignItems: "center",
   },
@@ -109,17 +113,7 @@ export const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: "#26A69A",
     borderRadius: 12,
-    marginTop: 5,
-    position: "absolute",
-    right: 0,
-    top: "100%", // Position below the detailValueContainer
     width: 120,
-    zIndex: 1000,
-    elevation: 10,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 2,
   },
   dropdownItem: {
     padding: 12,
@@ -134,7 +128,7 @@ export const styles = StyleSheet.create({
   gifContainer: {
     alignItems: "center",
     marginTop: 20,
-    zIndex: 0, // Ensure GIF is below dropdown
+    marginBottom: 20,
   },
   gif: {
     width: 250,
@@ -161,12 +155,19 @@ export const styles = StyleSheet.create({
     shadowOpacity: 0.3,
     shadowRadius: 6,
     elevation: 8,
-    zIndex: 100,
   },
   addSaltButtonText: {
     color: "#FFFFFF",
     fontSize: 18,
     fontWeight: "600",
     textAlign: "center",
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0, 0, 0, 0.1)",
+    justifyContent: "flex-start",
+    alignItems: "flex-end",
+    paddingTop: "60%", // Increased to move dropdown below the GIF and status
+    paddingRight: 40,
   },
 });

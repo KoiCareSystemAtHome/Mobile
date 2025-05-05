@@ -1,6 +1,9 @@
 import { StyleSheet } from "react-native";
 
 export const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
   background: {
     flex: 1,
   },
@@ -17,12 +20,25 @@ export const styles = StyleSheet.create({
     backgroundColor: "rgba(0, 105, 148, 0.8)", // Deep blue for water theme
     borderBottomLeftRadius: 20,
     borderBottomRightRadius: 20,
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    zIndex: 1000, // Ensure header stays above scrollable content
   },
   title: {
     fontSize: 24,
     fontWeight: "700",
     color: "#FFF",
     letterSpacing: 0.5,
+  },
+  scrollView: {
+    flex: 1,
+    marginTop: 100, // Space for fixed header
+    marginBottom: 80, // Space for fixed checkout button
+  },
+  scrollViewContent: {
+    paddingBottom: 20,
   },
   walletContainer: {
     padding: 12,
@@ -138,9 +154,6 @@ export const styles = StyleSheet.create({
     marginHorizontal: 12,
     fontWeight: "500",
   },
-  flatListContent: {
-    paddingBottom: 20,
-  },
   summaryContainer: {
     backgroundColor: "#FFFFFF",
     marginHorizontal: 20,
@@ -187,6 +200,7 @@ export const styles = StyleSheet.create({
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
+    shadowರ: false,
     shadowRadius: 4,
     elevation: 3,
   },
@@ -209,17 +223,25 @@ export const styles = StyleSheet.create({
     borderRadius: 12,
     marginHorizontal: 20,
     marginVertical: 20,
-    // padding: 16,
+    padding: 5,
     alignItems: "center",
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
     shadowRadius: 4,
     elevation: 4,
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
+    zIndex: 1000, // Ensure button stays above scrollable content
   },
   checkoutText: {
     color: "#FFF",
     fontSize: 18,
     fontWeight: "600",
+  },
+  spacer: {
+    height: 100, // Space to prevent content from being hidden under checkout button
   },
 });

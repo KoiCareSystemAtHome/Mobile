@@ -27,7 +27,7 @@ export const wardSelector = (state) => state.ghnSlice.ward;
 export const orderbyAccountSelector = (state) => state.ghnSlice.orderByAccount;
 export const orderDetailSelector = (state) => state.ghnSlice.orderDetail;
 export const orderTrackingSelector = (state) => state.ghnSlice.orderTrack;
-
+export const orderInvoiceSelector = (state) => state.ghnSlice.invoice;
 // Calculator Selectors
 export const foodSelector = (state) => state.calculatorSlice.food;
 export const saltSelector = (state) => state.calculatorSlice.salt;

@@ -7,6 +7,8 @@ import {
   TextInput,
   FlatList,
   ImageBackground,
+  ScrollView,
+  SafeAreaView,
 } from "react-native";
 import { Button, Provider, Toast } from "@ant-design/react-native";
 import AntDesign from "react-native-vector-icons/AntDesign";
@@ -14,22 +16,27 @@ import FontAwesome from "react-native-vector-icons/FontAwesome";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { styles } from "./styles";
 import { useDispatch, useSelector } from "react-redux";
-import { createOrder, updateOrderStatus } from "../../redux/slices/ghnSlice";
+import {
+  calculateOrderInvoice,
+  createOrder,
+  updateOrderStatus,
+} from "../../redux/slices/ghnSlice";
 import { loadAsync } from "expo-font";
 import { getWallet } from "../../redux/slices/authSlice";
-import { walletSelector } from "../../redux/selector";
+import { orderInvoiceSelector, walletSelector } from "../../redux/selector";
 import RadioGroup from "react-native-radio-buttons-group";
 import { payOrder, payPackage } from "../../redux/slices/transactionSlice";
 
 const CartScreen = ({ navigation }) => {
   const dispatch = useDispatch();
   const walletData = useSelector(walletSelector);
+  const invoiceData = useSelector(orderInvoiceSelector);
   const [cart, setCart] = useState([]);
   const [subtotal, setSubtotal] = useState(0);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [fontLoaded, setFontLoaded] = useState(false);
   const [address, setAddress] = useState(null);
-  const [userInfo, setUserInfo] = useState(null); // Updated to store both name and phoneNumber
+  const [userInfo, setUserInfo] = useState(null);
   const [paymentMethod, setPaymentMethod] = useState("COD");
   const tax = 0.0;
   const total = subtotal;
@@ -70,7 +77,7 @@ const CartScreen = ({ navigation }) => {
         const value = await AsyncStorage.getItem("address");
         setAddress(value ? JSON.parse(value) : null);
         const recipientInfo = await AsyncStorage.getItem("userInfo");
-        setUserInfo(recipientInfo ? JSON.parse(recipientInfo) : null); // Store name and phoneNumber
+        setUserInfo(recipientInfo ? JSON.parse(recipientInfo) : null);
         const userInfo = await AsyncStorage.getItem("user");
         setIsLoggedIn(userInfo ? JSON.parse(userInfo) : null);
       } catch (error) {
@@ -112,11 +119,10 @@ const CartScreen = ({ navigation }) => {
       .map((item) => {
         if (item.productId === productId) {
           if (type === "increase") {
-            // Only increase quantity if it's less than stockQuantity
             if (item.quantity < item.stockQuantity) {
               return { ...item, quantity: item.quantity + 1 };
             }
-            return item; // No change if quantity equals stockQuantity
+            return item;
           } else if (type === "decrease") {
             const newQuantity = item.quantity - 1;
             return newQuantity > 0 ? { ...item, quantity: newQuantity } : null;
@@ -131,14 +137,37 @@ const CartScreen = ({ navigation }) => {
     await AsyncStorage.setItem("cart", JSON.stringify(updatedCart));
   };
 
+  useEffect(() => {
+    if (userInfo && address) {
+      const name = userInfo?.name || "Người nhận";
+      const phoneNumber = userInfo?.phoneNumber || "Số điện thoại";
+      const order = {
+        name,
+        phoneNumber,
+        address,
+        accountId: isLoggedIn?.id,
+        orderDetails: cart.map(({ productId, quantity }) => ({
+          productId,
+          quantity,
+        })),
+        shipFee: 10,
+        shipType: "string",
+        status: "Pending",
+        note: "Không có ghi chú",
+      };
+      dispatch(calculateOrderInvoice(order));
+    }
+  }, [userInfo, address, cart, isLoggedIn, dispatch]);
+
   const handleCheckout = () => {
     const name = userInfo?.name || "Người nhận";
     const phoneNumber = userInfo?.phoneNumber || "Số điện thoại";
 
-    // Calculate total weight of the cart
-    const totalWeight = cart.reduce((acc, item) => acc + (item.weight * item.quantity), 0);
+    const totalWeight = cart.reduce(
+      (acc, item) => acc + item.weight * item.quantity,
+      0
+    );
 
-    // Check if total weight exceeds 50,000 grams
     if (totalWeight > 50000) {
       Toast.fail("Total weight exceeds 50,000 grams. Cannot create order.");
       return;
@@ -221,133 +250,178 @@ const CartScreen = ({ navigation }) => {
     return null;
   }
 
+  console.log("a", invoiceData ? invoiceData[0] : "invoiceData is undefined");
+
   return (
     <Provider>
-      <ImageBackground
-        source={require("../../assets/koimain3.jpg")}
-        style={styles.background}
-      >
-        <View style={styles.overlay} />
-        {/* Header */}
-        <View style={styles.header}>
-          <TouchableOpacity onPress={() => navigation.navigate("Shopping")}>
-            <AntDesign name="left" size={24} color="#FFF" />
-          </TouchableOpacity>
-          <Text style={styles.title}>Giỏ Hàng</Text>
-          <TouchableOpacity>
-            <FontAwesome name="bell" size={24} color="#FFF" />
-          </TouchableOpacity>
-        </View>
-
-        {/* Wallet Amount */}
-        <View style={styles.walletContainer}>
-          <Text style={styles.walletText}>
-            Số dư ví: {(walletData?.amount).toLocaleString("vi-VN") || "0.00"} VND
-          </Text>
-        </View>
-
-        {/* Recipient and Address Info */}
-        {address && userInfo ? (
-          <View style={styles.addressInfo}>
-            <Text style={styles.addressText}>
-              {`${userInfo.name} | ${userInfo.phoneNumber}`}
-            </Text>
-            <Text style={styles.addressText}>
-              {`${address.provinceName}, ${address.districtName}, ${address.wardName}`}
-            </Text>
-            <TouchableOpacity
-              onPress={() => navigation.navigate("AddressForm")}
-              style={styles.changeAddressButton}
-            >
-              <Text style={styles.changeAddressText}>Thay đổi địa chỉ</Text>
+      <SafeAreaView style={styles.container}>
+        <ImageBackground
+          source={require("../../assets/koimain3.jpg")}
+          style={styles.background}
+        >
+          <View style={styles.overlay} />
+          {/* Fixed Header */}
+          <View style={styles.header}>
+            <TouchableOpacity onPress={() => navigation.navigate("Shopping")}>
+              <AntDesign name="left" size={24} color="#FFF" />
+            </TouchableOpacity>
+            <Text style={styles.title}>Giỏ Hàng</Text>
+            <TouchableOpacity>
+              <FontAwesome name="bell" size={24} color="#FFF" />
             </TouchableOpacity>
           </View>
-        ) : (
-          <TouchableOpacity onPress={() => navigation.navigate("AddressForm")}>
-            <View style={styles.addressBar}>
-              <Text style={styles.addressBarText}>Thêm địa chỉ</Text>
-              <AntDesign name="arrowright" size={20} color="#FFF" />
-            </View>
-          </TouchableOpacity>
-        )}
 
-        {/* Cart Items */}
-        <FlatList
-          data={cart}
-          keyExtractor={(item) => item.productId}
-          renderItem={({ item }) => (
-            <View style={styles.cartItem}>
-              <Image source={{ uri: item.image }} style={styles.productImage} />
-              <View style={styles.productInfo}>
-                <Text style={styles.productName}>{item.productName}</Text>
-                <Text style={styles.productPrice}>
-                  {`${item.price.toLocaleString("vi-VN")} VND`}
+          {/* Scrollable Content */}
+          <ScrollView
+            style={styles.scrollView}
+            contentContainerStyle={styles.scrollViewContent}
+            showsVerticalScrollIndicator={false}
+          >
+            {/* Wallet Amount */}
+            <View style={styles.walletContainer}>
+              <Text style={styles.walletText}>
+                Số dư ví: {(walletData?.amount).toLocaleString("vi-VN") || "0.00"}{" "}
+                VND
+              </Text>
+            </View>
+
+            {/* Recipient and Address Info */}
+            {address && userInfo ? (
+              <View style={styles.addressInfo}>
+                <Text style={styles.addressText}>
+                  {`${userInfo.name} | ${userInfo.phoneNumber}`}
                 </Text>
-                <View style={styles.quantityContainer}>
-                  <TouchableOpacity
-                    style={styles.quantityButton}
-                    onPress={() =>
-                      handleQuantityChange(item.productId, "decrease")
-                    }
-                  >
-                    <AntDesign name="minus" size={16} color="#FFF" />
-                  </TouchableOpacity>
-                  <Text style={styles.quantityText}>{item.quantity}</Text>
-                  <TouchableOpacity
-                    style={[
-                      styles.quantityButton,
-                      item.quantity >= item.stockQuantity && {backgroundColor:"#ddd"},
-                    ]}
-                    onPress={() =>
-                      handleQuantityChange(item.productId, "increase")
-                    }
-                    disabled={item.quantity >= item.stockQuantity}
-                  >
-                    <AntDesign name="plus" size={16} color="#FFF" />
-                  </TouchableOpacity>
+                <Text style={styles.addressText}>
+                  {`${address.provinceName}, ${address.districtName}, ${address.wardName}`}
+                </Text>
+                <TouchableOpacity
+                  onPress={() => navigation.navigate("AddressForm")}
+                  style={styles.changeAddressButton}
+                >
+                  <Text style={styles.changeAddressText}>Thay đổi địa chỉ</Text>
+                </TouchableOpacity>
+              </View>
+            ) : (
+              <TouchableOpacity onPress={() => navigation.navigate("AddressForm")}>
+                <View style={styles.addressBar}>
+                  <Text style={styles.addressBarText}>Thêm địa chỉ</Text>
+                  <AntDesign name="arrowright" size={20} color="#FFF" />
                 </View>
+              </TouchableOpacity>
+            )}
+
+            {/* Cart Items */}
+            <FlatList
+              data={cart}
+              keyExtractor={(item) => item.productId}
+              renderItem={({ item }) => (
+                <View style={styles.cartItem}>
+                  <Image source={{ uri: item.image }} style={styles.productImage} />
+                  <View style={styles.productInfo}>
+                    <Text style={styles.productName}>{item.productName}</Text>
+                    <Text style={styles.productPrice}>
+                      {`${item.price.toLocaleString("vi-VN")} VND`}
+                    </Text>
+                    <View style={styles.quantityContainer}>
+                      <TouchableOpacity
+                        style={styles.quantityButton}
+                        onPress={() =>
+                          handleQuantityChange(item.productId, "decrease")
+                        }
+                      >
+                        <AntDesign name="minus" size={16} color="#FFF" />
+                      </TouchableOpacity>
+                      <Text style={styles.quantityText}>{item.quantity}</Text>
+                      <TouchableOpacity
+                        style={[
+                          styles.quantityButton,
+                          item.quantity >= item.stockQuantity && {
+                            backgroundColor: "#ddd",
+                          },
+                        ]}
+                        onPress={() =>
+                          handleQuantityChange(item.productId, "increase")
+                        }
+                        disabled={item.quantity >= item.stockQuantity}
+                      >
+                        <AntDesign name="plus" size={16} color="#FFF" />
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                </View>
+              )}
+              scrollEnabled={false} // Disable FlatList scrolling
+              nestedScrollEnabled={true} // Enable nested scrolling
+            />
+
+            {/* Order Summary */}
+            <View style={styles.summaryContainer}>
+              <View style={styles.summaryRow}>
+                <Text style={styles.summaryText}>Cân nặng</Text>
+                <Text style={styles.summaryPrice}>
+                  {`${cart.reduce(
+                    (acc, item) => acc + item.weight * item.quantity,
+                    0
+                  )}g`}
+                </Text>
+              </View>
+              <View style={styles.summaryRow}>
+                <Text style={styles.summaryText}>Tiền ship</Text>
+                <Text style={styles.summaryPrice}>
+                  {invoiceData && invoiceData.length > 0
+                    ? `${invoiceData[0]?.shippingFee.toLocaleString("vi-VN")} VND`
+                    : "0 VND"}
+                </Text>
+              </View>
+              <View style={styles.summaryRow}>
+                <Text style={styles.summaryText}>Tổng tiền</Text>
+                <Text style={styles.summaryPrice}>
+                  {invoiceData && invoiceData.length > 0
+                    ? `${invoiceData[0]?.totalProductPrice.toLocaleString(
+                        "vi-VN"
+                      )} VND`
+                    : "0 VND"}
+                </Text>
+              </View>
+              <View style={styles.summaryRow}>
+                <Text style={styles.totalText}>Tổng cộng</Text>
+                <Text style={styles.totalPrice}>
+                  {invoiceData && invoiceData.length > 0
+                    ? `${invoiceData[0]?.totalOrderPrice.toLocaleString(
+                        "vi-VN"
+                      )} VND`
+                    : "0 VND"}
+                </Text>
               </View>
             </View>
-          )}
-          contentContainerStyle={styles.flatListContent}
-        />
 
-        {/* Order Summary */}
-        <View style={styles.summaryContainer}>
-          <View style={styles.summaryRow}>
-            <Text style={styles.summaryText}>Cân nặng</Text>
-            <Text style={styles.summaryPrice}>
-              {`${cart.reduce((acc, item) => acc + (item.weight * item.quantity), 0)}g`}
-            </Text>
-          </View>
-          <View style={styles.summaryRow}>
-            <Text style={styles.totalText}>Tổng cộng</Text>
-            <Text style={styles.totalPrice}>{`${total.toLocaleString("vi-VN")} VND`}</Text>
-          </View>
-        </View>
+            {/* Payment Method Selection */}
+            <View style={styles.paymentMethodContainer}>
+              <Text style={styles.paymentMethodLabel}>Phương thức thanh toán</Text>
+              <RadioGroup
+                radioButtons={radioButtons}
+                onPress={setPaymentMethod}
+                selectedId={paymentMethod}
+                layout="column"
+                containerStyle={styles.radioGroup}
+                labelStyle={styles.radioText}
+              />
+            </View>
 
-        {/* Payment Method Selection */}
-        <View style={styles.paymentMethodContainer}>
-          <Text style={styles.paymentMethodLabel}>Phương thức thanh toán</Text>
-          <RadioGroup
-            radioButtons={radioButtons}
-            onPress={setPaymentMethod}
-            selectedId={paymentMethod}
-            layout="column"
-            containerStyle={styles.radioGroup}
-            labelStyle={styles.radioText}
-          />
-        </View>
+            {/* Spacer to Prevent Content from Being Hidden by Checkout Button */}
+            <View style={styles.spacer} />
+          </ScrollView>
 
-        {/* Checkout Button */}
-        <Button
-          type="primary"
-          style={styles.checkoutButton}
-          onPress={handleCheckout}
-        >
-          <Text style={styles.checkoutText}>Thanh toán</Text>
-        </Button>
-      </ImageBackground>
+          {/* Fixed Checkout Button */}
+          <Button
+            type="primary"
+            style={styles.checkoutButton}
+            onPress={handleCheckout}
+          >
+            <Text style={styles.checkoutText}>Thanh toán</Text>
+          </Button>
+        </ImageBackground>
+      </SafeAreaView>
     </Provider>
   );
 };

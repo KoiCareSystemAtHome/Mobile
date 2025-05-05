@@ -32,7 +32,123 @@ const AddressForm = ({ navigation }) => {
   const [openDistrict, setOpenDistrict] = useState(false);
   const [openWard, setOpenWard] = useState(false);
 
+  // State to store AsyncStorage data and track initial load
+  const [storedUserInfo, setStoredUserInfo] = useState(null);
+  const [storedAddress, setStoredAddress] = useState(null);
+  const [isInitialLoad, setIsInitialLoad] = useState(true);
+  const [fetchedProvinceId, setFetchedProvinceId] = useState(null);
+  const [fetchedDistrictId, setFetchedDistrictId] = useState(null);
+
+  useEffect(() => {
+    // Fetch userInfo and address from AsyncStorage
+    const fetchStoredData = async () => {
+      try {
+        const storedUserInfo = await AsyncStorage.getItem("userInfo");
+        const storedAddress = await AsyncStorage.getItem("address");
+
+        console.log("Stored userInfo:", storedUserInfo);
+        console.log("Stored address:", storedAddress);
+
+        if (storedUserInfo) {
+          const userInfo = JSON.parse(storedUserInfo);
+          setStoredUserInfo(userInfo);
+          form.setFieldsValue({
+            name: userInfo.name || "",
+            phoneNumber: userInfo.phoneNumber || "",
+          });
+        }
+
+        if (storedAddress) {
+          const address = JSON.parse(storedAddress);
+          setStoredAddress(address);
+          console.log("Parsed address:", address);
+        }
+      } catch (error) {
+        console.error("Error fetching data from AsyncStorage:", error);
+      }
+    };
+
+    dispatch(getProvince());
+    fetchStoredData();
+  }, [dispatch, form]);
+
+  useEffect(() => {
+    if (isInitialLoad && storedAddress && provinceData?.length > 0 && !selectedProvince) {
+      const provinceValue = provinceData.find(
+        (prov) => prov.ProvinceID === parseInt(storedAddress.provinceId)
+      );
+      if (provinceValue) {
+        const provinceString = JSON.stringify({
+          provinceId: provinceValue.ProvinceID,
+          provinceName: provinceValue.ProvinceName,
+        });
+        setSelectedProvince(provinceString);
+        console.log("Set selectedProvince:", provinceString);
+      }
+    }
+  }, [isInitialLoad, storedAddress, provinceData, selectedProvince]);
+
+  useEffect(() => {
+    if (selectedProvince) {
+      const province = JSON.parse(selectedProvince);
+      // Only dispatch getDistrict if not already fetched for this provinceId
+      if (fetchedProvinceId !== province.provinceId) {
+        dispatch(getDistrict(province.provinceId));
+        setFetchedProvinceId(province.provinceId);
+        console.log("Dispatched getDistrict for provinceId:", province.provinceId);
+      }
+
+      if (isInitialLoad && storedAddress && districtData?.length > 0 && !selectedDistrict) {
+        console.log("districtData:", districtData);
+        const districtValue = districtData.find(
+          (dist) => dist.DistrictID === parseInt(storedAddress.districtId)
+        );
+        if (districtValue) {
+          const districtString = JSON.stringify({
+            districtId: districtValue.DistrictID,
+            districtName: districtValue.DistrictName,
+          });
+          setSelectedDistrict(districtString);
+          console.log("Set selectedDistrict:", districtString);
+        }
+      }
+    }
+  }, [selectedProvince, storedAddress, districtData, isInitialLoad, dispatch, fetchedProvinceId]);
+
+  useEffect(() => {
+    if (selectedDistrict) {
+      const district = JSON.parse(selectedDistrict);
+      // Only dispatch getWard if not already fetched for this districtId
+      if (fetchedDistrictId !== district.districtId) {
+        dispatch(getWard(district.districtId));
+        setFetchedDistrictId(district.districtId);
+        console.log("Dispatched getWard for districtId:", district.districtId);
+      }
+
+      if (isInitialLoad && storedAddress && wardData?.length > 0 && !selectedWard) {
+        console.log("wardData:", wardData);
+        const wardValue = wardData.find(
+          (w) => w.WardCode === storedAddress.wardId
+        );
+        if (wardValue) {
+          const wardString = JSON.stringify({
+            wardCode: wardValue.WardCode,
+            wardName: wardValue.WardName,
+          });
+          setSelectedWard(wardString);
+          console.log("Set selectedWard:", wardString);
+          setIsInitialLoad(false); // Mark initial load as complete
+        }
+      }
+    }
+  }, [selectedDistrict, storedAddress, wardData, isInitialLoad, dispatch, fetchedDistrictId]);
+
   const onFinish = async (values) => {
+    if (!selectedProvince || !selectedDistrict || !selectedWard) {
+      console.error("Please select province, district, and ward");
+      return;
+    }
+
     const address = {
       provinceId: String(JSON.parse(selectedProvince).provinceId),
       provinceName: JSON.parse(selectedProvince).provinceName,
@@ -53,29 +169,6 @@ const AddressForm = ({ navigation }) => {
       console.error("Error saving data to AsyncStorage:", error);
     }
   };
-
-  useEffect(() => {
-    dispatch(getProvince());
-  }, [dispatch]);
-
-  useEffect(() => {
-    console.log(selectedDistrict);
-
-    if (selectedProvince) {
-      const province = JSON.parse(selectedProvince);
-      dispatch(getDistrict(province.provinceId));
-      setSelectedDistrict(null);
-      setSelectedWard(null);
-    }
-  }, [selectedProvince, dispatch]);
-
-  useEffect(() => {
-    if (selectedDistrict) {
-      const district = JSON.parse(selectedDistrict);
-      dispatch(getWard(district.districtId));
-      setSelectedWard(null);
-    }
-  }, [selectedDistrict, dispatch]);
 
   return (
     <ImageBackground
