@@ -1,66 +1,70 @@
-import { StyleSheet, Dimensions } from "react-native";
+import { StyleSheet } from "react-native";
 
 export const styles = StyleSheet.create({
   background: {
     flex: 1,
-    height: "100%",
   },
   overlay: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: "rgba(255, 255, 255, 0.5)",
+    backgroundColor: "rgba(255, 255, 255, 0.5)", // As specified
   },
   scrollContainer: {
     paddingHorizontal: 20,
-    paddingTop: 60,
+    paddingTop: 80, // Space for back button
     paddingBottom: 40,
   },
-  container: {
-    paddingHorizontal: 20,
-    paddingTop: 60,
-  },
   title: {
-    fontSize: 24,
+    fontSize: 32,
     fontWeight: "bold",
-    color: "#333",
+    color: "#004D40", // Deep teal
     textAlign: "center",
     marginVertical: 20,
+    letterSpacing: 1,
   },
   backButton: {
     position: "absolute",
     top: 50,
     left: 20,
-    zIndex: 1,
-  },
-  backArrow: {
-    fontSize: 30,
-    color: "#fff",
+    backgroundColor: "#E0F2F1", // Light teal
+    borderRadius: 16,
+    padding: 12,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 3,
+    zIndex: 100,
   },
   button: {
     flexDirection: "row",
-    backgroundColor: "rgba(255, 255, 255, 0.9)",
-    borderRadius: 10,
-    padding: 15,
-    marginVertical: 10,
-    paddingVertical: 30,
-    width: "100%",
+    backgroundColor: "#FFFFFF",
+    borderRadius: 16,
+    padding: 20,
+    marginVertical: 12,
     alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 5,
   },
   buttonIcon: {
     width: 50,
     height: 50,
-    marginRight: 15,
+    marginRight: 16,
   },
   buttonTextContainer: {
     flex: 1,
   },
   buttonTitle: {
-    fontSize: 16,
-    fontWeight: "bold",
-    color: "#000",
+    fontSize: 18,
+    fontWeight: "600",
+    color: "#004D40", // Deep teal
+    marginBottom: 4,
   },
   buttonSubtitle: {
     fontSize: 14,
-    color: "#666",
+    fontWeight: "500",
+    color: "#37474F",
   },
-
 });

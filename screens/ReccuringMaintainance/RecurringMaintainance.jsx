@@ -34,22 +34,19 @@ const CalculateMaintainance = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [endDate, setEndDate] = useState(() => {
     const minDate = new Date();
-    minDate.setMonth(minDate.getMonth() + 2); // Default to 2 months from now
+    minDate.setMonth(minDate.getMonth() + 2);
     return minDate;
   });
-  const [cycleDays, setCycleDays] = useState("30"); // Default to 30 days
+  const [cycleDays, setCycleDays] = useState("30");
   const [isDatePickerVisible, setDatePickerVisible] = useState(false);
   const [isTimePickerVisible, setTimePickerVisible] = useState(false);
 
-  // Toggle options for cycle days
   const cycleOptions = ["30", "60", "90"];
-
   const isMounted = useRef(true);
 
-  // Calculate minDate (2 months from now)
   const getMinDate = () => {
     const minDate = new Date();
-    minDate.setMonth(minDate.getMonth() + 2); // Set to 2 months from now
+    minDate.setMonth(minDate.getMonth() + 2);
     return minDate;
   };
 
@@ -88,7 +85,6 @@ const CalculateMaintainance = () => {
       adjustedEndDate.setHours(adjustedEndDate.getHours() + 7);
       const formattedEndDate = adjustedEndDate.toISOString().split(".")[0];
       const values = { pondId, endDate: formattedEndDate, cycleDays };
-      console.log("save", values);
       dispatch(reccuringMaintainance(values))
         .unwrap()
         .then((res) => {
@@ -117,7 +113,7 @@ const CalculateMaintainance = () => {
     if (isMounted.current) {
       const [hours, minutes] = time;
       const newDate = new Date(endDate);
-      newDate.setHours(hours, minutes, 0, 0); // Set local hours and minutes
+      newDate.setHours(hours, minutes, 0, 0);
       setEndDate(newDate);
       setTimePickerVisible(false);
     }
@@ -144,135 +140,135 @@ const CalculateMaintainance = () => {
         resizeMode="cover"
       >
         <View style={styles.overlay} />
-        <ScrollView contentContainerStyle={styles.container}>
-          <Text style={styles.title}>Lịch Trình Định Kỳ</Text>
+        <ScrollView
+          contentContainerStyle={styles.container}
+          showsVerticalScrollIndicator={false}
+        >
+          <Text style={styles.title}>Lịch Trình Định Kỳ</Text>
 
-          {/* Pond Dropdown */}
-          <View style={{ justifyContent: "center", flexDirection: "row" }}>
-            <TouchableOpacity
-              onPress={() => setHomePondOpen(!homePondOpen)}
-              style={styles.selector}
-            >
-              <Text style={styles.selectorText}>
-                {homePond ? homePond?.name : "Chọn một ao"}
-              </Text>
-              <Icon name="down" size={16} color="#000" />
-            </TouchableOpacity>
-          </View>
-          <View style={{ justifyContent: "center", flexDirection: "row" }}>
-            {homePondOpen && (
-              <View style={styles.dropdown}>
-                {pondData?.map((item) => (
-                  <TouchableOpacity
-                    key={item?.pondID}
-                    onPress={() => {
-                      setHomePond(item);
-                      setHomePondOpen(false);
-                    }}
-                  >
-                    <Text style={styles.dropdownItem}>{item?.name}</Text>
-                  </TouchableOpacity>
-                ))}
-              </View>
-            )}
-          </View>
-
-          <View>
-            {/* Date Picker */}
-            <Text style={styles.label}>NGÀY KẾT THÚC LỊCH TRÌNH</Text>
-            <DatePicker
-              value={endDate}
-              mode="date"
-              minDate={getMinDate()} // At least 2 months from now
-              format="DD MMMM YYYY"
-              onChange={handleDatePickerChange}
-              visible={isDatePickerVisible}
-              onDismiss={() => setDatePickerVisible(false)}
-            >
-              <TouchableOpacity
-                style={styles.datePickerContainer}
-                onPress={() => setDatePickerVisible(true)}
-              >
-                <Text style={styles.dateText}>
-                  {endDate.toLocaleDateString("vi-VN", {
-                    day: "numeric",
-                    month: "long",
-                    year: "numeric",
-                    timeZone: "Asia/Ho_Chi_Minh", // Display Vietnam local time
-                  })}
-                </Text>
-                <Icon name="calendar" size={20} color="#000" />
-              </TouchableOpacity>
-            </DatePicker>
-
-            {/* Time Picker */}
-            <Text style={styles.label}>GIỜ BẢO TRÌ</Text>
-            <Picker
-              data={timeData}
-              cols={2}
-              cascade={false}
-              value={[endDate.getHours(), endDate.getMinutes()]} // Use local hours and minutes
-              onChange={handleTimePickerChange}
-              visible={isTimePickerVisible}
-              onDismiss={() => setTimePickerVisible(false)}
-              okText="Xác nhận"
-              dismissText="Hủy"
-            >
-              <TouchableOpacity
-                style={styles.datePickerContainer}
-                onPress={() => setTimePickerVisible(true)}
-              >
-                <Text style={styles.dateText}>
-                  {endDate.toLocaleTimeString("vi-VN", {
-                    hour: "2-digit",
-                    minute: "2-digit",
-                    hour12: false,
-                    timeZone: "Asia/Ho_Chi_Minh", // Display Vietnam local time
-                  })}
-                </Text>
-                <Icon name="clockcircleo" size={20} color="#000" />
-              </TouchableOpacity>
-            </Picker>
-
-            {/* Cycle Days Toggle */}
-            <Text style={styles.label}>NGÀY CHU KỲ</Text>
-            <View style={styles.toggleContainer}>
-              {cycleOptions.map((option) => (
+          <Text style={styles.label}>CHỌN AO</Text>
+          <TouchableOpacity
+            style={styles.selector}
+            onPress={() => setHomePondOpen(!homePondOpen)}
+            accessibilityLabel="Select a pond"
+            accessibilityRole="button"
+          >
+            <Text style={styles.selectorText}>
+              {homePond ? homePond?.name : "Chọn một ao"}
+            </Text>
+            <Icon name="down" size={16} color="#004D40" />
+          </TouchableOpacity>
+          {homePondOpen && (
+            <View style={styles.dropdown}>
+              {pondData?.map((item) => (
                 <TouchableOpacity
-                  key={option}
-                  style={[
-                    styles.toggleButton,
-                    cycleDays === option && styles.activeToggle,
-                  ]}
-                  onPress={() => setCycleDays(option)}
+                  key={item?.pondID}
+                  style={styles.dropdownItem}
+                  onPress={() => {
+                    setHomePond(item);
+                    setHomePondOpen(false);
+                  }}
+                  accessibilityLabel={`Select pond ${item?.name}`}
+                  accessibilityRole="button"
                 >
-                  <Text
-                    style={[
-                      styles.toggleText,
-                      cycleDays === option && styles.activeText,
-                    ]}
-                  >
-                    {option} ngày
-                  </Text>
+                  <Text style={styles.dropdownItemText}>{item?.name}</Text>
                 </TouchableOpacity>
               ))}
             </View>
+          )}
+
+          <Text style={styles.label}>NGÀY KẾT THÚC LỊCH TRÌNH</Text>
+          <DatePicker
+            value={endDate}
+            mode="date"
+            minDate={getMinDate()}
+            format="DD MMMM YYYY"
+            onChange={handleDatePickerChange}
+            visible={isDatePickerVisible}
+            onDismiss={() => setDatePickerVisible(false)}
+          >
+            <TouchableOpacity
+              style={styles.pickerContainer}
+              onPress={() => setDatePickerVisible(true)}
+              accessibilityLabel="Select end date"
+              accessibilityRole="button"
+            >
+              <Text style={styles.pickerText}>
+                {endDate.toLocaleDateString("vi-VN", {
+                  day: "numeric",
+                  month: "long",
+                  year: "numeric",
+                  timeZone: "Asia/Ho_Chi_Minh",
+                })}
+              </Text>
+              <Icon name="calendar" size={20} color="#004D40" />
+            </TouchableOpacity>
+          </DatePicker>
+
+          <Text style={styles.label}>GIỜ BẢO TRÌ</Text>
+          <Picker
+            data={timeData}
+            cols={2}
+            cascade={false}
+            value={[endDate.getHours(), endDate.getMinutes()]}
+            onChange={handleTimePickerChange}
+            visible={isTimePickerVisible}
+            onDismiss={() => setTimePickerVisible(false)}
+            okText="Xác nhận"
+            dismissText="Hủy"
+          >
+            <TouchableOpacity
+              style={styles.pickerContainer}
+              onPress={() => setTimePickerVisible(true)}
+              accessibilityLabel="Select maintenance time"
+              accessibilityRole="button"
+            >
+              <Text style={styles.pickerText}>
+                {endDate.toLocaleTimeString("vi-VN", {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                  hour12: false,
+                  timeZone: "Asia/Ho_Chi_Minh",
+                })}
+              </Text>
+              <Icon name="clockcircleo" size={20} color="#004D40" />
+            </TouchableOpacity>
+          </Picker>
+
+          <Text style={styles.label}>NGÀY CHU KỲ</Text>
+          <View style={styles.toggleContainer}>
+            {cycleOptions.map((option) => (
+              <TouchableOpacity
+                key={option}
+                style={[
+                  styles.toggleButton,
+                  cycleDays === option && styles.activeToggle,
+                ]}
+                onPress={() => setCycleDays(option)}
+                accessibilityLabel={`Select ${option} day cycle`}
+                accessibilityRole="button"
+              >
+                <Text
+                  style={[
+                    styles.toggleText,
+                    cycleDays === option && styles.activeText,
+                  ]}
+                >
+                  {option} ngày
+                </Text>
+              </TouchableOpacity>
+            ))}
           </View>
         </ScrollView>
 
         <TouchableOpacity
-          style={[styles.saveButton, !homePond && { backgroundColor: "#ccc" }]}
+          style={[styles.saveButton, !homePond && styles.saveButtonDisabled]}
           onPress={handleSave}
           disabled={!homePond}
+          accessibilityLabel="Save maintenance schedule"
+          accessibilityRole="button"
         >
-          <Text
-            style={[
-              styles.saveButtonText,
-              !homePond && styles.saveButtonTextDisabled,
-            ]}
-          >
-            Lưu
-          </Text>
+          <Text style={styles.saveButtonText}>Lưu</Text>
         </TouchableOpacity>
       </ImageBackground>
     </Provider>

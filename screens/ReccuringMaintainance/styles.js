@@ -6,123 +6,141 @@ export const styles = StyleSheet.create({
   },
   overlay: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: "rgba(255, 255, 255, 0.5)",
+    backgroundColor: "rgba(255, 255, 255, 0.5)", // As specified
   },
   container: {
     flexGrow: 1,
     paddingHorizontal: 20,
     paddingTop: 60,
-    paddingBottom: 80, // Space for the save button
+    paddingBottom: 100, // Space for save button
   },
   title: {
-    fontSize: 24,
+    fontSize: 32,
     fontWeight: "bold",
-    color: "#333",
+    color: "#004D40", // Deep teal
     textAlign: "center",
     marginVertical: 20,
+    letterSpacing: 1,
   },
-  subtitle: {
-    fontSize: 18,
-    fontWeight: "bold",
-    color: "#333", // Changed to match the image
-    // marginTop: 20,
-    // marginBottom: 10,
+  label: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#004D40",
+    marginTop: 20,
+    marginBottom: 10,
   },
   selector: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    backgroundColor: "transparent",
-    padding: 10,
-    borderRadius: 10,
-    width: "50%",
+    backgroundColor: "#FFFFFF",
+    borderRadius: 12,
+    borderWidth: 2,
+    borderColor: "#26A69A", // Teal
+    padding: 15,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
   },
   selectorText: {
     fontSize: 16,
-    color: "#000",
+    fontWeight: "500",
+    color: "#004D40",
   },
   dropdown: {
-    backgroundColor: "#fff",
-    borderRadius: 10,
-    marginTop: 5,
+    backgroundColor: "#FFFFFF",
+    borderRadius: 12,
+    marginTop: 8,
     padding: 10,
-    width: "50%",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 5,
   },
   dropdownItem: {
-    fontSize: 16,
-    paddingVertical: 5,
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+    borderRadius: 8,
   },
-  // New Styles for Date Picker, Cycle Days Input, and Save Button
-  label: {
+  dropdownItemText: {
     fontSize: 16,
-    fontWeight: "bold",
-    color: "#333",
-    marginTop: 20,
-    marginBottom: 10,
+    fontWeight: "500",
+    color: "#37474F",
   },
-  datePickerContainer: {
+  pickerContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    borderBottomWidth: 1,
-    borderBottomColor: "#000",
-    paddingBottom: 5,
+    backgroundColor: "#FFFFFF",
+    borderRadius: 12,
+    borderWidth: 2,
+    borderColor: "#26A69A",
+    padding: 15,
+    marginBottom: 15,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
   },
-  dateText: {
+  pickerText: {
     fontSize: 16,
-    color: "#000",
-  },
-  input: {
-    borderBottomWidth: 1,
-    borderBottomColor: "#000",
-    fontSize: 16,
-    color: "#000",
-    paddingVertical: 5,
-  },
-  saveButton: {
-    position: "absolute",
-    bottom: 80, // Adjusted to account for bottom navigation
-    alignSelf: "center",
-    backgroundColor: "#4A90E2", // Blue color from the image
-    paddingVertical: 15,
-    paddingHorizontal: 40,
-    borderRadius: 10,
-  },
-  saveButtonText: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "bold",
-    textTransform: "uppercase",
+    fontWeight: "500",
+    color: "#004D40",
   },
   toggleContainer: {
     flexDirection: "row",
-    justifyContent: "space-around",
-    backgroundColor: "rgba(255, 255, 255, 0.3)",
-    borderRadius: 10,
-    padding: 10,
+    justifyContent: "space-between",
+    backgroundColor: "#E0F2F1", // Light teal
+    borderRadius: 12,
+    padding: 8,
+    marginBottom: 20,
   },
   toggleButton: {
     flex: 1,
-    paddingVertical: 10,
+    paddingVertical: 12,
     marginHorizontal: 5,
     borderRadius: 10,
     alignItems: "center",
   },
   activeToggle: {
-    backgroundColor: "#FFA500", // Orange for active
+    backgroundColor: "#26A69A", // Teal
   },
   toggleText: {
-    fontSize: 12,
-    color: "#fff",
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#004D40",
   },
   activeText: {
-    fontWeight: "bold",
-    color: "#000",
+    color: "#FFFFFF",
+    fontWeight: "700",
   },
-  infoText: {
-    fontSize: 14,
-    color: "#fff",
-    marginTop: 20,
-    textAlign: "justify",
+  saveButton: {
+    position: "absolute",
+    bottom: 30,
+    right: 20,
+    backgroundColor: "#26A69A", // Teal
+    paddingVertical: 14,
+    paddingHorizontal: 40,
+    borderRadius: 50,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.3,
+    shadowRadius: 6,
+    elevation: 8,
+    zIndex: 100,
+  },
+  saveButtonDisabled: {
+    backgroundColor: "#B0BEC5",
+    opacity: 0.6,
+  },
+  saveButtonText: {
+    color: "#FFFFFF",
+    fontSize: 18,
+    fontWeight: "600",
+    textAlign: "center",
   },
 });

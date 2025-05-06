@@ -12,6 +12,7 @@ import { getPondByOwner } from "../../redux/slices/pondSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { styles } from "./styles";
 import Icon from "react-native-vector-icons/AntDesign";
+import FontAwesome from "react-native-vector-icons/FontAwesome";
 import {
   calculatedMaintainanceSelector,
   pondByOwnerSelector,
@@ -26,7 +27,6 @@ import enUS from "@ant-design/react-native/lib/locale-provider/en_US";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 
-// Enable UTC plugin
 dayjs.extend(utc);
 
 const CalculateMaintainance = () => {
@@ -36,7 +36,7 @@ const CalculateMaintainance = () => {
   const [homePond, setHomePond] = useState(null);
   const [homePondOpen, setHomePondOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [endDate, setEndDate] = useState(dayjs.utc().toDate()); // Initialize to UTC
+  const [endDate, setEndDate] = useState(dayjs.utc().toDate());
   const [isDatePickerVisible, setDatePickerVisible] = useState(false);
   const [isTimePickerVisible, setTimePickerVisible] = useState(false);
 
@@ -84,10 +84,9 @@ const CalculateMaintainance = () => {
       maintainanceData.maintainDate &&
       maintainanceData.maintainDate !== prevMaintainanceDataRef.current?.maintainDate
     ) {
-      // Parse maintainDate as UTC
       const date = dayjs.utc(maintainanceData.maintainDate);
       if (date.isValid()) {
-        setEndDate(date.toDate()); // Keep as UTC
+        setEndDate(date.toDate());
       } else {
         console.warn("Invalid maintainDate:", maintainanceData.maintainDate);
       }
@@ -97,7 +96,6 @@ const CalculateMaintainance = () => {
 
   const handleSave = () => {
     if (maintainanceData) {
-      // Format seenDate to replace space with T
       const formattedSeenDate = maintainanceData.seenDate
         ? maintainanceData.seenDate.replace(" ", "-all")
         : maintainanceData.seenDate;
@@ -107,7 +105,6 @@ const CalculateMaintainance = () => {
         maintainDate: dayjs.utc(endDate).format("YYYY-MM-DDTHH:mm:ss"),
         seenDate: formattedSeenDate,
       };
-      console.log(updatedMaintenanceData);
       dispatch(saveMaintainance(updatedMaintenanceData))
         .unwrap()
         .then((res) => {
@@ -118,14 +115,13 @@ const CalculateMaintainance = () => {
         })
         .catch((error) => {
           console.error("Error saving maintenance:", error);
-          Alert.alert("Thất Bại", "Lưu không thành công.");
+          Alert.alert("Thất Bại", "Lưu không thành công.");
         });
     }
   };
 
   const handleDatePickerChange = (date) => {
     if (isMounted.current) {
-      // Treat the selected date as local time and convert to UTC
       const selectedDate = dayjs(date).local();
       const newDate = dayjs.utc(endDate);
       const updatedDate = newDate
@@ -163,10 +159,6 @@ const CalculateMaintainance = () => {
     })),
   ];
 
-  console.log("endDate (UTC):", dayjs.utc(endDate).format("YYYY-MM-DD HH:mm:ss"));
-  console.log("endDate (Local):", dayjs(endDate).local().format("YYYY-MM-DD HH:mm:ss"));
-  console.log("maintainanceData:", maintainanceData);
-
   return (
     <Provider locale={enUS}>
       <ImageBackground
@@ -175,41 +167,48 @@ const CalculateMaintainance = () => {
         resizeMode="cover"
       >
         <View style={styles.overlay} />
-        <ScrollView contentContainerStyle={styles.container}>
+        <ScrollView
+          contentContainerStyle={styles.container}
+          showsVerticalScrollIndicator={false}
+        >
           <Text style={styles.title}>Lịch Trình Bảo Trì</Text>
-          <View style={{ justifyContent: "center", flexDirection: "row" }}>
-            <TouchableOpacity
-              onPress={() => setHomePondOpen(!homePondOpen)}
-              style={styles.selector}
-            >
-              <Text style={styles.selectorText}>
-                {homePond ? homePond?.name : "Chọn một ao"}
-              </Text>
-              <Icon name="down" size={16} color="#000" />
-            </TouchableOpacity>
-          </View>
-          <View style={{ justifyContent: "center", flexDirection: "row" }}>
-            {homePondOpen && (
-              <View style={styles.dropdown}>
-                {pondData?.map((item) => (
-                  <TouchableOpacity
-                    key={item?.pondID}
-                    onPress={() => {
-                      setHomePond(item);
-                      setHomePondOpen(false);
-                    }}
-                  >
-                    <Text style={styles.dropdownItem}>{item?.name}</Text>
-                  </TouchableOpacity>
-                ))}
-              </View>
-            )}
-          </View>
+          <Text style={styles.label}>CHỌN AO</Text>
+          <TouchableOpacity
+            style={styles.selector}
+            onPress={() => setHomePondOpen(!homePondOpen)}
+            accessibilityLabel="Select a pond"
+            accessibilityRole="button"
+          >
+            <Text style={styles.selectorText}>
+              {homePond ? homePond?.name : "Chọn một ao"}
+            </Text>
+            <Icon name="down" size={16} color="#004D40" />
+          </TouchableOpacity>
+          {homePondOpen && (
+            <View style={styles.dropdown}>
+              {pondData?.map((item) => (
+                <TouchableOpacity
+                  key={item?.pondID}
+                  style={styles.dropdownItem}
+                  onPress={() => {
+                    setHomePond(item);
+                    setHomePondOpen(false);
+                  }}
+                  accessibilityLabel={`Select pond ${item?.name}`}
+                  accessibilityRole="button"
+                >
+                  <Text style={styles.dropdownItemText}>{item?.name}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          )}
 
           {homePond && maintainanceData && (
-            <View>
-              <Text style={styles.subtitle}>{maintainanceData?.title}</Text>
-              <Text style={styles.selectorText}>
+            <View style={styles.maintenanceCard}>
+              <View style={styles.cardHeader}>
+                <Text style={styles.cardTitle}>{maintainanceData?.title}</Text>
+              </View>
+              <Text style={styles.cardDescription}>
                 {maintainanceData?.description}
               </Text>
               <Text style={styles.label}>NGÀY BẢO TRÌ</Text>
@@ -223,13 +222,15 @@ const CalculateMaintainance = () => {
                 onDismiss={() => setDatePickerVisible(false)}
               >
                 <TouchableOpacity
-                  style={styles.datePickerContainer}
+                  style={styles.pickerContainer}
                   onPress={() => setDatePickerVisible(true)}
+                  accessibilityLabel="Select maintenance date"
+                  accessibilityRole="button"
                 >
-                  <Text style={styles.dateText}>
+                  <Text style={styles.pickerText}>
                     {dayjs.utc(endDate).format("DD MMMM YYYY")}
                   </Text>
-                  <Icon name="calendar" size={20} color="#000" />
+                  <Icon name="calendar" size={20} color="#004D40" />
                 </TouchableOpacity>
               </DatePicker>
               <Text style={styles.label}>GIỜ BẢO TRÌ</Text>
@@ -245,20 +246,27 @@ const CalculateMaintainance = () => {
                 dismissText="Hủy"
               >
                 <TouchableOpacity
-                  style={styles.datePickerContainer}
+                  style={styles.pickerContainer}
                   onPress={() => setTimePickerVisible(true)}
+                  accessibilityLabel="Select maintenance time"
+                  accessibilityRole="button"
                 >
-                  <Text style={styles.dateText}>
+                  <Text style={styles.pickerText}>
                     {dayjs.utc(endDate).format("HH:mm")}
                   </Text>
-                  <Icon name="clockcircleo" size={20} color="#000" />
+                  <Icon name="clockcircleo" size={20} color="#004D40" />
                 </TouchableOpacity>
               </Picker>
             </View>
           )}
         </ScrollView>
         {homePond && maintainanceData && (
-          <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
+          <TouchableOpacity
+            style={styles.saveButton}
+            onPress={handleSave}
+            accessibilityLabel="Save maintenance schedule"
+            accessibilityRole="button"
+          >
             <Text style={styles.saveButtonText}>Lưu</Text>
           </TouchableOpacity>
         )}
