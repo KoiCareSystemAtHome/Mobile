@@ -54,6 +54,18 @@ const CartScreen = ({ navigation }) => {
     },
   ];
 
+  // Helper function to calculate sums from invoiceData
+  const calculateInvoiceSums = (invoiceData) => {
+    return invoiceData.reduce(
+      (acc, shop) => ({
+        totalShippingFee: acc.totalShippingFee + (shop.shippingFee || 0),
+        totalProductPrice: acc.totalProductPrice + (shop.totalProductPrice || 0),
+        totalOrderPrice: acc.totalOrderPrice + (shop.totalOrderPrice || 0),
+      }),
+      { totalShippingFee: 0, totalProductPrice: 0, totalOrderPrice: 0 }
+    );
+  };
+
   useEffect(() => {
     const fetchCart = async () => {
       try {
@@ -194,7 +206,8 @@ const CartScreen = ({ navigation }) => {
       return;
     } else {
       if (paymentMethod === "Online Banking") {
-        if (walletData?.amount < total) {
+        const { totalOrderPrice } = calculateInvoiceSums(invoiceData);
+        if (walletData?.amount < totalOrderPrice) {
           Toast.fail("Insufficient wallet balance");
           return;
         }
@@ -204,9 +217,7 @@ const CartScreen = ({ navigation }) => {
           .then(async (res) => {
             const orderIds = res.map((item) => item.message);
             const email = isLoggedIn?.email;
-            console.log(email, orderIds);
             const values = { email, orderIds };
-            console.log(values);
             dispatch(payOrder(values))
               .unwrap()
               .then((res) => {
@@ -250,7 +261,9 @@ const CartScreen = ({ navigation }) => {
     return null;
   }
 
-  console.log("a", invoiceData ? invoiceData[0] : "invoiceData is undefined");
+  // Calculate sums for display
+  const { totalShippingFee, totalProductPrice, totalOrderPrice } =
+    calculateInvoiceSums(invoiceData);
 
   return (
     <Provider>
@@ -350,8 +363,8 @@ const CartScreen = ({ navigation }) => {
                   </View>
                 </View>
               )}
-              scrollEnabled={false} // Disable FlatList scrolling
-              nestedScrollEnabled={true} // Enable nested scrolling
+              scrollEnabled={false}
+              nestedScrollEnabled={true}
             />
 
             {/* Order Summary */}
@@ -369,7 +382,7 @@ const CartScreen = ({ navigation }) => {
                 <Text style={styles.summaryText}>Tiền ship</Text>
                 <Text style={styles.summaryPrice}>
                   {invoiceData && invoiceData.length > 0
-                    ? `${invoiceData[0]?.shippingFee.toLocaleString("vi-VN")} VND`
+                    ? `${totalShippingFee.toLocaleString("vi-VN")} VND`
                     : "0 VND"}
                 </Text>
               </View>
@@ -377,9 +390,7 @@ const CartScreen = ({ navigation }) => {
                 <Text style={styles.summaryText}>Tổng tiền</Text>
                 <Text style={styles.summaryPrice}>
                   {invoiceData && invoiceData.length > 0
-                    ? `${invoiceData[0]?.totalProductPrice.toLocaleString(
-                        "vi-VN"
-                      )} VND`
+                    ? `${totalProductPrice.toLocaleString("vi-VN")} VND`
                     : "0 VND"}
                 </Text>
               </View>
@@ -387,9 +398,7 @@ const CartScreen = ({ navigation }) => {
                 <Text style={styles.totalText}>Tổng cộng</Text>
                 <Text style={styles.totalPrice}>
                   {invoiceData && invoiceData.length > 0
-                    ? `${invoiceData[0]?.totalOrderPrice.toLocaleString(
-                        "vi-VN"
-                      )} VND`
+                    ? `${totalOrderPrice.toLocaleString("vi-VN")} VND`
                     : "0 VND"}
                 </Text>
               </View>

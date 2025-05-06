@@ -215,6 +215,16 @@ const HomeScreen = ({ navigation }) => {
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.drawerItem}
+            onPress={() => navigation.navigate("WithdrawalStatistic")}
+          >
+            <Image
+              source={require("../../assets/history_svgrepo.com.png")}
+              style={styles.drawerItemImage}
+            />
+            <Text style={styles.drawerItemText}>Lịch Sử Rút Tiền</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.drawerItem}
             onPress={() => navigation.navigate("ScheduleScreen")}
           >
             <Image
@@ -321,7 +331,7 @@ const HomeScreen = ({ navigation }) => {
                     <TouchableOpacity
                       onPress={() => navigation.navigate("DepositScreen")}
                     >
-                      <Text style={styles.depositLink}>Nạp Tiền</Text>
+                      <Text style={styles.depositLink}>Nạp/Rút</Text>
                     </TouchableOpacity>
                   </View>
                   <Text style={styles.cardDescription}>

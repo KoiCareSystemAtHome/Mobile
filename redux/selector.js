@@ -55,6 +55,7 @@ export const orderTransactionSelector = (state) => state.transactionSlice.orderT
 export const packageTransactionSelector = (state) => state.transactionSlice.packageTransaction;
 export const depositTransactionOrder = (state) => state.transactionSlice.depositTransaction;
 export const packageSelector = (state) => state.transactionSlice.package;
+export const userWithdrawalSelector = (state) => state.transactionSlice.withdrawal;
 
 // Authentication Selectors
 export const tokenSelector = (state) => state.authSlice.token;

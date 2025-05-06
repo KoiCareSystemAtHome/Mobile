@@ -7,7 +7,8 @@ const initialState = {
   packageTransaction:null,
   orderTransaction:null,
   depositTransaction:null,
-  package:null
+  package:null,
+  withdrawal:null,
 };
 
 export const transactionSlice = createSlice({
@@ -33,6 +34,9 @@ export const transactionSlice = createSlice({
     })
     .addCase(getPackage.fulfilled, (state, action) => {
       state.package = action.payload;
+    })
+    .addCase(getUserWithdraw.fulfilled, (state, action) => {
+      state.withdrawal = action.payload;
     })
   },
 });
@@ -116,6 +120,29 @@ export const payOrder = createAsyncThunk(
     }
   }
 );
+export const withdrawal = createAsyncThunk(
+  "transactionSlice/withdrawal",
+  async (values) => {
+    try {
+      const res = await postRequest(`WalletWithdraw`,values)
+      return res.data;
+    } catch (error) {
+      Alert.alert("Error", "Failed to load data.");
+    }
+  }
+);
+export const getUserWithdraw = createAsyncThunk(
+  "transactionSlice/getUserWithdraw",
+  async (userId) => {
+    try {
+      const res = await getRequest(`WalletWithdraw/user/${userId}`)
+      return res.data;
+    } catch (error) {
+      Alert.alert("Error", "Failed to load data.");
+    }
+  }
+);
+
 
 
 

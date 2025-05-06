@@ -9,7 +9,7 @@ import {
   Alert,
   ImageBackground,
 } from "react-native";
-import { getPaymentUrl } from "../../redux/slices/transactionSlice";
+import { getPaymentUrl, withdrawal } from "../../redux/slices/transactionSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { createdUrlSelector } from "../../redux/selector";
 import { getWallet } from "../../redux/slices/authSlice";
@@ -24,6 +24,7 @@ const DepositScreen = ({ navigation }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(null);
   const [loading, setLoading] = useState(false);
   const [showWebView, setShowWebView] = useState(false);
+  const [isDepositMode, setIsDepositMode] = useState(true); // Toggle state for deposit/withdrawal
 
   const handleCreatePayment = () => {
     if (!money || !description) {
@@ -48,7 +49,7 @@ const DepositScreen = ({ navigation }) => {
       const urlParams = new URLSearchParams(url.split("?")[1]);
       const transactionStatus = urlParams.get("vnp_TransactionStatus");
       if (transactionStatus === "00") {
-        Alert.alert("Success", "Giao dịch thành công. Giao dịch thành công.");
+        Alert.alert("Thành Công", " Giao dịch thành công.");
         navigation.navigate("MainTabs");
         dispatch(getWallet(isLoggedIn?.id));
       } else {
@@ -64,18 +65,45 @@ const DepositScreen = ({ navigation }) => {
 
     // Calculate suggested amounts by multiplying the input by 10, 100, and 1,000
     const amounts = [
-      inputAmount * 10,    // e.g., 100 -> 1,000
-      inputAmount * 100,   // e.g., 100 -> 10,000
-      inputAmount * 1000,  // e.g., 100 -> 100,000
+      inputAmount * 10, // e.g., 100 -> 1,000
+      inputAmount * 100, // e.g., 100 -> 10,000
+      inputAmount * 1000, // e.g., 100 -> 100,000
     ];
 
-    // Filter out amounts greater than 10 million (10,000,000)
+    // Filter out amounts greater than 100 million (100,000,000)
     return amounts.filter((amount) => amount <= 100000000);
   };
 
   // Handle button press to set the money value
   const handleSuggestedAmount = (amount) => {
     setMoney(amount.toString());
+  };
+
+  // Handle withdrawal logic
+  const handleWithdrawal = () => {
+    if (!money) {
+      Alert.alert("Error", "Hãy nhập số tiền cần rút");
+      return;
+    }
+    const amount = Number(money)
+    const userId = isLoggedIn?.id
+    const values = { amount, userId };
+    dispatch(withdrawal(values))
+    .unwrap()
+    .then((res)=>{
+      Alert.alert("Thành Công", res.message);
+    })
+    setMoney("");
+    setDescription("");
+  };
+
+  // Handle form submission based on mode
+  const handleSubmit = () => {
+    if (isDepositMode) {
+      handleCreatePayment();
+    } else {
+      handleWithdrawal();
+    }
   };
 
   useEffect(() => {
@@ -97,16 +125,51 @@ const DepositScreen = ({ navigation }) => {
     <ImageBackground
       source={require("../../assets/koimain3.jpg")}
       style={styles.container}
-      // resizeMode="cover"
     >
       <View style={styles.overlay} />
       {!showWebView ? (
         <>
-          <Text style={styles.title}>Nạp tiền</Text>
+          <Text style={styles.title}>{isDepositMode ? "Nạp Tiền" : "Rút Tiền"}</Text>
+
+          {/* Toggle Button */}
+          <View style={styles.toggleContainer}>
+            <TouchableOpacity
+              style={[
+                styles.toggleButton,
+                isDepositMode ? styles.toggleButtonActive : styles.toggleButtonInactive,
+              ]}
+              onPress={() => setIsDepositMode(true)}
+            >
+              <Text
+                style={[
+                  styles.toggleButtonText,
+                  isDepositMode ? styles.toggleButtonTextActive : styles.toggleButtonTextInactive,
+                ]}
+              >
+                Nạp Tiền
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[
+                styles.toggleButton,
+                !isDepositMode ? styles.toggleButtonActive : styles.toggleButtonInactive,
+              ]}
+              onPress={() => setIsDepositMode(false)}
+            >
+              <Text
+                style={[
+                  styles.toggleButtonText,
+                  !isDepositMode ? styles.toggleButtonTextActive : styles.toggleButtonTextInactive,
+                ]}
+              >
+                Rút Tiền
+              </Text>
+            </TouchableOpacity>
+          </View>
 
           <TextInput
             style={styles.input}
-            placeholder="Số tiền (VND)"
+            placeholder="Số tiền (VND)"
             keyboardType="numeric"
             value={money}
             onChangeText={setMoney}
@@ -121,7 +184,7 @@ const DepositScreen = ({ navigation }) => {
                 onPress={() => handleSuggestedAmount(amount)}
               >
                 <Text style={styles.suggestedButtonText}>
-                  {amount.toLocaleString('vi-VN')} VND
+                  {amount.toLocaleString("vi-VN")} VND
                 </Text>
               </TouchableOpacity>
             ))}
@@ -129,7 +192,7 @@ const DepositScreen = ({ navigation }) => {
 
           <TextInput
             style={styles.input}
-            placeholder="Mô tả"
+            placeholder="Mô tả"
             value={description}
             onChangeText={setDescription}
           />
@@ -140,9 +203,11 @@ const DepositScreen = ({ navigation }) => {
             <View style={{ marginHorizontal: 20 }}>
               <TouchableOpacity
                 style={styles.submitButton}
-                onPress={handleCreatePayment}
+                onPress={handleSubmit}
               >
-                <Text style={styles.submitButtonText}>Tạo giao dịch</Text>
+                <Text style={styles.submitButtonText}>
+                  {isDepositMode ? "Tạo giao dịch" : "Tạo yêu cầu"}
+                </Text>
               </TouchableOpacity>
             </View>
           )}
@@ -205,7 +270,7 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontWeight: "bold",
     textAlign: "center",
-    fontSize:12
+    fontSize: 12,
   },
   submitButton: {
     backgroundColor: "#007bff",
@@ -217,6 +282,37 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontWeight: "bold",
     fontSize: 16,
+  },
+  toggleContainer: {
+    flexDirection: "row",
+    justifyContent: "center",
+    marginBottom: 20,
+    marginHorizontal: 20,
+  },
+  toggleButton: {
+    flex: 1,
+    padding: 10,
+    borderRadius: 5,
+    alignItems: "center",
+    marginHorizontal: 5,
+  },
+  toggleButtonActive: {
+    backgroundColor: "#007bff",
+  },
+  toggleButtonInactive: {
+    backgroundColor: "transparent",
+    borderWidth: 1,
+    borderColor: "#007bff",
+  },
+  toggleButtonText: {
+    fontSize: 16,
+    fontWeight: "bold",
+  },
+  toggleButtonTextActive: {
+    color: "#fff",
+  },
+  toggleButtonTextInactive: {
+    color: "#007bff",
   },
 });
 
