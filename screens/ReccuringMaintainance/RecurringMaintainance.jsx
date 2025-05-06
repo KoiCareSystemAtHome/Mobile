@@ -145,7 +145,7 @@ const CalculateMaintainance = () => {
       >
         <View style={styles.overlay} />
         <ScrollView contentContainerStyle={styles.container}>
-          <Text style={styles.title}>Lịch Trình Bảo Trì</Text>
+          <Text style={styles.title}>Lịch Trình Định Kỳ</Text>
 
           {/* Pond Dropdown */}
           <View style={{ justifyContent: "center", flexDirection: "row" }}>
@@ -206,7 +206,7 @@ const CalculateMaintainance = () => {
             </DatePicker>
 
             {/* Time Picker */}
-            <Text style={styles.label}>GIỜ KẾT THÚC LỊCH TRÌNH</Text>
+            <Text style={styles.label}>GIỜ BẢO TRÌ</Text>
             <Picker
               data={timeData}
               cols={2}

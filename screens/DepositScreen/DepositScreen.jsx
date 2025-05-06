@@ -4,10 +4,10 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
-  StyleSheet,
   ActivityIndicator,
   Alert,
   ImageBackground,
+  ScrollView,
 } from "react-native";
 import { getPaymentUrl, withdrawal } from "../../redux/slices/transactionSlice";
 import { useDispatch, useSelector } from "react-redux";
@@ -15,6 +15,7 @@ import { createdUrlSelector } from "../../redux/selector";
 import { getWallet } from "../../redux/slices/authSlice";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import WebView from "react-native-webview";
+import { styles } from "./styles";
 
 const DepositScreen = ({ navigation }) => {
   const dispatch = useDispatch();
@@ -24,20 +25,27 @@ const DepositScreen = ({ navigation }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(null);
   const [loading, setLoading] = useState(false);
   const [showWebView, setShowWebView] = useState(false);
-  const [isDepositMode, setIsDepositMode] = useState(true); // Toggle state for deposit/withdrawal
+  const [isDepositMode, setIsDepositMode] = useState(true);
 
   const handleCreatePayment = () => {
     if (!money || !description) {
-      Alert.alert("Error", "Please fill in all fields");
+      Alert.alert("Lỗi", "Vui lòng điền đầy đủ các trường");
       return;
     }
     const email = isLoggedIn?.email;
     const values = { money, description, email };
+    setLoading(true);
     dispatch(getPaymentUrl(values))
       .unwrap()
       .then((response) => {
         setPaymentUrl(response.data);
         setShowWebView(true);
+      })
+      .catch((error) => {
+        Alert.alert("Lỗi", "Không thể tạo giao dịch. Vui lòng thử lại.");
+      })
+      .finally(() => {
+        setLoading(false);
       });
   };
 
@@ -49,55 +57,56 @@ const DepositScreen = ({ navigation }) => {
       const urlParams = new URLSearchParams(url.split("?")[1]);
       const transactionStatus = urlParams.get("vnp_TransactionStatus");
       if (transactionStatus === "00") {
-        Alert.alert("Thành Công", " Giao dịch thành công.");
+        Alert.alert("Thành Công", "Giao dịch thành công.");
         navigation.navigate("MainTabs");
         dispatch(getWallet(isLoggedIn?.id));
       } else {
-        Alert.alert("Error", "Payment failed. Please try again.");
+        Alert.alert("Lỗi", "Giao dịch thất bại. Vui lòng thử lại.");
       }
     }
   };
 
-  // Calculate suggested amounts based on the input
   const getSuggestedAmounts = () => {
     const inputAmount = parseFloat(money) || 0;
-    if (inputAmount <= 0) return [1000, 10000, 100000]; // Default values if no input
+    if (inputAmount <= 0) return [1000, 10000, 100000];
 
-    // Calculate suggested amounts by multiplying the input by 10, 100, and 1,000
     const amounts = [
-      inputAmount * 10, // e.g., 100 -> 1,000
-      inputAmount * 100, // e.g., 100 -> 10,000
-      inputAmount * 1000, // e.g., 100 -> 100,000
+      inputAmount * 10,
+      inputAmount * 100,
+      inputAmount * 1000,
     ];
 
-    // Filter out amounts greater than 100 million (100,000,000)
     return amounts.filter((amount) => amount <= 100000000);
   };
 
-  // Handle button press to set the money value
   const handleSuggestedAmount = (amount) => {
     setMoney(amount.toString());
   };
 
-  // Handle withdrawal logic
   const handleWithdrawal = () => {
     if (!money) {
-      Alert.alert("Error", "Hãy nhập số tiền cần rút");
+      Alert.alert("Lỗi", "Hãy nhập số tiền cần rút");
       return;
     }
-    const amount = Number(money)
-    const userId = isLoggedIn?.id
+    const amount = Number(money);
+    const userId = isLoggedIn?.id;
     const values = { amount, userId };
+    setLoading(true);
     dispatch(withdrawal(values))
-    .unwrap()
-    .then((res)=>{
-      Alert.alert("Thành Công", res.message);
-    })
-    setMoney("");
-    setDescription("");
+      .unwrap()
+      .then((res) => {
+        Alert.alert("Thành Công", res.message);
+        setMoney("");
+        setDescription("");
+      })
+      .catch((error) => {
+        Alert.alert("Lỗi", "Rút tiền thất bại. Vui lòng thử lại.");
+      })
+      .finally(() => {
+        setLoading(false);
+      });
   };
 
-  // Handle form submission based on mode
   const handleSubmit = () => {
     if (isDepositMode) {
       handleCreatePayment();
@@ -125,25 +134,37 @@ const DepositScreen = ({ navigation }) => {
     <ImageBackground
       source={require("../../assets/koimain3.jpg")}
       style={styles.container}
+      resizeMode="cover"
     >
       <View style={styles.overlay} />
-      {!showWebView ? (
-        <>
+      {showWebView ? (
+        <WebView
+          source={{ uri: paymentUrl }}
+          style={styles.webview}
+          onNavigationStateChange={handleWebViewNavigationStateChange}
+          startInLoadingState
+        />
+      ) : (
+        <ScrollView
+          contentContainerStyle={styles.scrollContainer}
+          showsVerticalScrollIndicator={false}
+        >
           <Text style={styles.title}>{isDepositMode ? "Nạp Tiền" : "Rút Tiền"}</Text>
 
-          {/* Toggle Button */}
           <View style={styles.toggleContainer}>
             <TouchableOpacity
               style={[
                 styles.toggleButton,
-                isDepositMode ? styles.toggleButtonActive : styles.toggleButtonInactive,
+                isDepositMode && styles.toggleButtonActive,
               ]}
               onPress={() => setIsDepositMode(true)}
+              accessibilityLabel="Select deposit mode"
+              accessibilityRole="button"
             >
               <Text
                 style={[
                   styles.toggleButtonText,
-                  isDepositMode ? styles.toggleButtonTextActive : styles.toggleButtonTextInactive,
+                  isDepositMode && styles.toggleButtonTextActive,
                 ]}
               >
                 Nạp Tiền
@@ -152,14 +173,16 @@ const DepositScreen = ({ navigation }) => {
             <TouchableOpacity
               style={[
                 styles.toggleButton,
-                !isDepositMode ? styles.toggleButtonActive : styles.toggleButtonInactive,
+                !isDepositMode && styles.toggleButtonActive,
               ]}
               onPress={() => setIsDepositMode(false)}
+              accessibilityLabel="Select withdrawal mode"
+              accessibilityRole="button"
             >
               <Text
                 style={[
                   styles.toggleButtonText,
-                  !isDepositMode ? styles.toggleButtonTextActive : styles.toggleButtonTextInactive,
+                  !isDepositMode && styles.toggleButtonTextActive,
                 ]}
               >
                 Rút Tiền
@@ -170,18 +193,21 @@ const DepositScreen = ({ navigation }) => {
           <TextInput
             style={styles.input}
             placeholder="Số tiền (VND)"
+            placeholderTextColor="#B0BEC5"
             keyboardType="numeric"
             value={money}
             onChangeText={setMoney}
+            accessibilityLabel="Enter amount in VND"
           />
 
-          {/* Suggested Amount Buttons */}
           <View style={styles.suggestedAmountContainer}>
             {suggestedAmounts.map((amount, index) => (
               <TouchableOpacity
                 key={index}
                 style={styles.suggestedButton}
                 onPress={() => handleSuggestedAmount(amount)}
+                accessibilityLabel={`Select ${amount.toLocaleString("vi-VN")} VND`}
+                accessibilityRole="button"
               >
                 <Text style={styles.suggestedButtonText}>
                   {amount.toLocaleString("vi-VN")} VND
@@ -193,127 +219,30 @@ const DepositScreen = ({ navigation }) => {
           <TextInput
             style={styles.input}
             placeholder="Mô tả"
+            placeholderTextColor="#B0BEC5"
             value={description}
             onChangeText={setDescription}
+            accessibilityLabel="Enter transaction description"
           />
 
           {loading ? (
-            <ActivityIndicator size="large" color="#0000ff" />
+            <ActivityIndicator size="large" color="#26A69A" />
           ) : (
-            <View style={{ marginHorizontal: 20 }}>
-              <TouchableOpacity
-                style={styles.submitButton}
-                onPress={handleSubmit}
-              >
-                <Text style={styles.submitButtonText}>
-                  {isDepositMode ? "Tạo giao dịch" : "Tạo yêu cầu"}
-                </Text>
-              </TouchableOpacity>
-            </View>
+            <TouchableOpacity
+              style={styles.submitButton}
+              onPress={handleSubmit}
+              accessibilityLabel={isDepositMode ? "Create transaction" : "Create withdrawal request"}
+              accessibilityRole="button"
+            >
+              <Text style={styles.submitButtonText}>
+                {isDepositMode ? "Tạo Giao Dịch" : "Tạo Yêu Cầu"}
+              </Text>
+            </TouchableOpacity>
           )}
-        </>
-      ) : (
-        <WebView
-          source={{ uri: paymentUrl }}
-          style={styles.webview}
-          onNavigationStateChange={handleWebViewNavigationStateChange}
-          startInLoadingState
-        />
+        </ScrollView>
       )}
     </ImageBackground>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: "bold",
-    marginBottom: 20,
-    textAlign: "center",
-    marginTop: 60,
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: "#ccc",
-    padding: 10,
-    marginBottom: 15,
-    borderRadius: 5,
-    backgroundColor: "#fff",
-    marginHorizontal: 20,
-  },
-  webview: {
-    flex: 1,
-  },
-  overlay: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: "rgba(255, 255, 255, 0.5)",
-  },
-  suggestedAmountContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginHorizontal: 20,
-    marginBottom: 15,
-  },
-  suggestedButton: {
-    backgroundColor: "transparent",
-    borderWidth: 1,
-    borderColor: "white",
-    padding: 10,
-    borderRadius: 5,
-    marginHorizontal: 5,
-    alignItems: "center",
-  },
-  suggestedButtonText: {
-    color: "#fff",
-    fontWeight: "bold",
-    textAlign: "center",
-    fontSize: 12,
-  },
-  submitButton: {
-    backgroundColor: "#007bff",
-    padding: 12,
-    borderRadius: 5,
-    alignItems: "center",
-  },
-  submitButtonText: {
-    color: "#fff",
-    fontWeight: "bold",
-    fontSize: 16,
-  },
-  toggleContainer: {
-    flexDirection: "row",
-    justifyContent: "center",
-    marginBottom: 20,
-    marginHorizontal: 20,
-  },
-  toggleButton: {
-    flex: 1,
-    padding: 10,
-    borderRadius: 5,
-    alignItems: "center",
-    marginHorizontal: 5,
-  },
-  toggleButtonActive: {
-    backgroundColor: "#007bff",
-  },
-  toggleButtonInactive: {
-    backgroundColor: "transparent",
-    borderWidth: 1,
-    borderColor: "#007bff",
-  },
-  toggleButtonText: {
-    fontSize: 16,
-    fontWeight: "bold",
-  },
-  toggleButtonTextActive: {
-    color: "#fff",
-  },
-  toggleButtonTextInactive: {
-    color: "#007bff",
-  },
-});
 
 export default DepositScreen;

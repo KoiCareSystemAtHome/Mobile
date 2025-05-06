@@ -8,18 +8,21 @@ import {
   SafeAreaView,
 } from "react-native";
 import { AntDesign } from "@expo/vector-icons";
+import FontAwesome from "react-native-vector-icons/FontAwesome";
 import { styles } from "./styles";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {
   getDepositTransaction,
   getOrderTransaction,
   getPackageTransaction,
+  getUserWithdraw,
 } from "../../redux/slices/transactionSlice";
 import { useDispatch, useSelector } from "react-redux";
 import {
   depositTransactionOrder,
   orderTransactionSelector,
   packageTransactionSelector,
+  userWithdrawalSelector,
 } from "../../redux/selector";
 import dayjs from "dayjs";
 
@@ -33,6 +36,7 @@ const TransactionScreen = ({ navigation }) => {
   const orderTransactionData = useSelector(orderTransactionSelector);
   const packageTransactionData = useSelector(packageTransactionSelector);
   const depositeTransactionData = useSelector(depositTransactionOrder);
+  const withdrawalData = useSelector(userWithdrawalSelector);
 
   const getDataForTab = () => {
     switch (activeTab) {
@@ -42,6 +46,8 @@ const TransactionScreen = ({ navigation }) => {
         return orderTransactionData;
       case "Gói member":
         return packageTransactionData;
+      case "Yêu cầu rút":
+        return withdrawalData;
       default:
         return [];
     }
@@ -61,62 +67,118 @@ const TransactionScreen = ({ navigation }) => {
     }));
   };
 
-  const renderDepositData = ({ item }) => {
+  const renderTransactionData = ({ item }) => {
     const isExpanded = expandedItems[item.transactionId] || false;
+
+    if (activeTab === "Yêu cầu rút") {
+      const formatDate = (dateString) => {
+        return new Date(dateString).toLocaleDateString("vi-VN", {
+          year: "numeric",
+          month: "short",
+          day: "numeric",
+        });
+      };
+
+      const translateStatus = (status) => {
+        switch (status) {
+          case "Pending":
+            return "Đang chờ";
+          case "Approved":
+            return "Đã duyệt";
+          case "Rejected":
+            return "Bị từ chối";
+          default:
+            return status;
+        }
+      };
+
+      return (
+        <View style={styles.transactionCard}>
+          <View style={styles.cardContent}>
+            <View style={styles.infoHeader}>
+              <Text style={styles.orderNumber}>
+                Yêu cầu rút tiền {formatDate(item.createDate)}
+              </Text>
+              <FontAwesome
+                name="money"
+                size={20}
+                color="#26A69A"
+                style={styles.icon}
+              />
+            </View>
+            <Text style={styles.orderDetails}>
+              Ngày yêu cầu: {formatDate(item.createDate)}
+            </Text>
+            <Text style={styles.orderTotal}>
+              Số tiền: {item.money.toLocaleString("vi-VN")} VND
+            </Text>
+            <Text style={styles.orderDetails}>
+              Trạng thái: {translateStatus(item.status)}
+            </Text>
+          </View>
+        </View>
+      );
+    }
 
     return (
       <View style={styles.transactionCard}>
-        <View
-          style={{
-            flexDirection: "row",
-            justifyContent: "space-between",
-            alignItems: "center",
-          }}
-        >
-          <View>
+        <View style={styles.cardContent}>
+          <View style={styles.infoHeader}>
             <Text style={styles.orderNumber}>
               {item?.pakageName
                 ? `Gói ${item?.pakageName}`
                 : `Đơn ${item?.vnPayTransactionId}`}
             </Text>
-            {/* Conditionally render status text only for orderTransactionData (Sản phẩm tab) */}
-            {activeTab === "Sản phẩm" && (
-              <>
-                {item.refund && item.payment && (
-                  <Text style={styles.statusText}>Đơn đã được hủy</Text>
-                )}
-                {item.payment && !item.refund && (
-                  <Text style={[styles.statusText, { color: "green" }]}>
-                    Đơn đã được trả
-                  </Text>
-                )}
-                {!item.payment && !item.refund && (
-                  <Text style={[styles.statusText, { color: "yellow" }]}>
-                    Chờ thanh toán
-                  </Text>
-                )}
-              </>
-            )}
-            <Text style={styles.orderDetails}>
-              Mua ngày: {dayjs(item.transactionDate).format("ddd, D MMMM YYYY")}
-            </Text>
-            <Text style={styles.orderTotal}>
-              Tổng tiền: {item.amount.toLocaleString("vi-VN")} VND
-            </Text>
+            <FontAwesome
+              name="money"
+              size={20}
+              color="#26A69A"
+              style={styles.icon}
+            />
           </View>
+          {activeTab === "Sản phẩm" && (
+            <>
+              {item.refund && item.payment && (
+                <Text style={[styles.statusText, { color: "#EF5350" }]}>
+                  Đơn đã được hủy
+                </Text>
+              )}
+              {item.payment && !item.refund && (
+                <Text style={[styles.statusText, { color: "#26A69A" }]}>
+                  Đơn đã được trả
+                </Text>
+              )}
+              {!item.payment && !item.refund && (
+                <Text style={[styles.statusText, { color: "#FFB300" }]}>
+                  Chờ thanh toán
+                </Text>
+              )}
+            </>
+          )}
+          <Text style={styles.orderDetails}>
+            Mua ngày: {dayjs(item.transactionDate).format("ddd, D MMMM YYYY")}
+          </Text>
+          <Text style={styles.orderTotal}>
+            Tổng tiền: {item.amount.toLocaleString("vi-VN")} VND
+          </Text>
           {(item.payment || item.refund) && (
-            <TouchableOpacity onPress={() => toggleExpand(item.transactionId)}>
+            <TouchableOpacity
+              style={styles.expandButton}
+              onPress={() => toggleExpand(item.transactionId)}
+              accessibilityLabel={isExpanded ? "Collapse details" : "Expand details"}
+              accessibilityRole="button"
+            >
               <AntDesign
                 name={isExpanded ? "up" : "down"}
                 size={20}
-                color="#1E3A8A"
+                color="#004D40"
               />
             </TouchableOpacity>
           )}
         </View>
 
         {isExpanded && (item.payment || item.refund) && (
-          <View style={{ marginTop: 10 }}>
+          <View style={styles.expandedContent}>
             {item.payment && (
               <View style={styles.paymentContainer}>
                 <Text style={styles.detailText}>
@@ -174,6 +236,7 @@ const TransactionScreen = ({ navigation }) => {
       dispatch(getOrderTransaction(isLoggedIn.id));
       dispatch(getPackageTransaction(isLoggedIn.id));
       dispatch(getDepositTransaction(isLoggedIn.id));
+      dispatch(getUserWithdraw(isLoggedIn.id));
     }
   }, [isLoggedIn?.id, dispatch]);
 
@@ -203,8 +266,12 @@ const TransactionScreen = ({ navigation }) => {
       <View style={styles.overlay} />
       <SafeAreaView style={styles.container}>
         <View style={styles.header}>
-          <TouchableOpacity onPress={() => navigation.goBack()}>
-            <AntDesign name="left" size={24} color="#1E3A8A" />
+          <TouchableOpacity
+            onPress={() => navigation.goBack()}
+            accessibilityLabel="Go back"
+            accessibilityRole="button"
+          >
+            <AntDesign name="left" size={24} color="#004D40" />
           </TouchableOpacity>
           <Text style={styles.title}>Lịch Sử Giao Dịch</Text>
           <View style={{ width: 24 }} />
@@ -213,6 +280,8 @@ const TransactionScreen = ({ navigation }) => {
           <TouchableOpacity
             style={[styles.tab, activeTab === "Thanh toán" && styles.activeTab]}
             onPress={() => setActiveTab("Thanh toán")}
+            accessibilityLabel="View payment transactions"
+            accessibilityRole="button"
           >
             <Text
               style={[
@@ -226,6 +295,8 @@ const TransactionScreen = ({ navigation }) => {
           <TouchableOpacity
             style={[styles.tab, activeTab === "Sản phẩm" && styles.activeTab]}
             onPress={() => setActiveTab("Sản phẩm")}
+            accessibilityLabel="View product transactions"
+            accessibilityRole="button"
           >
             <Text
               style={[
@@ -239,6 +310,8 @@ const TransactionScreen = ({ navigation }) => {
           <TouchableOpacity
             style={[styles.tab, activeTab === "Gói member" && styles.activeTab]}
             onPress={() => setActiveTab("Gói member")}
+            accessibilityLabel="View package transactions"
+            accessibilityRole="button"
           >
             <Text
               style={[
@@ -249,11 +322,26 @@ const TransactionScreen = ({ navigation }) => {
               Gói member
             </Text>
           </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.tab, activeTab === "Yêu cầu rút" && styles.activeTab]}
+            onPress={() => setActiveTab("Yêu cầu rút")}
+            accessibilityLabel="View withdrawal requests"
+            accessibilityRole="button"
+          >
+            <Text
+              style={[
+                styles.tabText,
+                activeTab === "Yêu cầu rút" && styles.activeTabText,
+              ]}
+            >
+              Yêu cầu rút
+            </Text>
+          </TouchableOpacity>
         </View>
         <FlatList
           data={paginatedTransactions}
-          renderItem={renderDepositData}
-          keyExtractor={(item) => item.transactionId}
+          renderItem={renderTransactionData}
+          keyExtractor={(item) => item.transactionId || item.id}
           contentContainerStyle={styles.listContainer}
         />
         {transactions?.length > 0 && (
@@ -265,10 +353,10 @@ const TransactionScreen = ({ navigation }) => {
               ]}
               onPress={handlePreviousPage}
               disabled={currentPage === 1}
+              accessibilityLabel="Previous page"
+              accessibilityRole="button"
             >
-              <Text style={styles.paginationText}>
-                <AntDesign name="left" size={20} color="#1E3A8A" />
-              </Text>
+              <AntDesign name="left" size={20} color="#FFFFFF" />
             </TouchableOpacity>
             <Text style={styles.pageText}>
               {currentPage}/{totalPages}
@@ -280,10 +368,10 @@ const TransactionScreen = ({ navigation }) => {
               ]}
               onPress={handleNextPage}
               disabled={currentPage === totalPages}
+              accessibilityLabel="Next page"
+              accessibilityRole="button"
             >
-              <Text style={styles.paginationText}>
-                <AntDesign name="right" size={20} color="#1E3A8A" />
-              </Text>
+              <AntDesign name="right" size={20} color="#FFFFFF" />
             </TouchableOpacity>
           </View>
         )}

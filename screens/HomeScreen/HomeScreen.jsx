@@ -213,16 +213,7 @@ const HomeScreen = ({ navigation }) => {
             />
             <Text style={styles.drawerItemText}>Lịch Sử Giao Dịch</Text>
           </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.drawerItem}
-            onPress={() => navigation.navigate("WithdrawalStatistic")}
-          >
-            <Image
-              source={require("../../assets/history_svgrepo.com.png")}
-              style={styles.drawerItemImage}
-            />
-            <Text style={styles.drawerItemText}>Lịch Sử Rút Tiền</Text>
-          </TouchableOpacity>
+
           <TouchableOpacity
             style={styles.drawerItem}
             onPress={() => navigation.navigate("ScheduleScreen")}
