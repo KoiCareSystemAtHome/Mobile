@@ -83,9 +83,9 @@ const TransactionScreen = ({ navigation }) => {
         switch (status) {
           case "Pending":
             return "Đang chờ";
-          case "Approved":
+          case "Approve":
             return "Đã duyệt";
-          case "Rejected":
+          case "Reject":
             return "Bị từ chối";
           default:
             return status;
@@ -138,7 +138,7 @@ const TransactionScreen = ({ navigation }) => {
           </View>
           {activeTab === "Sản phẩm" && (
             <>
-              {item.refund && item.payment && (
+              {((item.refund && item.payment) || (item.transactionType === "Cancel")) && (
                 <Text style={[styles.statusText, { color: "#EF5350" }]}>
                   Đơn đã được hủy
                 </Text>
@@ -148,7 +148,7 @@ const TransactionScreen = ({ navigation }) => {
                   Đơn đã được trả
                 </Text>
               )}
-              {!item.payment && !item.refund && (
+              {!item.payment && !item.refund && item.transactionType !== "Cancel" && (
                 <Text style={[styles.statusText, { color: "#FFB300" }]}>
                   Chờ thanh toán
                 </Text>

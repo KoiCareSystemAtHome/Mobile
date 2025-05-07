@@ -25,7 +25,7 @@ import {
 import { DatePicker, Provider, Picker } from "@ant-design/react-native";
 import enUS from "@ant-design/react-native/lib/locale-provider/en_US";
 
-const CalculateMaintainance = () => {
+const CalculateMaintainance = ({navigation}) => {
   const dispatch = useDispatch();
   const pondData = useSelector(pondByOwnerSelector);
   const maintainanceData = useSelector(calculatedMaintainanceSelector);
@@ -91,6 +91,7 @@ const CalculateMaintainance = () => {
           dispatch(getReminderByOwner(isLoggedIn?.id));
           if (Array.isArray(res) && res.length > 0) {
             Alert.alert("Thành công", "Lịch Định Kỳ Được Lưu Thành Công");
+            navigation.goBack()
           }
         })
         .catch((error) => {

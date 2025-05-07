@@ -158,6 +158,7 @@ const OrderTracking = ({ navigation }) => {
       year: "numeric",
     });
   };
+  console.log(orderTrack?.log)
 
   return (
     <Provider locale={enUS}>
@@ -340,6 +341,7 @@ const OrderTracking = ({ navigation }) => {
                   return: "Trả hàng",
                   transporting: "Đang vận chuyển",
                   sorting: "Đang phân loại",
+                  money_collect_delivering: "Đã thu tiền vận chuyển"
                 };
                 return (
                   <View key={index} style={styles.trackingItem}>

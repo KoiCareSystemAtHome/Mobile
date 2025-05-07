@@ -20,6 +20,7 @@ import {
   calculateOrderInvoice,
   createOrder,
   updateOrderStatus,
+  resetInvoice,
 } from "../../redux/slices/ghnSlice";
 import { loadAsync } from "expo-font";
 import { getWallet } from "../../redux/slices/authSlice";
@@ -56,14 +57,28 @@ const CartScreen = ({ navigation }) => {
 
   // Helper function to calculate sums from invoiceData
   const calculateInvoiceSums = (invoiceData) => {
-    return invoiceData.reduce(
+    return invoiceData?.reduce(
       (acc, shop) => ({
-        totalShippingFee: acc.totalShippingFee + (shop.shippingFee || 0),
-        totalProductPrice: acc.totalProductPrice + (shop.totalProductPrice || 0),
-        totalOrderPrice: acc.totalOrderPrice + (shop.totalOrderPrice || 0),
+        totalShippingFee: acc?.totalShippingFee + (shop?.shippingFee || 0),
+        totalProductPrice:
+          acc?.totalProductPrice + (shop?.totalProductPrice || 0),
+        totalOrderPrice: acc?.totalOrderPrice + (shop?.totalOrderPrice || 0),
       }),
       { totalShippingFee: 0, totalProductPrice: 0, totalOrderPrice: 0 }
     );
+  };
+
+  // Helper function to calculate sums from cart when invoiceData is empty
+  const calculateCartSums = (cartItems) => {
+    const totalProductPrice = cartItems.reduce(
+      (acc, item) => acc + item.price * item.quantity,
+      0
+    );
+    return {
+      totalShippingFee: 0, // Shipping fee is 0 until address exists
+      totalProductPrice,
+      totalOrderPrice: totalProductPrice, // No additional fees
+    };
   };
 
   useEffect(() => {
@@ -118,6 +133,32 @@ const CartScreen = ({ navigation }) => {
     }
   }, [cart, isLoggedIn, dispatch]);
 
+  useEffect(() => {
+    if (cart.length > 0 && userInfo && address) {
+      const name = userInfo?.name || "Người nhận";
+      const phoneNumber = userInfo?.phoneNumber || "Số điện thoại";
+      const order = {
+        name,
+        phoneNumber,
+        address,
+        accountId: isLoggedIn?.id,
+        orderDetails: cart.map(({ productId, quantity }) => ({
+          productId,
+          quantity,
+        })),
+        shipFee: 10,
+        shipType: "string",
+        status: "Pending",
+        note: "Không có ghi chú",
+      };
+      dispatch(calculateOrderInvoice(order));
+    }
+    // Cleanup: Reset invoice state when component unmounts
+    return () => {
+      dispatch(resetInvoice());
+    };
+  }, [userInfo, address, cart, isLoggedIn, dispatch]);
+
   const calculateSubtotal = (cartItems) => {
     const total = cartItems.reduce(
       (acc, item) => acc + item.price * item.quantity,
@@ -147,10 +188,12 @@ const CartScreen = ({ navigation }) => {
     setCart(updatedCart);
     calculateSubtotal(updatedCart);
     await AsyncStorage.setItem("cart", JSON.stringify(updatedCart));
-  };
 
-  useEffect(() => {
-    if (userInfo && address) {
+    // Reset invoice if cart is empty
+    if (updatedCart.length === 0) {
+      dispatch(resetInvoice());
+    } else if (userInfo && address) {
+      // Dispatch calculateOrderInvoice if cart is not empty and userInfo and address exist
       const name = userInfo?.name || "Người nhận";
       const phoneNumber = userInfo?.phoneNumber || "Số điện thoại";
       const order = {
@@ -158,7 +201,7 @@ const CartScreen = ({ navigation }) => {
         phoneNumber,
         address,
         accountId: isLoggedIn?.id,
-        orderDetails: cart.map(({ productId, quantity }) => ({
+        orderDetails: updatedCart.map(({ productId, quantity }) => ({
           productId,
           quantity,
         })),
@@ -169,7 +212,7 @@ const CartScreen = ({ navigation }) => {
       };
       dispatch(calculateOrderInvoice(order));
     }
-  }, [userInfo, address, cart, isLoggedIn, dispatch]);
+  };
 
   const handleCheckout = () => {
     const name = userInfo?.name || "Người nhận";
@@ -201,12 +244,17 @@ const CartScreen = ({ navigation }) => {
       paymentMethod: paymentMethod,
     };
 
-    if (address === null && userInfo === null) {
+    if (address === null || userInfo === null) {
       Toast.fail("Please provide recipient information and address");
       return;
     } else {
       if (paymentMethod === "Online Banking") {
-        const { totalOrderPrice } = calculateInvoiceSums(invoiceData);
+        const invoiceSums = cart.length > 0
+          ? (invoiceData?.length > 0
+              ? calculateInvoiceSums(invoiceData)
+              : calculateCartSums(cart))
+          : { totalOrderPrice: 0 };
+        const { totalOrderPrice } = invoiceSums;
         if (walletData?.amount < totalOrderPrice) {
           Toast.fail("Insufficient wallet balance");
           return;
@@ -261,9 +309,14 @@ const CartScreen = ({ navigation }) => {
     return null;
   }
 
-  // Calculate sums for display
-  const { totalShippingFee, totalProductPrice, totalOrderPrice } =
-    calculateInvoiceSums(invoiceData);
+  const invoiceSums = cart.length > 0
+    ? (invoiceData?.length > 0 && address
+        ? calculateInvoiceSums(invoiceData)
+        : calculateCartSums(cart))
+    : { totalShippingFee: 0, totalProductPrice: 0, totalOrderPrice: 0 };
+  const { totalShippingFee, totalProductPrice, totalOrderPrice } = invoiceSums;
+
+      console.log(invoiceData)
 
   return (
     <Provider>
@@ -293,8 +346,7 @@ const CartScreen = ({ navigation }) => {
             {/* Wallet Amount */}
             <View style={styles.walletContainer}>
               <Text style={styles.walletText}>
-                Số dư ví: {(walletData?.amount).toLocaleString("vi-VN") || "0.00"}{" "}
-                VND
+                Số dư ví: {(walletData?.amount).toLocaleString("vi-VN") || "0.00"} VND
               </Text>
             </View>
 
@@ -381,25 +433,19 @@ const CartScreen = ({ navigation }) => {
               <View style={styles.summaryRow}>
                 <Text style={styles.summaryText}>Tiền ship</Text>
                 <Text style={styles.summaryPrice}>
-                  {invoiceData && invoiceData.length > 0
-                    ? `${totalShippingFee.toLocaleString("vi-VN")} VND`
-                    : "0 VND"}
+                  {`${totalShippingFee.toLocaleString("vi-VN")} VND`}
                 </Text>
               </View>
               <View style={styles.summaryRow}>
                 <Text style={styles.summaryText}>Tổng tiền</Text>
                 <Text style={styles.summaryPrice}>
-                  {invoiceData && invoiceData.length > 0
-                    ? `${totalProductPrice.toLocaleString("vi-VN")} VND`
-                    : "0 VND"}
+                  {`${totalProductPrice.toLocaleString("vi-VN")} VND`}
                 </Text>
               </View>
               <View style={styles.summaryRow}>
                 <Text style={styles.totalText}>Tổng cộng</Text>
                 <Text style={styles.totalPrice}>
-                  {invoiceData && invoiceData.length > 0
-                    ? `${totalOrderPrice.toLocaleString("vi-VN")} VND`
-                    : "0 VND"}
+                  {`${totalOrderPrice.toLocaleString("vi-VN")} VND`}
                 </Text>
               </View>
             </View>
@@ -426,6 +472,7 @@ const CartScreen = ({ navigation }) => {
             type="primary"
             style={styles.checkoutButton}
             onPress={handleCheckout}
+            disabled={!address}
           >
             <Text style={styles.checkoutText}>Thanh toán</Text>
           </Button>

@@ -29,7 +29,7 @@ import utc from "dayjs/plugin/utc";
 
 dayjs.extend(utc);
 
-const CalculateMaintainance = () => {
+const CalculateMaintainance = ({navigation}) => {
   const dispatch = useDispatch();
   const pondData = useSelector(pondByOwnerSelector);
   const maintainanceData = useSelector(calculatedMaintainanceSelector);
@@ -74,6 +74,7 @@ const CalculateMaintainance = () => {
   useEffect(() => {
     if (homePond) {
       const pondId = homePond?.pondID;
+      console.log(pondId)
       dispatch(calculateMaintainance({ pondId }));
     }
   }, [homePond, dispatch]);
@@ -109,8 +110,10 @@ const CalculateMaintainance = () => {
         .unwrap()
         .then((res) => {
           if (res.message) {
-            Alert.alert(res.message);
+            console.log(res.message)
+            Alert.alert("Thành Công", "Lưu lịch bảo trì thành công.");
             dispatch(getReminderByOwner(isLoggedIn?.id));
+            navigation.goBack()
           }
         })
         .catch((error) => {
@@ -158,6 +161,7 @@ const CalculateMaintainance = () => {
       key: `minute-${i}`,
     })),
   ];
+  console.log(maintainanceData)
 
   return (
     <Provider locale={enUS}>

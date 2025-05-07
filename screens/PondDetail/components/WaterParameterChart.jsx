@@ -139,7 +139,7 @@ const WaterParametersChart = ({
 
     if (paramInfo) {
       const bounds = [
-        paramInfo.warningLower,
+        paramInfo.warningLowwer,
         paramInfo.warningUpper,
         paramInfo.dangerLower,
         paramInfo.dangerUpper,
@@ -219,9 +219,9 @@ const WaterParametersChart = ({
           const paramInfo = pondParameters.find(
             (p) => p.parameterName === parameter
           );
-          const warningLowerY =
-            paramInfo?.warningLower != null
-              ? (1 - paramInfo.warningLower / maxYValue) *
+          const warnigLowwerY =
+            paramInfo?.warningLowwer != null
+              ? (1 - paramInfo.warningLowwer / maxYValue) *
                   (CHART_HEIGHT - PADDING * 2) +
                 PADDING
               : null;
@@ -295,12 +295,12 @@ const WaterParametersChart = ({
                   strokeWidth="1"
                 />
                 {/* Warning and Danger Lines */}
-                {warningLowerY && (
+                {warnigLowwerY && (
                   <Line
                     x1={PADDING}
-                    y1={warningLowerY}
+                    y1={warnigLowwerY}
                     x2={CHART_WIDTH - PADDING}
-                    y2={warningLowerY}
+                    y2={warnigLowwerY}
                     stroke="#FFD700"
                     strokeWidth="1"
                     strokeDasharray="5,5"

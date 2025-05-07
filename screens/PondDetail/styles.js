@@ -227,7 +227,7 @@ export const styles = StyleSheet.create({
   },
   addToCartText: {
     color: "#fff",
-    fontSize: 14,
+    fontSize: 12,
     fontWeight: "600",
   },
   noDataText: {

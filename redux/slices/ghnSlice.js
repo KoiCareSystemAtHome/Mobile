@@ -15,7 +15,7 @@ const initialState = {
   orderByAccount: null,
   orderDetail: null,
   orderTrack: null,
-  invoice:[]
+  invoice: [],
 };
 
 export const ghnSlice = createSlice({
@@ -27,7 +27,10 @@ export const ghnSlice = createSlice({
     },
     resetOrderTrack(state) {
       state.orderTrack = null; // Reset orderTrack state
-      state.orderDetail = null
+      state.orderDetail = null;
+    },
+    resetInvoice(state) {
+      state.invoice = []; // Reset invoice state
     },
   },
   extraReducers: (builder) => {
@@ -52,7 +55,7 @@ export const ghnSlice = createSlice({
       })
       .addCase(calculateOrderInvoice.fulfilled, (state, action) => {
         state.invoice = action.payload;
-      })
+      });
   },
 });
 
@@ -103,6 +106,7 @@ export const getOrderByAccount = createAsyncThunk(
     }
   }
 );
+
 export const getOrderDetail = createAsyncThunk(
   "ghnSlice/getOrderDetail",
   async (values) => {
@@ -119,11 +123,11 @@ export const getOrderTracking = createAsyncThunk(
   "ghnSlice/getOrderTracking",
   async (values) => {
     try {
-      console.log(values)
+      console.log(values);
       const res = await postRequest(`Ghn/tracking-order`, values);
       return res.data?.data;
     } catch (error) {
-      console.log(error)
+      console.log(error);
       // Alert.alert("Error", "Failed to load order tracking.");
     }
   }
@@ -136,7 +140,7 @@ export const createOrder = createAsyncThunk(
       const res = await postRequest(`Order/create`, values);
       return res.data;
     } catch (error) {
-      console.log(error)
+      console.log(error);
     }
   }
 );
@@ -145,15 +149,14 @@ export const calculateOrderInvoice = createAsyncThunk(
   "ghnSlice/calculateOrderInvoice",
   async (values) => {
     try {
-      console.log(values)
+      console.log(values);
       const res = await postRequest(`Order/CalculateOrderInvoices`, values);
       return res.data;
     } catch (error) {
-      console.log(error)
+      console.log(error);
     }
   }
 );
-
 
 export const updateShipType = createAsyncThunk(
   "ghnSlice/updateShipType",
@@ -162,7 +165,7 @@ export const updateShipType = createAsyncThunk(
       const res = await putRequest(`Order/updateOrderShipType`, values);
       return res.data;
     } catch (error) {
-      console.log(error)
+      console.log(error);
     }
   }
 );
@@ -174,10 +177,11 @@ export const updateOrderStatus = createAsyncThunk(
       const res = await putRequest(`Order/updateOrderStatus`, values);
       return res.data;
     } catch (error) {
-      console.log(error)
+      console.log(error);
     }
   }
 );
+
 export const rejectOrder = createAsyncThunk(
   "ghnSlice/rejectOrder",
   async (values) => {
@@ -185,10 +189,10 @@ export const rejectOrder = createAsyncThunk(
       const res = await putRequest(`Order/RejectOrder`, values);
       return res.data;
     } catch (error) {
-      console.log(error)
+      console.log(error);
     }
   }
 );
 
-export const { setData, resetOrderTrack } = ghnSlice.actions;
+export const { setData, resetOrderTrack, resetInvoice } = ghnSlice.actions;
 export default ghnSlice;

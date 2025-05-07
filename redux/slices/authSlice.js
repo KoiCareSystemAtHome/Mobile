@@ -174,7 +174,7 @@ const authSlice = createSlice({
         state.loading = false;
         state.token = action.payload.token;
         state.user = action.payload.user;
-        handleLogin(action.payload);
+        handleLogin(action.payload.token);
       })
       .addCase(login.rejected, (state, action) => {
         state.loading = false;

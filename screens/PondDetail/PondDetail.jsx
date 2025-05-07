@@ -242,7 +242,7 @@ const PondDetail = ({ navigation, route }) => {
                         onPress={() =>
                           navigation.navigate("FishList", {
                             pondID: pond.pondID,
-                            userId: isLoggedIn?.id
+                            userId: isLoggedIn?.id,
                           })
                         }
                         disabled={pond?.fishAmount === 0}
@@ -353,7 +353,12 @@ const PondDetail = ({ navigation, route }) => {
                         ? `${item.price.toLocaleString("vi-VN")} VND`
                         : "N/A"}
                     </Text>
-                    <TouchableOpacity style={styles.addToCartButton}>
+                    <TouchableOpacity
+                      style={styles.addToCartButton}
+                      onPress={() =>
+                        navigation.navigate("ProductDetail", { product: item })
+                      }
+                    >
                       <Text style={styles.addToCartText}>Thêm Vào Giỏ</Text>
                     </TouchableOpacity>
                   </TouchableOpacity>

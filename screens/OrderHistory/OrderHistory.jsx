@@ -33,6 +33,7 @@ const OrderHistory = ({ navigation }) => {
     currentPage * itemsPerPage
   );
 
+
   useEffect(() => {
     const getData = async () => {
       try {
@@ -99,7 +100,7 @@ const OrderHistory = ({ navigation }) => {
     }, 0);
   };
 
-
+console.log(paginatedOrderData)
   return (
     <Provider>
       <ImageBackground
@@ -188,6 +189,10 @@ const OrderHistory = ({ navigation }) => {
                 })}
 
                 <View style={styles.orderFooter}>
+                <Text style={styles.orderTotal}>
+                    Phí ship: ₫
+                    {Number(order?.shipFee).toLocaleString("vi-VN")}
+                  </Text>
                   <Text style={styles.orderTotal}>
                     Tổng đơn hàng: ₫
                     {calculateOrderTotal(order).toLocaleString("vi-VN")}
