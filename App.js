@@ -6,11 +6,13 @@ import { createStackNavigator } from '@react-navigation/stack';
 import { NavigationContainer, useNavigationContainerRef } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Notifications from 'expo-notifications';
+import * as Battery from 'expo-battery';
 import { useDispatch, useSelector } from 'react-redux';
 import { getReminderByOwner } from './redux/slices/reminderSlice';
 import { reminderByOwnerSelector } from './redux/selector';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import { Platform, Linking, Alert } from 'react-native';
 import HomeScreen from './screens/HomeScreen/HomeScreen';
 import RegisterScreen from './screens/RegisterScreen/RegisterScreen';
 import FishStatistic from './screens/FishStatistic/FishStatistic';
@@ -64,8 +66,8 @@ const Stack = createStackNavigator();
 const scheduleNotification = async (reminder, isImmediate = false) => {
   try {
     const maintainDate = new Date(reminder.maintainDate);
-    const now = new Date(new Date().getTime() + 7 * 60 * 60 * 1000); // Add 7 hours for timezone
-    const notificationDate = isImmediate ? new Date(now.getTime() + 1000) : new Date(maintainDate.getTime() - 60 * 60 * 1000); // 1 second for immediate, 1 hour before for regular
+    const now = new Date(new Date().getTime() + 7 * 60 * 60 * 1000); 
+    const notificationDate = isImmediate ? new Date(now.getTime() + 1000) : new Date(maintainDate.getTime() - 60 * 60 * 1000); 
 
     if (notificationDate > now && reminder.seenDate === "0001-01-01T00:00:00") {
       const notificationId = await Notifications.scheduleNotificationAsync({
@@ -75,6 +77,11 @@ const scheduleNotification = async (reminder, isImmediate = false) => {
           data: { reminderId: reminder.pondReminderId },
           sound: true,
           vibrate: [0, 250, 250, 250],
+          android: {
+            channelId: 'reminder-notifications',
+            priority: 'max',
+            sticky: false,
+          },
         },
         trigger: {
           date: notificationDate,
@@ -139,12 +146,20 @@ const AppContent = () => {
   const dispatch = useDispatch();
   const reminderByOwner = useSelector(reminderByOwnerSelector);
 
-  // Initialize app: permissions, user data, and reminders
+  // Initialize app: permissions, user data, notification channel, and reminders
   useEffect(() => {
     const initializeApp = async () => {
       // Request notification permissions
       const { status } = await Notifications.requestPermissionsAsync();
       if (status !== 'granted') {
+        Alert.alert(
+          'Notification Permissions Required',
+          'Please enable notifications in your device settings to receive reminders.',
+          [
+            { text: 'OK' },
+            { text: 'Open Settings', onPress: () => Linking.openSettings() },
+          ]
+        );
         console.warn("Notification permissions not granted!");
         return;
       }
@@ -157,6 +172,44 @@ const AppContent = () => {
           shouldSetBadge: false,
         }),
       });
+
+      // Create notification channel for Android
+      if (Platform.OS === 'android') {
+        await Notifications.setNotificationChannelAsync('reminder-notifications', {
+          name: 'Reminder Notifications',
+          importance: Notifications.AndroidImportance.MAX,
+          vibrationPattern: [0, 250, 250, 250],
+          lightColor: '#FF231F7C',
+          lockscreenVisibility: Notifications.AndroidNotificationVisibility.PUBLIC,
+          bypassDnd: true,
+          enableLights: true,
+          enableVibrate: true,
+          sound: 'default',
+        });
+      }
+
+      // Check battery optimization status and alert only if needed
+      if (Platform.OS === 'android') {
+        const isDismissed = await AsyncStorage.getItem('batteryOptimizationDismissed');
+        if (isDismissed !== 'true') {
+          const isOptimized = await Battery.isBatteryOptimizationEnabledAsync();
+          if (isOptimized) {
+            Alert.alert(
+              'Battery Optimization',
+              'To ensure timely notifications, please disable battery optimization for KoiCareAtHomeMobile in your device settings.',
+              [
+                { 
+                  text: 'Don’t Show Again', 
+                  onPress: async () => {
+                    await AsyncStorage.setItem('batteryOptimizationDismissed', 'true');
+                  }
+                },
+                { text: 'Open Settings', onPress: () => Linking.openSettings() },
+              ]
+            );
+          }
+        }
+      }
 
       // Fetch user data and reminders
       try {
@@ -194,23 +247,19 @@ const AppContent = () => {
         }
         await AsyncStorage.setItem('scheduledNotifications', JSON.stringify(scheduledNotificationIds));
 
-        // Check for reminders within the next hour and schedule immediate notifications
-        for (const reminder of reminderByOwner) {
-          const maintainDate = new Date(reminder.maintainDate);
-          if (
-            maintainDate > now &&
-            maintainDate <= oneHourFromNow &&
-            reminder.seenDate === "0001-01-01T00:00:00" &&
-            !scheduledNotificationIds[reminder.pondReminderId]
-          ) {
-            await scheduleNotification(reminder, true); // Immediate notification
-          } else if (
-            maintainDate > oneHourFromNow &&
-            reminder.seenDate === "0001-01-01T00:00:00" &&
-            !scheduledNotificationIds[reminder.pondReminderId]
-          ) {
-            await scheduleNotification(reminder, false); // Regular 1-hour prior notification
-          }
+        // Find the next upcoming reminder
+        const nextReminder = reminderByOwner
+          .filter((reminder) => {
+            const maintainDate = new Date(reminder.maintainDate);
+            return maintainDate > now && reminder.seenDate === "0001-01-01T00:00:00" && !scheduledNotificationIds[reminder.pondReminderId];
+          })
+          .sort((a, b) => new Date(a.maintainDate) - new Date(b.maintainDate))[0];
+
+        // Schedule notification for the next reminder only
+        if (nextReminder) {
+          const maintainDate = new Date(nextReminder.maintainDate);
+          const isImmediate = maintainDate <= oneHourFromNow;
+          await scheduleNotification(nextReminder, isImmediate);
         }
       }
     };

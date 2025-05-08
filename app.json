@@ -22,14 +22,18 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/logo.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "permissions": [
+        "NOTIFICATIONS",
+        "RECEIVE_BOOT_COMPLETED",
+        "VIBRATE"
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png"
     },
     "developmentClient": {
       "silentLaunch": false
-     
     },
     "extra": {
       "eas": {
@@ -37,11 +41,20 @@
       }
     },
     "plugins": [
-    "./plugins/withAndroidPackageName.js",
-    "./plugins/withKotlinVersion.js",
-    "./plugins/withDependencyTree.js",
-    "./plugins/withKotlinResolution.js",
-    "./plugins/withRemovePackageAttribute.js"
-]
+      "./plugins/withAndroidPackageName.js",
+      "./plugins/withKotlinVersion.js",
+      "./plugins/withDependencyTree.js",
+      "./plugins/withKotlinResolution.js",
+      "./plugins/withRemovePackageAttribute.js",
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/logo.png",
+          "color": "#ffffff",
+          "sounds": ["./assets/notification.wav"],
+          "mode": "production"
+        }
+      ]
+    ]
   }
 }

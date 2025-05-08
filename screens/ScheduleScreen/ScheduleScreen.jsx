@@ -51,6 +51,8 @@ const ScheduleScreen = ({ navigation }) => {
     if (reminderByOwner && reminderByOwner.length > 0) {
       const newMarkedDates = {};
       const now = new Date();
+      now.setHours(now.getHours() + 7); // Add 7 hours to shift to Vietnam time (UTC+07:00)
+      console.log("Adjusted Vietnam time:", now.toISOString()); // Log the adjusted time
 
       const futureReminders = reminderByOwner.filter((reminder) => {
         try {
