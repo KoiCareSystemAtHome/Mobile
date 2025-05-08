@@ -96,8 +96,6 @@ export const resetPassword = createAsyncThunk(
   }
 );
 
-
-
 export const activateAccount = createAsyncThunk(
   "authSlice/activateAccount",
   async (credentials, { rejectWithValue }) => {
@@ -105,7 +103,7 @@ export const activateAccount = createAsyncThunk(
       const response = await putRequest(
         `Account/activate?email=${credentials.email}&code=${credentials.otp}`
       );
-   
+
       return response.data;
     } catch (error) {
       Alert.alert("Error", "Login failed. Please try again.");
@@ -134,9 +132,7 @@ export const updateProfile = createAsyncThunk(
   "authSlice/updateProfile",
   async (credentials, { rejectWithValue }) => {
     try {
-      const response = await postRequest(
-        `Account/UpdateProfile`, credentials
-      );
+      const response = await postRequest(`Account/UpdateProfile`, credentials);
 
       return response.data;
     } catch (error) {
@@ -161,7 +157,15 @@ const authSlice = createSlice({
     logout(state) {
       state.token = null;
       state.user = null;
+      state.wallet = null; // Reset wallet as well
       Alert.alert("Success", "Logged out successfully");
+    },
+    resetState(state) {
+      state.user = null;
+      state.token = null;
+      state.loading = false;
+      state.error = null;
+      state.wallet = null;
     },
   },
   extraReducers: (builder) => {
@@ -186,5 +190,5 @@ const authSlice = createSlice({
   },
 });
 
-export const { logout } = authSlice.actions;
+export const { logout, resetState } = authSlice.actions;
 export default authSlice;

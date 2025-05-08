@@ -23,7 +23,7 @@ import {
   resetInvoice,
 } from "../../redux/slices/ghnSlice";
 import { loadAsync } from "expo-font";
-import { getWallet } from "../../redux/slices/authSlice";
+import { getWallet, resetState } from "../../redux/slices/authSlice";
 import { orderInvoiceSelector, walletSelector } from "../../redux/selector";
 import RadioGroup from "react-native-radio-buttons-group";
 import { payOrder, payPackage } from "../../redux/slices/transactionSlice";
@@ -75,7 +75,7 @@ const CartScreen = ({ navigation }) => {
       0
     );
     return {
-      totalShippingFee: 0, // Shipping fee is 0 until address exists
+      totalShippingFee: 0, // Shipping ücret is 0 until address exists
       totalProductPrice,
       totalOrderPrice: totalProductPrice, // No additional fees
     };
@@ -156,6 +156,7 @@ const CartScreen = ({ navigation }) => {
     // Cleanup: Reset invoice state when component unmounts
     return () => {
       dispatch(resetInvoice());
+      dispatch(resetState()); // Reset authSlice state
     };
   }, [userInfo, address, cart, isLoggedIn, dispatch]);
 
@@ -316,7 +317,7 @@ const CartScreen = ({ navigation }) => {
     : { totalShippingFee: 0, totalProductPrice: 0, totalOrderPrice: 0 };
   const { totalShippingFee, totalProductPrice, totalOrderPrice } = invoiceSums;
 
-      console.log(invoiceData)
+  console.log(invoiceData);
 
   return (
     <Provider>
@@ -346,7 +347,7 @@ const CartScreen = ({ navigation }) => {
             {/* Wallet Amount */}
             <View style={styles.walletContainer}>
               <Text style={styles.walletText}>
-                Số dư ví: {(walletData?.amount).toLocaleString("vi-VN") || "0.00"} VND
+                Số dư ví: {walletData?.amount ? walletData.amount.toLocaleString("vi-VN") : "0.00"} VND
               </Text>
             </View>
 

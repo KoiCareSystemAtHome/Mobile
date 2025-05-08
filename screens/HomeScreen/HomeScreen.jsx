@@ -24,7 +24,7 @@ import {
   userSelector,
   walletSelector,
 } from "../../redux/selector";
-import { getWallet } from "../../redux/slices/authSlice";
+import { getWallet, resetState } from "../../redux/slices/authSlice";
 import { LinearGradient } from "expo-linear-gradient";
 
 const HomeScreen = ({ navigation }) => {
@@ -108,6 +108,7 @@ const HomeScreen = ({ navigation }) => {
       await AsyncStorage.removeItem("cart");
       await AsyncStorage.removeItem("address");
       await AsyncStorage.removeItem("userInfo");
+      dispatch(resetState());
       setIsLoggedIn(null);
       setToken(null);
       setTooltipVisible(false);

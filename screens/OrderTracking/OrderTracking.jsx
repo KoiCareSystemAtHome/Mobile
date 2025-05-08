@@ -1,5 +1,5 @@
 import { Provider, Toast, Modal } from "@ant-design/react-native";
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Image,
   ImageBackground,
@@ -10,7 +10,7 @@ import {
   View,
 } from "react-native";
 import { styles } from "./styles";
-import { useRoute, useFocusEffect } from "@react-navigation/native";
+import { useRoute } from "@react-navigation/native";
 import {
   getOrderByAccount,
   getOrderDetail,
@@ -18,7 +18,7 @@ import {
   rejectOrder,
   updateOrderStatus,
   updateShipType,
-  resetOrderTrack, // Import the new action
+  resetOrderTrack,
 } from "../../redux/slices/ghnSlice";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -46,14 +46,18 @@ const OrderTracking = ({ navigation }) => {
   // Function to check if the Report button should be displayed
   const isReportButtonVisible = () => {
     if (!orderTrack?.log) return false;
-    const deliveredLog = orderTrack.log.find(
-      (log) => log.status === "delivered"
-    );
+
+    // Find the delivered log
+    const deliveredLog = orderTrack.log.find((log) => log.status === "delivered");
     if (!deliveredLog) return false;
+
+    // Calculate the time difference
     const deliveredDate = new Date(deliveredLog.updated_date);
-    const currentDate = new Date("2025-04-25");
+    const currentDate = new Date(); // Use actual current date
     const timeDiff = currentDate - deliveredDate;
-    const daysDiff = timeDiff / (1000 * 60 * 60 * 24);
+    const daysDiff = timeDiff / (1000 * 60 * 60 * 24); // Convert milliseconds to days
+
+    // Return true if within 3 days, false otherwise
     return daysDiff <= 3;
   };
 
@@ -61,11 +65,12 @@ const OrderTracking = ({ navigation }) => {
   useEffect(() => {
     dispatch(resetOrderTrack()); // Reset on mount
     dispatch(getOrderDetail(orderId));
-  
+
     return () => {
       dispatch(resetOrderTrack()); // Reset on unmount
     };
   }, [dispatch, orderId]);
+
   // Fetch order tracking data
   useEffect(() => {
     if (orderDetail?.oder_code) {
@@ -108,7 +113,10 @@ const OrderTracking = ({ navigation }) => {
         payload = { orderId, status: "In Progress" };
       } else if (orderTrack?.status === "delivery_fail") {
         payload = { orderId, status: "Fail" };
-      } else if (orderTrack?.status === "delivering" && orderDetail?.status !== "Delivered") {
+      } else if (
+        orderTrack?.status === "delivering" &&
+        orderDetail?.status !== "Delivered"
+      ) {
         payload = { orderId, status: "In Progress" };
       } else if (orderTrack?.status === "delivered") {
         payload = { orderId, status: "Complete" };
@@ -158,7 +166,8 @@ const OrderTracking = ({ navigation }) => {
       year: "numeric",
     });
   };
-  console.log(orderTrack?.log)
+
+  console.log(orderTrack?.log);
 
   return (
     <Provider locale={enUS}>
@@ -177,7 +186,6 @@ const OrderTracking = ({ navigation }) => {
         </View>
 
         <ScrollView contentContainerStyle={styles.container}>
-          {/* Rest of the JSX remains unchanged */}
           <View style={styles.orderCard}>
             <Text style={styles.sectionTitle}>Chi Tiết Đơn Hàng</Text>
             {orderDetail?.details?.length > 0 ? (
@@ -341,7 +349,7 @@ const OrderTracking = ({ navigation }) => {
                   return: "Trả hàng",
                   transporting: "Đang vận chuyển",
                   sorting: "Đang phân loại",
-                  money_collect_delivering: "Đã thu tiền vận chuyển"
+                  money_collect_delivering: "Đã thu tiền vận chuyển",
                 };
                 return (
                   <View key={index} style={styles.trackingItem}>

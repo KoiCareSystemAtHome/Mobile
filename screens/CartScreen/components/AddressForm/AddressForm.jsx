@@ -236,14 +236,14 @@ const AddressForm = ({ navigation }) => {
               ]}
               textStyle={{ fontSize: 16, color: "#333" }}
               dropDownContainerStyle={styles.dropdown}
-              placeholder="Select Province"
+              placeholder="Chọn tỉnh/thành phố"
             />
           </Form.Item>
 
           <Form.Item label="District" style={styles.dropdownContainer} noStyle>
             <DropDownPicker
               placeholder={
-                selectedProvince ? "Select District" : "Select Province First"
+                selectedProvince ? "Chọn Quận/Huyện" : "Hãy chọn tỉnh/thành phố"
               }
               open={openDistrict}
               value={selectedDistrict}
@@ -271,7 +271,7 @@ const AddressForm = ({ navigation }) => {
           <Form.Item label="Ward" style={styles.dropdownContainer} noStyle>
             <DropDownPicker
               placeholder={
-                selectedDistrict ? "Select Ward" : "Select District First"
+                selectedDistrict ? "Chọn Phường/Xã" : "Hãy chọn quận/huyện"
               }
               open={openWard}
               value={selectedWard}

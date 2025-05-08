@@ -45,7 +45,9 @@ const SuggestFood = ({ route, navigation }) => {
           {foodSuggestion?.image && (
             <Image
               source={{
-                uri: foodSuggestion.image || "https://via.placeholder.com/80/ADD8E6/FFFFFF?",
+                uri:
+                  foodSuggestion.image ||
+                  "https://via.placeholder.com/80/ADD8E6/FFFFFF?",
               }}
               style={styles.noteImage}
             />
@@ -59,21 +61,34 @@ const SuggestFood = ({ route, navigation }) => {
       {/* Food Suggestions List */}
       <FlatList
         data={foodSuggestion?.foods || []}
-        keyExtractor={(item) => item.foodId?.toString() || Math.random().toString()}
+        keyExtractor={(item) =>
+          item.foodId?.toString() || Math.random().toString()
+        }
         numColumns={2}
         contentContainerStyle={styles.productList}
         renderItem={({ item }) => (
-          <TouchableOpacity style={styles.productCard}>
+          <TouchableOpacity
+            style={styles.productCard}
+            onPress={() => {
+              navigation.navigate("ProductDetail", {
+                product: item.product || {},
+              });
+            }}
+          >
             <Image
               source={{
-                uri: item.product?.image || "https://via.placeholder.com/150/ADD8E6/FFFFFF?text=Koi+Food",
+                uri:
+                  item.product?.image ||
+                  "https://via.placeholder.com/150/ADD8E6/FFFFFF?text=Koi+Food",
               }}
               style={styles.productImage}
             />
             <Text style={styles.productName}>
               {item.product?.productName || "Unknown Product"}
             </Text>
-            <Text style={styles.productName}>{item.product?.brand || "N/A"}</Text>
+            <Text style={styles.productName}>
+              {item.product?.brand || "N/A"}
+            </Text>
             <Text style={styles.ageText}>
               Age: {item.ageFrom ?? "N/A"} - {item.ageTo ?? "N/A"} months
             </Text>
@@ -95,7 +110,9 @@ const SuggestFood = ({ route, navigation }) => {
         )}
         ListEmptyComponent={() => (
           <View style={{ flex: 1, alignItems: "center", padding: 30 }}>
-            <Text style={{ fontSize: 18, color: "#6B7280", textAlign: "center" }}>
+            <Text
+              style={{ fontSize: 18, color: "#6B7280", textAlign: "center" }}
+            >
               No food suggestions available for your koi at this time.
             </Text>
           </View>
