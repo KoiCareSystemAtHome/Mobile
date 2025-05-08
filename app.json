@@ -45,16 +45,7 @@
       "./plugins/withKotlinVersion.js",
       "./plugins/withDependencyTree.js",
       "./plugins/withKotlinResolution.js",
-      "./plugins/withRemovePackageAttribute.js",
-      [
-        "expo-notifications",
-        {
-          "icon": "./assets/logo.png",
-          "color": "#ffffff",
-          "sounds": ["./assets/notification.wav"],
-          "mode": "production"
-        }
-      ]
+      "./plugins/withRemovePackageAttribute.js"
     ]
   }
 }

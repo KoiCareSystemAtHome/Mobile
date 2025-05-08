@@ -74,7 +74,21 @@ const ScheduleScreen = ({ navigation }) => {
           const currDate = new Date(curr.maintainDate);
           return currDate.getTime() < prevDate.getTime() ? curr : prev;
         });
-        setNextReminder(closestReminder);
+
+        // Check if the closest reminder has a seenDate of "0001-01-01T00:00:00"
+        if (closestReminder.seenDate === "0001-01-01T00:00:00") {
+          setNextReminder(closestReminder);
+        } else {
+          // Find the next reminder with seenDate "0001-01-01T00:00:00"
+          const nextUnseenReminder = futureReminders
+            .filter((reminder) => reminder.seenDate === "0001-01-01T00:00:00")
+            .sort((a, b) => {
+              const dateA = new Date(a.maintainDate);
+              const dateB = new Date(b.maintainDate);
+              return dateA.getTime() - dateB.getTime();
+            })[0];
+          setNextReminder(nextUnseenReminder || null);
+        }
       } else {
         setNextReminder(null);
       }
@@ -131,6 +145,8 @@ const ScheduleScreen = ({ navigation }) => {
     const date = dayjs.utc(maintainDate);
     return date.format("dddd, D MMMM").toUpperCase();
   };
+
+  console.log(reminderByOwner);
 
   return (
     <SafeAreaView style={styles.safeArea}>
