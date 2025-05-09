@@ -240,6 +240,8 @@ const FishDetail = ({ route, navigation }) => {
     return latestProfile.status === 0 ? "Ốm" : "Khỏe mạnh";
   };
 
+  console.log(fishById)
+
   const handleAddNote = () => {
     const koiId = fish.koiID;
     const note = newNote;

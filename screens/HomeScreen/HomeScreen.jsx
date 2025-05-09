@@ -118,7 +118,8 @@ const HomeScreen = ({ navigation }) => {
     }
   };
 
-  console.log(isLoggedIn?.id);
+  // Determine if buttons should be disabled
+  const isRestricted = isLoggedIn?.packageID == null;
 
   return (
     <ImageBackground
@@ -127,7 +128,6 @@ const HomeScreen = ({ navigation }) => {
       resizeMode="cover"
     >
       <View style={styles.overlay} />
-
       <Animated.View style={[styles.drawer, { left: drawerAnimation }]}>
         <View style={styles.drawerHeader}>
           <TouchableOpacity
@@ -214,7 +214,6 @@ const HomeScreen = ({ navigation }) => {
             />
             <Text style={styles.drawerItemText}>Lịch Sử Giao Dịch</Text>
           </TouchableOpacity>
-
           <TouchableOpacity
             style={styles.drawerItem}
             onPress={() => navigation.navigate("ScheduleScreen")}
@@ -260,7 +259,7 @@ const HomeScreen = ({ navigation }) => {
                   ) : (
                     <View style={styles.tooltipContainer}>
                       <TouchableOpacity
-                        Peròstyle={[
+                        style={[
                           styles.tooltipOption,
                           { borderBottomWidth: 1, paddingBottom: 5 },
                         ]}
@@ -343,7 +342,8 @@ const HomeScreen = ({ navigation }) => {
             <View style={styles.buttonGroup}>
               <Button
                 onPress={() => navigation.navigate("FishStatistic")}
-                style={styles.button}
+                style={[styles.button, isRestricted && styles.disabledButton]}
+                disabled={isRestricted}
               >
                 Thống Kê Cá
               </Button>
@@ -363,34 +363,32 @@ const HomeScreen = ({ navigation }) => {
               <Button
                 onPress={() => navigation.navigate("PondStatistic")}
                 type="primary"
-                style={styles.pondButton}
+                style={[styles.pondButton, isRestricted && styles.disabledButton]}
+                disabled={isRestricted}
               >
                 Thống Kê Hồ
               </Button>
               <Button
                 type="primary"
-                style={styles.pondButton}
-                onPress={() => {
-                  navigation.navigate("WaterParameter");
-                }}
+                style={[styles.pondButton, isRestricted && styles.disabledButton]}
+                onPress={() => navigation.navigate("WaterParameter")}
+                disabled={isRestricted}
               >
                 Thông Số Nước
               </Button>
               <Button
                 type="primary"
-                style={styles.pondButton}
-                onPress={() => {
-                  navigation.navigate("FoodCalculator");
-                }}
+                style={[styles.pondButton, isRestricted && styles.disabledButton]}
+                onPress={() => navigation.navigate("FoodCalculator")}
+                disabled={isRestricted}
               >
                 Tính Thức Ăn
               </Button>
               <Button
                 type="primary"
-                style={styles.pondButton}
-                onPress={() => {
-                  navigation.navigate("SaltCalculator");
-                }}
+                style={[styles.pondButton, isRestricted && styles.disabledButton]}
+                onPress={() => navigation.navigate("SaltCalculator")}
+                disabled={isRestricted}
               >
                 Tính Muối
               </Button>

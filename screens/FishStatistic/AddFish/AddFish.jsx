@@ -314,22 +314,7 @@ const AddFish = ({ navigation, route }) => {
                 </View>
               </View>
               <View style={styles.row}>
-                <View style={styles.inputRow}>
-                  <Text style={styles.inputLabel}>Tình trạng</Text>
-                  <Form.Item
-                    noStyle
-                    name="condition"
-                    rules={[
-                      { required: true, message: "Vui lòng nhập tình trạng!" },
-                    ]}
-                  >
-                    <Input
-                      style={styles.input}
-                      placeholder="Tình trạng"
-                      placeholderTextColor="#A0AEC0"
-                    />
-                  </Form.Item>
-                </View>
+
                 <View style={styles.inputRow}>
                   <Text style={styles.inputLabel}>Trong ao từ</Text>
                   <DatePicker

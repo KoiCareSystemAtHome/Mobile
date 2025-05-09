@@ -6,12 +6,11 @@ import { createStackNavigator } from '@react-navigation/stack';
 import { NavigationContainer, useNavigationContainerRef } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Notifications from 'expo-notifications';
-import * as Battery from 'expo-battery';
 import { useDispatch, useSelector } from 'react-redux';
 import { getReminderByOwner } from './redux/slices/reminderSlice';
 import { reminderByOwnerSelector } from './redux/selector';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import FontAwesome from 'react-native-vector-icons/FontAwesome';  
 import { Platform, Linking, Alert } from 'react-native';
 import HomeScreen from './screens/HomeScreen/HomeScreen';
 import RegisterScreen from './screens/RegisterScreen/RegisterScreen';
@@ -62,40 +61,55 @@ const Tab = createBottomTabNavigator();
 // Create Stack Navigator
 const Stack = createStackNavigator();
 
-// Function to schedule a local notification
-const scheduleNotification = async (reminder, isImmediate = false) => {
+// Function to schedule a local notification for reminders
+const scheduleReminderNotification = async (reminder, isImmediate = false) => {
   try {
     const maintainDate = new Date(reminder.maintainDate);
     const now = new Date(new Date().getTime() + 7 * 60 * 60 * 1000); 
     const notificationDate = isImmediate ? new Date(now.getTime() + 1000) : new Date(maintainDate.getTime() - 60 * 60 * 1000); 
 
-    if (notificationDate > now && reminder.seenDate === "0001-01-01T00:00:00") {
-      const notificationId = await Notifications.scheduleNotificationAsync({
-        content: {
-          title: `Reminder: ${reminder.title}`,
-          body: isImmediate ? `Your maintenance "${reminder.title}" is due soon (within 1 hour)!` : `Your maintenance "${reminder.title}" is due in 1 hour!`,
-          data: { reminderId: reminder.pondReminderId },
-          sound: true,
-          vibrate: [0, 250, 250, 250],
-          android: {
-            channelId: 'reminder-notifications',
-            priority: 'max',
-            sticky: false,
-          },
-        },
-        trigger: {
-          date: notificationDate,
-        },
+    if (notificationDate <= now || reminder.seenDate !== "0001-01-01T00:00:00") {
+      console.log(`Skipping notification for reminder: ${reminder.title}`, {
+        reason: notificationDate <= now ? 'Notification date in past or now' : 'Reminder already seen',
+        maintainDate: maintainDate.toISOString(),
+        notificationDate: notificationDate.toISOString(),
+        isImmediate,
       });
-
-      // Store the notification ID in AsyncStorage
-      const storedNotifications = await AsyncStorage.getItem('scheduledNotifications');
-      const notifications = storedNotifications ? JSON.parse(storedNotifications) : {};
-      notifications[reminder.pondReminderId] = notificationId;
-      await AsyncStorage.setItem('scheduledNotifications', JSON.stringify(notifications));
+      return;
     }
+
+    console.log(`Scheduling notification for reminder: ${reminder.title}`, {
+      pondReminderId: reminder.pondReminderId,
+      maintainDate: maintainDate.toISOString(),
+      notificationDate: notificationDate.toISOString(),
+      isImmediate,
+    });
+
+    const notificationId = await Notifications.scheduleNotificationAsync({
+      content: {
+        title: `Reminder: ${reminder.title}`,
+        body: isImmediate ? `Your maintenance "${reminder.title}" is due soon (within 1 hour)!` : `Your maintenance "${reminder.title}" is due in 1 hour!`,
+        data: { reminderId: reminder.pondReminderId },
+        sound: true,
+        vibrate: [0, 250, 250, 250],
+        android: {
+          channelId: 'reminder-notifications',
+          priority: 'max',
+          sticky: false,
+        },
+      },
+      trigger: {
+        date: notificationDate,
+      },
+    });
+
+    // Store the notification ID in AsyncStorage
+    const storedNotifications = await AsyncStorage.getItem('scheduledNotifications');
+    const notifications = storedNotifications ? JSON.parse(storedNotifications) : {};
+    notifications[reminder.pondReminderId] = notificationId;
+    await AsyncStorage.setItem('scheduledNotifications', JSON.stringify(notifications));
   } catch (error) {
-    console.error("Error scheduling notification:", error);
+    console.error("Error scheduling reminder notification:", error);
   }
 };
 
@@ -146,7 +160,7 @@ const AppContent = () => {
   const dispatch = useDispatch();
   const reminderByOwner = useSelector(reminderByOwnerSelector);
 
-  // Initialize app: permissions, user data, notification channel, and reminders
+  // Initialize app: permissions, user data, and notification channel
   useEffect(() => {
     const initializeApp = async () => {
       // Request notification permissions
@@ -188,29 +202,6 @@ const AppContent = () => {
         });
       }
 
-      // Check battery optimization status and alert only if needed
-      if (Platform.OS === 'android') {
-        const isDismissed = await AsyncStorage.getItem('batteryOptimizationDismissed');
-        if (isDismissed !== 'true') {
-          const isOptimized = await Battery.isBatteryOptimizationEnabledAsync();
-          if (isOptimized) {
-            Alert.alert(
-              'Battery Optimization',
-              'To ensure timely notifications, please disable battery optimization for KoiCareAtHomeMobile in your device settings.',
-              [
-                { 
-                  text: 'Don’t Show Again', 
-                  onPress: async () => {
-                    await AsyncStorage.setItem('batteryOptimizationDismissed', 'true');
-                  }
-                },
-                { text: 'Open Settings', onPress: () => Linking.openSettings() },
-              ]
-            );
-          }
-        }
-      }
-
       // Fetch user data and reminders
       try {
         const user = await AsyncStorage.getItem("user");
@@ -229,42 +220,84 @@ const AppContent = () => {
   // Schedule notifications for reminders
   useEffect(() => {
     const scheduleNotifications = async () => {
-      if (reminderByOwner && reminderByOwner.length > 0) {
-        const now = new Date(new Date().getTime() + 7 * 60 * 60 * 1000); // Add 7 hours for timezone
-        const oneHourFromNow = new Date(now.getTime() + 60 * 60 * 1000); // 1 hour from now
+      if (!reminderByOwner || reminderByOwner.length === 0) {
+        console.log('No reminders to process.');
+        return;
+      }
 
-        // Load stored notification IDs
-        const storedNotifications = await AsyncStorage.getItem('scheduledNotifications');
-        const scheduledNotificationIds = storedNotifications ? JSON.parse(storedNotifications) : {};
+      const now = new Date(new Date().getTime() + 7 * 60 * 60 * 1000); // Adjust for timezone
+      const oneHourFromNow = new Date(now.getTime() + 60 * 60 * 1000); // 1 hour from now
+      const twoHoursFromNow = new Date(now.getTime() + 2 * 60 * 60 * 1000); // 2 hours from now
 
-        // Cancel outdated or seen notifications
-        for (const reminderId in scheduledNotificationIds) {
-          const reminder = reminderByOwner.find(r => r.pondReminderId === reminderId);
-          if (!reminder || reminder.seenDate !== "0001-01-01T00:00:00" || new Date(reminder.maintainDate) <= now) {
-            await Notifications.cancelScheduledNotificationAsync(scheduledNotificationIds[reminderId]);
-            delete scheduledNotificationIds[reminderId];
-          }
+      console.log('Processing reminders:', {
+        now: now.toISOString(),
+        oneHourFromNow: oneHourFromNow.toISOString(),
+        twoHoursFromNow: twoHoursFromNow.toISOString(),
+        reminderCount: reminderByOwner.length,
+      });
+
+      // Load stored notification IDs
+      const storedNotifications = await AsyncStorage.getItem('scheduledNotifications');
+      let scheduledNotificationIds = storedNotifications ? JSON.parse(storedNotifications) : {};
+
+      // Cancel outdated or seen notifications
+      for (const reminderId in scheduledNotificationIds) {
+        const reminder = reminderByOwner.find(r => r.pondReminderId === reminderId);
+        if (!reminder || reminder.seenDate !== "0001-01-01T00:00:00" || new Date(reminder.maintainDate) <= now) {
+          console.log(`Canceling notification for reminderId: ${reminderId}`);
+          await Notifications.cancelScheduledNotificationAsync(scheduledNotificationIds[reminderId]);
+          delete scheduledNotificationIds[reminderId];
         }
-        await AsyncStorage.setItem('scheduledNotifications', JSON.stringify(scheduledNotificationIds));
+      }
+      await AsyncStorage.setItem('scheduledNotifications', JSON.stringify(scheduledNotificationIds));
 
-        // Find the next upcoming reminder
-        const nextReminder = reminderByOwner
-          .filter((reminder) => {
-            const maintainDate = new Date(reminder.maintainDate);
-            return maintainDate > now && reminder.seenDate === "0001-01-01T00:00:00" && !scheduledNotificationIds[reminder.pondReminderId];
-          })
-          .sort((a, b) => new Date(a.maintainDate) - new Date(b.maintainDate))[0];
+      // Process each reminder
+      for (const reminder of reminderByOwner) {
+        const maintainDate = new Date(reminder.maintainDate);
+        const isScheduled = scheduledNotificationIds[reminder.pondReminderId];
+        const isSeen = reminder.seenDate !== "0001-01-01T00:00:00";
+        const isPast = maintainDate <= now;
+        const isWithinHour = maintainDate > now && maintainDate <= oneHourFromNow;
 
-        // Schedule notification for the next reminder only
-        if (nextReminder) {
-          const maintainDate = new Date(nextReminder.maintainDate);
-          const isImmediate = maintainDate <= oneHourFromNow;
-          await scheduleNotification(nextReminder, isImmediate);
+        console.log(`Evaluating reminder: ${reminder.title}`, {
+          pondReminderId: reminder.pondReminderId,
+          maintainDate: maintainDate.toISOString(),
+          isScheduled,
+          isSeen,
+          isPast,
+          isWithinHour,
+        });
+
+        // Skip if already scheduled, seen, or past
+        if (isScheduled || isSeen || isPast) {
+          continue;
+        }
+
+        // Schedule notification if within 1 hour
+        if (isWithinHour) {
+          console.log(`Scheduling immediate notification for ${reminder.title}`);
+          await scheduleReminderNotification(reminder, true);
+        }
+        // For future reminders, only schedule if notification time is within 2 hours
+        else if (maintainDate > oneHourFromNow) {
+          const notificationDate = new Date(maintainDate.getTime() - 60 * 60 * 1000); // 1 hour before maintainDate
+          console.log(`Future reminder detected: ${reminder.title}, notificationDate: ${notificationDate.toISOString()}`);
+          // Only schedule if the notification time is within the next 2 hours
+          if (notificationDate <= twoHoursFromNow) {
+            console.log(`Scheduling future notification for ${reminder.title}`);
+            await scheduleReminderNotification(reminder, false);
+          } else {
+            console.log(`Deferring notification for ${reminder.title} (too far in the future)`);
+          }
         }
       }
     };
 
+    // Run immediately and set up periodic check
     scheduleNotifications();
+    const interval = setInterval(scheduleNotifications, 20 * 60 * 1000); // Check every 5 minutes
+
+    return () => clearInterval(interval);
   }, [reminderByOwner]);
 
   // Log the next upcoming reminder

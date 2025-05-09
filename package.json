@@ -26,7 +26,6 @@
     "axios": "^1.7.9",
     "dayjs": "^1.11.13",
     "expo": "^52.0.41",
-    "expo-battery": "^9.1.4",
     "expo-dev-client": "~5.0.15",
     "expo-font": "^13.0.4",
     "expo-image-picker": "~16.0.6",

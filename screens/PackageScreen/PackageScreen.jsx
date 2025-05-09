@@ -25,7 +25,6 @@ const PackageScreen = ({ navigation }) => {
   const updateUserPackage = async (newPackageId) => {
     try {
       const userData = await AsyncStorage.getItem("user");
-      console.log("a", newPackageId);
       if (userData) {
         const user = JSON.parse(userData);
         user.packageID = newPackageId;
@@ -45,7 +44,6 @@ const PackageScreen = ({ navigation }) => {
     const getData = async () => {
       try {
         const value = await AsyncStorage.getItem("user");
-        console.log(value);
         setIsLoggedIn(value ? JSON.parse(value) : null);
       } catch (error) {
         console.error(error);
@@ -69,22 +67,24 @@ const PackageScreen = ({ navigation }) => {
     const email = isLoggedIn?.email;
     const packageId = pkg?.packageId;
     const packageTitle = pkg?.packageTitle;
-  
+
     if (isLoggedIn?.packageID) {
       dispatch(payPackage({ email, packageId, confirmPurchase: false }))
         .unwrap()
         .then((res) => {
-          console.log(res);
           if (res && res.confirmationRequired) {
-            // Updated days left logic
-            const daysLeftMatch = res.message.match(/\((\d+\.\d+)\s+còn\s+lại\)/);
-            const daysLeft = daysLeftMatch ? parseFloat(daysLeftMatch[1]) : "không xác định";
+            const daysLeftMatch = res.message.match(
+              /\((\d+\.\d+)\s+còn\s+lại\)/
+            );
+            const daysLeft = daysLeftMatch
+              ? parseFloat(daysLeftMatch[1])
+              : "không xác định";
             const originalPrice = pkg.packagePrice;
             const discountedPrice = parseFloat(res.discountedPrice);
             const discountPercentage = Math.round(
               ((originalPrice - discountedPrice) / originalPrice) * 100
             );
-  
+
             Alert.alert(
               "Nâng cấp gói",
               `Gói hiện tại: "${currentPackageName}" có hạn đến ${
@@ -106,11 +106,11 @@ const PackageScreen = ({ navigation }) => {
                     )
                       .unwrap()
                       .then((finalRes) => {
-                        console.log(finalRes);
                         if (
                           finalRes.message === "Package upgraded successfully!"
                         ) {
                           updateUserPackage(packageId);
+                          dispatch(getWallet(isLoggedIn?.id));
                           navigation.navigate("MainTabs");
                           Alert.alert(
                             "Nâng cấp thành công!",
@@ -123,7 +123,6 @@ const PackageScreen = ({ navigation }) => {
                             ],
                             { cancelable: false }
                           );
-                          dispatch(getWallet(isLoggedIn?.id));
                         }
                       })
                       .catch((err) => {
@@ -182,22 +181,20 @@ const PackageScreen = ({ navigation }) => {
               dispatch(payPackage({ email, packageId, confirmPurchase: true }))
                 .unwrap()
                 .then((res) => {
-                  if (res === "Success") {
-                    updateUserPackage(packageId);
-                    navigation.navigate("MainTabs");
-                    Alert.alert(
-                      "Mua hàng thành công!",
-                      `Bạn đã mua thành công gói "${packageTitle}". Hãy khám phá trải nghiệm Koi Guardian nâng cao của bạn!`,
-                      [
-                        {
-                          text: "Tuyệt vời!",
-                          style: "default",
-                        },
-                      ],
-                      { cancelable: false }
-                    );
-                    dispatch(getWallet(isLoggedIn?.id));
-                  }
+                  updateUserPackage(packageId);
+                  dispatch(getWallet(isLoggedIn?.id));
+                  navigation.navigate("MainTabs");
+                  Alert.alert(
+                    "Mua hàng thành công!",
+                    `Bạn đã mua thành công gói "${packageTitle}". Hãy khám phá trải nghiệm Koi Guardian nâng cao của bạn!`,
+                    [
+                      {
+                        text: "Tuyệt vời!",
+                        style: "default",
+                      },
+                    ],
+                    { cancelable: false }
+                  );
                 })
                 .catch((err) => {
                   Alert.alert(
@@ -227,8 +224,6 @@ const PackageScreen = ({ navigation }) => {
       resizeMode="cover"
     >
       <View style={styles.overlay} />
-
-      {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
           <AntDesign name="left" size={24} color="black" />
@@ -236,10 +231,7 @@ const PackageScreen = ({ navigation }) => {
         <Text style={styles.title}>Gói Thành Viên</Text>
         <View style={{ width: 24 }} />
       </View>
-
-      {/* Main Content */}
       <ScrollView contentContainerStyle={styles.container}>
-        {/* Wallet Balance and Current Package */}
         <View style={styles.balanceContainer}>
           <Text style={styles.balanceText}>
             Số dư:{" "}
@@ -252,12 +244,9 @@ const PackageScreen = ({ navigation }) => {
             Gói hiện tại: {currentPackageName}
           </Text>
         </View>
-
         <Text style={styles.subtitle}>
           Trải nghiệm tất cả các dịch vụ mới từ Koi Guardian
         </Text>
-
-        {/* Package Cards */}
         {packageData?.map((pkg, index) => {
           const isDisabled = walletData?.amount < pkg.packagePrice;
 
