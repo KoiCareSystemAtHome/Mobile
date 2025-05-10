@@ -90,7 +90,7 @@ const SuggestFood = ({ route, navigation }) => {
               {item.product?.brand || "N/A"}
             </Text>
             <Text style={styles.ageText}>
-              Age: {item.ageFrom ?? "N/A"} - {item.ageTo ?? "N/A"} months
+              Age: {item.ageFrom ?? "N/A"} - {item.ageTo ?? "N/A"} ngày
             </Text>
             <Text style={styles.productPrice}>
               {(item.product?.price ?? 0).toLocaleString()}{" "}
