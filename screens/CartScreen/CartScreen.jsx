@@ -239,7 +239,7 @@ const CartScreen = ({ navigation }) => {
         quantity,
       })),
       shipFee: 10,
-      shipType: "string",
+      shipType: "Đặt hàng",
       status: "Pending",
       note: "Không có ghi chú",
       paymentMethod: paymentMethod,

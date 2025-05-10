@@ -189,6 +189,10 @@ console.log(paginatedOrderData)
                 })}
 
                 <View style={styles.orderFooter}>
+                 <Text style={styles.order Total}>
+                    
+                    {order?.shopName}
+                  </Text>
                 <Text style={styles.orderTotal}>
                     Phí ship: ₫
                     {Number(order?.shipFee).toLocaleString("vi-VN")}

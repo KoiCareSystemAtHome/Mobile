@@ -44,6 +44,7 @@ export const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 6,
     elevation: 5,
+    zIndex:3000
   },
   fishImage: {
     width: "95%",
@@ -81,6 +82,7 @@ export const styles = StyleSheet.create({
     alignSelf: "flex-start",
     paddingInline: 10,
     zIndex: 3000,
+    maxHeight:1000
   },
   dropdown: {
     flex: 1,

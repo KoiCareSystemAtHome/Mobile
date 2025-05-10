@@ -11,6 +11,7 @@ import {
   Image,
 } from "react-native";
 import AntDesign from "react-native-vector-icons/AntDesign";
+import FontAwesome from "react-native-vector-icons/FontAwesome";
 import { styles } from "./styles";
 import { createKoiProfile, getFishByOwner } from "../../redux/slices/fishSlice";
 import { useDispatch, useSelector } from "react-redux";
@@ -53,7 +54,6 @@ const CreateKoiProfile = ({ route, navigation }) => {
         console.error(error);
       }
     };
-
     getData();
   }, []);
 
@@ -74,11 +74,13 @@ const CreateKoiProfile = ({ route, navigation }) => {
   };
 
   const handleMedicineSelect = (medicineId) => {
-    // Toggle selection: deselect if the same medicine is clicked again
     setSelectedMedicineId(selectedMedicineId === medicineId ? "" : medicineId);
   };
 
-  const handleAddToCart = (medicine) => {};
+  const handleAddToCart = (medicine) => {
+    // Placeholder for cart functionality
+    setCart((prev) => [...prev, medicine]);
+  };
 
   const handleSave = () => {
     if (!selectedFishId) {
@@ -98,11 +100,9 @@ const CreateKoiProfile = ({ route, navigation }) => {
       medicineId: selectedMedicineId || null,
       symptoms,
     };
-    console.log("Saving profile with values:", values);
     dispatch(createKoiProfile(values))
       .unwrap()
       .then((res) => {
-        console.log(res);
         Alert.alert("Thành công", "Lưu lịch sử bệnh thành công!");
         navigation.navigate("FishStatistic");
       })
@@ -119,7 +119,6 @@ const CreateKoiProfile = ({ route, navigation }) => {
     })) || []),
   ];
 
-  // Render item for Medicine FlatList
   const renderMedicineItem = ({ item }) => (
     <TouchableOpacity
       style={[
@@ -127,8 +126,13 @@ const CreateKoiProfile = ({ route, navigation }) => {
         selectedMedicineId === item.medicineId && styles.medicineCardSelected,
       ]}
       onPress={() => handleMedicineSelect(item.medicineId)}
+      accessibilityLabel={`Select medicine ${item.name}`}
+      accessibilityRole="button"
     >
       <View style={styles.medicineContent}>
+        <View style={styles.medicineHeader}>
+          <Text style={styles.medicineName}>{item.name}</Text>
+        </View>
         {item.image && (
           <Image
             source={{ uri: item.image }}
@@ -136,7 +140,6 @@ const CreateKoiProfile = ({ route, navigation }) => {
             resizeMode="cover"
           />
         )}
-        <Text style={styles.medicineName}>{item.name}</Text>
         {item.dosageForm && (
           <Text style={styles.medicineDescription} numberOfLines={2}>
             {item.dosageForm}
@@ -145,6 +148,8 @@ const CreateKoiProfile = ({ route, navigation }) => {
         <TouchableOpacity
           style={styles.addToCartButton}
           onPress={() => handleAddToCart(item)}
+          accessibilityLabel={`Add ${item.name} to cart`}
+          accessibilityRole="button"
         >
           <Text style={styles.addToCartButtonText}>Thêm vào giỏ</Text>
         </TouchableOpacity>
@@ -152,7 +157,7 @@ const CreateKoiProfile = ({ route, navigation }) => {
           <AntDesign
             name="checkcircle"
             size={20}
-            color="#007AFF"
+            color="#26A69A"
             style={styles.checkIcon}
           />
         )}
@@ -160,7 +165,6 @@ const CreateKoiProfile = ({ route, navigation }) => {
     </TouchableOpacity>
   );
 
-  // Render item for Symptom and Side Effect FlatList
   const renderListItem = ({ item }) => (
     <View style={styles.listItem}>
       <Text style={styles.listItemText}>• {item.description}</Text>
@@ -175,45 +179,45 @@ const CreateKoiProfile = ({ route, navigation }) => {
         resizeMode="cover"
       >
         <View style={styles.overlay} />
-
-        {/* Header */}
         <View style={styles.header}>
-          <TouchableOpacity onPress={() => navigation.goBack()}>
-            <AntDesign
-              style={{ marginTop: 20, marginLeft: 20 }}
-              name="left"
-              size={24}
-              color="black"
-            />
+          <TouchableOpacity
+            style={styles.backButton}
+            onPress={() => navigation.goBack()}
+            accessibilityLabel="Go back"
+            accessibilityRole="button"
+          >
+            <AntDesign name="left" size={24} color="#004D40" />
           </TouchableOpacity>
-          <Text style={styles.title}>Lịch sử bệnh cá</Text>
+          <Text style={styles.title}>Lịch Sử Bệnh Cá</Text>
           <View style={{ width: 24 }} />
         </View>
-
-        {/* Scrollable Form */}
-        <ScrollView contentContainerStyle={styles.formContainer}>
-          {/* Fish Selection */}
+        <ScrollView
+          contentContainerStyle={styles.formContainer}
+          showsVerticalScrollIndicator={false}
+        >
           <View style={styles.inputContainer}>
-            <Text style={styles.label}>Tên cá koi:</Text>
+            <Text style={styles.label}>Tên Cá Koi</Text>
             <Picker
               data={fishData}
               cols={1}
               value={selectedFishId}
               onChange={(value) => setSelectedFishId(value[0])}
             >
-              <TouchableOpacity style={styles.pickerContainer}>
+              <TouchableOpacity
+                style={styles.pickerContainer}
+                accessibilityLabel="Select a fish"
+                accessibilityRole="button"
+              >
                 <Text style={styles.pickerText}>
                   {fishData.find((fish) => fish.value === selectedFishId)
                     ?.label || "Chọn con cá đang gặp vấn đề"}
                 </Text>
-                <AntDesign name="down" size={16} color="#000" />
+                <AntDesign name="down" size={16} color="#004D40" />
               </TouchableOpacity>
             </Picker>
           </View>
-
-          {/* End Date Picker */}
           <View style={styles.inputContainer}>
-            <Text style={styles.label}>Ngày hết điều trị (dự kiến)</Text>
+            <Text style={styles.label}>Ngày Hết Điều Trị (Dự Kiến)</Text>
             <DatePicker
               value={endDate}
               mode="date"
@@ -224,25 +228,25 @@ const CreateKoiProfile = ({ route, navigation }) => {
               onDismiss={() => setDatePickerVisible(false)}
             >
               <TouchableOpacity
-                style={styles.datePickerContainer}
+                style={styles.pickerContainer}
                 onPress={() => setDatePickerVisible(true)}
+                accessibilityLabel="Select end date"
+                accessibilityRole="button"
               >
-                <Text style={styles.dateText}>
-                  {endDate.toLocaleDateString("en-GB", {
+                <Text style={styles.pickerText}>
+                  {endDate.toLocaleDateString("vi-VN", {
                     day: "numeric",
                     month: "long",
                     year: "numeric",
                   })}
                 </Text>
-                <AntDesign name="calendar" size={20} color="#000" />
+                <AntDesign name="calendar" size={20} color="#004D40" />
               </TouchableOpacity>
             </DatePicker>
           </View>
-
-          {/* Medicines List */}
           {diseaseById && (
             <View style={styles.inputContainer}>
-              <Text style={styles.label}>Thuốc điều trị</Text>
+              <Text style={styles.label}>Thuốc Điều Trị</Text>
               {diseaseById.medicines?.length > 0 ? (
                 <FlatList
                   data={diseaseById.medicines}
@@ -251,7 +255,7 @@ const CreateKoiProfile = ({ route, navigation }) => {
                   horizontal
                   showsHorizontalScrollIndicator={false}
                   snapToAlignment="center"
-                  snapToInterval={160 + 10} // Card width + margin
+                  snapToInterval={180 + 12} // Card width + margin
                   decelerationRate="fast"
                   style={styles.medicineList}
                 />
@@ -262,11 +266,9 @@ const CreateKoiProfile = ({ route, navigation }) => {
               )}
             </View>
           )}
-
-          {/* Cart Contents */}
           {cart.length > 0 && (
             <View style={styles.inputContainer}>
-              <Text style={styles.label}>Giỏ hàng</Text>
+              <Text style={styles.label}>Giỏ Hàng</Text>
               <View style={styles.cartContainer}>
                 {cart.map((item) => (
                   <View key={item.medicineId} style={styles.cartItem}>
@@ -276,54 +278,55 @@ const CreateKoiProfile = ({ route, navigation }) => {
               </View>
             </View>
           )}
-
-          {/* Note Input */}
           <View style={styles.inputContainer}>
-            <Text style={styles.label}>Ghi chú</Text>
+            <Text style={styles.label}>Ghi Chú</Text>
             <TextInput
               style={styles.textInput}
               value={note}
               onChangeText={setNote}
               placeholder="Thêm thông tin ghi chú về thuốc và thức ăn để chăm sóc cá của bạn tốt hơn"
+              placeholderTextColor="#78909C"
               multiline
               numberOfLines={4}
+              accessibilityLabel="Enter notes"
             />
           </View>
-
-          {/* Sick Symptoms List */}
           {diseaseById && (
             <View style={styles.inputContainer}>
-              <Text style={styles.label}>Triệu chứng bệnh</Text>
-              <FlatList
-                data={diseaseById.sickSymtomps || []}
-                renderItem={renderListItem}
-                keyExtractor={(item) => item.id}
-                style={styles.listContainer}
-                initialNumToRender={10}
-                windowSize={5}
-                scrollEnabled={false}
-              />
+              <Text style={styles.label}>Triệu Chứng Bệnh</Text>
+              <View style={styles.listContainer}>
+                <FlatList
+                  data={diseaseById.sickSymtomps || []}
+                  renderItem={renderListItem}
+                  keyExtractor={(item) => item.id}
+                  initialNumToRender={10}
+                  windowSize={5}
+                  scrollEnabled={false}
+                />
+              </View>
             </View>
           )}
-
-          {/* Side Effects List */}
           {diseaseById && (
             <View style={styles.inputContainer}>
-              <Text style={styles.label}>Tác dụng phụ</Text>
-              <FlatList
-                data={diseaseById.sideEffect || []}
-                renderItem={renderListItem}
-                keyExtractor={(item) => item.id}
-                style={styles.listContainer}
-                initialNumToRender={10}
-                windowSize={5}
-                scrollEnabled={false}
-              />
+              <Text style={styles.label}>Tác Dụng Phụ</Text>
+              <View style={styles.listContainer}>
+                <FlatList
+                  data={diseaseById.sideEffect || []}
+                  renderItem={renderListItem}
+                  keyExtractor={(item) => item.id}
+                  initialNumToRender={10}
+                  windowSize={5}
+                  scrollEnabled={false}
+                />
+              </View>
             </View>
           )}
-
-          {/* Submit Button */}
-          <TouchableOpacity style={styles.submitButton} onPress={handleSave}>
+          <TouchableOpacity
+            style={styles.submitButton}
+            onPress={handleSave}
+            accessibilityLabel="Save koi profile"
+            accessibilityRole="button"
+          >
             <Text style={styles.submitButtonText}>Lưu</Text>
           </TouchableOpacity>
         </ScrollView>

@@ -69,6 +69,7 @@ const PackageScreen = ({ navigation }) => {
     const packageTitle = pkg?.packageTitle;
 
     if (isLoggedIn?.packageID) {
+      console.log(email, packageId)
       dispatch(payPackage({ email, packageId, confirmPurchase: false }))
         .unwrap()
         .then((res) => {
@@ -146,7 +147,7 @@ const PackageScreen = ({ navigation }) => {
               }
             );
           } else {
-            Alert.alert("Không thành công", "Gói này đã hết hạn");
+            Alert.alert("Không thành công", res.message);
           }
         })
         .catch((err) => {
