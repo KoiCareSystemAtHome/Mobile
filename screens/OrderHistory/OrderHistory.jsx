@@ -189,7 +189,7 @@ console.log(paginatedOrderData)
                 })}
 
                 <View style={styles.orderFooter}>
-                 <Text style={styles.order Total}>
+                 <Text style={styles.orderTotal}>
                     
                     {order?.shopName}
                   </Text>
